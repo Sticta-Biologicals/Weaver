@@ -29,7 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = os.environ.get(
     'WEAVER_ALLOWED_HOSTS',
-    'weaver.sticta.com,weaver.local,127.0.0.2',
+    'weaver.sticta.com,weaver.local',
 ).split(',')
 
 # Application definition
