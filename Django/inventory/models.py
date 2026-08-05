@@ -2,6 +2,7 @@ import os
 import uuid
 from django.db import models
 import datetime
+from django.conf import settings
 from shortuuidfield import ShortUUIDField
 import shortuuid
 from .custom.box import BOX_ROWS
@@ -22,6 +23,10 @@ RE_Choices = []
 for key in rest_dict:
     if not key.startswith("_"):
         RE_Choices.append((key, key))
+
+
+def generate_shortuuid():
+    return shortuuid.uuid()
 
 
 class Resistance(models.Model):
@@ -171,7 +176,7 @@ class Plasmid(models.Model):
 
     ligation_state = models.IntegerField(choices=LIGATION_STATES, default=2)
 
-    qr_id = ShortUUIDField(default=shortuuid.uuid(), editable=False)
+    qr_id = ShortUUIDField(default=generate_shortuuid, editable=False)
 
     # validation
 
@@ -390,6 +395,119 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
         return False
 
 
+SANGER_AUTOMATED_STATES = (
+    ("PASS", "Verifica"),
+    ("REVIEW", "Requiere revisión"),
+    ("FAIL", "No verifica"),
+    ("NO_DATA", "Sin datos utilizables"),
+)
+
+SANGER_MANUAL_DECISIONS = (
+    ("", "Pending"),
+    ("VERIFIED", "Verified"),
+    ("REJECTED", "Not verified"),
+    ("INCONCLUSIVE", "Inconclusive"),
+    ("PENDING", "Pending"),
+)
+
+SANGER_READ_ORIENTATIONS = (
+    ("forward", "Forward"),
+    ("reverse", "Reverse complement"),
+    ("ambiguous", "Ambiguous"),
+    ("unmapped", "Unmapped"),
+)
+
+SANGER_FILE_FORMATS = (
+    ("ab1", "AB1"),
+    ("phd1", "PHD.1"),
+    ("seq", "SEQ"),
+)
+
+
+def sanger_read_file_upload_to(instance, filename):
+    return "uploads/sanger/{}/{}/{}".format(instance.read.run.plasmid_id, instance.read.run_id, filename)
+
+
+class SangerVerificationRun(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    plasmid = models.ForeignKey(Plasmid, on_delete=models.CASCADE, related_name="sanger_verification_runs")
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, blank=True, null=True, related_name="sanger_verification_runs")
+    created_at = models.DateTimeField(auto_now_add=True)
+    label = models.CharField(max_length=200, blank=True)
+    colony = models.CharField(max_length=100, blank=True)
+    sample = models.CharField(max_length=100, blank=True)
+    notes = models.TextField(blank=True)
+    parameters = models.JSONField(default=dict, blank=True)
+    automated_state = models.CharField(max_length=20, choices=SANGER_AUTOMATED_STATES, default="NO_DATA")
+    automated_reasons = models.JSONField(default=list, blank=True)
+    combined_metrics = models.JSONField(default=dict, blank=True)
+    manual_decision = models.CharField(max_length=20, choices=SANGER_MANUAL_DECISIONS, blank=True, default="")
+    manual_decision_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, blank=True, null=True, related_name="sanger_manual_decisions")
+    manual_decision_at = models.DateTimeField(blank=True, null=True)
+    manual_decision_effective_date = models.DateField(blank=True, null=True)
+    manual_decision_comment = models.TextField(blank=True)
+    clustal_file = models.FileField(upload_to="uploads/sequencing_clustal", blank=True, null=True, max_length=500, validators=[clustal_validate])
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        when = self.created_at.strftime("%Y-%m-%d %H:%M") if self.created_at else ""
+        return "{} Sanger {}".format(self.plasmid.name, when)
+
+
+class SangerRead(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    run = models.ForeignKey(SangerVerificationRun, on_delete=models.CASCADE, related_name="reads")
+    name = models.CharField(max_length=255)
+    detected_orientation = models.CharField(max_length=20, choices=SANGER_READ_ORIENTATIONS, default="unmapped")
+    forced_orientation = models.CharField(max_length=20, choices=SANGER_READ_ORIENTATIONS, blank=True, default="")
+    raw_sequence = models.TextField(blank=True)
+    trimmed_sequence = models.TextField(blank=True)
+    selected_source = models.CharField(max_length=20, blank=True)
+    parsing_result = models.JSONField(default=dict, blank=True)
+    quality_metrics = models.JSONField(default=dict, blank=True)
+    alignment_metrics = models.JSONField(default=dict, blank=True)
+    warnings = models.JSONField(default=list, blank=True)
+    is_usable = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
+class SangerReadFile(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    read = models.ForeignKey(SangerRead, on_delete=models.CASCADE, related_name="files")
+    format = models.CharField(max_length=10, choices=SANGER_FILE_FORMATS)
+    original_name = models.CharField(max_length=255)
+    file = models.FileField(upload_to=sanger_read_file_upload_to, blank=True, max_length=500)
+    sha256 = models.CharField(max_length=64)
+    size = models.PositiveIntegerField(default=0)
+    metadata = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        ordering = ["format", "original_name"]
+
+
+class SangerVariant(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    run = models.ForeignKey(SangerVerificationRun, on_delete=models.CASCADE, related_name="variants")
+    read = models.ForeignKey(SangerRead, on_delete=models.CASCADE, related_name="variants", blank=True, null=True)
+    coordinate = models.PositiveIntegerField(help_text="0-based plasmid coordinate")
+    variant_type = models.CharField(max_length=20)
+    expected_base = models.CharField(max_length=20, blank=True)
+    observed_base = models.CharField(max_length=20, blank=True)
+    quality = models.IntegerField(blank=True, null=True)
+    evidence = models.JSONField(default=dict, blank=True)
+    flags = models.JSONField(default=list, blank=True)
+
+    class Meta:
+        ordering = ["coordinate", "variant_type"]
+
+
 class Strain(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=200, blank=True)
@@ -416,7 +534,7 @@ class GlycerolStock(models.Model):
     box_row = models.CharField(max_length=1, choices=BOX_ROWS, help_text="Click box position (below) to autocomplete")
     box_column = models.IntegerField(choices=BOX_COLUMNS, help_text="Click box position (below) to autocomplete")
     box = models.ForeignKey(Box, on_delete=models.CASCADE, help_text="Click box position (below) to autocomplete")
-    qr_id = ShortUUIDField(default=shortuuid.uuid(), editable=False)
+    qr_id = ShortUUIDField(default=generate_shortuuid, editable=False)
     details = models.CharField(max_length=1000, blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
@@ -438,7 +556,7 @@ class Primer(models.Model):
                                   help_text="5' → 3' direction")
     fwd_or_rev = models.CharField(choices=FWD_OR_REV, max_length=1, blank=True)
     intended_use = models.CharField(max_length=1000, blank=True)
-    qr_id = ShortUUIDField(default=shortuuid.uuid(), editable=False)
+    qr_id = ShortUUIDField(default=generate_shortuuid, editable=False)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
     def __str__(self):

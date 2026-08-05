@@ -3,6 +3,7 @@ from django import forms
 from .models import Plasmid
 from .models import Primer
 from .models import GlycerolStock
+from .custom.primer_access import visible_primers_for_user
 from .custom.standards import assembly_standards
 from organization.views import get_projects_where_member_can
 from organization.views import get_projects_where_member_can_any
@@ -39,17 +40,64 @@ class L0SequenceInput(forms.Form):
     enzyme = forms.CharField(required=True, widget=forms.HiddenInput())
 
 
+class FastaFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class FastaFileField(forms.FileField):
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            return [single_file_clean(d, initial) for d in data]
+        return single_file_clean(data, initial)
+
+
 class FastaAlignForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(FastaAlignForm, self).__init__(*args, **kwargs)
+        self.fields['fasta_sequence'].widget.attrs.update({'class': 'form-control', 'rows': 10, 'placeholder': '>query\nACGT...'})
+        self.fields['fasta_file'].widget.attrs.update({'class': 'form-control', 'accept': '.fa,.fas,.fasta,.txt'})
+        self.fields['alignment_view_mode'].widget.attrs.update({'class': 'form-select'})
+        self.fields['save_clustal_file'].widget.attrs.update({'class': 'form-check-input'})
+
     fasta_sequence = forms.CharField(widget=forms.Textarea(attrs={}), required=False)
+    alignment_view_mode = forms.ChoiceField(
+        label="View mode",
+        choices=(("combined", "Together"), ("individual", "One at a time")),
+        initial="combined",
+    )
     save_clustal_file = forms.BooleanField(required=False)
-    is_reversed = forms.BooleanField(label="Is reversed?", required=False)
-    fasta_file = forms.FileField(label="Fasta File", required=False)
+    fasta_file = FastaFileField(label="Fasta File", required=False, widget=FastaFileInput(attrs={"multiple": True}))
+
+
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            return [single_file_clean(d, initial) for d in data]
+        return single_file_clean(data, initial)
 
 
 class SangerAlignForm(forms.Form):
     save_clustal_file = forms.BooleanField(required=False)
-    is_reversed = forms.BooleanField(label="Is reversed?", required=False)
-    ab1 = forms.FileField(label="AB1 File", required=True)
+    label = forms.CharField(label="Run label", required=False, max_length=200)
+    notes = forms.CharField(label="Notes", required=False, widget=forms.Textarea(attrs={"rows": 2}))
+    sanger_files = MultipleFileField(label="Sanger files", required=False, widget=MultipleFileInput(attrs={
+        "multiple": True,
+        "accept": ".ab1,.phd.1,.seq,.fa,.fas,.fasta",
+        "id": "id_sanger_files",
+    }))
+    ab1 = forms.FileField(label="AB1 File", required=False)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not self.files.getlist("sanger_files") and not self.files.get("ab1"):
+            raise forms.ValidationError("Upload at least one .ab1, .phd.1, or .seq file.")
+        return cleaned_data
 
 
 class DateInput(forms.DateInput):
@@ -124,12 +172,70 @@ class DigestForm(forms.Form):
 
 
 class PCRForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(PCRForm, self).__init__(*args, **kwargs)
+        if user is not None:
+            queryset = visible_primers_for_user(user).order_by('name')
+            self.fields['primer_f'].queryset = queryset
+            self.fields['primer_r'].queryset = queryset
+
     primer_f = forms.ModelChoiceField(queryset=Primer.objects.all(), to_field_name="id", label="Primer F",
                                       required=False)
     primer_r = forms.ModelChoiceField(queryset=Primer.objects.all(), to_field_name="id", label="Primer R",
                                       required=False)
     primer_f_seq = forms.CharField(label="Primer F sequence", required=False)
     primer_r_seq = forms.CharField(label="Primer R sequence", required=False)
+
+
+class PrimerBatchUploadForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(PrimerBatchUploadForm, self).__init__(*args, **kwargs)
+        self.fields['fasta_file'].widget.attrs.update({'class': 'form-control', 'accept': '.fa,.fas,.fasta,.txt'})
+        self.fields['name_source'].widget.attrs.update({'class': 'form-select'})
+        self.fields['default_direction'].widget.attrs.update({'class': 'form-select'})
+        self.fields['update_existing'].widget.attrs.update({'class': 'form-check-input'})
+
+    fasta_file = forms.FileField(label="FASTA file")
+    update_existing = forms.BooleanField(label="Update existing primers with the same name", required=False)
+    name_source = forms.ChoiceField(
+        label="Primer name source",
+        choices=(("id", "FASTA ID"), ("description", "Full FASTA description")),
+        initial="id",
+    )
+    default_direction = forms.ChoiceField(
+        label="Direction when F/R is not in the name",
+        choices=(("f", "Forward"), ("r", "Reverse"), ("", "Leave empty")),
+        initial="f",
+        required=False,
+    )
+
+
+class ServicesPCRForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(ServicesPCRForm, self).__init__(*args, **kwargs)
+        if user is not None:
+            primers = visible_primers_for_user(user).order_by('name')
+            self.fields['primer_f'].queryset = primers.filter(fwd_or_rev='f')
+            self.fields['primer_r'].queryset = primers.filter(fwd_or_rev='r')
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
+        self.fields['primer_f'].widget.attrs.update({'class': 'form-select'})
+        self.fields['primer_r'].widget.attrs.update({'class': 'form-select'})
+
+    primer_f = forms.ModelChoiceField(queryset=Primer.objects.none(), to_field_name="id", label="Forward primer")
+    primer_r = forms.ModelChoiceField(queryset=Primer.objects.none(), to_field_name="id", label="Reverse primer")
+    min_product_size = forms.IntegerField(label="Minimum product size", min_value=1, initial=100)
+    max_product_size = forms.IntegerField(label="Maximum product size", min_value=1, required=False)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        min_product_size = cleaned_data.get('min_product_size')
+        max_product_size = cleaned_data.get('max_product_size')
+        if min_product_size and max_product_size and max_product_size < min_product_size:
+            raise forms.ValidationError("Maximum product size must be greater than or equal to minimum product size.")
+        return cleaned_data
 
 
 class MsaUploadAb1FilesForm(forms.Form):

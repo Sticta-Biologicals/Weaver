@@ -22,6 +22,7 @@ from .views import PlasmidValidationFromLink
 from .views import ServicesBlast
 from .views import ServicesGtr
 from .views import ServicesL0d
+from .views import ServicesPcr
 from .views import ServicesStats
 from .views import api_plasmid_get_fasta_by_name
 from .views import api_plasmid_get_fasta_by_idx
@@ -48,7 +49,17 @@ urlpatterns = [
     path('plasmid/download/<uuid:plasmid_id>', login_required(views.plasmid_download, redirect_field_name='next'), name='plasmid_download'),
     path('plasmid/download/clustal/<uuid:plasmid_id>', login_required(views.plasmid_download_clustal, redirect_field_name='next'), name='plasmid_download_clustal'),
     path('plasmid/view_edit/<uuid:plasmid_id>', login_required(views.plasmid_view_edit, redirect_field_name='next'), name='plasmid_view_edit'),
+    path('plasmid/seq_verification_<int:weaver_id>', login_required(views.plasmid_seq_verification_entry, redirect_field_name='next'), name='plasmid_seq_verification_entry'),
+    path('plasmid/seq_verification_<int:weaver_id>/', login_required(views.plasmid_seq_verification_entry, redirect_field_name='next'), name='plasmid_seq_verification_entry_slash'),
+    path('plasmid/seq_verification/<uuid:plasmid_id>', login_required(views.plasmid_seq_verification_entry_by_uuid, redirect_field_name='next'), name='plasmid_seq_verification_entry_uuid'),
+    path('plasmid/seq_verification/<uuid:plasmid_id>/', login_required(views.plasmid_seq_verification_entry_by_uuid, redirect_field_name='next'), name='plasmid_seq_verification_entry_uuid_slash'),
+    path('plasmid/align/<uuid:plasmid_id>', login_required(views.plasmid_align_sanger, redirect_field_name='next'), name='plasmid_align'),
     path('plasmid/align/sanger/<uuid:plasmid_id>', login_required(views.plasmid_align_sanger, redirect_field_name='next'), name='plasmid_align_sanger'),
+    path('plasmid/align/sanger/<uuid:plasmid_id>/run/<uuid:run_id>', login_required(views.sanger_run_detail, redirect_field_name='next'), name='sanger_run_detail'),
+    path('plasmid/align/sanger/<uuid:plasmid_id>/run/<uuid:run_id>/read/<uuid:read_id>/chromatogram', login_required(views.sanger_read_chromatogram, redirect_field_name='next'), name='sanger_read_chromatogram'),
+    path('plasmid/align/sanger/<uuid:plasmid_id>/run/<uuid:run_id>/download/<str:kind>', login_required(views.sanger_run_download, redirect_field_name='next'), name='sanger_run_download'),
+    path('plasmid/align/sanger/<uuid:plasmid_id>/run/<uuid:run_id>/decision', login_required(views.sanger_run_decision, redirect_field_name='next'), name='sanger_run_decision'),
+    path('plasmid/align/sanger/<uuid:plasmid_id>/run/<uuid:run_id>/delete', login_required(views.sanger_run_delete, redirect_field_name='next'), name='sanger_run_delete'),
     path('plasmid/align/fasta/<uuid:plasmid_id>', login_required(views.plasmid_align_fasta, redirect_field_name='next'), name='plasmid_align_fasta'),
     path('plasmid/digest/<uuid:plasmid_id>', login_required(views.plasmid_digest, redirect_field_name='next'), name='plasmid_digest'),
     path('plasmid/pcr/<uuid:plasmid_id>', login_required(views.plasmid_pcr, redirect_field_name='next'), name='plasmid_pcr'),
@@ -76,12 +87,14 @@ urlpatterns = [
     path('primers/', login_required(views.primers, redirect_field_name='next'), name='primers'),
     path('primer/<uuid:primer_id>/', login_required(views.primer, redirect_field_name='next'), name='primer'),
     path('primer/create/', login_required(PrimerCreate.as_view(), redirect_field_name='next'), name='primer_create'),
+    path('primer/import/', login_required(views.primer_import, redirect_field_name='next'), name='primer_import'),
     path('primer/edit/<uuid:pk>/', login_required(PrimerEdit.as_view(), redirect_field_name='next'), name='primer_edit'),
     path('primer/delete/<uuid:pk>/', login_required(PrimerDelete.as_view(), redirect_field_name='next'), name='primer_delete'),
 
     path('services/blast/', login_required(ServicesBlast, redirect_field_name='next'), name='services-blast'),
     path('services/gtr/', login_required(ServicesGtr, redirect_field_name='next'), name='services-gtr'),
     path('services/l0d/', login_required(ServicesL0d, redirect_field_name='next'), name='services-l0d'),
+    path('services/pcr/', login_required(ServicesPcr, redirect_field_name='next'), name='services-pcr'),
     path('services/stats/', login_required(ServicesStats, redirect_field_name='next'), name='services-stats'),
 
     path('experiments', login_required(views.experiments, redirect_field_name='next'), name='experiments'),
@@ -89,7 +102,11 @@ urlpatterns = [
     #path('api/plasmid/get_fasta/by_name/<str:name>/', api_plasmid_get_fasta_by_name, name='api-plasmid-get_fasta_by_name'),
     #path('api/plasmid/get_fasta/by_idx/<int:idx>/', api_plasmid_get_fasta_by_idx, name='api-plasmid-get_fasta_by_idx'),
     path('api/fidelity_calc/<str:enzyme>/<str:ohs>', login_required(views.api_fidelity_calc, redirect_field_name='next'), name='api-fidelity_calc'),
+    path('api/experiments-map/', login_required(views.api_experiments_map, redirect_field_name='next'), name='api-experiments-map'),
     path('api/plasmids/', login_required(views.api_plasmids, redirect_field_name='next'), name='api-plasmids'),
+    path('api/plasmid/<uuid:plasmid_id>/primer-matches/', login_required(views.api_plasmid_primer_matches, redirect_field_name='next'), name='api-plasmid-primer-matches'),
+    path('api/plasmid/<uuid:plasmid_id>/amplicon-matches/', login_required(views.api_plasmid_amplicon_matches, redirect_field_name='next'), name='api-plasmid-amplicon-matches'),
+    path('api/plasmid/<uuid:plasmid_id>/restriction-digests/', login_required(views.api_plasmid_restriction_digests, redirect_field_name='next'), name='api-plasmid-restriction-digests'),
     # path('api/plasmids/', views.api_plasmids, name='api-plasmids'),
     path('api/parts/<str:enzyme_name>/<str:assembly_standard>/', login_required(views.api_parts, redirect_field_name='next'), name='api-parts'),
     # path('api/parts/<str:enzyme_name>/<str:assembly_standard>/', views.api_parts, name='api-parts'),

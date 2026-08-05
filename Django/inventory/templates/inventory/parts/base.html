@@ -42,6 +42,10 @@
     <script defer type="text/javascript" src="{% static 'js/l0d.js' %}{{version}}"></script>
     <link rel="stylesheet" type="text/css" media="all" href="{% static 'css/l0d.css' %}{{version}}"/>
     {% endif %}
+    {% if request.path == "/inventory/experiments" %}
+    <script defer type="module" src="{% static 'experiments-reactflow/experiments-flow.js' %}{{version}}"></script>
+    <link rel="stylesheet" type="text/css" media="all" href="{% static 'experiments-reactflow/experiments-flow.css' %}{{version}}"/>
+    {% endif %}
     <!-- /JS -->
 
     <!-- Sorteable tables -->

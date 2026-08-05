@@ -27,11 +27,7 @@
                                     <div class="alert alert-light">
                                         {{experiment.description}}
                                     </div>
-                                    <div class="experiment-wrapper p-4">
-                                        {% for plasmid in experiment.plasmids.all %}
-                                            {% include "inventory/parts/experiments-iterator.html" %}
-                                        {% endfor %}
-                                    </div>
+                                    <div class="weaver-experiment-flow mb-4" data-experiment-id="{{experiment.id}}"></div>
                                 </div>
                             </div>
                         </div>

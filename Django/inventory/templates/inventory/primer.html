@@ -16,8 +16,12 @@
     </thead>
     <tbody>
     <tr>
+        <th scope="row">ID</th>
+        <td>{{primer.display_idx|default_if_none:""}}</td>
+    </tr>
+    <tr>
         <th scope="row">Primer</th>
-        <td>{{primer.name}}</td>
+        <td>{{primer.display_name|default:primer.name}}</td>
     </tr>
     <tr>
         <th scope="row">Sequence (5' → 3') (5' overhang undelined)</th>

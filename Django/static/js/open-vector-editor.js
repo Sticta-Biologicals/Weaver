@@ -8609,8 +8609,8 @@ var __async = (__this, __arguments, generator) => {
     return target;
   }
   __name(_objectWithoutPropertiesLoose$5, "_objectWithoutPropertiesLoose$5");
-  function _extends$j() {
-    _extends$j = Object.assign ? Object.assign.bind() : function(target) {
+  function _extends$k() {
+    _extends$k = Object.assign ? Object.assign.bind() : function(target) {
       for (var i2 = 1; i2 < arguments.length; i2++) {
         var source = arguments[i2];
         for (var key in source) {
@@ -8621,9 +8621,9 @@ var __async = (__this, __arguments, generator) => {
       }
       return target;
     };
-    return _extends$j.apply(this, arguments);
+    return _extends$k.apply(this, arguments);
   }
-  __name(_extends$j, "_extends$j");
+  __name(_extends$k, "_extends$k");
   function _setPrototypeOf$3(o2, p2) {
     _setPrototypeOf$3 = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : /* @__PURE__ */ __name(function _setPrototypeOf2(o3, p3) {
       o3.__proto__ = p3;
@@ -10454,7 +10454,7 @@ var __async = (__this, __arguments, generator) => {
     }
     return obj;
   }, "defineProperty$2");
-  var _extends$i = Object.assign || function(target) {
+  var _extends$j = Object.assign || function(target) {
     for (var i2 = 1; i2 < arguments.length; i2++) {
       var source = arguments[i2];
       for (var key in source) {
@@ -10466,7 +10466,7 @@ var __async = (__this, __arguments, generator) => {
     return target;
   };
   function getClientRect$1(offsets) {
-    return _extends$i({}, offsets, {
+    return _extends$j({}, offsets, {
       right: offsets.left + offsets.width,
       bottom: offsets.top + offsets.height
     });
@@ -10658,7 +10658,7 @@ var __async = (__this, __arguments, generator) => {
       }
     };
     var sortedAreas = Object.keys(rects).map(function(key) {
-      return _extends$i({
+      return _extends$j({
         key
       }, rects[key], {
         area: getArea(rects[key])
@@ -10990,9 +10990,9 @@ var __async = (__this, __arguments, generator) => {
     var attributes = {
       "x-placement": data.placement
     };
-    data.attributes = _extends$i({}, attributes, data.attributes);
-    data.styles = _extends$i({}, styles2, data.styles);
-    data.arrowStyles = _extends$i({}, data.offsets.arrow, data.arrowStyles);
+    data.attributes = _extends$j({}, attributes, data.attributes);
+    data.styles = _extends$j({}, styles2, data.styles);
+    data.arrowStyles = _extends$j({}, data.offsets.arrow, data.arrowStyles);
     return data;
   }
   __name(computeStyle, "computeStyle");
@@ -11132,7 +11132,7 @@ var __async = (__this, __arguments, generator) => {
           variation = getOppositeVariation(variation);
         }
         data.placement = placement + (variation ? "-" + variation : "");
-        data.offsets.popper = _extends$i({}, data.offsets.popper, getPopperOffsets(data.instance.popper, data.offsets.reference, data.placement));
+        data.offsets.popper = _extends$j({}, data.offsets.popper, getPopperOffsets(data.instance.popper, data.offsets.reference, data.placement));
         data = runModifiers(data.instance.modifiers, data, "flip");
       }
     });
@@ -11296,7 +11296,7 @@ var __async = (__this, __arguments, generator) => {
     };
     order2.forEach(function(placement) {
       var side = ["left", "top"].indexOf(placement) !== -1 ? "primary" : "secondary";
-      popper2 = _extends$i({}, popper2, check2[side](placement));
+      popper2 = _extends$j({}, popper2, check2[side](placement));
     });
     data.offsets.popper = popper2;
     return data;
@@ -11315,7 +11315,7 @@ var __async = (__this, __arguments, generator) => {
         start: defineProperty$2({}, side, reference2[side]),
         end: defineProperty$2({}, side, reference2[side] + reference2[measurement] - popper2[measurement])
       };
-      data.offsets.popper = _extends$i({}, popper2, shiftOffsets[shiftvariation]);
+      data.offsets.popper = _extends$j({}, popper2, shiftOffsets[shiftvariation]);
     }
     return data;
   }
@@ -11721,7 +11721,7 @@ var __async = (__this, __arguments, generator) => {
         return requestAnimationFrame(_this.update);
       };
       this.update = debounce$3(this.update.bind(this));
-      this.options = _extends$i({}, Popper2.Defaults, options);
+      this.options = _extends$j({}, Popper2.Defaults, options);
       this.state = {
         isDestroyed: false,
         isCreated: false,
@@ -11730,11 +11730,11 @@ var __async = (__this, __arguments, generator) => {
       this.reference = reference2 && reference2.jquery ? reference2[0] : reference2;
       this.popper = popper2 && popper2.jquery ? popper2[0] : popper2;
       this.options.modifiers = {};
-      Object.keys(_extends$i({}, Popper2.Defaults.modifiers, options.modifiers)).forEach(function(name2) {
-        _this.options.modifiers[name2] = _extends$i({}, Popper2.Defaults.modifiers[name2] || {}, options.modifiers ? options.modifiers[name2] : {});
+      Object.keys(_extends$j({}, Popper2.Defaults.modifiers, options.modifiers)).forEach(function(name2) {
+        _this.options.modifiers[name2] = _extends$j({}, Popper2.Defaults.modifiers[name2] || {}, options.modifiers ? options.modifiers[name2] : {});
       });
       this.modifiers = Object.keys(this.options.modifiers).map(function(name2) {
-        return _extends$i({
+        return _extends$j({
           name: name2
         }, _this.options.modifiers[name2]);
       }).sort(function(a2, b3) {
@@ -12201,8 +12201,8 @@ var __async = (__this, __arguments, generator) => {
           placement: _this.props.placement,
           eventsEnabled: _this.props.eventsEnabled,
           positionFixed: _this.props.positionFixed,
-          modifiers: _extends$j({}, _this.props.modifiers, {
-            arrow: _extends$j({}, _this.props.modifiers && _this.props.modifiers.arrow, {
+          modifiers: _extends$k({}, _this.props.modifiers, {
+            arrow: _extends$k({}, _this.props.modifiers && _this.props.modifiers.arrow, {
               enabled: !!_this.arrowNode,
               element: _this.arrowNode
             }),
@@ -12214,7 +12214,7 @@ var __async = (__this, __arguments, generator) => {
         };
       });
       _defineProperty$9(_assertThisInitialized$1(_assertThisInitialized$1(_this)), "getPopperStyle", function() {
-        return !_this.popperNode || !_this.state.data ? initialStyle : _extends$j({
+        return !_this.popperNode || !_this.state.data ? initialStyle : _extends$k({
           position: _this.state.data.offsets.popper.position
         }, _this.state.data.styles);
       });
@@ -12289,7 +12289,7 @@ var __async = (__this, __arguments, generator) => {
   function Popper(_ref) {
     var referenceElement = _ref.referenceElement, props = _objectWithoutPropertiesLoose$5(_ref, ["referenceElement"]);
     return reactExports.createElement(ManagerReferenceNodeContext.Consumer, null, function(referenceNode) {
-      return reactExports.createElement(InnerPopper, _extends$j({
+      return reactExports.createElement(InnerPopper, _extends$k({
         referenceElement: referenceElement !== void 0 ? referenceElement : referenceNode
       }, props));
     });
@@ -12326,7 +12326,7 @@ var __async = (__this, __arguments, generator) => {
   }(reactExports.Component);
   function Reference(props) {
     return reactExports.createElement(ManagerReferenceNodeSetterContext.Consumer, null, function(setReferenceNode) {
-      return reactExports.createElement(InnerReference, _extends$j({
+      return reactExports.createElement(InnerReference, _extends$k({
         setReferenceNode
       }, props));
     });
@@ -22537,6 +22537,13 @@ var __async = (__this, __arguments, generator) => {
     isDragging$1 = false;
   });
   let tippys = [];
+  function isInAllowedContainer(element2) {
+    if (window.onlyAllowTooltipsInVeEditor) {
+      return element2.closest(".veEditor") !== null;
+    }
+    return true;
+  }
+  __name(isInAllowedContainer, "isInAllowedContainer");
   let recentlyHidden = false;
   let clearMe;
   (function() {
@@ -22544,6 +22551,9 @@ var __async = (__this, __arguments, generator) => {
     document.addEventListener("mouseover", function(event) {
       var _a2, _b2;
       const element2 = event.target;
+      if (!isInAllowedContainer(element2)) {
+        return;
+      }
       if (element2 instanceof Element && element2 !== lastMouseOverElement) {
         let clearOldTippys = /* @__PURE__ */ __name(function(maybeInst) {
           tippys = tippys.filter((t2) => {
@@ -25003,7 +25013,7 @@ var __async = (__this, __arguments, generator) => {
     }
     return {
       type: INITIALIZE,
-      meta: _extends$j({
+      meta: _extends$k({
         form: form2,
         keepDirty
       }, otherMeta),
@@ -25223,7 +25233,7 @@ var __async = (__this, __arguments, generator) => {
   var renderChildren = /* @__PURE__ */ __name(function renderChildren2(Component, _ref) {
     var forwardedRef = _ref.forwardedRef, rest = _objectWithoutPropertiesLoose$5(_ref, ["forwardedRef"]);
     return function(_reduxForm) {
-      return reactExports.createElement(Component, _extends$j({}, rest, {
+      return reactExports.createElement(Component, _extends$k({}, rest, {
         _reduxForm,
         ref: forwardedRef
       }));
@@ -25245,7 +25255,7 @@ var __async = (__this, __arguments, generator) => {
       return Hoc2;
     }(reactExports.Component);
     var ref2 = reactExports.forwardRef(function(props, ref3) {
-      return reactExports.createElement(Hoc, _extends$j({}, props, {
+      return reactExports.createElement(Hoc, _extends$k({}, props, {
         forwardedRef: ref3
       }));
     });
@@ -26144,7 +26154,7 @@ var __async = (__this, __arguments, generator) => {
   }
   __name(mapStateToPropsFactory, "mapStateToPropsFactory");
   function defaultMergeProps(stateProps, dispatchProps, ownProps) {
-    return _extends$j({}, ownProps, stateProps, dispatchProps);
+    return _extends$k({}, ownProps, stateProps, dispatchProps);
   }
   __name(defaultMergeProps, "defaultMergeProps");
   function wrapMergePropsFunc(mergeProps) {
@@ -26468,7 +26478,7 @@ var __async = (__this, __arguments, generator) => {
           if (didStoreComeFromProps) {
             return contextValue;
           }
-          return _extends$j({}, contextValue, {
+          return _extends$k({}, contextValue, {
             subscription
           });
         }, [didStoreComeFromProps, contextValue, subscription]);
@@ -26546,7 +26556,7 @@ ${latestSubscriptionCallbackError.current.stack}
         const renderedWrappedComponent = reactExports.useMemo(() => {
           return (
             // @ts-ignore
-            /* @__PURE__ */ reactExports.createElement(WrappedComponent, _extends$j({}, actualChildProps, {
+            /* @__PURE__ */ reactExports.createElement(WrappedComponent, _extends$k({}, actualChildProps, {
               ref: reactReduxForwardedRef
             }))
           );
@@ -26568,7 +26578,7 @@ ${latestSubscriptionCallbackError.current.stack}
       Connect.displayName = ConnectFunction.displayName = displayName;
       if (forwardRef2) {
         const _forwarded = reactExports.forwardRef(/* @__PURE__ */ __name(function forwardConnectRef(props, ref2) {
-          return /* @__PURE__ */ reactExports.createElement(Connect, _extends$j({}, props, {
+          return /* @__PURE__ */ reactExports.createElement(Connect, _extends$k({}, props, {
             reactReduxForwardedRef: ref2
           }));
         }, "forwardConnectRef"));
@@ -26656,23 +26666,23 @@ ${latestSubscriptionCallbackError.current.stack}
   var processProps = /* @__PURE__ */ __name(function processProps2(type2, props, _value, deepEqual2) {
     var value = props.value;
     if (type2 === "checkbox") {
-      return _extends$j({}, props, {
+      return _extends$k({}, props, {
         checked: !!value
       });
     }
     if (type2 === "radio") {
-      return _extends$j({}, props, {
+      return _extends$k({}, props, {
         checked: deepEqual2(value, _value),
         value: _value
       });
     }
     if (type2 === "select-multiple") {
-      return _extends$j({}, props, {
+      return _extends$k({}, props, {
         value: value || []
       });
     }
     if (type2 === "file") {
-      return _extends$j({}, props, {
+      return _extends$k({}, props, {
         value: value || void 0
       });
     }
@@ -26707,7 +26717,7 @@ ${latestSubscriptionCallbackError.current.stack}
         onFocus,
         value: formattedFieldValue
       }, _value, deepEqual2),
-      meta: _extends$j({}, toJS2(state2), {
+      meta: _extends$k({}, toJS2(state2), {
         active: !!(state2 && getIn2(state2, "active")),
         asyncValidating,
         autofilled: !!(state2 && getIn2(state2, "autofilled")),
@@ -26725,7 +26735,7 @@ ${latestSubscriptionCallbackError.current.stack}
         valid: !error,
         visited: !!(state2 && getIn2(state2, "visited"))
       }),
-      custom: _extends$j({}, custom, {}, props)
+      custom: _extends$k({}, custom, {}, props)
     };
   }
   __name(createFieldProps, "createFieldProps");
@@ -27718,7 +27728,7 @@ ${latestSubscriptionCallbackError.current.stack}
       copy[parseInt(first, 10)] = next;
       return copy;
     }
-    return _extends$j({}, state2, (_extends2 = {}, _extends2[first] = next, _extends2));
+    return _extends$k({}, state2, (_extends2 = {}, _extends2[first] = next, _extends2));
   }, "setInWithPath");
   var setIn = /* @__PURE__ */ __name(function setIn2(state2, field, value) {
     return setInWithPath(state2, value, _toPath(field), 0);
@@ -28748,7 +28758,7 @@ ${latestSubscriptionCallbackError.current.stack}
       if (first in state2) {
         var _extends2;
         var _result = deleteInWithPath.apply(void 0, [state2 && state2[first]].concat(rest));
-        return state2[first] === _result ? state2 : _extends$j({}, state2, (_extends2 = {}, _extends2[first] = _result, _extends2));
+        return state2[first] === _result ? state2 : _extends$k({}, state2, (_extends2 = {}, _extends2[first] = _result, _extends2));
       }
       return state2;
     }
@@ -28765,7 +28775,7 @@ ${latestSubscriptionCallbackError.current.stack}
       return state2;
     }
     if (first in state2) {
-      var _copy2 = _extends$j({}, state2);
+      var _copy2 = _extends$k({}, state2);
       delete _copy2[first];
       return _copy2;
     }
@@ -28880,7 +28890,7 @@ ${latestSubscriptionCallbackError.current.stack}
           var defaultPrevented = false;
           if (onChange) {
             if (!isReactNative && isEvent(event)) {
-              onChange(_extends$j({}, event, {
+              onChange(_extends$k({}, event, {
                 preventDefault: /* @__PURE__ */ __name(function preventDefault2() {
                   defaultPrevented = true;
                   return eventPreventDefault(event);
@@ -28905,7 +28915,7 @@ ${latestSubscriptionCallbackError.current.stack}
           var defaultPrevented = false;
           if (onFocus) {
             if (!isReactNative) {
-              onFocus(_extends$j({}, event, {
+              onFocus(_extends$k({}, event, {
                 preventDefault: /* @__PURE__ */ __name(function preventDefault2() {
                   defaultPrevented = true;
                   return eventPreventDefault(event);
@@ -28932,7 +28942,7 @@ ${latestSubscriptionCallbackError.current.stack}
           var defaultPrevented = false;
           if (onBlur) {
             if (!isReactNative) {
-              onBlur(_extends$j({}, event, {
+              onBlur(_extends$k({}, event, {
                 preventDefault: /* @__PURE__ */ __name(function preventDefault2() {
                   defaultPrevented = true;
                   return eventPreventDefault(event);
@@ -28961,7 +28971,7 @@ ${latestSubscriptionCallbackError.current.stack}
           var newValue = eventDataTransferGetData(event, dataKey);
           var defaultPrevented = false;
           if (onDrop) {
-            onDrop(_extends$j({}, event, {
+            onDrop(_extends$k({}, event, {
               preventDefault: /* @__PURE__ */ __name(function preventDefault2() {
                 defaultPrevented = true;
                 return eventPreventDefault(event);
@@ -29001,7 +29011,7 @@ ${latestSubscriptionCallbackError.current.stack}
         _this$props6.onDrop;
         _this$props6.immutableProps;
         var rest = _objectWithoutPropertiesLoose$5(_this$props6, ["component", "forwardRef", "name", "_reduxForm", "normalize", "onBlur", "onChange", "onFocus", "onDragStart", "onDrop", "immutableProps"]);
-        var _createFieldProps = createFieldProps(structure$1, name2, _extends$j({}, rest, {
+        var _createFieldProps = createFieldProps(structure$1, name2, _extends$k({}, rest, {
           form: _reduxForm.form,
           onBlur: this.handleBlur,
           onChange: this.handleChange,
@@ -29015,9 +29025,9 @@ ${latestSubscriptionCallbackError.current.stack}
         if (typeof component === "string") {
           var input = props.input;
           props.meta;
-          return reactExports.createElement(component, _extends$j({}, input, {}, custom));
+          return reactExports.createElement(component, _extends$k({}, input, {}, custom));
         } else {
-          return reactExports.createElement(component, _extends$j({}, props, {}, custom));
+          return reactExports.createElement(component, _extends$k({}, props, {}, custom));
         }
       }, "render");
       return ConnectedField2;
@@ -29127,7 +29137,7 @@ ${latestSubscriptionCallbackError.current.stack}
         return this.ref.current ? this.ref.current.getRenderedComponent() : void 0;
       }, "getRenderedComponent");
       _proto.render = /* @__PURE__ */ __name(function render2() {
-        return reactExports.createElement(ConnectedField, _extends$j({}, this.props, {
+        return reactExports.createElement(ConnectedField, _extends$k({}, this.props, {
           name: this.name,
           normalize: this.normalize,
           ref: this.ref
@@ -29954,7 +29964,7 @@ ${latestSubscriptionCallbackError.current.stack}
     var error = syncError || asyncError || submitError;
     var warning2 = syncWarning;
     var fieldName = sectionPrefix ? name2.replace(sectionPrefix + ".", "") : name2;
-    var finalProps = _extends$j({
+    var finalProps = _extends$k({
       fields: {
         _isFieldArray: true,
         forEach: /* @__PURE__ */ __name(function forEach2(callback2) {
@@ -30196,7 +30206,7 @@ ${latestSubscriptionCallbackError.current.stack}
         return this.ref && this.ref.current.getRenderedComponent();
       }, "getRenderedComponent");
       _proto.render = /* @__PURE__ */ __name(function render2() {
-        return reactExports.createElement(ConnectedFieldArray, _extends$j({}, this.props, {
+        return reactExports.createElement(ConnectedFieldArray, _extends$k({}, this.props, {
           name: this.name,
           ref: this.ref
         }));
@@ -31014,7 +31024,7 @@ ${latestSubscriptionCallbackError.current.stack}
   __name(generateValidator, "generateValidator");
   var mergeErrors = /* @__PURE__ */ __name(function mergeErrors2(_ref) {
     var asyncErrors = _ref.asyncErrors, syncErrors = _ref.syncErrors;
-    return asyncErrors && typeof asyncErrors.merge === "function" ? asyncErrors.merge(syncErrors).toJS() : _extends$j({}, asyncErrors, {}, syncErrors);
+    return asyncErrors && typeof asyncErrors.merge === "function" ? asyncErrors.merge(syncErrors).toJS() : _extends$k({}, asyncErrors, {}, syncErrors);
   }, "mergeErrors");
   var executeSubmit = /* @__PURE__ */ __name(function executeSubmit2(submit2, fields, props) {
     var dispatch = props.dispatch, submitAsSideEffect = props.submitAsSideEffect, onSubmitFail = props.onSubmitFail, onSubmitSuccess = props.onSubmitSuccess, startSubmit2 = props.startSubmit, stopSubmit2 = props.stopSubmit, setSubmitFailed2 = props.setSubmitFailed, setSubmitSucceeded2 = props.setSubmitSucceeded, values2 = props.values;
@@ -31137,7 +31147,7 @@ ${latestSubscriptionCallbackError.current.stack}
     var deepEqual2 = structure$1.deepEqual, empty2 = structure$1.empty, getIn2 = structure$1.getIn, setIn2 = structure$1.setIn, keys2 = structure$1.keys, fromJS = structure$1.fromJS, toJS2 = structure$1.toJS;
     var isValid2 = createIsValid(structure$1);
     return function(initialConfig) {
-      var config = _extends$j({
+      var config = _extends$k({
         touchOnBlur: true,
         touchOnChange: false,
         persistentSubmitErrors: false,
@@ -31426,7 +31436,7 @@ ${latestSubscriptionCallbackError.current.stack}
                   } else {
                     return _this.listenToSubmit(handleSubmit(
                       checkSubmit(onSubmit),
-                      _extends$j({}, _this.props, {}, bindActionCreators({
+                      _extends$k({}, _this.props, {}, bindActionCreators({
                         blur: blur2,
                         change: change2
                       }, dispatch)),
@@ -31444,7 +31454,7 @@ ${latestSubscriptionCallbackError.current.stack}
                 return silenceEvents(function() {
                   return !_this.submitPromise && _this.listenToSubmit(handleSubmit(
                     checkSubmit(submitOrEvent),
-                    _extends$j({}, _this.props, {}, bindActionCreators({
+                    _extends$k({}, _this.props, {}, bindActionCreators({
                       blur: blur2,
                       change: change2
                     }, dispatch)),
@@ -31565,7 +31575,7 @@ ${latestSubscriptionCallbackError.current.stack}
             _this$props12.validExceptSubmit;
             _this$props12.values;
             var warning2 = _this$props12.warning, rest = _objectWithoutPropertiesLoose$5(_this$props12, ["anyTouched", "array", "arrayInsert", "arrayMove", "arrayPop", "arrayPush", "arrayRemove", "arrayRemoveAll", "arrayShift", "arraySplice", "arraySwap", "arrayUnshift", "asyncErrors", "asyncValidate", "asyncValidating", "blur", "change", "clearSubmit", "destroy", "destroyOnUnmount", "forceUnregisterOnUnmount", "dirty", "dispatch", "enableReinitialize", "error", "focus", "form", "getFormState", "immutableProps", "initialize", "initialized", "initialValues", "invalid", "keepDirtyOnReinitialize", "keepValues", "updateUnregisteredFields", "pristine", "propNamespace", "registeredFields", "registerField", "reset", "resetSection", "setSubmitFailed", "setSubmitSucceeded", "shouldAsyncValidate", "shouldValidate", "shouldError", "shouldWarn", "startAsyncValidation", "startSubmit", "stopAsyncValidation", "stopSubmit", "submitAsSideEffect", "submitting", "submitFailed", "submitSucceeded", "touch", "touchOnBlur", "touchOnChange", "persistentSubmitErrors", "syncErrors", "syncWarnings", "unregisterField", "untouch", "updateSyncErrors", "updateSyncWarnings", "valid", "validExceptSubmit", "values", "warning"]);
-            var reduxFormProps = _extends$j({
+            var reduxFormProps = _extends$k({
               array,
               anyTouched,
               asyncValidate: this.asyncValidate,
@@ -31597,11 +31607,11 @@ ${latestSubscriptionCallbackError.current.stack}
               valid: valid2,
               warning: warning2
             });
-            var propsToPass = _extends$j({}, propNamespace ? (_ref = {}, _ref[propNamespace] = reduxFormProps, _ref) : reduxFormProps, {}, rest);
+            var propsToPass = _extends$k({}, propNamespace ? (_ref = {}, _ref[propNamespace] = reduxFormProps, _ref) : reduxFormProps, {}, rest);
             if (isClassComponent(WrappedComponent)) {
               propsToPass.ref = this.wrapped;
             }
-            var _reduxForm = _extends$j({}, this.props, {
+            var _reduxForm = _extends$k({}, this.props, {
               getFormState: /* @__PURE__ */ __name(function getFormState(state2) {
                 return getIn2(_this3.props.getFormState(state2), _this3.props.form);
               }, "getFormState"),
@@ -31717,7 +31727,7 @@ ${latestSubscriptionCallbackError.current.stack}
             swap: bindActionCreators(boundArrayACs.arraySwap, dispatch),
             unshift: bindActionCreators(boundArrayACs.arrayUnshift, dispatch)
           };
-          return _extends$j({}, connectedFormACs, {}, boundArrayACs, {
+          return _extends$k({}, connectedFormACs, {}, boundArrayACs, {
             blur: boundBlur,
             change: boundChange,
             array: connectedArrayACs,
@@ -31752,7 +31762,7 @@ ${latestSubscriptionCallbackError.current.stack}
           }, "reset");
           _proto2.render = /* @__PURE__ */ __name(function render2() {
             var _this$props13 = this.props, initialValues2 = _this$props13.initialValues, rest = _objectWithoutPropertiesLoose$5(_this$props13, ["initialValues"]);
-            return reactExports.createElement(ConnectedForm, _extends$j({}, rest, {
+            return reactExports.createElement(ConnectedForm, _extends$k({}, rest, {
               ref: this.ref,
               // convert initialValues if need to
               initialValues: fromJS(initialValues2)
@@ -34293,13 +34303,13 @@ ${latestSubscriptionCallbackError.current.stack}
   }
   __name(getAllKeysIn, "getAllKeysIn");
   var DataView$1 = getNative(root$4, "DataView");
-  var Promise$2 = getNative(root$4, "Promise");
+  var Promise$1 = getNative(root$4, "Promise");
   var Set$1 = getNative(root$4, "Set");
   var mapTag$6 = "[object Map]", objectTag$2 = "[object Object]", promiseTag = "[object Promise]", setTag$6 = "[object Set]", weakMapTag$1 = "[object WeakMap]";
   var dataViewTag$3 = "[object DataView]";
-  var dataViewCtorString = toSource(DataView$1), mapCtorString = toSource(Map$1), promiseCtorString = toSource(Promise$2), setCtorString = toSource(Set$1), weakMapCtorString = toSource(WeakMap$1);
+  var dataViewCtorString = toSource(DataView$1), mapCtorString = toSource(Map$1), promiseCtorString = toSource(Promise$1), setCtorString = toSource(Set$1), weakMapCtorString = toSource(WeakMap$1);
   var getTag$1 = baseGetTag;
-  if (DataView$1 && getTag$1(new DataView$1(new ArrayBuffer(1))) != dataViewTag$3 || Map$1 && getTag$1(new Map$1()) != mapTag$6 || Promise$2 && getTag$1(Promise$2.resolve()) != promiseTag || Set$1 && getTag$1(new Set$1()) != setTag$6 || WeakMap$1 && getTag$1(new WeakMap$1()) != weakMapTag$1) {
+  if (DataView$1 && getTag$1(new DataView$1(new ArrayBuffer(1))) != dataViewTag$3 || Map$1 && getTag$1(new Map$1()) != mapTag$6 || Promise$1 && getTag$1(Promise$1.resolve()) != promiseTag || Set$1 && getTag$1(new Set$1()) != setTag$6 || WeakMap$1 && getTag$1(new WeakMap$1()) != weakMapTag$1) {
     getTag$1 = /* @__PURE__ */ __name(function(value) {
       var result = baseGetTag(value), Ctor = result == objectTag$2 ? value.constructor : void 0, ctorString = Ctor ? toSource(Ctor) : "";
       if (ctorString) {
@@ -35432,6 +35442,15 @@ ${latestSubscriptionCallbackError.current.stack}
     return value < other;
   }
   __name(baseLt, "baseLt");
+  function mapValues$1(object2, iteratee) {
+    var result = {};
+    iteratee = baseIteratee(iteratee);
+    baseForOwn(object2, function(value, key, object3) {
+      baseAssignValue(result, key, iteratee(value, key, object3));
+    });
+    return result;
+  }
+  __name(mapValues$1, "mapValues$1");
   function baseExtremum(array, iteratee, comparator) {
     var index2 = -1, length = array.length;
     while (++index2 < length) {
@@ -36037,7 +36056,7 @@ ${latestSubscriptionCallbackError.current.stack}
   }, "mapProps2");
   var withProps = /* @__PURE__ */ __name(function withProps2(input) {
     var hoc = mapProps(function(props) {
-      return _extends$j({}, props, typeof input === "function" ? input(props) : input);
+      return _extends$k({}, props, typeof input === "function" ? input(props) : input);
     });
     return hoc;
   }, "withProps2");
@@ -36110,7 +36129,7 @@ ${latestSubscriptionCallbackError.current.stack}
         __name(WithHandlers2, "WithHandlers2");
         var _proto = WithHandlers2.prototype;
         _proto.render = /* @__PURE__ */ __name(function render2() {
-          return factory(_extends$j({}, this.props, this.handlers));
+          return factory(_extends$k({}, this.props, this.handlers));
         }, "render");
         return WithHandlers2;
       }(reactExports.Component);
@@ -36185,7 +36204,7 @@ ${latestSubscriptionCallbackError.current.stack}
         __name(Lifecycle22, "Lifecycle2");
         var _proto = Lifecycle22.prototype;
         _proto.render = /* @__PURE__ */ __name(function render2() {
-          return factory(_extends$j({}, this.props, this.state));
+          return factory(_extends$k({}, this.props, this.state));
         }, "render");
         return Lifecycle22;
       }(reactExports.Component);
@@ -36287,6 +36306,195 @@ ${latestSubscriptionCallbackError.current.stack}
     );
   }
   __name(DialogFooter, "DialogFooter");
+  var NOT_FOUND = "NOT_FOUND";
+  function createSingletonCache(equals) {
+    var entry;
+    return {
+      get: /* @__PURE__ */ __name(function get2(key) {
+        if (entry && equals(entry.key, key)) {
+          return entry.value;
+        }
+        return NOT_FOUND;
+      }, "get"),
+      put: /* @__PURE__ */ __name(function put(key, value) {
+        entry = {
+          key,
+          value
+        };
+      }, "put"),
+      getEntries: /* @__PURE__ */ __name(function getEntries() {
+        return entry ? [entry] : [];
+      }, "getEntries"),
+      clear: /* @__PURE__ */ __name(function clear() {
+        entry = void 0;
+      }, "clear")
+    };
+  }
+  __name(createSingletonCache, "createSingletonCache");
+  function createLruCache(maxSize, equals) {
+    var entries = [];
+    function get2(key) {
+      var cacheIndex = entries.findIndex(function(entry2) {
+        return equals(key, entry2.key);
+      });
+      if (cacheIndex > -1) {
+        var entry = entries[cacheIndex];
+        if (cacheIndex > 0) {
+          entries.splice(cacheIndex, 1);
+          entries.unshift(entry);
+        }
+        return entry.value;
+      }
+      return NOT_FOUND;
+    }
+    __name(get2, "get");
+    function put(key, value) {
+      if (get2(key) === NOT_FOUND) {
+        entries.unshift({
+          key,
+          value
+        });
+        if (entries.length > maxSize) {
+          entries.pop();
+        }
+      }
+    }
+    __name(put, "put");
+    function getEntries() {
+      return entries;
+    }
+    __name(getEntries, "getEntries");
+    function clear() {
+      entries = [];
+    }
+    __name(clear, "clear");
+    return {
+      get: get2,
+      put,
+      getEntries,
+      clear
+    };
+  }
+  __name(createLruCache, "createLruCache");
+  var defaultEqualityCheck = /* @__PURE__ */ __name(function defaultEqualityCheck2(a2, b3) {
+    return a2 === b3;
+  }, "defaultEqualityCheck");
+  function createCacheKeyComparator(equalityCheck) {
+    return /* @__PURE__ */ __name(function areArgumentsShallowlyEqual(prev, next) {
+      if (prev === null || next === null || prev.length !== next.length) {
+        return false;
+      }
+      var length = prev.length;
+      for (var i2 = 0; i2 < length; i2++) {
+        if (!equalityCheck(prev[i2], next[i2])) {
+          return false;
+        }
+      }
+      return true;
+    }, "areArgumentsShallowlyEqual");
+  }
+  __name(createCacheKeyComparator, "createCacheKeyComparator");
+  function defaultMemoize(func, equalityCheckOrOptions) {
+    var providedOptions = typeof equalityCheckOrOptions === "object" ? equalityCheckOrOptions : {
+      equalityCheck: equalityCheckOrOptions
+    };
+    var _providedOptions$equa = providedOptions.equalityCheck, equalityCheck = _providedOptions$equa === void 0 ? defaultEqualityCheck : _providedOptions$equa, _providedOptions$maxS = providedOptions.maxSize, maxSize = _providedOptions$maxS === void 0 ? 1 : _providedOptions$maxS, resultEqualityCheck = providedOptions.resultEqualityCheck;
+    var comparator = createCacheKeyComparator(equalityCheck);
+    var cache2 = maxSize === 1 ? createSingletonCache(comparator) : createLruCache(maxSize, comparator);
+    function memoized() {
+      var value = cache2.get(arguments);
+      if (value === NOT_FOUND) {
+        value = func.apply(null, arguments);
+        if (resultEqualityCheck) {
+          var entries = cache2.getEntries();
+          var matchingEntry = entries.find(function(entry) {
+            return resultEqualityCheck(entry.value, value);
+          });
+          if (matchingEntry) {
+            value = matchingEntry.value;
+          }
+        }
+        cache2.put(arguments, value);
+      }
+      return value;
+    }
+    __name(memoized, "memoized");
+    memoized.clearCache = function() {
+      return cache2.clear();
+    };
+    return memoized;
+  }
+  __name(defaultMemoize, "defaultMemoize");
+  function getDependencies(funcs) {
+    var dependencies = Array.isArray(funcs[0]) ? funcs[0] : funcs;
+    if (!dependencies.every(function(dep) {
+      return typeof dep === "function";
+    })) {
+      var dependencyTypes = dependencies.map(function(dep) {
+        return typeof dep === "function" ? "function " + (dep.name || "unnamed") + "()" : typeof dep;
+      }).join(", ");
+      throw new Error("createSelector expects all input-selectors to be functions, but received the following types: [" + dependencyTypes + "]");
+    }
+    return dependencies;
+  }
+  __name(getDependencies, "getDependencies");
+  function createSelectorCreator(memoize2) {
+    for (var _len = arguments.length, memoizeOptionsFromArgs = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      memoizeOptionsFromArgs[_key - 1] = arguments[_key];
+    }
+    var createSelector2 = /* @__PURE__ */ __name(function createSelector3() {
+      for (var _len2 = arguments.length, funcs = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        funcs[_key2] = arguments[_key2];
+      }
+      var _recomputations = 0;
+      var _lastResult;
+      var directlyPassedOptions = {
+        memoizeOptions: void 0
+      };
+      var resultFunc = funcs.pop();
+      if (typeof resultFunc === "object") {
+        directlyPassedOptions = resultFunc;
+        resultFunc = funcs.pop();
+      }
+      if (typeof resultFunc !== "function") {
+        throw new Error("createSelector expects an output function after the inputs, but received: [" + typeof resultFunc + "]");
+      }
+      var _directlyPassedOption = directlyPassedOptions, _directlyPassedOption2 = _directlyPassedOption.memoizeOptions, memoizeOptions = _directlyPassedOption2 === void 0 ? memoizeOptionsFromArgs : _directlyPassedOption2;
+      var finalMemoizeOptions = Array.isArray(memoizeOptions) ? memoizeOptions : [memoizeOptions];
+      var dependencies = getDependencies(funcs);
+      var memoizedResultFunc = memoize2.apply(void 0, [/* @__PURE__ */ __name(function recomputationWrapper() {
+        _recomputations++;
+        return resultFunc.apply(null, arguments);
+      }, "recomputationWrapper")].concat(finalMemoizeOptions));
+      var selector = memoize2(/* @__PURE__ */ __name(function dependenciesChecker() {
+        var params = [];
+        var length = dependencies.length;
+        for (var i2 = 0; i2 < length; i2++) {
+          params.push(dependencies[i2].apply(null, arguments));
+        }
+        _lastResult = memoizedResultFunc.apply(null, params);
+        return _lastResult;
+      }, "dependenciesChecker"));
+      Object.assign(selector, {
+        resultFunc,
+        memoizedResultFunc,
+        dependencies,
+        lastResult: /* @__PURE__ */ __name(function lastResult() {
+          return _lastResult;
+        }, "lastResult"),
+        recomputations: /* @__PURE__ */ __name(function recomputations() {
+          return _recomputations;
+        }, "recomputations"),
+        resetRecomputations: /* @__PURE__ */ __name(function resetRecomputations() {
+          return _recomputations = 0;
+        }, "resetRecomputations")
+      });
+      return selector;
+    }, "createSelector");
+    return createSelector2;
+  }
+  __name(createSelectorCreator, "createSelectorCreator");
+  var createSelector = /* @__PURE__ */ createSelectorCreator(defaultMemoize);
   function useCombinedRefs() {
     for (var _len = arguments.length, refs = new Array(_len), _key = 0; _key < _len; _key++) {
       refs[_key] = arguments[_key];
@@ -39709,6 +39917,64 @@ ${latestSubscriptionCallbackError.current.stack}
       scaleY: newRect.height / oldRect.height
     };
   }, "rectSortingStrategy");
+  const defaultScale$1 = {
+    scaleX: 1,
+    scaleY: 1
+  };
+  const verticalListSortingStrategy = /* @__PURE__ */ __name((_ref) => {
+    var _rects$activeIndex;
+    let {
+      activeIndex,
+      activeNodeRect: fallbackActiveRect,
+      index: index2,
+      rects,
+      overIndex
+    } = _ref;
+    const activeNodeRect = (_rects$activeIndex = rects[activeIndex]) != null ? _rects$activeIndex : fallbackActiveRect;
+    if (!activeNodeRect) {
+      return null;
+    }
+    if (index2 === activeIndex) {
+      const overIndexRect = rects[overIndex];
+      if (!overIndexRect) {
+        return null;
+      }
+      return __spreadValues({
+        x: 0,
+        y: activeIndex < overIndex ? overIndexRect.top + overIndexRect.height - (activeNodeRect.top + activeNodeRect.height) : overIndexRect.top - activeNodeRect.top
+      }, defaultScale$1);
+    }
+    const itemGap = getItemGap$1(rects, index2, activeIndex);
+    if (index2 > activeIndex && index2 <= overIndex) {
+      return __spreadValues({
+        x: 0,
+        y: -activeNodeRect.height - itemGap
+      }, defaultScale$1);
+    }
+    if (index2 < activeIndex && index2 >= overIndex) {
+      return __spreadValues({
+        x: 0,
+        y: activeNodeRect.height + itemGap
+      }, defaultScale$1);
+    }
+    return __spreadValues({
+      x: 0,
+      y: 0
+    }, defaultScale$1);
+  }, "verticalListSortingStrategy");
+  function getItemGap$1(clientRects, index2, activeIndex) {
+    const currentRect = clientRects[index2];
+    const previousRect = clientRects[index2 - 1];
+    const nextRect = clientRects[index2 + 1];
+    if (!currentRect) {
+      return 0;
+    }
+    if (activeIndex < index2) {
+      return previousRect ? currentRect.top - (previousRect.top + previousRect.height) : nextRect ? nextRect.top - (currentRect.top + currentRect.height) : 0;
+    }
+    return nextRect ? nextRect.top - (currentRect.top + currentRect.height) : previousRect ? currentRect.top - (previousRect.top + previousRect.height) : 0;
+  }
+  __name(getItemGap$1, "getItemGap$1");
   const ID_PREFIX = "Sortable";
   const Context$1 = /* @__PURE__ */ React.createContext({
     activeIndex: -1,
@@ -40196,12 +40462,12 @@ ${latestSubscriptionCallbackError.current.stack}
   if (typeof window !== "undefined") {
     getComputedStyleX = window.getComputedStyle ? _getComputedStyle : _getComputedStyleIE;
   }
-  function each$2(arr, fn2) {
+  function each(arr, fn2) {
     for (var i2 = 0; i2 < arr.length; i2++) {
       fn2(arr[i2]);
     }
   }
-  __name(each$2, "each$2");
+  __name(each, "each");
   function isBorderBoxFn(elem) {
     return getComputedStyleX(elem, "boxSizing") === "border-box";
   }
@@ -40256,7 +40522,7 @@ ${latestSubscriptionCallbackError.current.stack}
   }
   __name(isWindow, "isWindow");
   var domUtils = {};
-  each$2(["Width", "Height"], function(name2) {
+  each(["Width", "Height"], function(name2) {
     domUtils["doc".concat(name2)] = function(refWin) {
       var d2 = refWin.document;
       return Math.max(
@@ -40352,7 +40618,7 @@ ${latestSubscriptionCallbackError.current.stack}
     return getComputedStyleX(el, name2);
   }
   __name(css, "css");
-  each$2(["width", "height"], function(name2) {
+  each(["width", "height"], function(name2) {
     var first = name2.charAt(0).toUpperCase() + name2.slice(1);
     domUtils["outer".concat(first)] = function(el, includeMargin) {
       return el && getWHIgnoreDisplay(el, name2, includeMargin ? MARGIN_INDEX : BORDER_INDEX);
@@ -40403,7 +40669,7 @@ ${latestSubscriptionCallbackError.current.stack}
       }
     }, "offset"),
     isWindow,
-    each: each$2,
+    each,
     css,
     clone: /* @__PURE__ */ __name(function clone2(obj) {
       var ret = {};
@@ -41239,7 +41505,7 @@ ${latestSubscriptionCallbackError.current.stack}
   __name(requireReactList, "requireReactList");
   var reactListExports = requireReactList();
   const ReactList = /* @__PURE__ */ getDefaultExportFromCjs(reactListExports);
-  var _extends$h = Object.assign || function(target) {
+  var _extends$i = Object.assign || function(target) {
     for (var i2 = 1; i2 < arguments.length; i2++) {
       var source = arguments[i2];
       for (var key in source) {
@@ -41389,7 +41655,7 @@ ${latestSubscriptionCallbackError.current.stack}
       var children = _ref.children, className = _ref.className, rest = _objectWithoutProperties$3(_ref, ["children", "className"]);
       return React.createElement(
         "div",
-        _extends$h({ className: classNames$1(compClass, className) }, rest),
+        _extends$i({ className: classNames$1(compClass, className) }, rest),
         children
       );
     }, "cmp");
@@ -41621,7 +41887,7 @@ ${latestSubscriptionCallbackError.current.stack}
       }
     };
   }();
-  var _extends$g = Object.assign || function(target) {
+  var _extends$h = Object.assign || function(target) {
     for (var i2 = 1; i2 < arguments.length; i2++) {
       var source = arguments[i2];
       for (var key in source) {
@@ -41701,7 +41967,7 @@ ${latestSubscriptionCallbackError.current.stack}
       _createClass$b(_class, [{
         key: "getResolvedState",
         value: /* @__PURE__ */ __name(function getResolvedState(props, state2) {
-          var resolvedState = _extends$g({}, _.compactObject(this.state), _.compactObject(this.props), _.compactObject(state2), _.compactObject(props));
+          var resolvedState = _extends$h({}, _.compactObject(this.state), _.compactObject(this.props), _.compactObject(state2), _.compactObject(props));
           return resolvedState;
         }, "getResolvedState")
       }, {
@@ -41733,9 +41999,9 @@ ${latestSubscriptionCallbackError.current.stack}
           var makeDecoratedColumn = /* @__PURE__ */ __name(function makeDecoratedColumn2(column, parentColumn) {
             var dcol = void 0;
             if (column.expander) {
-              dcol = _extends$g({}, _this2.props.column, _this2.props.expanderDefaults, column);
+              dcol = _extends$h({}, _this2.props.column, _this2.props.expanderDefaults, column);
             } else {
-              dcol = _extends$g({}, _this2.props.column, column);
+              dcol = _extends$h({}, _this2.props.column, column);
             }
             if (dcol.maxWidth < dcol.minWidth) {
               dcol.minWidth = dcol.maxWidth;
@@ -41770,7 +42036,7 @@ ${latestSubscriptionCallbackError.current.stack}
           }, "decorateAndAddToAll");
           var decoratedColumns = columnsWithExpander.map(function(column) {
             if (column.columns) {
-              return _extends$g({}, column, {
+              return _extends$h({}, column, {
                 columns: column.columns.map(function(d2) {
                   return decorateAndAddToAll(d2, column);
                 })
@@ -41785,7 +42051,7 @@ ${latestSubscriptionCallbackError.current.stack}
               var visibleSubColumns = column.columns.filter(function(d2) {
                 return pivotBy.indexOf(d2.id) > -1 ? false : _.getFirstDefined(d2.show, true);
               });
-              return _extends$g({}, column, {
+              return _extends$h({}, column, {
                 columns: visibleSubColumns
               });
             }
@@ -41821,14 +42087,14 @@ ${latestSubscriptionCallbackError.current.stack}
             var pivotColumnGroup = {
               Header: PivotGroupHeader,
               columns: pivotColumns.map(function(col) {
-                return _extends$g({}, _this2.props.pivotDefaults, col, {
+                return _extends$h({}, _this2.props.pivotDefaults, col, {
                   pivoted: true
                 });
               })
               // Place the pivotColumns back into the visibleColumns
             };
             if (pivotIndex >= 0) {
-              pivotColumnGroup = _extends$g({}, visibleColumns[pivotIndex], pivotColumnGroup);
+              pivotColumnGroup = _extends$h({}, visibleColumns[pivotIndex], pivotColumnGroup);
               visibleColumns.splice(pivotIndex, 1, pivotColumnGroup);
             } else {
               visibleColumns.unshift(pivotColumnGroup);
@@ -41837,7 +42103,7 @@ ${latestSubscriptionCallbackError.current.stack}
           var headerGroups = [];
           var currentSpan = [];
           var addHeader = /* @__PURE__ */ __name(function addHeader2(columns2, column) {
-            headerGroups.push(_extends$g({}, _this2.props.column, column, {
+            headerGroups.push(_extends$h({}, _this2.props.column, column, {
               columns: columns2
             }));
             currentSpan = [];
@@ -41902,13 +42168,13 @@ ${latestSubscriptionCallbackError.current.stack}
               groupedRows = groupedRows.map(function(rowGroup) {
                 var _extends2;
                 var subRows = groupRecursively2(rowGroup[subRowsKey], keys2, i2 + 1);
-                return _extends$g({}, rowGroup, (_extends2 = {}, _defineProperty$4(_extends2, subRowsKey, subRows), _defineProperty$4(_extends2, aggregatedKey, true), _extends2), aggregate(subRows));
+                return _extends$h({}, rowGroup, (_extends2 = {}, _defineProperty$4(_extends2, subRowsKey, subRows), _defineProperty$4(_extends2, aggregatedKey, true), _extends2), aggregate(subRows));
               });
               return groupedRows;
             }, "groupRecursively");
             resolvedData = groupRecursively(resolvedData, pivotBy);
           }
-          return _extends$g({}, newState, {
+          return _extends$h({}, newState, {
             resolvedData,
             allVisibleColumns,
             headerGroups,
@@ -41970,7 +42236,7 @@ ${latestSubscriptionCallbackError.current.stack}
               if (!row[_this3.props.subRowsKey]) {
                 return row;
               }
-              return _extends$g({}, row, _defineProperty$4({}, _this3.props.subRowsKey, _this3.filterData(row[_this3.props.subRowsKey], filtered, defaultFilterMethod, allVisibleColumns)));
+              return _extends$h({}, row, _defineProperty$4({}, _this3.props.subRowsKey, _this3.filterData(row[_this3.props.subRowsKey], filtered, defaultFilterMethod, allVisibleColumns)));
             }).filter(function(row) {
               if (!row[_this3.props.subRowsKey]) {
                 return true;
@@ -42250,7 +42516,7 @@ ${latestSubscriptionCallbackError.current.stack}
       return Constructor;
     };
   }();
-  var _extends$f = Object.assign || function(target) {
+  var _extends$g = Object.assign || function(target) {
     for (var i2 = 1; i2 < arguments.length; i2++) {
       var source = arguments[i2];
       for (var key in source) {
@@ -42285,7 +42551,7 @@ ${latestSubscriptionCallbackError.current.stack}
   var defaultButton = /* @__PURE__ */ __name(function defaultButton2(props) {
     return React.createElement(
       "button",
-      _extends$f({ type: "button" }, props, { className: "-btn" }),
+      _extends$g({ type: "button" }, props, { className: "-btn" }),
       props.children
     );
   }, "defaultButton");
@@ -42485,7 +42751,7 @@ ${latestSubscriptionCallbackError.current.stack}
       );
     }, "renderPageSizeOptions")
   };
-  var _extends$e = Object.assign || function(target) {
+  var _extends$f = Object.assign || function(target) {
     for (var i2 = 1; i2 < arguments.length; i2++) {
       var source = arguments[i2];
       for (var key in source) {
@@ -42676,7 +42942,7 @@ ${latestSubscriptionCallbackError.current.stack}
       var children = _ref.children, className = _ref.className, rest = _objectWithoutProperties$2(_ref, ["children", "className"]);
       return React.createElement(
         "div",
-        _extends$e({
+        _extends$f({
           className: classNames$1("rt-table", className),
           role: "grid"
           // tabIndex='0'
@@ -42690,7 +42956,7 @@ ${latestSubscriptionCallbackError.current.stack}
       var children = _ref2.children, className = _ref2.className, rest = _objectWithoutProperties$2(_ref2, ["children", "className"]);
       return React.createElement(
         "div",
-        _extends$e({ className: classNames$1("rt-tr-group", className), role: "rowgroup" }, rest),
+        _extends$f({ className: classNames$1("rt-tr-group", className), role: "rowgroup" }, rest),
         children
       );
     }, "TrGroupComponent"),
@@ -42698,7 +42964,7 @@ ${latestSubscriptionCallbackError.current.stack}
       var children = _ref3.children, className = _ref3.className, rest = _objectWithoutProperties$2(_ref3, ["children", "className"]);
       return React.createElement(
         "div",
-        _extends$e({ className: classNames$1("rt-tr", className), role: "row" }, rest),
+        _extends$f({ className: classNames$1("rt-tr", className), role: "row" }, rest),
         children
       );
     }, "TrComponent"),
@@ -42708,7 +42974,7 @@ ${latestSubscriptionCallbackError.current.stack}
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events
         React.createElement(
           "div",
-          _extends$e({
+          _extends$f({
             className: classNames$1("rt-th", className),
             onClick: /* @__PURE__ */ __name(function onClick(e2) {
               return toggleSort && toggleSort(e2);
@@ -42726,7 +42992,7 @@ ${latestSubscriptionCallbackError.current.stack}
       var className = _ref5.className, children = _ref5.children, rest = _objectWithoutProperties$2(_ref5, ["toggleSort", "className", "children"]);
       return React.createElement(
         "div",
-        _extends$e({ className: classNames$1("rt-td", className), role: "gridcell" }, rest),
+        _extends$f({ className: classNames$1("rt-td", className), role: "gridcell" }, rest),
         children
       );
     }, "TdComponent"),
@@ -42794,7 +43060,7 @@ ${latestSubscriptionCallbackError.current.stack}
       var className = _ref10.className, loading = _ref10.loading, loadingText = _ref10.loadingText, rest = _objectWithoutProperties$2(_ref10, ["className", "loading", "loadingText"]);
       return React.createElement(
         "div",
-        _extends$e({ className: classNames$1("-loading", { "-active": loading }, className) }, rest),
+        _extends$f({ className: classNames$1("-loading", { "-active": loading }, className) }, rest),
         React.createElement(
           "div",
           { className: "-loading-inner" },
@@ -42998,7 +43264,7 @@ ${latestSubscriptionCallbackError.current.stack}
       }
     };
   }();
-  var _extends$d = Object.assign || function(target) {
+  var _extends$e = Object.assign || function(target) {
     for (var i2 = 1; i2 < arguments.length; i2++) {
       var source = arguments[i2];
       for (var key in source) {
@@ -43108,7 +43374,7 @@ ${latestSubscriptionCallbackError.current.stack}
           var index2 = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : -1;
           return [rows.map(function(row, i2) {
             index2 += 1;
-            var rowWithViewIndex = _extends$d({}, row, {
+            var rowWithViewIndex = _extends$e({}, row, {
               _viewIndex: index2
             });
             var newPath = path2.concat([i2]);
@@ -43133,7 +43399,7 @@ ${latestSubscriptionCallbackError.current.stack}
           return _.getFirstDefined(resizedColumn.value, d2.width, d2.minWidth);
         }));
         var rowIndex = -1;
-        var finalState = _extends$d({}, resolvedState, {
+        var finalState = _extends$e({}, resolvedState, {
           startRow,
           endRow,
           pageRows,
@@ -43167,8 +43433,8 @@ ${latestSubscriptionCallbackError.current.stack}
           var theadGroupThProps = _.splitProps(getTheadGroupThProps(finalState, void 0, column, _this2));
           var columnHeaderProps = _.splitProps(column.getHeaderProps(finalState, void 0, column, _this2));
           var classes = [column.headerClassName, theadGroupThProps.className, columnHeaderProps.className];
-          var styles2 = _extends$d({}, column.headerStyle, theadGroupThProps.style, columnHeaderProps.style);
-          var rest = _extends$d({}, theadGroupThProps.rest, columnHeaderProps.rest);
+          var styles2 = _extends$e({}, column.headerStyle, theadGroupThProps.style, columnHeaderProps.style);
+          var rest = _extends$e({}, theadGroupThProps.rest, columnHeaderProps.rest);
           var flexStyles = {
             flex: flex + " 0 auto",
             width: _.asPx(width),
@@ -43176,10 +43442,10 @@ ${latestSubscriptionCallbackError.current.stack}
           };
           return React.createElement(
             ThComponent2,
-            _extends$d({
+            _extends$e({
               key: i2 + "-" + column.id,
               className: classNames$1(classes),
-              style: _extends$d({}, styles2, flexStyles)
+              style: _extends$e({}, styles2, flexStyles)
             }, rest),
             _.normalizeComponent(column.Header, {
               data: sortedData,
@@ -43192,15 +43458,15 @@ ${latestSubscriptionCallbackError.current.stack}
           var theadGroupTrProps = _.splitProps(getTheadGroupTrProps(finalState, void 0, void 0, _this2));
           return React.createElement(
             TheadComponent,
-            _extends$d({
+            _extends$e({
               className: classNames$1("-headerGroups", theadGroupProps.className),
-              style: _extends$d({}, theadGroupProps.style, {
+              style: _extends$e({}, theadGroupProps.style, {
                 minWidth: rowMinWidth + "px"
               })
             }, theadGroupProps.rest),
             React.createElement(
               TrComponent,
-              _extends$d({
+              _extends$e({
                 className: theadGroupTrProps.className,
                 style: theadGroupTrProps.style
               }, theadGroupTrProps.rest),
@@ -43221,10 +43487,10 @@ ${latestSubscriptionCallbackError.current.stack}
           var theadThProps = _.splitProps(getTheadThProps(finalState, void 0, column, _this2));
           var columnHeaderProps = _.splitProps(column.getHeaderProps(finalState, void 0, column, _this2));
           var classes = [column.headerClassName, theadThProps.className, columnHeaderProps.className];
-          var styles2 = _extends$d({}, column.headerStyle, theadThProps.style, columnHeaderProps.style);
-          var rest = _extends$d({}, theadThProps.rest, columnHeaderProps.rest);
+          var styles2 = _extends$e({}, column.headerStyle, theadThProps.style, columnHeaderProps.style);
+          var rest = _extends$e({}, theadThProps.rest, columnHeaderProps.rest);
           var isResizable = _.getFirstDefined(column.resizable, resizable, false);
-          var resizer = isResizable ? React.createElement(ResizerComponent, _extends$d({
+          var resizer = isResizable ? React.createElement(ResizerComponent, _extends$e({
             onMouseDown: /* @__PURE__ */ __name(function onMouseDown(e2) {
               return _this2.resizeColumnStart(e2, column, false);
             }, "onMouseDown"),
@@ -43235,10 +43501,10 @@ ${latestSubscriptionCallbackError.current.stack}
           var isSortable = _.getFirstDefined(column.sortable, sortable, false);
           return React.createElement(
             ThComponent2,
-            _extends$d({
+            _extends$e({
               key: i2 + "-" + column.id,
               className: classNames$1(classes, isResizable && "rt-resizable-header", sort ? sort.desc ? "-sort-desc" : "-sort-asc" : "", isSortable && "-cursor-pointer", !show2 && "-hidden", pivotBy && pivotBy.slice(0, -1).includes(column.id) && "rt-header-pivot"),
-              style: _extends$d({}, styles2, {
+              style: _extends$e({}, styles2, {
                 flex: width + " 0 auto",
                 width: _.asPx(width),
                 maxWidth: _.asPx(maxWidth)
@@ -43263,15 +43529,15 @@ ${latestSubscriptionCallbackError.current.stack}
           var theadTrProps = _.splitProps(getTheadTrProps(finalState, void 0, void 0, _this2));
           return React.createElement(
             TheadComponent,
-            _extends$d({
+            _extends$e({
               className: classNames$1("-header", theadProps.className),
-              style: _extends$d({}, theadProps.style, {
+              style: _extends$e({}, theadProps.style, {
                 minWidth: rowMinWidth + "px"
               })
             }, theadProps.rest),
             React.createElement(
               TrComponent,
-              _extends$d({
+              _extends$e({
                 className: theadTrProps.className,
                 style: theadTrProps.style
               }, theadTrProps.rest),
@@ -43288,8 +43554,8 @@ ${latestSubscriptionCallbackError.current.stack}
           var theadFilterThProps = _.splitProps(getTheadFilterThProps(finalState, void 0, column, _this2));
           var columnHeaderProps = _.splitProps(column.getHeaderProps(finalState, void 0, column, _this2));
           var classes = [column.headerClassName, theadFilterThProps.className, columnHeaderProps.className];
-          var styles2 = _extends$d({}, column.headerStyle, theadFilterThProps.style, columnHeaderProps.style);
-          var rest = _extends$d({}, theadFilterThProps.rest, columnHeaderProps.rest);
+          var styles2 = _extends$e({}, column.headerStyle, theadFilterThProps.style, columnHeaderProps.style);
+          var rest = _extends$e({}, theadFilterThProps.rest, columnHeaderProps.rest);
           var filter2 = filtered.find(function(filter3) {
             return filter3.id === column.id;
           });
@@ -43297,10 +43563,10 @@ ${latestSubscriptionCallbackError.current.stack}
           var isFilterable = _.getFirstDefined(column.filterable, filterable, false);
           return React.createElement(
             ThComponent2,
-            _extends$d({
+            _extends$e({
               key: i2 + "-" + column.id,
               className: classNames$1(classes),
-              style: _extends$d({}, styles2, {
+              style: _extends$e({}, styles2, {
                 flex: width + " 0 auto",
                 width: _.asPx(width),
                 maxWidth: _.asPx(maxWidth)
@@ -43320,15 +43586,15 @@ ${latestSubscriptionCallbackError.current.stack}
           var theadFilterTrProps = _.splitProps(getTheadFilterTrProps(finalState, void 0, void 0, _this2));
           return React.createElement(
             TheadComponent,
-            _extends$d({
+            _extends$e({
               className: classNames$1("-filters", theadFilterProps.className),
-              style: _extends$d({}, theadFilterProps.style, {
+              style: _extends$e({}, theadFilterProps.style, {
                 minWidth: rowMinWidth + "px"
               })
             }, theadFilterProps.rest),
             React.createElement(
               TrComponent,
-              _extends$d({
+              _extends$e({
                 className: theadFilterTrProps.className,
                 style: theadFilterTrProps.style
               }, theadFilterTrProps.rest),
@@ -43356,10 +43622,10 @@ ${latestSubscriptionCallbackError.current.stack}
           var trProps = _.splitProps(getTrProps(finalState, rowInfo, void 0, _this2));
           return React.createElement(
             TrGroupComponent,
-            _extends$d({ key: rowInfo.nestingPath.join("_") }, trGroupProps),
+            _extends$e({ key: rowInfo.nestingPath.join("_") }, trGroupProps),
             React.createElement(
               TrComponent,
-              _extends$d({
+              _extends$e({
                 className: classNames$1(trProps.className, row._viewIndex % 2 ? "-even" : "-odd"),
                 style: trProps.style
               }, trProps.rest),
@@ -43373,10 +43639,10 @@ ${latestSubscriptionCallbackError.current.stack}
                 var tdProps = _.splitProps(getTdProps(finalState, rowInfo, column, _this2));
                 var columnProps = _.splitProps(column.getProps(finalState, rowInfo, column, _this2));
                 var classes = [tdProps.className, column.className, columnProps.className];
-                var styles2 = _extends$d({}, tdProps.style, column.style, columnProps.style);
-                var cellInfo = _extends$d({}, rowInfo, {
+                var styles2 = _extends$e({}, tdProps.style, column.style, columnProps.style);
+                var cellInfo = _extends$e({}, rowInfo, {
                   isExpanded,
-                  column: _extends$d({}, column),
+                  column: _extends$e({}, column),
                   value: rowInfo.row[column.id],
                   pivoted: column.pivoted,
                   expander: column.expander,
@@ -43430,7 +43696,7 @@ ${latestSubscriptionCallbackError.current.stack}
                   isBranch = rowInfo.row[pivotIDKey] === column.id && cellInfo.subRows;
                   isPreview = pivotBy.indexOf(column.id) > pivotBy.indexOf(rowInfo.row[pivotIDKey]) && cellInfo.subRows;
                   if (isBranch) {
-                    resolvedCell = _.normalizeComponent(ResolvedPivotComponent, _extends$d({}, cellInfo, {
+                    resolvedCell = _.normalizeComponent(ResolvedPivotComponent, _extends$e({}, cellInfo, {
                       value: row[pivotValKey]
                     }), row[pivotValKey]);
                   } else if (isPreview) {
@@ -43473,10 +43739,10 @@ ${latestSubscriptionCallbackError.current.stack}
                 }
                 return React.createElement(
                   TdComponent,
-                  _extends$d({
+                  _extends$e({
                     key: i22 + "-" + column.id,
                     className: classNames$1(classes, !cellInfo.expandable && !show2 && "hidden", cellInfo.expandable && "rt-expandable", (isBranch || isPreview) && "rt-pivot"),
-                    style: _extends$d({}, styles2, {
+                    style: _extends$e({}, styles2, {
                       flex: width + " 0 auto",
                       width: _.asPx(width),
                       maxWidth: _.asPx(maxWidth)
@@ -43506,13 +43772,13 @@ ${latestSubscriptionCallbackError.current.stack}
           var tdProps = _.splitProps(getTdProps(finalState, void 0, column, _this2));
           var columnProps = _.splitProps(column.getProps(finalState, void 0, column, _this2));
           var classes = [tdProps.className, column.className, columnProps.className];
-          var styles2 = _extends$d({}, tdProps.style, column.style, columnProps.style);
+          var styles2 = _extends$e({}, tdProps.style, column.style, columnProps.style);
           return React.createElement(
             TdComponent,
-            _extends$d({
+            _extends$e({
               key: i2 + "-" + column.id,
               className: classNames$1(classes, !show2 && "hidden"),
-              style: _extends$d({}, styles2, {
+              style: _extends$e({}, styles2, {
                 flex: flex + " 0 auto",
                 width: _.asPx(width),
                 maxWidth: _.asPx(maxWidth)
@@ -43526,7 +43792,7 @@ ${latestSubscriptionCallbackError.current.stack}
           var trProps = _.splitProps(getTrProps(finalState, void 0, void 0, _this2));
           return React.createElement(
             TrGroupComponent,
-            _extends$d({ key: "pad-" + i2 }, trGroupProps),
+            _extends$e({ key: "pad-" + i2 }, trGroupProps),
             React.createElement(
               TrComponent,
               {
@@ -43548,13 +43814,13 @@ ${latestSubscriptionCallbackError.current.stack}
           var columnProps = _.splitProps(column.getProps(finalState, void 0, column, _this2));
           var columnFooterProps = _.splitProps(column.getFooterProps(finalState, void 0, column, _this2));
           var classes = [tFootTdProps.className, column.className, columnProps.className, columnFooterProps.className];
-          var styles2 = _extends$d({}, tFootTdProps.style, column.style, columnProps.style, columnFooterProps.style);
+          var styles2 = _extends$e({}, tFootTdProps.style, column.style, columnProps.style, columnFooterProps.style);
           return React.createElement(
             TdComponent,
-            _extends$d({
+            _extends$e({
               key: i2 + "-" + column.id,
               className: classNames$1(classes, !show2 && "hidden"),
-              style: _extends$d({}, styles2, {
+              style: _extends$e({}, styles2, {
                 flex: width + " 0 auto",
                 width: _.asPx(width),
                 maxWidth: _.asPx(maxWidth)
@@ -43571,15 +43837,15 @@ ${latestSubscriptionCallbackError.current.stack}
           var tFootTrProps = _.splitProps(getTfootTrProps(finalState, void 0, void 0, _this2));
           return React.createElement(
             TfootComponent,
-            _extends$d({
+            _extends$e({
               className: tFootProps.className,
-              style: _extends$d({}, tFootProps.style, {
+              style: _extends$e({}, tFootProps.style, {
                 minWidth: rowMinWidth + "px"
               })
             }, tFootProps.rest),
             React.createElement(
               TrComponent,
-              _extends$d({
+              _extends$e({
                 className: classNames$1(tFootTrProps.className),
                 style: tFootTrProps.style
               }, tFootTrProps.rest),
@@ -43589,7 +43855,7 @@ ${latestSubscriptionCallbackError.current.stack}
         }, "makeColumnFooters");
         var makePagination = /* @__PURE__ */ __name(function makePagination2(isTop) {
           var paginationProps = _.splitProps(getPaginationProps(finalState, void 0, void 0, _this2));
-          return React.createElement(PaginationComponent, _extends$d({}, resolvedState, {
+          return React.createElement(PaginationComponent, _extends$e({}, resolvedState, {
             pages,
             canPrevious,
             canNext,
@@ -43603,9 +43869,9 @@ ${latestSubscriptionCallbackError.current.stack}
         var makeTable = /* @__PURE__ */ __name(function makeTable2() {
           return React.createElement(
             "div",
-            _extends$d({
+            _extends$e({
               className: classNames$1("ReactTable", className, rootProps.className),
-              style: _extends$d({}, style2, rootProps.style)
+              style: _extends$e({}, style2, rootProps.style)
             }, rootProps.rest, {
               ref: /* @__PURE__ */ __name(function ref2(r2) {
                 if (!r2) return;
@@ -43622,7 +43888,7 @@ ${latestSubscriptionCallbackError.current.stack}
             ) : null,
             React.createElement(
               TableComponent,
-              _extends$d({
+              _extends$e({
                 className: classNames$1(tableProps.className, currentlyResizing ? "rt-resizing" : ""),
                 style: tableProps.style
               }, tableProps.rest),
@@ -43631,9 +43897,9 @@ ${latestSubscriptionCallbackError.current.stack}
               hasFilters ? makeFilters() : null,
               React.createElement(
                 TbodyComponent,
-                _extends$d({
+                _extends$e({
                   className: classNames$1(tBodyProps.className),
-                  style: _extends$d({}, tBodyProps.style, {
+                  style: _extends$e({}, tBodyProps.style, {
                     minWidth: rowMinWidth + "px"
                   })
                 }, tBodyProps.rest),
@@ -43662,7 +43928,7 @@ ${latestSubscriptionCallbackError.current.stack}
               noDataProps,
               _.normalizeComponent(noDataText)
             ),
-            React.createElement(LoadingComponent2, _extends$d({ loading, loadingText }, loadingProps))
+            React.createElement(LoadingComponent2, _extends$e({ loading, loadingText }, loadingProps))
           );
         }, "makeTable");
         return children ? children(finalState, makeTable, this) : makeTable();
@@ -43679,6 +43945,7 @@ ${latestSubscriptionCallbackError.current.stack}
       className,
       children,
       style: style2,
+      path: path2,
       columnindex
     } = _d2, rest = __objRest(_d2, [
       "toggleSort",
@@ -43686,16 +43953,30 @@ ${latestSubscriptionCallbackError.current.stack}
       "className",
       "children",
       "style",
+      "path",
       "columnindex"
     ]);
-    const index2 = columnindex != null ? columnindex : -1;
-    const { attributes, listeners, setNodeRef, transform: transform2, transition } = useSortable({
-      id: `${index2}`,
-      disabled: immovable === "true"
+    const index2 = columnindex ? path2 : -1;
+    const disabled = !path2 || immovable === "true" || immovable === true;
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform: transform2,
+      transition,
+      isDragging: _isDragging
+    } = useSortable({
+      id: path2,
+      disabled
     });
+    const isDragging2 = _isDragging && !disabled;
+    if (transform2) {
+      transform2.scaleX = 1;
+    }
     const sortStyles = {
       transform: CSS.Transform.toString(transform2),
-      transition
+      transition,
+      zIndex: isDragging2 ? 999 : void 0
     };
     return /* @__PURE__ */ React.createElement(
       "div",
@@ -43703,11 +43984,12 @@ ${latestSubscriptionCallbackError.current.stack}
         style: __spreadValues(__spreadValues({}, sortStyles), style2),
         ref: setNodeRef
       }, attributes), listeners), {
-        className: classNames$1("rt-th", className),
+        className: classNames$1("rt-th", className, { "th-dragging": isDragging2 }),
         onClick: /* @__PURE__ */ __name((e2) => toggleSort && toggleSort(e2), "onClick"),
         role: "columnheader",
         tabIndex: "-1",
         columnindex,
+        path: path2,
         index: index2
       }), rest),
       children
@@ -44208,22 +44490,16 @@ ${latestSubscriptionCallbackError.current.stack}
       },
       [dispatch, tableFormName]
     );
-    const { allOrderedEntities, selectedEntities } = useSelector((state2) => {
+    const entitySelector = /* @__PURE__ */ __name((state2) => {
       var _a2, _b2, _c2, _d2, _e, _f;
       return {
         allOrderedEntities: (_c2 = (_b2 = (_a2 = state2.form) == null ? void 0 : _a2[tableFormName]) == null ? void 0 : _b2.values) == null ? void 0 : _c2.allOrderedEntities,
         selectedEntities: (_f = (_e = (_d2 = state2.form) == null ? void 0 : _d2[tableFormName]) == null ? void 0 : _e.values) == null ? void 0 : _f.reduxFormSelectedEntityIdMap
       };
-    });
+    }, "entitySelector");
+    const { allOrderedEntities, selectedEntities } = useSelector(entitySelector);
     return { selectTableEntities, allOrderedEntities, selectedEntities };
   }, "useTableEntities");
-  const useDeepEqualMemo = /* @__PURE__ */ __name((value) => {
-    const ref2 = reactExports.useRef();
-    if (!isEqual$3(value, ref2.current)) {
-      ref2.current = value;
-    }
-    return ref2.current;
-  }, "useDeepEqualMemo");
   function rowClick(e2, rowInfo, entities, {
     reduxFormSelectedEntityIdMap,
     isSingleSelect,
@@ -44236,7 +44512,8 @@ ${latestSubscriptionCallbackError.current.stack}
     onMultiRowSelect,
     noDeselectAll,
     onRowSelect,
-    change: change2
+    change: change2,
+    getCheckboxGroupId
   }) {
     const entity = rowInfo.original;
     onRowClick(e2, entity, rowInfo);
@@ -44306,6 +44583,38 @@ ${latestSubscriptionCallbackError.current.stack}
             newIdMap[rowId].time = Date.now() + 1;
           }
         }
+      }
+    }
+    if (getCheckboxGroupId) {
+      const clickedRowId = rowId;
+      const clickedEntity = entity;
+      const clickedGroupId = getCheckboxGroupId(clickedEntity, rowInfo.index);
+      if (!newIdMap[clickedRowId] && clickedGroupId) {
+        entities.forEach((e22, i2) => {
+          if (getCheckboxGroupId(e22, i2) === clickedGroupId) {
+            const id2 = getIdOrCodeOrIndex(e22, i2);
+            delete newIdMap[id2];
+          }
+        });
+      }
+      const selectedGroupIds = /* @__PURE__ */ new Set();
+      entities.forEach((e22, i2) => {
+        const id2 = getIdOrCodeOrIndex(e22, i2);
+        if (newIdMap[id2]) {
+          const gid = getCheckboxGroupId(e22, i2);
+          if (gid) selectedGroupIds.add(gid);
+        }
+      });
+      if (selectedGroupIds.size > 0) {
+        entities.forEach((e22, i2) => {
+          const gid = getCheckboxGroupId(e22, i2);
+          if (gid && selectedGroupIds.has(gid)) {
+            const id2 = getIdOrCodeOrIndex(e22, i2);
+            if (!newIdMap[id2]) {
+              newIdMap[id2] = { entity: e22, time: Date.now() };
+            }
+          }
+        });
       }
     }
     finalizeSelection({
@@ -45820,35 +46129,49 @@ ${latestSubscriptionCallbackError.current.stack}
       const uniqueFieldsByPath = {};
       const searchTerms = searchTerm.split(",");
       schema2.fields.forEach((field) => {
-        const { type: type2, path: path2, searchDisabled } = field;
-        if (uniqueFieldsByPath[path2]) return;
-        uniqueFieldsByPath[path2] = true;
-        if (searchDisabled || field.filterDisabled || type2 === "color") return;
-        searchTerms.forEach((term) => {
-          const filterValue = term.trim();
-          if (type2 === "string" || type2 === "lookup") {
-            const o2 = set$2({}, path2, { _ilike: `%${filterValue}%` });
-            searchTermFilters.push(o2);
-          } else if (type2 === "boolean") {
-            let regex;
-            try {
-              regex = new RegExp("^" + filterValue, "ig");
-            } catch (error) {
-            }
-            if (regex) {
-              if ("true".replace(regex, "") !== "true") {
-                const o2 = set$2({}, path2, { _eq: true });
-                searchTermFilters.push(o2);
-              } else if ("false".replace(regex, "") !== "false") {
-                const o2 = set$2({}, path2, { _eq: false });
-                searchTermFilters.push(o2);
-              }
-            }
-          } else if ((type2 === "number" || type2 === "integer") && !isNaN(filterValue)) {
-            const o2 = set$2({}, path2, { _eq: parseFloat(filterValue) });
-            searchTermFilters.push(o2);
-          }
+        const {
+          type: type2,
+          path: path2,
+          additionalSearchPaths = [],
+          searchDisabled,
+          isHidden: isHidden2
+        } = field;
+        const allPaths = [path2, ...additionalSearchPaths];
+        allPaths.forEach((path22) => {
+          addSearchTermFilters(path22);
         });
+        function addSearchTermFilters(path22) {
+          if (uniqueFieldsByPath[path22]) return;
+          uniqueFieldsByPath[path22] = true;
+          if (searchDisabled || field.filterDisabled || type2 === "color" || isHidden2 || !path22)
+            return;
+          searchTerms.forEach((term) => {
+            const filterValue = term.trim();
+            if (type2 === "string" || type2 === "lookup") {
+              const o2 = set$2({}, path22, { _ilike: `%${filterValue}%` });
+              searchTermFilters.push(o2);
+            } else if (type2 === "boolean") {
+              let regex;
+              try {
+                regex = new RegExp("^" + filterValue, "ig");
+              } catch (error) {
+              }
+              if (regex) {
+                if ("true".replace(regex, "") !== "true") {
+                  const o2 = set$2({}, path22, { _eq: true });
+                  searchTermFilters.push(o2);
+                } else if ("false".replace(regex, "") !== "false") {
+                  const o2 = set$2({}, path22, { _eq: false });
+                  searchTermFilters.push(o2);
+                }
+              }
+            } else if ((type2 === "number" || type2 === "integer") && !isNaN(filterValue)) {
+              const o2 = set$2({}, path22, { _eq: parseFloat(filterValue) });
+              searchTermFilters.push(o2);
+            }
+          });
+        }
+        __name(addSearchTermFilters, "addSearchTermFilters");
       });
       if (searchTermFilters.length > 0) {
         if (Object.keys(where).length > 0) {
@@ -45859,10 +46182,16 @@ ${latestSubscriptionCallbackError.current.stack}
       }
     }
     if (filters && filters.length > 0) {
-      const filterClauses = filters.map((filter2) => {
+      const filterClauses = flatMap(filters, (filter2) => {
         let { selectedFilter, filterOn, filterValue } = filter2;
         const fieldSchema = ccFields[filterOn] || {};
-        const { path: path2, reference: reference2, type: type2, customColumnFilter } = fieldSchema;
+        const {
+          path: path2,
+          additionalSearchPaths = [],
+          reference: reference2,
+          type: type2,
+          customColumnFilter
+        } = fieldSchema;
         if (customColumnFilter) {
           return customColumnFilter(filterValue);
         }
@@ -45885,117 +46214,131 @@ ${latestSubscriptionCallbackError.current.stack}
         }
         if (reference2) {
           filterOn = reference2.sourceField;
+          return addColumnFilters(filterOn);
         } else {
-          filterOn = path2 || filterOn;
+          if (path2) {
+            const allPaths = [path2, ...additionalSearchPaths];
+            if (allPaths.length > 1) {
+              return { _or: allPaths.map((p2) => addColumnFilters(p2)) };
+            }
+            return allPaths.map((p2) => addColumnFilters(p2));
+          } else {
+            return addColumnFilters(filterOn);
+          }
         }
-        switch (selectedFilter) {
-          case "none":
-            return {};
-          case "startsWith":
-            return { [filterOn]: { _ilike: `${filterValue}%` } };
-          case "endsWith":
-            return { [filterOn]: { _ilike: `%${filterValue}` } };
-          case "contains":
-            return { [filterOn]: { _ilike: `%${filterValue}%` } };
-          case "notContains":
-            return { [filterOn]: { _nilike: `%${filterValue}%` } };
-          case "isExactly":
-            return { [filterOn]: { _eq: filterValue } };
-          case "isEmpty":
-            if (filterOn.includes(".")) {
+        function addColumnFilters(filterOn2) {
+          switch (selectedFilter) {
+            case "none":
+              return {};
+            case "startsWith":
+              return { [filterOn2]: { _ilike: `${filterValue}%` } };
+            case "endsWith":
+              return { [filterOn2]: { _ilike: `%${filterValue}` } };
+            case "contains":
+              return { [filterOn2]: { _ilike: `%${filterValue}%` } };
+            case "notContains":
+              return { [filterOn2]: { _nilike: `%${filterValue}%` } };
+            case "isExactly":
+              return { [filterOn2]: { _eq: filterValue } };
+            case "isEmpty":
+              if (filterOn2.includes(".")) {
+                return {
+                  _not: {
+                    [filterOn2.split(".")[0]]: {}
+                  }
+                };
+              }
               return {
-                _not: {
-                  [filterOn.split(".")[0]]: {}
+                _or: [
+                  { [filterOn2]: { _eq: "" } },
+                  { [filterOn2]: { _is_null: true } }
+                ]
+              };
+            case "notEmpty":
+              return {
+                _and: [
+                  { [filterOn2]: { _neq: "" } },
+                  { [filterOn2]: { _is_null: false } }
+                ]
+              };
+            case "inList":
+              return { [filterOn2]: { _in: filterValue } };
+            case "notInList":
+              return { [filterOn2]: { _nin: filterValue } };
+            case "true":
+              return { [filterOn2]: { _eq: true } };
+            case "false":
+              return { [filterOn2]: { _eq: false } };
+            case "dateIs":
+              return { [filterOn2]: { _eq: filterValue } };
+            case "notBetween":
+              return {
+                _or: [
+                  {
+                    [filterOn2]: {
+                      _lt: new Date(arrayFilterValue[0])
+                    }
+                  },
+                  {
+                    [filterOn2]: {
+                      _gt: new Date(
+                        new Date(arrayFilterValue[1]).setHours(23, 59)
+                      )
+                    }
+                  }
+                ]
+              };
+            case "isBetween":
+              return {
+                [filterOn2]: {
+                  _gte: new Date(arrayFilterValue[0]),
+                  _lte: new Date(new Date(arrayFilterValue[1]).setHours(23, 59))
                 }
               };
-            }
-            return {
-              _or: [
-                { [filterOn]: { _eq: "" } },
-                { [filterOn]: { _is_null: true } }
-              ]
-            };
-          case "notEmpty":
-            return {
-              _and: [
-                { [filterOn]: { _neq: "" } },
-                { [filterOn]: { _is_null: false } }
-              ]
-            };
-          case "inList":
-            return { [filterOn]: { _in: filterValue } };
-          case "notInList":
-            return { [filterOn]: { _nin: filterValue } };
-          case "true":
-            return { [filterOn]: { _eq: true } };
-          case "false":
-            return { [filterOn]: { _eq: false } };
-          case "dateIs":
-            return { [filterOn]: { _eq: filterValue } };
-          case "notBetween":
-            return {
-              _or: [
-                {
-                  [filterOn]: {
-                    _lt: new Date(arrayFilterValue[0])
-                  }
-                },
-                {
-                  [filterOn]: {
-                    _gt: new Date(new Date(arrayFilterValue[1]).setHours(23, 59))
-                  }
+            case "isBefore":
+              return { [filterOn2]: { _lt: new Date(filterValue) } };
+            case "isAfter":
+              return { [filterOn2]: { _gt: new Date(filterValue) } };
+            case "greaterThan":
+              return { [filterOn2]: { _gt: parseFloat(filterValue) } };
+            case "lessThan":
+              return { [filterOn2]: { _lt: parseFloat(filterValue) } };
+            case "inRange":
+              return {
+                [filterOn2]: {
+                  _gte: parseFloat(arrayFilterValue[0]),
+                  _lte: parseFloat(arrayFilterValue[1])
                 }
-              ]
-            };
-          case "isBetween":
-            return {
-              [filterOn]: {
-                _gte: new Date(arrayFilterValue[0]),
-                _lte: new Date(new Date(arrayFilterValue[1]).setHours(23, 59))
-              }
-            };
-          case "isBefore":
-            return { [filterOn]: { _lt: new Date(filterValue) } };
-          case "isAfter":
-            return { [filterOn]: { _gt: new Date(filterValue) } };
-          case "greaterThan":
-            return { [filterOn]: { _gt: parseFloat(filterValue) } };
-          case "lessThan":
-            return { [filterOn]: { _lt: parseFloat(filterValue) } };
-          case "inRange":
-            return {
-              [filterOn]: {
-                _gte: parseFloat(arrayFilterValue[0]),
-                _lte: parseFloat(arrayFilterValue[1])
-              }
-            };
-          case "outsideRange":
-            return {
-              _or: [
-                {
-                  [filterOn]: {
-                    _lt: parseFloat(arrayFilterValue[0])
+              };
+            case "outsideRange":
+              return {
+                _or: [
+                  {
+                    [filterOn2]: {
+                      _lt: parseFloat(arrayFilterValue[0])
+                    }
+                  },
+                  {
+                    [filterOn2]: {
+                      _gt: parseFloat(arrayFilterValue[1])
+                    }
                   }
-                },
-                {
-                  [filterOn]: {
-                    _gt: parseFloat(arrayFilterValue[1])
-                  }
+                ]
+              };
+            case "equalTo":
+              return {
+                [filterOn2]: {
+                  _eq: type2 === "number" || type2 === "integer" ? parseFloat(filterValue) : filterValue
                 }
-              ]
-            };
-          case "equalTo":
-            return {
-              [filterOn]: {
-                _eq: type2 === "number" || type2 === "integer" ? parseFloat(filterValue) : filterValue
-              }
-            };
-          case "regex":
-            return { [filterOn]: { _regex: filterValue } };
-          default:
-            console.warn(`Unsupported filter type: ${selectedFilter}`);
-            return {};
+              };
+            case "regex":
+              return { [filterOn2]: { _regex: filterValue } };
+            default:
+              console.warn(`Unsupported filter type: ${selectedFilter}`);
+              return {};
+          }
         }
+        __name(addColumnFilters, "addColumnFilters");
       });
       if (filterClauses.length > 0) {
         if (Object.keys(where).length > 0) {
@@ -46168,6 +46511,23 @@ ${latestSubscriptionCallbackError.current.stack}
                 if (!isString$1(value) || !new RegExp(conditionValue.replace(/%/g, ".*")).test(value))
                   return false;
                 break;
+              case "_in":
+                if (!some(conditionValue, (item) => isEqual$3(value, item)))
+                  return false;
+                break;
+              case "_nin":
+                if (some(conditionValue, (item) => isEqual$3(value, item)))
+                  return false;
+                break;
+              case "_regex": {
+                try {
+                  if (!isString$1(value) || !new RegExp(conditionValue).test(value))
+                    return false;
+                } catch (e2) {
+                  return false;
+                }
+                break;
+              }
               default:
                 if (operator.startsWith("_")) {
                   console.warn(`Unsupported operator: ${operator}`);
@@ -46518,10 +46878,15 @@ ${latestSubscriptionCallbackError.current.stack}
           const ccDisplayName = orderVal.replace(/^-/gi, "");
           const schemaForField = ccFields[ccDisplayName];
           if (schemaForField) {
-            const { path: path2 } = schemaForField;
+            const { path: path2, additionalSearchPaths } = schemaForField;
             const reversed = ccDisplayName !== orderVal;
             const prefix2 = reversed ? "-" : "";
             cleanedOrder.push(prefix2 + path2);
+            if (additionalSearchPaths && additionalSearchPaths.length) {
+              additionalSearchPaths.forEach((additionalPath) => {
+                cleanedOrder.push(prefix2 + additionalPath);
+              });
+            }
           } else {
             !noOrderError && console.error(
               "No schema for field found!",
@@ -47807,7 +48172,7 @@ ${latestSubscriptionCallbackError.current.stack}
     checkboardCache[key] = checkboard;
     return checkboard;
   }, "get");
-  var _extends$c = Object.assign || function(target) {
+  var _extends$d = Object.assign || function(target) {
     for (var i2 = 1; i2 < arguments.length; i2++) {
       var source = arguments[i2];
       for (var key in source) {
@@ -47830,7 +48195,7 @@ ${latestSubscriptionCallbackError.current.stack}
         }
       }
     });
-    return reactExports.isValidElement(children) ? React.cloneElement(children, _extends$c({}, children.props, { style: _extends$c({}, children.props.style, styles2.grid) })) : React.createElement("div", { style: styles2.grid });
+    return reactExports.isValidElement(children) ? React.cloneElement(children, _extends$d({}, children.props, { style: _extends$d({}, children.props.style, styles2.grid) })) : React.createElement("div", { style: styles2.grid });
   }, "Checkboard");
   Checkboard.defaultProps = {
     size: 8,
@@ -47838,7 +48203,7 @@ ${latestSubscriptionCallbackError.current.stack}
     grey: "rgba(0,0,0,.08)",
     renderers: {}
   };
-  var _extends$b = Object.assign || function(target) {
+  var _extends$c = Object.assign || function(target) {
     for (var i2 = 1; i2 < arguments.length; i2++) {
       var source = arguments[i2];
       for (var key in source) {
@@ -47966,7 +48331,7 @@ ${latestSubscriptionCallbackError.current.stack}
               top: rgb2.a * 100 + "%"
             }
           },
-          "overwrite": _extends$b({}, this.props.style)
+          "overwrite": _extends$c({}, this.props.style)
         }, {
           vertical: this.props.direction === "vertical",
           overwrite: true
@@ -49716,7 +50081,7 @@ ${latestSubscriptionCallbackError.current.stack}
     var stringWithoutDegree = string2.replace("°", "");
     return tinycolor(type2 + " (" + stringWithoutDegree + ")")._ok;
   }, "isvalidColorString");
-  var _extends$a = Object.assign || function(target) {
+  var _extends$b = Object.assign || function(target) {
     for (var i2 = 1; i2 < arguments.length; i2++) {
       var source = arguments[i2];
       for (var key in source) {
@@ -49787,7 +50152,7 @@ ${latestSubscriptionCallbackError.current.stack}
             _this.props.onSwatchHover && _this.props.onSwatchHover(colors, event);
           }
         };
-        _this.state = _extends$a({}, toState(props.color, 0));
+        _this.state = _extends$b({}, toState(props.color, 0));
         _this.debounce = debounce(function(fn2, data, event) {
           fn2(data, event);
         }, 100);
@@ -49801,20 +50166,20 @@ ${latestSubscriptionCallbackError.current.stack}
           if (this.props.onSwatchHover) {
             optionalEvents.onSwatchHover = this.handleSwatchHover;
           }
-          return React.createElement(Picker, _extends$a({}, this.props, this.state, {
+          return React.createElement(Picker, _extends$b({}, this.props, this.state, {
             onChange: this.handleChange
           }, optionalEvents));
         }, "render")
       }], [{
         key: "getDerivedStateFromProps",
         value: /* @__PURE__ */ __name(function getDerivedStateFromProps(nextProps, state2) {
-          return _extends$a({}, toState(nextProps.color, state2.oldHue));
+          return _extends$b({}, toState(nextProps.color, state2.oldHue));
         }, "getDerivedStateFromProps")
       }]);
       return ColorPicker2;
     }(reactExports.PureComponent || reactExports.Component);
-    ColorPicker.propTypes = _extends$a({}, Picker.propTypes);
-    ColorPicker.defaultProps = _extends$a({}, Picker.defaultProps, {
+    ColorPicker.propTypes = _extends$b({}, Picker.propTypes);
+    ColorPicker.defaultProps = _extends$b({}, Picker.defaultProps, {
       color: {
         h: 250,
         s: 0.5,
@@ -49824,7 +50189,7 @@ ${latestSubscriptionCallbackError.current.stack}
     });
     return ColorPicker;
   }, "ColorWrap");
-  var _extends$9 = Object.assign || function(target) {
+  var _extends$a = Object.assign || function(target) {
     for (var i2 = 1; i2 < arguments.length; i2++) {
       var source = arguments[i2];
       for (var key in source) {
@@ -49897,14 +50262,14 @@ ${latestSubscriptionCallbackError.current.stack}
           return React.createElement(
             Span,
             { onFocus: this.handleFocus, onBlur: this.handleBlur },
-            React.createElement(Component, _extends$9({}, this.props, this.state))
+            React.createElement(Component, _extends$a({}, this.props, this.state))
           );
         }, "render")
       }]);
       return Focus;
     }(React.Component);
   }, "handleFocus");
-  var _extends$8 = Object.assign || function(target) {
+  var _extends$9 = Object.assign || function(target) {
     for (var i2 = 1; i2 < arguments.length; i2++) {
       var source = arguments[i2];
       for (var key in source) {
@@ -49922,7 +50287,7 @@ ${latestSubscriptionCallbackError.current.stack}
     var transparent = color2 === "transparent";
     var styles2 = reactCSS({
       default: {
-        swatch: _extends$8({
+        swatch: _extends$9({
           background: color2,
           height: "100%",
           width: "100%",
@@ -49947,7 +50312,7 @@ ${latestSubscriptionCallbackError.current.stack}
     }
     return React.createElement(
       "div",
-      _extends$8({
+      _extends$9({
         style: styles2.swatch,
         onClick: handleClick,
         title,
@@ -49983,7 +50348,7 @@ ${latestSubscriptionCallbackError.current.stack}
     }, { vertical: direction2 === "vertical" });
     return React.createElement("div", { style: styles2.picker });
   }, "AlphaPointer");
-  var _extends$7 = Object.assign || function(target) {
+  var _extends$8 = Object.assign || function(target) {
     for (var i2 = 1; i2 < arguments.length; i2++) {
       var source = arguments[i2];
       for (var key in source) {
@@ -50012,7 +50377,7 @@ ${latestSubscriptionCallbackError.current.stack}
     return React.createElement(
       "div",
       { style: styles2.picker, className: "alpha-picker " + className },
-      React.createElement(Alpha, _extends$7({}, styles2.alpha, {
+      React.createElement(Alpha, _extends$8({}, styles2.alpha, {
         rgb: rgb2,
         hsl: hsl2,
         pointer,
@@ -51258,7 +51623,7 @@ ${latestSubscriptionCallbackError.current.stack}
     }, { vertical: direction2 === "vertical" });
     return React.createElement("div", { style: styles2.picker });
   }, "SliderPointer");
-  var _extends$6 = Object.assign || function(target) {
+  var _extends$7 = Object.assign || function(target) {
     for (var i2 = 1; i2 < arguments.length; i2++) {
       var source = arguments[i2];
       for (var key in source) {
@@ -51289,7 +51654,7 @@ ${latestSubscriptionCallbackError.current.stack}
     return React.createElement(
       "div",
       { style: styles2.picker, className: "hue-picker " + className },
-      React.createElement(Hue, _extends$6({}, styles2.hue, {
+      React.createElement(Hue, _extends$7({}, styles2.hue, {
         hsl: hsl2,
         pointer,
         onChange: handleChange,
@@ -52073,7 +52438,7 @@ ${latestSubscriptionCallbackError.current.stack}
       )
     );
   }, "SketchFields");
-  var _extends$5 = Object.assign || function(target) {
+  var _extends$6 = Object.assign || function(target) {
     for (var i2 = 1; i2 < arguments.length; i2++) {
       var source = arguments[i2];
       for (var key in source) {
@@ -52130,7 +52495,7 @@ ${latestSubscriptionCallbackError.current.stack}
         return React.createElement(
           "div",
           { key, style: styles2.swatchWrap },
-          React.createElement(Swatch$1, _extends$5({}, c2, {
+          React.createElement(Swatch$1, _extends$6({}, c2, {
             style: styles2.swatch,
             onClick: handleClick,
             onHover: onSwatchHover,
@@ -52148,7 +52513,7 @@ ${latestSubscriptionCallbackError.current.stack}
       title: PropTypes.string
     })])).isRequired
   };
-  var _extends$4 = Object.assign || function(target) {
+  var _extends$5 = Object.assign || function(target) {
     for (var i2 = 1; i2 < arguments.length; i2++) {
       var source = arguments[i2];
       for (var key in source) {
@@ -52162,7 +52527,7 @@ ${latestSubscriptionCallbackError.current.stack}
   var Sketch = /* @__PURE__ */ __name(function Sketch2(_ref) {
     var width = _ref.width, rgb2 = _ref.rgb, hex = _ref.hex, hsv = _ref.hsv, hsl2 = _ref.hsl, onChange = _ref.onChange, onSwatchHover = _ref.onSwatchHover, disableAlpha = _ref.disableAlpha, presetColors = _ref.presetColors, renderers = _ref.renderers, _ref$styles = _ref.styles, passedStyles = _ref$styles === void 0 ? {} : _ref$styles, _ref$className = _ref.className, className = _ref$className === void 0 ? "" : _ref$className;
     var styles2 = reactCSS(merge$1({
-      "default": _extends$4({
+      "default": _extends$5({
         picker: {
           width,
           padding: "10px 10px 0",
@@ -61801,6 +62166,8 @@ ${latestSubscriptionCallbackError.current.stack}
               }
             }, "onKeyDown"),
             inputProps: __spreadValues({
+              autoComplete: "off",
+              name: "tg-multiselect-input",
               autoFocus: autoFocus || autoOpen,
               onBlur
             }, tagInputProps && tagInputProps.inputProps)
@@ -63413,21 +63780,175 @@ ${latestSubscriptionCallbackError.current.stack}
       })
     );
   }, "SearchBar");
+  const restrictToHorizontalAxis = /* @__PURE__ */ __name((_ref) => {
+    let {
+      transform: transform2
+    } = _ref;
+    return __spreadProps(__spreadValues({}, transform2), {
+      y: 0
+    });
+  }, "restrictToHorizontalAxis");
+  const restrictToVerticalAxis = /* @__PURE__ */ __name((_ref) => {
+    let {
+      transform: transform2
+    } = _ref;
+    return __spreadProps(__spreadValues({}, transform2), {
+      x: 0
+    });
+  }, "restrictToVerticalAxis");
+  const DraggableColumnOption = /* @__PURE__ */ __name(({
+    field,
+    index: index2,
+    onVisibilityChange,
+    numVisible
+  }) => {
+    const { displayName, isHidden: isHidden2, path: path2, subFrag, immovable, type: type2 } = field;
+    const { attributes, listeners, setNodeRef, transform: transform2, transition } = useSortable({
+      id: path2,
+      disabled: immovable === "true"
+    });
+    if (type2 === "action") {
+      return null;
+    }
+    const style2 = {
+      transform: CSS.Transform.toString(transform2),
+      transition,
+      cursor: "grab",
+      marginBottom: 5
+    };
+    return /* @__PURE__ */ React.createElement(
+      "div",
+      __spreadValues(__spreadValues({
+        ref: setNodeRef,
+        style: style2,
+        className: "SortableItem",
+        "data-path": path2
+      }, attributes), listeners),
+      /* @__PURE__ */ React.createElement(
+        Checkbox,
+        {
+          name: `${path2}-${index2}`,
+          key: index2,
+          onChange: /* @__PURE__ */ __name(() => {
+            if (numVisible <= 1 && !isHidden2) {
+              return window.toastr.warning(
+                "We have to display at least one column :)"
+              );
+            }
+            onVisibilityChange({ shouldShow: isHidden2, path: path2 });
+          }, "onChange"),
+          checked: !isHidden2,
+          label: /* @__PURE__ */ React.createElement("span", { style: { display: "flex", marginTop: -17 } }, displayName, " ", field.fieldGroup && /* @__PURE__ */ React.createElement(
+            "span",
+            {
+              style: { fontSize: 10, marginLeft: 5, marginTop: 2 },
+              className: TEXT_MUTED
+            },
+            "(",
+            field.fieldGroup,
+            ")"
+          ), subFrag && /* @__PURE__ */ React.createElement(InfoHelper, { style: { marginLeft: 5 } }, "Note: Viewing this complex column may cause the table to load slower. Try hiding it for better performance."))
+        }
+      )
+    );
+  }, "DraggableColumnOption");
+  const DraggableColumnOptions = /* @__PURE__ */ __name(({
+    fields,
+    onVisibilityChange,
+    moveColumnPersist,
+    numVisible
+  }) => {
+    const [sortedFields, setSortedFields] = reactExports.useState(fields);
+    reactExports.useEffect(() => {
+      setSortedFields(fields);
+    }, [fields]);
+    const mouseSensor = useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 5
+      }
+    });
+    const sensors = useSensors(mouseSensor);
+    const handleDragStart = /* @__PURE__ */ __name((event) => {
+      document.body.classList.add("column-dragging");
+      const { active: active2 } = event;
+      if (active2) {
+        const activeNode = document.querySelector(`[data-path="${active2.id}"]`);
+        if (activeNode) {
+          activeNode.classList.add("dragging");
+        }
+      }
+    }, "handleDragStart");
+    const handleDragEnd = /* @__PURE__ */ __name((event) => {
+      document.body.classList.remove("column-dragging");
+      const draggingItem = document.querySelector(".SortableItem.dragging");
+      if (draggingItem) {
+        draggingItem.classList.remove("dragging");
+      }
+      const { active: active2, over } = event;
+      if (!over || !active2 || active2.id === over.id) {
+        return;
+      }
+      const oldIndex = sortedFields.findIndex((f2) => f2.path === active2.id);
+      const newIndex = sortedFields.findIndex((f2) => f2.path === over.id);
+      const newSortedFields = arrayMove(sortedFields, oldIndex, newIndex);
+      setSortedFields(newSortedFields);
+      moveColumnPersist({ oldIndex, newIndex });
+    }, "handleDragEnd");
+    return /* @__PURE__ */ React.createElement(
+      DndContext,
+      {
+        sensors,
+        modifiers: [restrictToVerticalAxis],
+        onDragStart: handleDragStart,
+        onDragEnd: handleDragEnd
+      },
+      /* @__PURE__ */ React.createElement(
+        SortableContext,
+        {
+          items: sortedFields.map((field) => field.path),
+          strategy: verticalListSortingStrategy
+        },
+        /* @__PURE__ */ React.createElement("div", null, sortedFields.map((field, index2) => /* @__PURE__ */ React.createElement(
+          DraggableColumnOption,
+          {
+            key: field.path || index2,
+            field,
+            index: index2,
+            onVisibilityChange,
+            numVisible
+          }
+        )))
+      )
+    );
+  }, "DraggableColumnOptions");
+  const dragNoticeEl = /* @__PURE__ */ React.createElement(
+    "div",
+    {
+      className: TEXT_MUTED,
+      style: {
+        padding: 10,
+        fontSize: "12px"
+      }
+    },
+    /* @__PURE__ */ React.createElement(Icon, { icon: "info-sign", size: 12 }),
+    " Drag columns to reorder them"
+  );
   const DisplayOptions = /* @__PURE__ */ __name(({
     compact,
     extraCompact,
     disabled,
+    doNotSearchHiddenColumns,
     hideDisplayOptionsIcon,
     resetDefaultVisibility = noop$8,
     updateColumnVisibility = noop$8,
     updateTableDisplayDensity,
+    moveColumnPersist = noop$8,
     showForcedHiddenColumns,
     setShowForcedHidden,
     hasOptionForForcedHidden,
     schema: schema2
   }) => {
     const [isOpen2, setIsOpen] = reactExports.useState(false);
-    const [searchTerms, setSearchTerms] = reactExports.useState({});
     const changeTableDensity = /* @__PURE__ */ __name((e2) => {
       updateTableDisplayDensity(e2.target.value);
       setIsOpen(false);
@@ -63437,83 +63958,16 @@ ${latestSubscriptionCallbackError.current.stack}
       return null;
     }
     const { fields } = schema2;
-    const fieldGroups = {};
-    const mainFields = [];
-    fields.forEach((field) => {
-      if (field.hideInMenu) return;
-      if (!field.fieldGroup) return mainFields.push(field);
-      if (!fieldGroups[field.fieldGroup]) fieldGroups[field.fieldGroup] = [];
-      fieldGroups[field.fieldGroup].push(field);
-    });
     let numVisible = 0;
-    const getFieldCheckbox = /* @__PURE__ */ __name((field, i2) => {
-      const { displayName, isHidden: isHidden2, isForcedHidden, path: path2 } = field;
-      if (isForcedHidden) return;
-      if (!isHidden2) numVisible++;
-      return /* @__PURE__ */ React.createElement(
-        Checkbox,
-        {
-          name: `${path2}-${i2}`,
-          key: path2 || i2,
-          onChange: /* @__PURE__ */ __name(() => {
-            if (numVisible <= 1 && !isHidden2) {
-              return window.toastr.warning(
-                "We have to display at least one column :)"
-              );
-            }
-            updateColumnVisibility({ shouldShow: isHidden2, path: path2 });
-          }, "onChange"),
-          checked: !isHidden2,
-          label: displayName
-        }
-      );
-    }, "getFieldCheckbox");
-    let fieldGroupMenu;
-    if (!isEmpty$1(fieldGroups)) {
-      fieldGroupMenu = map$3(fieldGroups, (groupFields, groupName) => {
-        const searchTerm = searchTerms[groupName] || "";
-        const anyVisible = groupFields.some(
-          (field) => !field.isHidden && !field.isForcedHidden
-        );
-        const anyNotForcedHidden = groupFields.some(
-          (field) => !field.isForcedHidden
-        );
-        if (!anyNotForcedHidden) return;
-        return /* @__PURE__ */ React.createElement(MenuItem, { key: groupName, text: groupName }, /* @__PURE__ */ React.createElement(
-          InputGroup,
-          {
-            leftIcon: "search",
-            value: searchTerm,
-            onChange: /* @__PURE__ */ __name((e2) => {
-              setSearchTerms((prev) => __spreadProps(__spreadValues({}, prev), {
-                [groupName]: e2.target.value
-              }));
-            }, "onChange")
-          }
-        ), /* @__PURE__ */ React.createElement(
-          Button,
-          {
-            className: MINIMAL,
-            text: (anyVisible ? "Hide" : "Show") + " All",
-            style: { margin: "10px 0" },
-            onClick: /* @__PURE__ */ __name(() => {
-              updateColumnVisibility({
-                shouldShow: !anyVisible,
-                paths: groupFields.map((field) => field.path)
-              });
-            }, "onClick")
-          }
-        ), groupFields.filter(
-          (field) => startCase(getCCDisplayName(field)).toLowerCase().indexOf(searchTerm.toLowerCase()) > -1
-        ).map(getFieldCheckbox));
-      });
-    }
+    fields.forEach((field) => {
+      if (!field.isHidden && field.type !== "action") numVisible++;
+    });
     return /* @__PURE__ */ React.createElement(
       Popover,
       {
         isOpen: isOpen2,
         onClose: /* @__PURE__ */ __name(() => setIsOpen(false), "onClose"),
-        content: /* @__PURE__ */ React.createElement(Menu, null, /* @__PURE__ */ React.createElement("div", { style: { padding: 10, paddingLeft: 20, paddingRight: 20 } }, /* @__PURE__ */ React.createElement("h5", { style: { marginBottom: 10 } }, "Display Density:"), /* @__PURE__ */ React.createElement("div", { className: SELECT$1 + " tg-table-display-density" }, /* @__PURE__ */ React.createElement(
+        content: /* @__PURE__ */ React.createElement(Menu, null, /* @__PURE__ */ React.createElement("div", { style: { padding: 10, paddingLeft: 20, paddingRight: 20 } }, /* @__PURE__ */ React.createElement("h5", { style: { marginBottom: 10, fontWeight: "bold" } }, "Display Density:"), /* @__PURE__ */ React.createElement("div", { className: SELECT$1 + " tg-table-display-density" }, /* @__PURE__ */ React.createElement(
           "select",
           {
             onChange: changeTableDensity,
@@ -63529,7 +63983,27 @@ ${latestSubscriptionCallbackError.current.stack}
             },
             "Compact"
           )
-        )), /* @__PURE__ */ React.createElement("h5", { style: { marginBottom: 10, marginTop: 10 } }, "Displayed Columns:"), /* @__PURE__ */ React.createElement("div", { style: { maxHeight: 260, overflowY: "auto", padding: 2 } }, mainFields.map(getFieldCheckbox)), /* @__PURE__ */ React.createElement("div", null, fieldGroupMenu), hasOptionForForcedHidden && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 15 } }, /* @__PURE__ */ React.createElement(
+        )), /* @__PURE__ */ React.createElement(
+          "h5",
+          {
+            style: {
+              fontWeight: "bold",
+              marginBottom: 0,
+              marginTop: 10,
+              display: "flex"
+            }
+          },
+          "Displayed Columns:  ",
+          doNotSearchHiddenColumns && /* @__PURE__ */ React.createElement(InfoHelper, null, "Note: Hidden columns will NOT be used when searching the datatable")
+        ), dragNoticeEl, /* @__PURE__ */ React.createElement("div", { style: { maxHeight: 360, overflowY: "auto", padding: 2 } }, /* @__PURE__ */ React.createElement(
+          DraggableColumnOptions,
+          {
+            fields,
+            onVisibilityChange: updateColumnVisibility,
+            moveColumnPersist,
+            numVisible
+          }
+        )), hasOptionForForcedHidden && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 15 } }, /* @__PURE__ */ React.createElement(
           Switch,
           {
             label: "Show Empty Columns",
@@ -63537,23 +64011,15 @@ ${latestSubscriptionCallbackError.current.stack}
             onChange: toggleForcedHidden
           }
         )), /* @__PURE__ */ React.createElement(
-          "div",
+          Button,
           {
-            style: {
-              width: "100%",
-              display: "flex",
-              justifyContent: "flex-end"
-            }
+            style: { marginTop: 5 },
+            onClick: resetDefaultVisibility,
+            title: "Display Options",
+            icon: "reset",
+            minimal: true
           },
-          /* @__PURE__ */ React.createElement(
-            Button,
-            {
-              onClick: resetDefaultVisibility,
-              title: "Display Options",
-              minimal: true
-            },
-            "Reset"
-          )
+          "Reset Column Visibilites"
         )))
       },
       /* @__PURE__ */ React.createElement(
@@ -63580,22 +64046,22 @@ ${latestSubscriptionCallbackError.current.stack}
     );
   }
   __name(DisabledLoadingComponent, "DisabledLoadingComponent");
-  const restrictToHorizontalAxis = /* @__PURE__ */ __name((_ref) => {
-    let {
-      transform: transform2
-    } = _ref;
-    return __spreadProps(__spreadValues({}, transform2), {
-      y: 0
-    });
-  }, "restrictToHorizontalAxis");
   const CustomTheadComponent = /* @__PURE__ */ __name(({
     children: _children,
     className,
-    onSortEnd,
-    onSortStart,
+    moveColumn,
+    sortedItemsFull,
     style: style2
   }) => {
     const children = _children.props.children;
+    const [sortedItems, setSortedItems] = reactExports.useState(
+      () => children.map((c2) => {
+        return c2.props.path || c2.key.split("-")[1];
+      })
+    );
+    reactExports.useEffect(() => {
+      setSortedItems(children.map((c2) => c2.props.path || c2.key.split("-")[1]));
+    }, [children]);
     const mouseSensor = useSensor(MouseSensor, {
       activationConstraint: {
         distance: 10
@@ -63610,15 +64076,17 @@ ${latestSubscriptionCallbackError.current.stack}
       if (active2.id === over.id) {
         return;
       }
-      onSortEnd({
-        oldIndex: parseInt(active2.id),
-        newIndex: parseInt(over.id)
-      });
+      const oldPath = active2.id;
+      const newPath = over.id;
+      const oldIndex = sortedItemsFull.indexOf(oldPath);
+      const newIndex = sortedItemsFull.indexOf(newPath);
+      const newSortedItems = arrayMove(sortedItemsFull, oldIndex, newIndex);
+      setSortedItems(newSortedItems);
+      moveColumn({ oldIndex, newIndex });
     }, "handleDragEnd");
     return /* @__PURE__ */ React.createElement(
       DndContext,
       {
-        onDragStart: onSortStart,
         onDragEnd: handleDragEnd,
         modifiers: [restrictToHorizontalAxis],
         sensors
@@ -63626,36 +64094,31 @@ ${latestSubscriptionCallbackError.current.stack}
       /* @__PURE__ */ React.createElement("div", { className: "rt-thead " + className, style: style2 }, /* @__PURE__ */ React.createElement("div", { className: "rt-tr" }, /* @__PURE__ */ React.createElement(
         SortableContext,
         {
-          items: children.map((_2, index2) => `${index2}`),
+          items: sortedItems,
           strategy: horizontalListSortingStrategy
         },
         children
       )))
     );
   }, "CustomTheadComponent");
-  const SortableColumns = /* @__PURE__ */ __name(({ className, style: style2, children, moveColumn }) => {
+  const SortableColumns = /* @__PURE__ */ __name(({
+    className,
+    style: style2,
+    children,
+    moveColumn,
+    sortedItemsFull
+  }) => {
     const shouldCancelStart = /* @__PURE__ */ __name((e2) => {
       const className2 = e2.target.className;
       return e2.target instanceof SVGElement || className2.indexOf("rt-resizer") > -1;
     }, "shouldCancelStart");
-    const onSortEnd = /* @__PURE__ */ __name((...args) => {
-      const { oldIndex, newIndex } = args[0];
-      document.body.classList.remove("drag-active");
-      moveColumn({
-        oldIndex,
-        newIndex
-      });
-    }, "onSortEnd");
-    const onSortStart = /* @__PURE__ */ __name(() => {
-      document.body.classList.add("drag-active");
-    }, "onSortStart");
     return /* @__PURE__ */ React.createElement(
       CustomTheadComponent,
       {
         className,
         style: style2,
-        onSortStart,
-        onSortEnd,
+        sortedItemsFull,
+        moveColumn,
         helperClass: "above-dialog",
         shouldCancelStart
       },
@@ -63787,7 +64250,7 @@ ${latestSubscriptionCallbackError.current.stack}
       location2 = parsePath(path2);
       location2.state = state2;
     } else {
-      location2 = _extends$j({}, path2);
+      location2 = _extends$k({}, path2);
       if (location2.pathname === void 0) location2.pathname = "";
       if (location2.search) {
         if (location2.search.charAt(0) !== "?") location2.search = "?" + location2.search;
@@ -63941,7 +64404,7 @@ ${latestSubscriptionCallbackError.current.stack}
     __name(createKey2, "createKey");
     var transitionManager = createTransitionManager();
     function setState(nextState) {
-      _extends$j(history, nextState);
+      _extends$k(history, nextState);
       history.length = globalHistory.length;
       transitionManager.notifyListeners(history.location, history.action);
     }
@@ -64176,7 +64639,7 @@ ${latestSubscriptionCallbackError.current.stack}
     __name(getDOMLocation, "getDOMLocation");
     var transitionManager = createTransitionManager();
     function setState(nextState) {
-      _extends$j(history, nextState);
+      _extends$k(history, nextState);
       history.length = globalHistory.length;
       transitionManager.notifyListeners(history.location, history.action);
     }
@@ -64371,7 +64834,7 @@ ${latestSubscriptionCallbackError.current.stack}
     var _props = props, getUserConfirmation = _props.getUserConfirmation, _props$initialEntries = _props.initialEntries, initialEntries = _props$initialEntries === void 0 ? ["/"] : _props$initialEntries, _props$initialIndex = _props.initialIndex, initialIndex = _props$initialIndex === void 0 ? 0 : _props$initialIndex, _props$keyLength = _props.keyLength, keyLength = _props$keyLength === void 0 ? 6 : _props$keyLength;
     var transitionManager = createTransitionManager();
     function setState(nextState) {
-      _extends$j(history, nextState);
+      _extends$k(history, nextState);
       history.length = history.entries.length;
       transitionManager.notifyListeners(history.location, history.action);
     }
@@ -64480,16 +64943,16 @@ ${latestSubscriptionCallbackError.current.stack}
     return history;
   }
   __name(createMemoryHistory, "createMemoryHistory");
-  function _extends$3() {
-    return _extends$3 = Object.assign ? Object.assign.bind() : function(n2) {
+  function _extends$4() {
+    return _extends$4 = Object.assign ? Object.assign.bind() : function(n2) {
       for (var e2 = 1; e2 < arguments.length; e2++) {
         var t2 = arguments[e2];
         for (var r2 in t2) ({}).hasOwnProperty.call(t2, r2) && (n2[r2] = t2[r2]);
       }
       return n2;
-    }, _extends$3.apply(null, arguments);
+    }, _extends$4.apply(null, arguments);
   }
-  __name(_extends$3, "_extends$3");
+  __name(_extends$4, "_extends$4");
   var pathToRegexp$1 = { exports: {} };
   var isarray;
   var hasRequiredIsarray;
@@ -65137,7 +65600,7 @@ ${latestSubscriptionCallbackError.current.stack}
         !context$1 ? invariant$1() : void 0;
         var location2 = _this.props.location || context$1.location;
         var match = _this.props.computedMatch ? _this.props.computedMatch : _this.props.path ? matchPath(location2.pathname, _this.props) : context$1.match;
-        var props = _extends$3({}, context$1, {
+        var props = _extends$4({}, context$1, {
           location: location2,
           match
         });
@@ -65158,7 +65621,7 @@ ${latestSubscriptionCallbackError.current.stack}
   __name(addLeadingSlash, "addLeadingSlash");
   function addBasename(basename2, location2) {
     if (!basename2) return location2;
-    return _extends$3({}, location2, {
+    return _extends$4({}, location2, {
       pathname: addLeadingSlash(basename2) + location2.pathname
     });
   }
@@ -65167,7 +65630,7 @@ ${latestSubscriptionCallbackError.current.stack}
     if (!basename2) return location2;
     var base = addLeadingSlash(basename2);
     if (location2.pathname.indexOf(base) !== 0) return location2;
-    return _extends$3({}, location2, {
+    return _extends$4({}, location2, {
       pathname: location2.pathname.substr(base.length)
     });
   }
@@ -65231,7 +65694,7 @@ ${latestSubscriptionCallbackError.current.stack}
         listen: this.handleListen,
         block: this.handleBlock
       };
-      return /* @__PURE__ */ React.createElement(Router, _extends$3({}, rest, {
+      return /* @__PURE__ */ React.createElement(Router, _extends$4({}, rest, {
         history,
         staticContext: context2
       }));
@@ -65255,7 +65718,7 @@ ${latestSubscriptionCallbackError.current.stack}
           if (match == null && /* @__PURE__ */ React.isValidElement(child)) {
             element2 = child;
             var path2 = child.props.path || child.props.from;
-            match = path2 ? matchPath(location2.pathname, _extends$3({}, child.props, {
+            match = path2 ? matchPath(location2.pathname, _extends$4({}, child.props, {
               path: path2
             })) : context2.match;
           }
@@ -65274,7 +65737,7 @@ ${latestSubscriptionCallbackError.current.stack}
       var wrappedComponentRef = props.wrappedComponentRef, remainingProps = _objectWithoutPropertiesLoose$3(props, ["wrappedComponentRef"]);
       return /* @__PURE__ */ React.createElement(context.Consumer, null, function(context2) {
         !context2 ? invariant$1() : void 0;
-        return /* @__PURE__ */ React.createElement(Component, _extends$3({}, remainingProps, context2, {
+        return /* @__PURE__ */ React.createElement(Component, _extends$4({}, remainingProps, context2, {
           ref: wrappedComponentRef
         }));
       });
@@ -65295,16 +65758,16 @@ ${latestSubscriptionCallbackError.current.stack}
     t2.prototype = Object.create(o2.prototype), t2.prototype.constructor = t2, _setPrototypeOf$1(t2, o2);
   }
   __name(_inheritsLoose$1, "_inheritsLoose$1");
-  function _extends$2() {
-    return _extends$2 = Object.assign ? Object.assign.bind() : function(n2) {
+  function _extends$3() {
+    return _extends$3 = Object.assign ? Object.assign.bind() : function(n2) {
       for (var e2 = 1; e2 < arguments.length; e2++) {
         var t2 = arguments[e2];
         for (var r2 in t2) ({}).hasOwnProperty.call(t2, r2) && (n2[r2] = t2[r2]);
       }
       return n2;
-    }, _extends$2.apply(null, arguments);
+    }, _extends$3.apply(null, arguments);
   }
-  __name(_extends$2, "_extends$2");
+  __name(_extends$3, "_extends$3");
   function _objectWithoutPropertiesLoose$2(r2, e2) {
     if (null == r2) return {};
     var t2 = {};
@@ -65377,7 +65840,7 @@ ${latestSubscriptionCallbackError.current.stack}
   var LinkAnchor = forwardRef(function(_ref, forwardedRef) {
     var innerRef = _ref.innerRef, navigate = _ref.navigate, _onClick = _ref.onClick, rest = _objectWithoutPropertiesLoose$2(_ref, ["innerRef", "navigate", "onClick"]);
     var target = rest.target;
-    var props = _extends$2({}, rest, {
+    var props = _extends$3({}, rest, {
       onClick: /* @__PURE__ */ __name(function onClick(event) {
         try {
           if (_onClick) _onClick(event);
@@ -65408,7 +65871,7 @@ ${latestSubscriptionCallbackError.current.stack}
       var history = context2.history;
       var location2 = normalizeToLocation(resolveToLocation(to, context2.location), context2.location);
       var href = location2 ? history.createHref(location2) : "";
-      var props = _extends$2({}, rest, {
+      var props = _extends$3({}, rest, {
         href,
         navigate: /* @__PURE__ */ __name(function navigate() {
           var location22 = resolveToLocation(to, context2.location);
@@ -65460,9 +65923,9 @@ ${latestSubscriptionCallbackError.current.stack}
       var style2 = typeof styleProp === "function" ? styleProp(isActive2) : styleProp;
       if (isActive2) {
         className = joinClassnames(className, activeClassName);
-        style2 = _extends$2({}, style2, activeStyle);
+        style2 = _extends$3({}, style2, activeStyle);
       }
-      var props = _extends$2({
+      var props = _extends$3({
         "aria-current": isActive2 && ariaCurrent || null,
         className,
         style: style2,
@@ -65806,6 +66269,9 @@ ${latestSubscriptionCallbackError.current.stack}
     }, "dropdownMulti"),
     number: /* @__PURE__ */ __name((newVal2, field) => {
       if (isValueEmpty(newVal2) && !field.isRequired) return;
+      if (field.allowNaN && Number.isNaN(newVal2)) {
+        return;
+      }
       if (isNaN(newVal2) || !isNumber$2(newVal2)) {
         return "Must be a number";
       }
@@ -65881,7 +66347,6 @@ ${latestSubscriptionCallbackError.current.stack}
   const viewColumn = {
     width: 35,
     noEllipsis: true,
-    hideInMenu: true,
     immovable: true,
     type: "action",
     render: /* @__PURE__ */ __name(() => {
@@ -66028,13 +66493,13 @@ ${latestSubscriptionCallbackError.current.stack}
   __name(name$1, "name$1");
   const re = /[ \t\n\f\r]/g;
   function whitespace(thing) {
-    return typeof thing === "object" ? thing.type === "text" ? empty$3(thing.value) : false : empty$3(thing);
+    return typeof thing === "object" ? thing.type === "text" ? empty$2(thing.value) : false : empty$2(thing);
   }
   __name(whitespace, "whitespace");
-  function empty$3(value) {
+  function empty$2(value) {
     return value.replace(re, "") === "";
   }
-  __name(empty$3, "empty$3");
+  __name(empty$2, "empty$2");
   const _Schema = class _Schema {
     /**
      * @constructor
@@ -74107,7 +74572,7 @@ ${latestSubscriptionCallbackError.current.stack}
     return d2;
   }
   __name(color$2, "color$2");
-  const empty$2 = [];
+  const empty$1 = [];
   const CONTINUE = true;
   const EXIT = false;
   const SKIP = "skip";
@@ -74141,7 +74606,7 @@ ${latestSubscriptionCallbackError.current.stack}
       }
       return visit2;
       function visit2() {
-        let result = empty$2;
+        let result = empty$1;
         let subresult;
         let offset2;
         let grandparents;
@@ -74183,7 +74648,7 @@ ${latestSubscriptionCallbackError.current.stack}
     if (typeof value === "number") {
       return [CONTINUE, value];
     }
-    return value === null || value === void 0 ? empty$2 : [value];
+    return value === null || value === void 0 ? empty$1 : [value];
   }
   __name(toResult, "toResult");
   function visit(tree, testOrVisitor, visitorOrReverse, maybeReverse) {
@@ -79395,7 +79860,7 @@ ${latestSubscriptionCallbackError.current.stack}
         filterValToUse = false;
       } else if (ccSelectedFilter2 === "inList" || ccSelectedFilter2 === "notInList") {
         if (dataType === "number") {
-          filterValToUse = filterValue && filterValue.map((val2) => parseFloat(val2.replaceAll(",", "")));
+          filterValToUse = filterValue && filterValue.map((val2) => parseFloat(`${val2}`.replaceAll(",", "")));
         }
       }
       if (isInvalidFilterValue(filterValToUse)) {
@@ -79501,7 +79966,7 @@ ${latestSubscriptionCallbackError.current.stack}
             multi: true,
             creatable: true,
             value: (filterValue || []).map((val2) => ({
-              label: val2,
+              label: `${val2}`,
               value: val2
             })),
             onChange: /* @__PURE__ */ __name((selectedOptions) => {
@@ -79935,17 +80400,17 @@ ${latestSubscriptionCallbackError.current.stack}
     args
   }) => {
     var _a2;
-    const editingCell = useSelector(
-      (state2) => {
-        var _a3, _b2, _c2;
-        return (_c2 = (_b2 = (_a3 = state2.form) == null ? void 0 : _a3[formName]) == null ? void 0 : _b2.values) == null ? void 0 : _c2.reduxFormEditingCell;
-      }
-    );
+    const editingCellSelector = /* @__PURE__ */ __name((state2) => {
+      var _a3, _b2, _c2;
+      return (_c2 = (_b2 = (_a3 = state2.form) == null ? void 0 : _a3[formName]) == null ? void 0 : _b2.values) == null ? void 0 : _c2.reduxFormEditingCell;
+    }, "editingCellSelector");
+    const shouldEditableCellInputBeClearedSelector = /* @__PURE__ */ __name((state2) => {
+      var _a3, _b2, _c2;
+      return (_c2 = (_b2 = (_a3 = state2.form) == null ? void 0 : _a3[formName]) == null ? void 0 : _b2.values) == null ? void 0 : _c2.shouldEditableCellInputBeCleared;
+    }, "shouldEditableCellInputBeClearedSelector");
+    const editingCell = useSelector(editingCellSelector);
     const shouldEditableCellInputBeCleared = useSelector(
-      (state2) => {
-        var _a3, _b2, _c2;
-        return (_c2 = (_b2 = (_a3 = state2.form) == null ? void 0 : _a3[formName]) == null ? void 0 : _b2.values) == null ? void 0 : _c2.shouldEditableCellInputBeCleared;
-      }
+      shouldEditableCellInputBeClearedSelector
     );
     const [row] = args;
     const rowId = getIdOrCodeOrIndex(row.original, row.index);
@@ -80085,6 +80550,238 @@ ${latestSubscriptionCallbackError.current.stack}
       }
     ));
   }, "RenderCell");
+  function MenuItemLink({ text: text2, onClick, icon, navTo, active: active2, disabled }) {
+    if (disabled) {
+      return /* @__PURE__ */ React.createElement("li", { className: POPOVER_DISMISS }, /* @__PURE__ */ React.createElement(MenuItem, { icon, disabled: true, text: text2 }));
+    }
+    const handleLinkClick = /* @__PURE__ */ __name((e2) => {
+      e2.target.closest(`.${POPOVER_DISMISS}`).click();
+    }, "handleLinkClick");
+    return /* @__PURE__ */ React.createElement("li", { className: POPOVER_DISMISS, onClick }, /* @__PURE__ */ React.createElement(
+      Link,
+      {
+        onClick: handleLinkClick,
+        to: navTo,
+        className: classNames$1(MENU_ITEM, {
+          [ACTIVE]: active2,
+          [INTENT_PRIMARY]: active2
+        })
+      },
+      icon && /* @__PURE__ */ React.createElement(Icon, { icon }),
+      /* @__PURE__ */ React.createElement("div", { className: "bp3-text-overflow-ellipsis bp3-fill" }, text2)
+    ));
+  }
+  __name(MenuItemLink, "MenuItemLink");
+  const EnhancedMenuItem = compose(
+    lifecycle({
+      componentDidMount: /* @__PURE__ */ __name(function() {
+        const { didMount = noop$8, className } = this.props;
+        didMount({ className });
+      }, "componentDidMount"),
+      componentWillUnmount: /* @__PURE__ */ __name(function() {
+        const { willUnmount = noop$8, className } = this.props;
+        willUnmount({ className });
+      }, "componentWillUnmount")
+    }),
+    branch(({ navTo }) => navTo, withRouter)
+  )(function(_u) {
+    var _v = _u, {
+      navTo,
+      context: context2,
+      staticContext,
+      didMount,
+      willUnmount
+    } = _v, props = __objRest(_v, [
+      "navTo",
+      "context",
+      "staticContext",
+      "didMount",
+      "willUnmount"
+    ]);
+    let MenuItemComp = MenuItem;
+    if (navTo) {
+      MenuItemComp = MenuItemLink;
+    }
+    return /* @__PURE__ */ React.createElement(
+      MenuItemComp,
+      __spreadProps(__spreadValues(__spreadValues({
+        popoverProps: {
+          autoFocus: false
+        }
+      }, navTo && { navTo }), props), {
+        onClick: props.onClick ? (...args) => {
+          return props.onClick(...args, context2);
+        } : void 0
+      })
+    );
+  });
+  function fnu(...args) {
+    return args.find((v2) => v2 !== void 0);
+  }
+  __name(fnu, "fnu");
+  const tickMenuEnhancer = /* @__PURE__ */ __name((def) => {
+    const out = __spreadValues({}, def);
+    if (out.checked !== void 0) {
+      out.icon = out.checked ? "small-tick" : "blank";
+    }
+    return out;
+  }, "tickMenuEnhancer");
+  const commandMenuEnhancer = /* @__PURE__ */ __name((commands, config = {}) => (def, context2) => {
+    const cmdId = typeof def === "string" ? def : def.cmd;
+    let item = typeof def === "string" ? { cmd: def } : __spreadValues({}, def);
+    const useTicks = fnu(item.useTicks, config.useTicks);
+    delete item.useTicks;
+    if (cmdId && commands[cmdId] && def.divider === void 0) {
+      const command = commands[cmdId];
+      const { isActive: isActive2, isDisabled, isHidden: isHidden2 } = command;
+      const toggles = isActive2 !== void 0;
+      item.hidden = fnu(item.hidden, isHidden2);
+      item.disabled = fnu(item.disabled, isDisabled);
+      item.key = item.key || cmdId;
+      item.submenu = item.submenu || command.submenu;
+      item.component = item.component || command.component;
+      if (toggles) {
+        if (useTicks) {
+          item.text = item.text || command.shortName || command.name;
+          item.checked = item.checked || isActive2;
+        } else {
+          item.text = item.text || (isActive2 ? command.name : command.inactiveName || command.name);
+          item.icon = item.icon || (isActive2 ? command.icon : command.inactiveIcon || command.icon);
+        }
+      } else {
+        item.text = item.text || command.name;
+        item.icon = item.icon || command.icon;
+      }
+      item.hotkey = item.hotkey || command.hotkey;
+      if (!item.onClick) {
+        item.onClick = (event) => command.execute({
+          event,
+          context: context2,
+          menuItem: item,
+          viaMenu: true
+        });
+      }
+    } else if (cmdId && !commands[cmdId]) {
+      item.text = item.text || startCase(cmdId);
+      item.disabled = true;
+    }
+    if (config.omitIcons) {
+      item.icon = void 0;
+    }
+    if (config.forceIconAlignment !== false) {
+      item.icon = item.icon || "blank";
+    }
+    if (useTicks) {
+      item = tickMenuEnhancer(item);
+    }
+    return item;
+  }, "commandMenuEnhancer");
+  const ident$1 = /* @__PURE__ */ __name((x2) => x2, "ident$1");
+  const dividerShorthandEnhancer = /* @__PURE__ */ __name((def) => typeof def === "string" && def.startsWith("--") ? { divider: def.substr(2) } : def, "dividerShorthandEnhancer");
+  const unwantedAttrs = [
+    "isSimpleText",
+    "justText",
+    "submenu",
+    "component",
+    "hotkey",
+    "changingProps",
+    "showInSearchMenu",
+    "hideFromMenuSearch"
+  ];
+  const DynamicMenuItem = /* @__PURE__ */ __name(({
+    def,
+    enhancers = [ident$1],
+    context: context2,
+    doNotEnhanceTopLevelItem
+  }) => {
+    if (React.isValidElement(def)) return def;
+    const item = [
+      dividerShorthandEnhancer,
+      ...doNotEnhanceTopLevelItem ? [ident$1] : enhancers
+    ].reduce((v2, f2) => f2(v2, context2), def);
+    let out;
+    if (item.divider !== void 0) {
+      out = /* @__PURE__ */ React.createElement(
+        MenuDivider,
+        __spreadValues({}, item.divider ? { title: item.divider, className: item.className } : {})
+      );
+    } else {
+      const ItemComponent = item.component || EnhancedMenuItem;
+      out = /* @__PURE__ */ React.createElement(
+        ItemComponent,
+        __spreadProps(__spreadValues({}, omit$1(item, unwantedAttrs)), {
+          context: context2,
+          icon: item.icon || item.iconName,
+          labelElement: item.hotkey && /* @__PURE__ */ React.createElement(KeyCombo, { minimal: true, combo: item.hotkey }),
+          text: item.text
+        }),
+        item.submenu ? item.submenu.filter(ident$1).map((def2, index2) => /* @__PURE__ */ React.createElement(DynamicMenuItem, __spreadValues({ key: index2 }, { def: def2, enhancers, context: context2 }))) : void 0
+      );
+    }
+    if (item.disabled && typeof item.disabled === "string") {
+      item.tooltip = item.disabled;
+    }
+    if (item.tooltip) {
+      out = /* @__PURE__ */ React.createElement(Tooltip, { content: item.tooltip }, out);
+    }
+    return item.hidden ? null : out;
+  }, "DynamicMenuItem");
+  const createDynamicMenu = /* @__PURE__ */ __name((menuDef2, enhancers, context2) => {
+    if (menuDef2 instanceof Array) {
+      return menuDef2.map((def, index2) => /* @__PURE__ */ React.createElement(DynamicMenuItem, __spreadValues({ key: index2 }, { def, enhancers, context: context2 })));
+    } else {
+      return /* @__PURE__ */ React.createElement(DynamicMenuItem, __spreadValues({}, { def: menuDef2, enhancers, context: context2 }));
+    }
+  }, "createDynamicMenu");
+  const createCommandMenu = /* @__PURE__ */ __name((menuDef2, commands, config, context2) => {
+    return createDynamicMenu(
+      menuDef2,
+      [commandMenuEnhancer(commands, config)],
+      context2
+    );
+  }, "createCommandMenu");
+  function showContextMenu(menuDef2, enhancers, event, onClose, context2, menuComp = Menu) {
+    menuDef2 = filterMenuForCorrectness(menuDef2);
+    if (!menuDef2) return;
+    const MenuComponent = menuComp;
+    event.persist && event.persist();
+    ContextMenu.show(
+      /* @__PURE__ */ React.createElement(MenuComponent, null, createDynamicMenu(menuDef2, enhancers, context2)),
+      { left: event.clientX, top: event.clientY },
+      onClose
+    );
+    event.stopPropagation && event.stopPropagation();
+    event.preventDefault && event.preventDefault();
+  }
+  __name(showContextMenu, "showContextMenu");
+  function filterMenuForCorrectness(menuDef2) {
+    return menuDef2 && menuDef2.length && menuDef2.filter(ident$1);
+  }
+  __name(filterMenuForCorrectness, "filterMenuForCorrectness");
+  function getStringFromReactComponent(comp) {
+    var _a2;
+    if (!comp) return "";
+    if (isString$1(comp) || isNumber$2(comp)) return comp;
+    if ((_a2 = comp.props) == null ? void 0 : _a2.text) {
+      return getStringFromReactComponent(comp.props.text);
+    }
+    const { children } = comp.props || {};
+    if (!children) return "";
+    if (isArray$2(children))
+      return flatMap(children, getStringFromReactComponent).join("");
+    if (isString$1(children)) return children;
+    if (children.props) {
+      return getStringFromReactComponent(children.props);
+    }
+  }
+  __name(getStringFromReactComponent, "getStringFromReactComponent");
+  function doesSearchValMatchText(searchVal, justText) {
+    return fuzzysearch(
+      searchVal ? searchVal.toLowerCase() : "",
+      justText ? justText.toLowerCase() : ""
+    );
+  }
+  __name(doesSearchValMatchText, "doesSearchValMatchText");
   dayjs.extend(localizedFormat);
   const RenderColumnHeader = /* @__PURE__ */ __name(({
     recordIdToIsVisibleMap,
@@ -80096,8 +80793,13 @@ ${latestSubscriptionCallbackError.current.stack}
     entities,
     extraCompact,
     filters,
+    resetDefaultVisibility,
+    onlyOneVisibleColumn,
     formName,
     isCellEditable,
+    updateColumnVisibility,
+    schema: schema2,
+    withDisplayOptions,
     isLocalCall,
     order: order2,
     removeSingleFilter,
@@ -80193,6 +80895,56 @@ ${latestSubscriptionCallbackError.current.stack}
           <strong>${columnTitle}:</strong> <br>
           ${description2} ${isUnique ? "<br>Must be unique" : ""}</div>`
       }), {
+        onContextMenu: /* @__PURE__ */ __name((e2) => {
+          if (!withDisplayOptions) {
+            return;
+          }
+          e2.preventDefault();
+          e2.persist();
+          showContextMenu(
+            [
+              dragNoticeEl,
+              {
+                text: "Hide Column",
+                disabled: onlyOneVisibleColumn,
+                icon: "eye-off",
+                onClick: /* @__PURE__ */ __name(() => {
+                  updateColumnVisibility({
+                    shouldShow: false,
+                    path: path2
+                  });
+                }, "onClick")
+              },
+              {
+                text: "Hide Other Columns",
+                icon: "eye-off",
+                onClick: /* @__PURE__ */ __name(() => {
+                  updateColumnVisibility({
+                    shouldShow: false,
+                    paths: schema2.fields.map((c2) => c2.path).filter(Boolean).filter((p2) => p2 !== path2)
+                  });
+                }, "onClick")
+              },
+              {
+                text: "Reset Column Visibilities",
+                icon: "reset",
+                onClick: /* @__PURE__ */ __name(() => {
+                  resetDefaultVisibility();
+                }, "onClick")
+              },
+              {
+                text: "Table Display Options",
+                icon: "cog",
+                onClick: /* @__PURE__ */ __name(() => {
+                  var _a2, _b2;
+                  (_b2 = (_a2 = e2.target.closest(".data-table-container")) == null ? void 0 : _a2.querySelector(".tg-table-display-options")) == null ? void 0 : _b2.click();
+                }, "onClick")
+              }
+            ],
+            void 0,
+            e2
+          );
+        }, "onContextMenu"),
         "data-test": columnTitleTextified,
         "data-path": path2,
         "data-copy-text": columnTitleTextified,
@@ -80364,8 +81116,10 @@ ${latestSubscriptionCallbackError.current.stack}
     addFilters,
     cellRenderer,
     columns,
+    resetDefaultVisibility,
     currentParams,
     compact,
+    hideExpandSubCompColumn,
     editingCell,
     editingCellSelectAll,
     entities,
@@ -80398,6 +81152,7 @@ ${latestSubscriptionCallbackError.current.stack}
     selectedCells,
     setExpandedEntityIdMap,
     setNewParams,
+    updateColumnVisibility,
     setOrder = noop$8,
     setSelectedCells,
     shouldShowSubComponent,
@@ -80411,7 +81166,9 @@ ${latestSubscriptionCallbackError.current.stack}
     withFilter: _withFilter,
     withSort = true,
     recordIdToIsVisibleMap,
-    setRecordIdToIsVisibleMap
+    setRecordIdToIsVisibleMap,
+    withDisplayOptions,
+    getCheckboxGroupId
   }) => {
     const dispatch = useDispatch();
     const change$12 = reactExports.useCallback(
@@ -80659,6 +81416,14 @@ ${latestSubscriptionCallbackError.current.stack}
           return /* @__PURE__ */ React.createElement("div", null);
         }
         const entity = entities[rowIndex];
+        if (getCheckboxGroupId) {
+          const currentGroupId = getCheckboxGroupId(entity, rowIndex);
+          const previousEntity = entities[rowIndex - 1];
+          const previousGroupId = previousEntity ? getCheckboxGroupId(previousEntity, rowIndex - 1) : void 0;
+          if (currentGroupId && currentGroupId === previousGroupId) {
+            return /* @__PURE__ */ React.createElement("div", null);
+          }
+        }
         return /* @__PURE__ */ React.createElement(
           Checkbox,
           {
@@ -80677,7 +81442,8 @@ ${latestSubscriptionCallbackError.current.stack}
                 onMultiRowSelect,
                 noDeselectAll,
                 onRowSelect,
-                change: change$12
+                change: change$12,
+                getCheckboxGroupId
               });
             }, "onClick"),
             checked: isSelected
@@ -80698,7 +81464,8 @@ ${latestSubscriptionCallbackError.current.stack}
         onRowSelect,
         onSingleRowSelect,
         reduxFormSelectedEntityIdMap,
-        withCheckboxes
+        withCheckboxes,
+        getCheckboxGroupId
       ]
     );
     const finishCellEdit = reactExports.useCallback(
@@ -80773,13 +81540,14 @@ ${latestSubscriptionCallbackError.current.stack}
           );
         }, "Header")
       }), {
+        show: !hideExpandSubCompColumn,
         expander: true,
         Expander: /* @__PURE__ */ __name(({ isExpanded, original: record }) => {
           let shouldShow = true;
           if (shouldShowSubComponent) {
             shouldShow = shouldShowSubComponent(record);
           }
-          if (!shouldShow) return null;
+          if (!shouldShow || hideExpandSubCompColumn) return null;
           return /* @__PURE__ */ React.createElement(
             Button,
             {
@@ -80826,18 +81594,26 @@ ${latestSubscriptionCallbackError.current.stack}
         }, "getProps")
       });
     }
-    const tableColumns = columns.map((column) => {
+    const tableColumns = flatMap(columns, (column) => {
+      if (column.isHidden) {
+        return [];
+      }
       const tableColumn = __spreadProps(__spreadValues({}, column), {
         Header: RenderColumnHeader({
+          onlyOneVisibleColumn: columns.length === 1,
           recordIdToIsVisibleMap,
           setRecordIdToIsVisibleMap,
           column,
+          withDisplayOptions,
           isLocalCall,
           filters,
           currentParams,
           order: order2,
+          resetDefaultVisibility,
           setOrder,
           withSort,
+          schema: schema2,
+          updateColumnVisibility,
           formName,
           extraCompact,
           withFilter,
@@ -80853,8 +81629,9 @@ ${latestSubscriptionCallbackError.current.stack}
         getHeaderProps: /* @__PURE__ */ __name(() => ({
           // needs to be a string because it is getting passed
           // to the dom
-          immovable: column.immovable ? "true" : "false",
-          columnindex: column.columnIndex
+          immovable: column.type === "action" || column.immovable ? "true" : "false",
+          columnindex: column.columnIndex,
+          path: column.path
         }), "getHeaderProps")
       });
       const noEllipsis = column.noEllipsis;
@@ -81138,8 +81915,8 @@ ${latestSubscriptionCallbackError.current.stack}
     return Constructor;
   }
   __name(_createClass, "_createClass");
-  function _extends$1() {
-    _extends$1 = Object.assign ? Object.assign.bind() : function(target) {
+  function _extends$2() {
+    _extends$2 = Object.assign ? Object.assign.bind() : function(target) {
       for (var i2 = 1; i2 < arguments.length; i2++) {
         var source = arguments[i2];
         for (var key in source) {
@@ -81150,9 +81927,9 @@ ${latestSubscriptionCallbackError.current.stack}
       }
       return target;
     };
-    return _extends$1.apply(this, arguments);
+    return _extends$2.apply(this, arguments);
   }
-  __name(_extends$1, "_extends$1");
+  __name(_extends$2, "_extends$2");
   function _inheritsLoose(subClass, superClass) {
     subClass.prototype = Object.create(superClass.prototype);
     subClass.prototype.constructor = subClass;
@@ -81239,7 +82016,7 @@ ${latestSubscriptionCallbackError.current.stack}
   __name(createDecoratorAnnotation, "createDecoratorAnnotation");
   function storeAnnotation(prototype, key, annotation) {
     if (!hasProp(prototype, storedAnnotationsSymbol)) {
-      addHiddenProp(prototype, storedAnnotationsSymbol, _extends$1({}, prototype[storedAnnotationsSymbol]));
+      addHiddenProp(prototype, storedAnnotationsSymbol, _extends$2({}, prototype[storedAnnotationsSymbol]));
     }
     if (!isOverride(annotation)) {
       prototype[storedAnnotationsSymbol][key] = annotation;
@@ -81608,7 +82385,7 @@ ${latestSubscriptionCallbackError.current.stack}
   __name(make_$3, "make_$3");
   function extend_$3(adm, key, descriptor, proxyTrap) {
     assertComputedDescriptor(adm, this, key, descriptor);
-    return adm.defineComputedProperty_(key, _extends$1({}, this.options_, {
+    return adm.defineComputedProperty_(key, _extends$2({}, this.options_, {
       get: descriptor.get,
       set: descriptor.set
     }), proxyTrap);
@@ -81619,7 +82396,7 @@ ${latestSubscriptionCallbackError.current.stack}
     var key = context2.name, addInitializer = context2.addInitializer;
     addInitializer(function() {
       var adm = asObservableObject(this)[$mobx];
-      var options = _extends$1({}, ann.options_, {
+      var options = _extends$2({}, ann.options_, {
         get: get4,
         context: this
       });
@@ -84418,7 +85195,7 @@ ${latestSubscriptionCallbackError.current.stack}
           }
           var newValue = change2.newValue;
           if (descriptor.value !== newValue) {
-            descriptor = _extends$1({}, descriptor, {
+            descriptor = _extends$2({}, descriptor, {
               value: newValue
             });
           }
@@ -85023,6 +85800,33 @@ ${latestSubscriptionCallbackError.current.stack}
       $mobx
     });
   }
+  const isEqualIgnoreFunctions = /* @__PURE__ */ __name((o1, o2) => {
+    const isEq = isEqualWith(o1, o2, function(val1, val2) {
+      if (isFunction$1(val1) && isFunction$1(val2)) {
+        return val1 === val2 || val1.toString() === val2.toString();
+      }
+      if (val1 && val1.constructor && val1.constructor.name === "FiberNode")
+        return true;
+    });
+    return isEq;
+  }, "isEqualIgnoreFunctions");
+  const useDeepEqualMemoIgnoreFns = /* @__PURE__ */ __name((value) => {
+    const ref2 = reactExports.useRef();
+    if (!isEqualIgnoreFunctions(value, ref2.current)) {
+      ref2.current = value;
+    }
+    return ref2.current;
+  }, "useDeepEqualMemoIgnoreFns");
+  const useDeepEqualMemo = /* @__PURE__ */ __name((value) => {
+    const ref2 = reactExports.useRef();
+    if (!isEqual$3(value, ref2.current)) {
+      ref2.current = value;
+    }
+    return ref2.current;
+  }, "useDeepEqualMemo");
+  const useMemoDeepEqual = /* @__PURE__ */ __name((value, depsArray) => {
+    return reactExports.useMemo(value, useDeepEqualMemo(depsArray));
+  }, "useMemoDeepEqual");
   T$1();
   const IS_LINUX = window.navigator.platform.toLowerCase().search("linux") > -1;
   const itemSizeEstimators = {
@@ -85030,11 +85834,12 @@ ${latestSubscriptionCallbackError.current.stack}
     normal: /* @__PURE__ */ __name(() => 33.34, "normal"),
     comfortable: /* @__PURE__ */ __name(() => 41.34, "comfortable")
   };
-  const DataTable = /* @__PURE__ */ __name((_u) => {
-    var _v = _u, {
+  const DataTable = /* @__PURE__ */ __name((_w) => {
+    var _x = _w, {
       controlled_pageSize,
       formName = "tgDataTable",
       history,
+      doNotSearchHiddenColumns,
       isSimple,
       isLocalCall = true,
       isTableParamsConnected,
@@ -85045,10 +85850,11 @@ ${latestSubscriptionCallbackError.current.stack}
       tableParams: _tableParams,
       anyTouched,
       blur: blur2
-    } = _v, ownProps = __objRest(_v, [
+    } = _x, ownProps = __objRest(_x, [
       "controlled_pageSize",
       "formName",
       "history",
+      "doNotSearchHiddenColumns",
       "isSimple",
       "isLocalCall",
       "isTableParamsConnected",
@@ -85060,7 +85866,6 @@ ${latestSubscriptionCallbackError.current.stack}
       "anyTouched",
       "blur"
     ]);
-    var _a2;
     if (isTableParamsConnected && _tableParams && !_tableParams.entities) {
       throw new Error(
         `No entities array detected in tableParams object (<DataTable {...tableParams}/>). You need to call withQuery() after withTableParams() like: compose(withTableParams(), withQuery(something)).`
@@ -85093,24 +85898,32 @@ ${latestSubscriptionCallbackError.current.stack}
       }
       return false;
     });
+    const dtFormParamsSelector = reactExports.useMemo(
+      () => createSelector(
+        (state2) => formValueSelector(formName)(
+          state2,
+          "reduxFormCellValidation",
+          "reduxFormEntities",
+          "reduxFormQueryParams",
+          "reduxFormSelectedEntityIdMap"
+        ),
+        (result) => result
+        // identity, but memoized
+      ),
+      [formName]
+    );
     const {
       reduxFormCellValidation: _reduxFormCellValidation,
       reduxFormEditingCell,
       reduxFormEntities,
       reduxFormQueryParams: _reduxFormQueryParams = {},
       reduxFormSelectedEntityIdMap: _reduxFormSelectedEntityIdMap = {}
-    } = useSelector(
-      (state2) => formValueSelector(formName)(
-        state2,
-        "reduxFormCellValidation",
-        "reduxFormEntities",
-        "reduxFormQueryParams",
-        "reduxFormSelectedEntityIdMap"
-      )
+    } = useSelector(dtFormParamsSelector);
+    const reduxFormCellValidation = useDeepEqualMemoIgnoreFns(
+      _reduxFormCellValidation
     );
-    const reduxFormCellValidation = useDeepEqualMemo(_reduxFormCellValidation);
-    const reduxFormQueryParams = useDeepEqualMemo(_reduxFormQueryParams);
-    const reduxFormSelectedEntityIdMap = useDeepEqualMemo(
+    const reduxFormQueryParams = useDeepEqualMemoIgnoreFns(_reduxFormQueryParams);
+    const reduxFormSelectedEntityIdMap = useDeepEqualMemoIgnoreFns(
       _reduxFormSelectedEntityIdMap
     );
     let props = ownProps;
@@ -85120,7 +85933,8 @@ ${latestSubscriptionCallbackError.current.stack}
         entities: normalizedEntities
       });
     }
-    const convertedSchema = reactExports.useMemo(() => convertSchema(_schema), [_schema]);
+    const __schema = useDeepEqualMemo(_schema);
+    const convertedSchema = reactExports.useMemo(() => convertSchema(__schema), [__schema]);
     if (isLocalCall) {
       if (!noForm && (!formName || formName === "tgDataTable")) {
         throw new Error(
@@ -85140,12 +85954,11 @@ ${latestSubscriptionCallbackError.current.stack}
     const {
       doNotCoercePageSize,
       isInfinite = isSimple && !withPaging,
-      syncDisplayOptionsToDb,
       urlConnected,
       withSelectedEntities: withSelectedEntities2
     } = props;
     const defaults2 = reactExports.useMemo(() => {
-      var _a3;
+      var _a2;
       const _defaults = __spreadValues({
         pageSize: controlled_pageSize || 25,
         order: [],
@@ -85161,11 +85974,11 @@ ${latestSubscriptionCallbackError.current.stack}
           // }
         ]
       }, props.defaults || {});
-      if (isLocalCall && orderByFirstColumn && !((_a3 = _defaults == null ? void 0 : _defaults.order) == null ? void 0 : _a3.length)) {
+      if (isLocalCall && orderByFirstColumn && !((_a2 = _defaults == null ? void 0 : _defaults.order) == null ? void 0 : _a2.length)) {
         const r2 = [getCCDisplayName(convertedSchema.fields[0])];
         _defaults.order = r2;
       }
-      if (!syncDisplayOptionsToDb && userSetPageSize) {
+      if (userSetPageSize) {
         _defaults.pageSize = userSetPageSize;
       }
       return _defaults;
@@ -85175,7 +85988,6 @@ ${latestSubscriptionCallbackError.current.stack}
       isLocalCall,
       orderByFirstColumn,
       props.defaults,
-      syncDisplayOptionsToDb,
       userSetPageSize
     ]);
     const selectedEntities = withSelectedEntities2 ? getRecordsFromIdMap(reduxFormSelectedEntityIdMap) : void 0;
@@ -85186,7 +85998,7 @@ ${latestSubscriptionCallbackError.current.stack}
       const tmp = (urlConnected ? getCurrentParamsFromUrl(history.location) : reduxFormQueryParams) || {};
       return tmp;
     }, [history, reduxFormQueryParams, urlConnected]);
-    const currentParams = useDeepEqualMemo(_currentParams);
+    const currentParams = useDeepEqualMemoIgnoreFns(_currentParams);
     const tableParams = reactExports.useMemo(() => {
       if (!isTableParamsConnected) {
         const setNewParams2 = /* @__PURE__ */ __name((newParams) => {
@@ -85273,8 +86085,6 @@ ${latestSubscriptionCallbackError.current.stack}
       controlled_setPage,
       controlled_setPageSize,
       controlled_total,
-      currentUser,
-      deleteTableConfiguration,
       disabled = false,
       disableSetPageSize,
       doNotShowEmptyRows,
@@ -85314,6 +86124,7 @@ ${latestSubscriptionCallbackError.current.stack}
       minimalStyle,
       mustClickCheckboxToSelect,
       noDeselectAll,
+      hideExpandSubCompColumn,
       noFooter = isSimple ? !withPaging : false,
       noFullscreenButton = isSimple,
       noHeader = false,
@@ -85344,15 +86155,13 @@ ${latestSubscriptionCallbackError.current.stack}
       setPageSize = noop$8,
       setSearchTerm = noop$8,
       shouldShowSubComponent,
-      showCount = false,
+      showCount = true,
       style: style2 = {},
       SubComponent,
       subHeader,
       tableConfigurations,
       tableName,
       topLeftItems,
-      upsertFieldOption,
-      upsertTableConfiguration,
       variables,
       withCheckboxes = false,
       withDisplayOptions,
@@ -85362,14 +86171,16 @@ ${latestSubscriptionCallbackError.current.stack}
       withSelectAll,
       withSort,
       withTitle = !isSimple,
-      noExcessiveCheck
+      noExcessiveCheck,
+      isEntityCountLoading,
+      getCheckboxGroupId
     } = props;
     const _entities = reactExports.useMemo(
       () => ((reduxFormEntities == null ? void 0 : reduxFormEntities.length) ? reduxFormEntities : _origEntities) || [],
       [_origEntities, reduxFormEntities]
     );
-    const entities = useDeepEqualMemo(_entities);
-    const entitiesAcrossPages = useDeepEqualMemo(_entitiesAcrossPages);
+    const entities = useDeepEqualMemoIgnoreFns(_entities);
+    const entitiesAcrossPages = useDeepEqualMemoIgnoreFns(_entitiesAcrossPages);
     reactExports.useEffect(() => {
       change$12("allOrderedEntities", entitiesAcrossPages);
       if (entities.length === 0 || isEmpty$1(reduxFormSelectedEntityIdMap)) return;
@@ -85382,27 +86193,41 @@ ${latestSubscriptionCallbackError.current.stack}
       entitiesAcrossPages,
       reduxFormSelectedEntityIdMap,
       change$12,
-      noExcessiveCheck
+      noExcessiveCheck,
+      entities,
+      formName
     ]);
-    const [tableConfig, setTableConfig] = reactExports.useState({ fieldOptions: [] });
+    const [tableConfig, _setTableConfig] = reactExports.useState({ fieldOptions: [] });
+    const setTableConfig = reactExports.useCallback(
+      (newConfig) => {
+        _setTableConfig((prev) => {
+          let newConfigVal = newConfig;
+          if (typeof newConfig === "function") {
+            newConfigVal = newConfig(prev);
+          }
+          if (!isEqual$3(prev.fieldOptions, newConfigVal.fieldOptions)) {
+            change$12(
+              "reduxFormReadOnlyFieldOptions",
+              newConfigVal.fieldOptions || []
+            );
+          }
+          return newConfigVal;
+        });
+      },
+      [change$12]
+    );
     reactExports.useEffect(() => {
       if (withDisplayOptions) {
         let newTableConfig = {};
-        if (syncDisplayOptionsToDb) {
-          newTableConfig = tableConfigurations && tableConfigurations[0];
-        } else {
-          newTableConfig = getTableConfigFromStorage(formName);
-        }
+        newTableConfig = getTableConfigFromStorage(formName);
         setTableConfig((prev) => {
           if (!newTableConfig) {
             newTableConfig = {
               fieldOptions: []
             };
-            if (isEqual$3(prev, newTableConfig)) {
-              return prev;
-            } else {
-              return newTableConfig;
-            }
+          }
+          if (isEqual$3(prev, newTableConfig)) {
+            return prev;
           } else {
             return newTableConfig;
           }
@@ -85412,7 +86237,7 @@ ${latestSubscriptionCallbackError.current.stack}
       convertedSchema,
       // If the schema changes we want to take into account the synced tableConfig again
       formName,
-      syncDisplayOptionsToDb,
+      setTableConfig,
       tableConfigurations,
       withDisplayOptions,
       noExcessiveCheck
@@ -85460,8 +86285,7 @@ ${latestSubscriptionCallbackError.current.stack}
           }
           if (noValsForField && entities.length) {
             return __spreadProps(__spreadValues({}, field), {
-              isHidden: true,
-              isForcedHidden: true
+              isHidden: true
             });
           } else if (fieldOpt) {
             return __spreadProps(__spreadValues({}, field), {
@@ -85501,6 +86325,7 @@ ${latestSubscriptionCallbackError.current.stack}
       convertedSchema,
       currentParams,
       entities,
+      setTableConfig,
       history,
       isInfinite,
       isOpenable,
@@ -85514,6 +86339,7 @@ ${latestSubscriptionCallbackError.current.stack}
       withDisplayOptions,
       recordIdToIsVisibleMap
     ]);
+    const [columns, setColumns] = reactExports.useState([]);
     const {
       moveColumnPersist,
       persistPageSize,
@@ -85530,69 +86356,37 @@ ${latestSubscriptionCallbackError.current.stack}
       let resizePersist2 = noop$8;
       if (withDisplayOptions) {
         const fieldOptsByPath = keyBy(tableConfig.fieldOptions, "path");
-        if (syncDisplayOptionsToDb) {
-          let tableConfigurationId;
-          resetDefaultVisibility2 = /* @__PURE__ */ __name(function() {
-            tableConfigurationId = tableConfig.id;
-            if (tableConfigurationId) {
-              deleteTableConfiguration(tableConfigurationId);
-            }
-          }, "resetDefaultVisibility2");
-          updateColumnVisibility2 = /* @__PURE__ */ __name(function({ shouldShow, path: path2 }) {
-            if (tableConfigurationId) {
-              const existingFieldOpt = fieldOptsByPath[path2] || {};
-              upsertFieldOption({
-                id: existingFieldOpt.id,
-                path: path2,
-                isHidden: !shouldShow,
-                tableConfigurationId
-              });
-            } else {
-              upsertTableConfiguration({
-                userId: currentUser.user.id,
-                formName,
-                fieldOptions: [
-                  {
-                    path: path2,
-                    isHidden: !shouldShow
-                  }
-                ]
-              });
-            }
-          }, "updateColumnVisibility2");
-        } else {
-          const syncStorage = /* @__PURE__ */ __name((newTableConfig) => {
-            setTableConfig(newTableConfig);
-            window.localStorage.setItem(formName, JSON.stringify(newTableConfig));
-          }, "syncStorage");
-          resetDefaultVisibility2 = /* @__PURE__ */ __name(function() {
-            setTableConfig({ fieldOptions: [] });
-            window.localStorage.removeItem(formName);
-          }, "resetDefaultVisibility2");
-          updateColumnVisibility2 = /* @__PURE__ */ __name(function({ path: path2, paths, shouldShow }) {
-            const newFieldOpts = __spreadValues({}, fieldOptsByPath);
-            const pathsToUse = paths ? paths : [path2];
-            pathsToUse.forEach((path22) => {
-              newFieldOpts[path22] = { path: path22, isHidden: !shouldShow };
-            });
-            syncStorage(__spreadProps(__spreadValues({}, tableConfig), { fieldOptions: toArray(newFieldOpts) }));
-          }, "updateColumnVisibility2");
-          updateTableDisplayDensity2 = /* @__PURE__ */ __name(function(density) {
-            syncStorage(__spreadProps(__spreadValues({}, tableConfig), { density }));
-          }, "updateTableDisplayDensity2");
-          persistPageSize2 = /* @__PURE__ */ __name(function(pageSize2) {
-            syncStorage(__spreadProps(__spreadValues({}, tableConfig), { userSetPageSize: pageSize2 }));
-          }, "persistPageSize2");
-          moveColumnPersist2 = /* @__PURE__ */ __name(function({ oldIndex, newIndex }) {
-            const columnOrderings = tableConfig.columnOrderings || schema2.fields.map(({ path: path2 }) => path2);
-            syncStorage(__spreadProps(__spreadValues({}, tableConfig), {
-              columnOrderings: arrayMove(columnOrderings, oldIndex, newIndex)
-            }));
-          }, "moveColumnPersist2");
-          resizePersist2 = /* @__PURE__ */ __name(function(newResized) {
-            syncStorage(__spreadProps(__spreadValues({}, tableConfig), { resized: newResized }));
-          }, "resizePersist2");
-        }
+        const syncStorage = /* @__PURE__ */ __name((newTableConfig) => {
+          setTableConfig(newTableConfig);
+          window.localStorage.setItem(formName, JSON.stringify(newTableConfig));
+        }, "syncStorage");
+        resetDefaultVisibility2 = /* @__PURE__ */ __name(function() {
+          setTableConfig({ fieldOptions: [] });
+          window.localStorage.removeItem(formName);
+        }, "resetDefaultVisibility2");
+        updateColumnVisibility2 = /* @__PURE__ */ __name(function({ path: path2, paths, shouldShow }) {
+          const newFieldOpts = __spreadValues({}, fieldOptsByPath);
+          const pathsToUse = paths ? paths : [path2];
+          pathsToUse.forEach((path22) => {
+            newFieldOpts[path22] = { path: path22, isHidden: !shouldShow };
+          });
+          syncStorage(__spreadProps(__spreadValues({}, tableConfig), { fieldOptions: toArray(newFieldOpts) }));
+        }, "updateColumnVisibility2");
+        updateTableDisplayDensity2 = /* @__PURE__ */ __name(function(density) {
+          syncStorage(__spreadProps(__spreadValues({}, tableConfig), { density }));
+        }, "updateTableDisplayDensity2");
+        persistPageSize2 = /* @__PURE__ */ __name(function(pageSize2) {
+          syncStorage(__spreadProps(__spreadValues({}, tableConfig), { userSetPageSize: pageSize2 }));
+        }, "persistPageSize2");
+        moveColumnPersist2 = /* @__PURE__ */ __name(function({ oldIndex, newIndex }) {
+          const columnOrderings = tableConfig.columnOrderings || columns.map(({ path: path2 }) => path2);
+          syncStorage(__spreadProps(__spreadValues({}, tableConfig), {
+            columnOrderings: arrayMove(columnOrderings, oldIndex, newIndex)
+          }));
+        }, "moveColumnPersist2");
+        resizePersist2 = /* @__PURE__ */ __name(function(newResized) {
+          syncStorage(__spreadProps(__spreadValues({}, tableConfig), { resized: newResized }));
+        }, "resizePersist2");
       }
       return {
         moveColumnPersist: moveColumnPersist2,
@@ -85602,17 +86396,7 @@ ${latestSubscriptionCallbackError.current.stack}
         updateColumnVisibility: updateColumnVisibility2,
         updateTableDisplayDensity: updateTableDisplayDensity2
       };
-    }, [
-      (_a2 = currentUser == null ? void 0 : currentUser.user) == null ? void 0 : _a2.id,
-      deleteTableConfiguration,
-      formName,
-      schema2.fields,
-      syncDisplayOptionsToDb,
-      tableConfig,
-      upsertFieldOption,
-      upsertTableConfiguration,
-      withDisplayOptions
-    ]);
+    }, [formName, setTableConfig, columns, tableConfig, withDisplayOptions]);
     let compact = _compact;
     let extraCompact = _extraCompact;
     if (withDisplayOptions && tableConfig.density) {
@@ -85918,8 +86702,8 @@ ${latestSubscriptionCallbackError.current.stack}
     const waitUntilAllRowsAreRendered = reactExports.useCallback(() => {
       return new Promise((resolve) => {
         const interval = setInterval(() => {
-          var _a3, _b2;
-          const allRowEls = (_b2 = (_a3 = tableRef.current) == null ? void 0 : _a3.tableRef) == null ? void 0 : _b2.querySelectorAll(".rt-tr-group");
+          var _a2, _b2;
+          const allRowEls = (_b2 = (_a2 = tableRef.current) == null ? void 0 : _a2.tableRef) == null ? void 0 : _b2.querySelectorAll(".rt-tr-group");
           if ((allRowEls == null ? void 0 : allRowEls.length) === entities.length) {
             clearInterval(interval);
             resolve();
@@ -86236,7 +87020,6 @@ ${latestSubscriptionCallbackError.current.stack}
       ]
     );
     const { handleKeyDown, handleKeyUp } = useHotkeys(hotKeys);
-    const [columns, setColumns] = reactExports.useState([]);
     const [fullscreen, setFullscreen] = reactExports.useState(false);
     const [selectingAll, setSelectingAll] = reactExports.useState(false);
     reactExports.useEffect(() => {
@@ -86417,16 +87200,15 @@ ${latestSubscriptionCallbackError.current.stack}
       addFilters(additionalFilters);
     }, [additionalFilters]);
     reactExports.useEffect(() => {
-      setColumns(
-        schema2.fields ? schema2.fields.reduce((col, field, i2) => {
-          if (field.isHidden) {
-            return col;
-          }
-          return col.concat(__spreadProps(__spreadValues({}, field), {
-            columnIndex: i2
-          }));
-        }, []) : []
-      );
+      const newCols = schema2.fields ? schema2.fields.reduce((columns2, field, i2) => {
+        if (field.isHidden) {
+          return columns2.concat(field);
+        }
+        return columns2.concat(__spreadProps(__spreadValues({}, field), {
+          columnIndex: i2
+        }));
+      }, []) : [];
+      setColumns(newCols);
     }, [schema2 == null ? void 0 : schema2.fields]);
     const setSelectedIds = reactExports.useCallback(
       (selectedIds2, scrollToFirst) => {
@@ -86495,25 +87277,19 @@ ${latestSubscriptionCallbackError.current.stack}
     const TheadComponent = reactExports.useCallback(
       ({ className: className2, style: style22, children: children2 }) => {
         const moveColumn = /* @__PURE__ */ __name(({ oldIndex, newIndex }) => {
-          let oldStateColumnIndex, newStateColumnIndex;
-          columns.forEach((column, i2) => {
-            if (oldIndex === column.columnIndex) oldStateColumnIndex = i2;
-            if (newIndex === column.columnIndex) newStateColumnIndex = i2;
-          });
-          const newColumns = arrayMove(
-            columns,
-            oldStateColumnIndex,
-            newStateColumnIndex
-          ).map((column, i2) => {
-            return __spreadProps(__spreadValues({}, column), {
-              columnIndex: i2
-            });
-          });
+          const newColumns = arrayMove(columns, oldIndex, newIndex).map(
+            (column, i2) => {
+              return __spreadProps(__spreadValues({}, column), {
+                columnIndex: i2
+              });
+            }
+          );
           setColumns(newColumns);
         }, "moveColumn");
         return /* @__PURE__ */ React.createElement(
           SortableColumns,
           {
+            sortedItemsFull: columns.map((c2) => c2.path),
             className: className2,
             style: style22,
             moveColumn: moveColumnPersist || moveColumn
@@ -86546,8 +87322,8 @@ ${latestSubscriptionCallbackError.current.stack}
       });
     }, "addEntitiesToSelection");
     const refocusTable = reactExports.useCallback(() => {
-      var _a3, _b2;
-      const table2 = (_b2 = (_a3 = tableRef.current) == null ? void 0 : _a3.tableRef) == null ? void 0 : _b2.closest(
+      var _a2, _b2;
+      const table2 = (_b2 = (_a2 = tableRef.current) == null ? void 0 : _a2.tableRef) == null ? void 0 : _b2.closest(
         ".data-table-container>div"
       );
       table2 == null ? void 0 : table2.focus();
@@ -86932,6 +87708,15 @@ ${latestSubscriptionCallbackError.current.stack}
         const isExpanded = expandedEntityIdMap[rowId];
         const rowDisabled = isEntityDisabled(entity);
         const dataId = entity.id || entity.code;
+        let noGroupBorder = false;
+        if (getCheckboxGroupId) {
+          const currentGroupId = getCheckboxGroupId(entity, rowInfo.index);
+          const nextEntity = entities[rowInfo.index + 1];
+          const nextGroupId = nextEntity ? getCheckboxGroupId(nextEntity, rowInfo.index + 1) : void 0;
+          if (currentGroupId && currentGroupId === nextGroupId) {
+            noGroupBorder = true;
+          }
+        }
         return {
           onClick: /* @__PURE__ */ __name((e2) => {
             if (isCellEditable) return;
@@ -86958,7 +87743,8 @@ ${latestSubscriptionCallbackError.current.stack}
               onMultiRowSelect,
               noDeselectAll,
               onRowSelect,
-              change: change$12
+              change: change$12,
+              getCheckboxGroupId
             });
           }, "onClick"),
           //row right click
@@ -87000,9 +87786,11 @@ ${latestSubscriptionCallbackError.current.stack}
             {
               disabled: rowDisabled,
               selected: rowSelected && !withCheckboxes,
-              "rt-tr-last-row": rowInfo.index === entities.length - 1
+              "rt-tr-last-row": rowInfo.index === entities.length - 1,
+              "no-group-border": noGroupBorder
             }
           ),
+          "data-test-selected": !!rowSelected,
           "data-test-id": dataId === void 0 ? rowInfo.index : dataId,
           "data-index": rowInfo.index,
           "data-tip": typeof rowDisabled === "string" ? rowDisabled : void 0,
@@ -87033,7 +87821,8 @@ ${latestSubscriptionCallbackError.current.stack}
         reduxFormSelectedEntityIdMap,
         selectedCells,
         showContextMenu2,
-        withCheckboxes
+        withCheckboxes,
+        getCheckboxGroupId
       ]
     );
     const getTableCellProps = reactExports.useCallback(
@@ -87242,13 +88031,23 @@ ${latestSubscriptionCallbackError.current.stack}
         _selectedAndTotalMessage += `/ `;
       }
       if (showCount) {
-        _selectedAndTotalMessage += `${entityCount || 0} Total`;
+        if (isEntityCountLoading && entityCount < 1) {
+          _selectedAndTotalMessage += `Loading...`;
+        } else {
+          _selectedAndTotalMessage += `${entityCount || 0} Total`;
+        }
       }
       if (_selectedAndTotalMessage) {
         _selectedAndTotalMessage = /* @__PURE__ */ React.createElement("div", null, _selectedAndTotalMessage);
       }
       return _selectedAndTotalMessage;
-    }, [entityCount, selectedRowCount, showCount, showNumSelected]);
+    }, [
+      entityCount,
+      selectedRowCount,
+      showCount,
+      showNumSelected,
+      isEntityCountLoading
+    ]);
     const shouldShowPaging = !isInfinite && withPaging && (hidePageSizeWhenPossible ? entityCount > pageSize : true);
     const SubComponentToUse = reactExports.useMemo(() => {
       if (SubComponent) {
@@ -87320,6 +88119,8 @@ ${latestSubscriptionCallbackError.current.stack}
       columns,
       currentParams,
       compact,
+      withDisplayOptions,
+      resetDefaultVisibility,
       editingCellSelectAll,
       entities,
       expandedEntityIdMap,
@@ -87334,6 +88135,7 @@ ${latestSubscriptionCallbackError.current.stack}
       isSingleSelect,
       isSelectionARectangle,
       noDeselectAll,
+      hideExpandSubCompColumn,
       noSelect,
       noUserSelect,
       onDeselect,
@@ -87357,6 +88159,7 @@ ${latestSubscriptionCallbackError.current.stack}
       startCellEdit,
       SubComponent,
       tableRef,
+      updateColumnVisibility,
       updateEntitiesHelper,
       updateValidation,
       withCheckboxes,
@@ -87364,12 +88167,13 @@ ${latestSubscriptionCallbackError.current.stack}
       withFilter,
       withSort,
       recordIdToIsVisibleMap,
+      getCheckboxGroupId,
       setRecordIdToIsVisibleMap
     });
     const scrollToTop = reactExports.useCallback(
       () => {
-        var _a3, _b2, _c2, _d2, _e, _f;
-        return (_f = (_e = (_d2 = (_c2 = (_b2 = (_a3 = tableRef.current) == null ? void 0 : _a3.tableRef) == null ? void 0 : _b2.children) == null ? void 0 : _c2[0]) == null ? void 0 : _d2.children) == null ? void 0 : _e[0]) == null ? void 0 : _f.scrollIntoView();
+        var _a2, _b2, _c2, _d2, _e, _f;
+        return (_f = (_e = (_d2 = (_c2 = (_b2 = (_a2 = tableRef.current) == null ? void 0 : _a2.tableRef) == null ? void 0 : _b2.children) == null ? void 0 : _c2[0]) == null ? void 0 : _d2.children) == null ? void 0 : _e[0]) == null ? void 0 : _f.scrollIntoView();
       },
       []
     );
@@ -87382,6 +88186,7 @@ ${latestSubscriptionCallbackError.current.stack}
           noVirtual,
           className: classNames$1({
             isCellEditable,
+            loading: isLoading,
             "tg-table-loading": isLoading,
             "tg-table-disabled": disabled
           }),
@@ -87394,7 +88199,7 @@ ${latestSubscriptionCallbackError.current.stack}
           expanded: expandedRows,
           showPagination: false,
           sortable: false,
-          loading: isLoading || disabled,
+          loading: disabled,
           defaultResized: resized,
           onResizedChange: /* @__PURE__ */ __name((newResized = []) => {
             const resizedToUse = newResized.map((column) => {
@@ -87412,7 +88217,7 @@ ${latestSubscriptionCallbackError.current.stack}
           ThComponent,
           getTrGroupProps: getTableRowProps,
           getTdProps: getTableCellProps,
-          NoDataComponent: /* @__PURE__ */ __name(({ children: children2 }) => isLoading ? null : /* @__PURE__ */ React.createElement("div", { className: "rt-noData" }, noRowsFoundMessage || children2), "NoDataComponent"),
+          NoDataComponent: /* @__PURE__ */ __name(({ children: children2 }) => isLoading ? /* @__PURE__ */ React.createElement("div", { className: "rt-noData" }, "Loading...") : /* @__PURE__ */ React.createElement("div", { className: "rt-noData" }, noRowsFoundMessage || children2), "NoDataComponent"),
           LoadingComponent: /* @__PURE__ */ __name(({ loadingText, loading }) => /* @__PURE__ */ React.createElement(
             DisabledLoadingComponent,
             {
@@ -87485,10 +88290,10 @@ ${latestSubscriptionCallbackError.current.stack}
           }, isCellEditable && {
             tabIndex: -1,
             onKeyDown: /* @__PURE__ */ __name((e2) => {
-              var _a3, _b2, _c2, _d2, _e, _f, _g, _h;
+              var _a2, _b2, _c2, _d2, _e, _f, _g, _h;
               const isTabKey = e2.key === "Tab";
               const isArrowKey = e2.key.startsWith("Arrow");
-              if (isArrowKey && ((_a3 = e2.target) == null ? void 0 : _a3.tagName) !== "INPUT" || isTabKey) {
+              if (isArrowKey && ((_a2 = e2.target) == null ? void 0 : _a2.tagName) !== "INPUT" || isTabKey) {
                 const left2 = e2.key === "ArrowLeft";
                 const up = e2.key === "ArrowUp";
                 const down = e2.key === "ArrowDown" || e2.key === "Enter";
@@ -87759,6 +88564,7 @@ ${latestSubscriptionCallbackError.current.stack}
             /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap" } }, additionalFooterButtons, !noFullscreenButton && toggleFullscreenButton, withDisplayOptions && /* @__PURE__ */ React.createElement(
               DisplayOptions,
               {
+                doNotSearchHiddenColumns,
                 compact,
                 extraCompact,
                 disabled,
@@ -87766,6 +88572,7 @@ ${latestSubscriptionCallbackError.current.stack}
                 resetDefaultVisibility,
                 updateColumnVisibility,
                 updateTableDisplayDensity,
+                moveColumnPersist,
                 showForcedHiddenColumns,
                 setShowForcedHidden,
                 hasOptionForForcedHidden: withDisplayOptions && (isSimple || isInfinite),
@@ -89935,17 +90742,19 @@ ${latestSubscriptionCallbackError.current.stack}
         return (_b2 = (_a3 = state2.form) == null ? void 0 : _a3[dataTableForm]) == null ? void 0 : _b2.values.reduxFormEntities;
       }
     );
-    const reduxFormEntities = useDeepEqualMemo(_reduxFormEntities);
+    const reduxFormEntities = useDeepEqualMemoIgnoreFns(_reduxFormEntities);
     reactExports.useEffect(() => {
       return () => dispatch(destroy(dataTableForm));
     }, [dataTableForm, dispatch]);
     const _reduxFormCellValidation = useSelector(
-      (state2) => {
+      /* @__PURE__ */ __name(function _reduxFormCellValidationSelector(state2) {
         var _a3, _b2;
         return (_b2 = (_a3 = state2.form) == null ? void 0 : _a3[dataTableForm]) == null ? void 0 : _b2.values.reduxFormCellValidation;
-      }
+      }, "_reduxFormCellValidationSelector")
     );
-    const reduxFormCellValidation = useDeepEqualMemo(_reduxFormCellValidation);
+    const reduxFormCellValidation = useDeepEqualMemoIgnoreFns(
+      _reduxFormCellValidation
+    );
     const { entsToUse, validationToUse } = reactExports.useMemo(
       () => removeCleanRows(reduxFormEntities, reduxFormCellValidation),
       [reduxFormEntities, reduxFormCellValidation]
@@ -90023,15 +90832,17 @@ ${latestSubscriptionCallbackError.current.stack}
     const {
       reduxFormEntities: _reduxFormEntities,
       reduxFormCellValidation: _reduxFormCellValidation
-    } = useSelector(
-      (state2) => formValueSelector(datatableFormName)(
+    } = useSelector(/* @__PURE__ */ __name(function dtFormNameSelector(state2) {
+      return formValueSelector(datatableFormName)(
         state2,
         "reduxFormEntities",
         "reduxFormCellValidation"
-      )
+      );
+    }, "dtFormNameSelector"));
+    const reduxFormEntities = useDeepEqualMemoIgnoreFns(_reduxFormEntities);
+    const reduxFormCellValidation = useDeepEqualMemoIgnoreFns(
+      _reduxFormCellValidation
     );
-    const reduxFormEntities = useDeepEqualMemo(_reduxFormEntities);
-    const reduxFormCellValidation = useDeepEqualMemo(_reduxFormCellValidation);
     let inner2;
     if (hasSubmitted) {
       inner2 = /* @__PURE__ */ React.createElement(
@@ -90333,8 +91144,10 @@ ${latestSubscriptionCallbackError.current.stack}
         };
       }
     });
-    const reduxFormEntitiesArray = useDeepEqualMemo(_reduxFormEntitiesArray);
-    const finishedFiles = useDeepEqualMemo(_finishedFiles);
+    const reduxFormEntitiesArray = useDeepEqualMemoIgnoreFns(
+      _reduxFormEntitiesArray
+    );
+    const finishedFiles = useDeepEqualMemoIgnoreFns(_finishedFiles);
     const [hasSubmittedOuter, setSubmittedOuter] = reactExports.useState();
     const [steps, setSteps] = reactExports.useState(getInitialSteps(true));
     const [focusedTab, setFocusedTab] = reactExports.useState(0);
@@ -92855,5034 +93668,6 @@ ${latestSubscriptionCallbackError.current.stack}
   __name(requireJszip_min, "requireJszip_min");
   var jszip_minExports = requireJszip_min();
   const JSZip = /* @__PURE__ */ getDefaultExportFromCjs(jszip_minExports);
-  var bluebird = { exports: {} };
-  /* @preserve
-   * The MIT License (MIT)
-   * 
-   * Copyright (c) 2013-2018 Petka Antonov
-   * 
-   * Permission is hereby granted, free of charge, to any person obtaining a copy
-   * of this software and associated documentation files (the "Software"), to deal
-   * in the Software without restriction, including without limitation the rights
-   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-   * copies of the Software, and to permit persons to whom the Software is
-   * furnished to do so, subject to the following conditions:
-   * 
-   * The above copyright notice and this permission notice shall be included in
-   * all copies or substantial portions of the Software.
-   * 
-   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
-   * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-   * THE SOFTWARE.
-   * 
-   */
-  var hasRequiredBluebird;
-  function requireBluebird() {
-    if (hasRequiredBluebird) return bluebird.exports;
-    hasRequiredBluebird = 1;
-    (function(module2, exports3) {
-      !function(e2) {
-        module2.exports = e2();
-      }(function() {
-        return (/* @__PURE__ */ __name(function e2(t2, n2, r2) {
-          function s2(o3, u2) {
-            if (!n2[o3]) {
-              if (!t2[o3]) {
-                var a2 = typeof _dereq_ == "function" && _dereq_;
-                if (!u2 && a2) return a2(o3, true);
-                if (i2) return i2(o3, true);
-                var f2 = new Error("Cannot find module '" + o3 + "'");
-                throw f2.code = "MODULE_NOT_FOUND", f2;
-              }
-              var l2 = n2[o3] = { exports: {} };
-              t2[o3][0].call(l2.exports, function(e3) {
-                var n3 = t2[o3][1][e3];
-                return s2(n3 ? n3 : e3);
-              }, l2, l2.exports, e2, t2, n2, r2);
-            }
-            return n2[o3].exports;
-          }
-          __name(s2, "s");
-          var i2 = typeof _dereq_ == "function" && _dereq_;
-          for (var o2 = 0; o2 < r2.length; o2++) s2(r2[o2]);
-          return s2;
-        }, "e"))({ 1: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2) {
-            var SomePromiseArray = Promise2._SomePromiseArray;
-            function any(promises) {
-              var ret = new SomePromiseArray(promises);
-              var promise = ret.promise();
-              ret.setHowMany(1);
-              ret.setUnwrap();
-              ret.init();
-              return promise;
-            }
-            __name(any, "any");
-            Promise2.any = function(promises) {
-              return any(promises);
-            };
-            Promise2.prototype.any = function() {
-              return any(this);
-            };
-          };
-        }, {}], 2: [function(_dereq_2, module3, exports4) {
-          var firstLineError;
-          try {
-            throw new Error();
-          } catch (e2) {
-            firstLineError = e2;
-          }
-          var schedule = _dereq_2("./schedule");
-          var Queue = _dereq_2("./queue");
-          function Async() {
-            this._customScheduler = false;
-            this._isTickUsed = false;
-            this._lateQueue = new Queue(16);
-            this._normalQueue = new Queue(16);
-            this._haveDrainedQueues = false;
-            var self2 = this;
-            this.drainQueues = function() {
-              self2._drainQueues();
-            };
-            this._schedule = schedule;
-          }
-          __name(Async, "Async");
-          Async.prototype.setScheduler = function(fn2) {
-            var prev = this._schedule;
-            this._schedule = fn2;
-            this._customScheduler = true;
-            return prev;
-          };
-          Async.prototype.hasCustomScheduler = function() {
-            return this._customScheduler;
-          };
-          Async.prototype.haveItemsQueued = function() {
-            return this._isTickUsed || this._haveDrainedQueues;
-          };
-          Async.prototype.fatalError = function(e2, isNode2) {
-            if (isNode2) {
-              process.stderr.write("Fatal " + (e2 instanceof Error ? e2.stack : e2) + "\n");
-              process.exit(2);
-            } else {
-              this.throwLater(e2);
-            }
-          };
-          Async.prototype.throwLater = function(fn2, arg) {
-            if (arguments.length === 1) {
-              arg = fn2;
-              fn2 = /* @__PURE__ */ __name(function() {
-                throw arg;
-              }, "fn");
-            }
-            if (typeof setTimeout !== "undefined") {
-              setTimeout(function() {
-                fn2(arg);
-              }, 0);
-            } else try {
-              this._schedule(function() {
-                fn2(arg);
-              });
-            } catch (e2) {
-              throw new Error("No async scheduler available\n\n    See http://goo.gl/MqrFmX\n");
-            }
-          };
-          function AsyncInvokeLater(fn2, receiver, arg) {
-            this._lateQueue.push(fn2, receiver, arg);
-            this._queueTick();
-          }
-          __name(AsyncInvokeLater, "AsyncInvokeLater");
-          function AsyncInvoke(fn2, receiver, arg) {
-            this._normalQueue.push(fn2, receiver, arg);
-            this._queueTick();
-          }
-          __name(AsyncInvoke, "AsyncInvoke");
-          function AsyncSettlePromises(promise) {
-            this._normalQueue._pushOne(promise);
-            this._queueTick();
-          }
-          __name(AsyncSettlePromises, "AsyncSettlePromises");
-          Async.prototype.invokeLater = AsyncInvokeLater;
-          Async.prototype.invoke = AsyncInvoke;
-          Async.prototype.settlePromises = AsyncSettlePromises;
-          function _drainQueue(queue) {
-            while (queue.length() > 0) {
-              _drainQueueStep(queue);
-            }
-          }
-          __name(_drainQueue, "_drainQueue");
-          function _drainQueueStep(queue) {
-            var fn2 = queue.shift();
-            if (typeof fn2 !== "function") {
-              fn2._settlePromises();
-            } else {
-              var receiver = queue.shift();
-              var arg = queue.shift();
-              fn2.call(receiver, arg);
-            }
-          }
-          __name(_drainQueueStep, "_drainQueueStep");
-          Async.prototype._drainQueues = function() {
-            _drainQueue(this._normalQueue);
-            this._reset();
-            this._haveDrainedQueues = true;
-            _drainQueue(this._lateQueue);
-          };
-          Async.prototype._queueTick = function() {
-            if (!this._isTickUsed) {
-              this._isTickUsed = true;
-              this._schedule(this.drainQueues);
-            }
-          };
-          Async.prototype._reset = function() {
-            this._isTickUsed = false;
-          };
-          module3.exports = Async;
-          module3.exports.firstLineError = firstLineError;
-        }, { "./queue": 26, "./schedule": 29 }], 3: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, INTERNAL, tryConvertToPromise, debug) {
-            var calledBind = false;
-            var rejectThis = /* @__PURE__ */ __name(function(_2, e2) {
-              this._reject(e2);
-            }, "rejectThis");
-            var targetRejected = /* @__PURE__ */ __name(function(e2, context2) {
-              context2.promiseRejectionQueued = true;
-              context2.bindingPromise._then(rejectThis, rejectThis, null, this, e2);
-            }, "targetRejected");
-            var bindingResolved = /* @__PURE__ */ __name(function(thisArg, context2) {
-              if ((this._bitField & 50397184) === 0) {
-                this._resolveCallback(context2.target);
-              }
-            }, "bindingResolved");
-            var bindingRejected = /* @__PURE__ */ __name(function(e2, context2) {
-              if (!context2.promiseRejectionQueued) this._reject(e2);
-            }, "bindingRejected");
-            Promise2.prototype.bind = function(thisArg) {
-              if (!calledBind) {
-                calledBind = true;
-                Promise2.prototype._propagateFrom = debug.propagateFromFunction();
-                Promise2.prototype._boundValue = debug.boundValueFunction();
-              }
-              var maybePromise = tryConvertToPromise(thisArg);
-              var ret = new Promise2(INTERNAL);
-              ret._propagateFrom(this, 1);
-              var target = this._target();
-              ret._setBoundTo(maybePromise);
-              if (maybePromise instanceof Promise2) {
-                var context2 = {
-                  promiseRejectionQueued: false,
-                  promise: ret,
-                  target,
-                  bindingPromise: maybePromise
-                };
-                target._then(INTERNAL, targetRejected, void 0, ret, context2);
-                maybePromise._then(
-                  bindingResolved,
-                  bindingRejected,
-                  void 0,
-                  ret,
-                  context2
-                );
-                ret._setOnCancel(maybePromise);
-              } else {
-                ret._resolveCallback(target);
-              }
-              return ret;
-            };
-            Promise2.prototype._setBoundTo = function(obj) {
-              if (obj !== void 0) {
-                this._bitField = this._bitField | 2097152;
-                this._boundTo = obj;
-              } else {
-                this._bitField = this._bitField & -2097153;
-              }
-            };
-            Promise2.prototype._isBound = function() {
-              return (this._bitField & 2097152) === 2097152;
-            };
-            Promise2.bind = function(thisArg, value) {
-              return Promise2.resolve(value).bind(thisArg);
-            };
-          };
-        }, {}], 4: [function(_dereq_2, module3, exports4) {
-          var old;
-          if (typeof Promise !== "undefined") old = Promise;
-          function noConflict() {
-            try {
-              if (Promise === bluebird2) Promise = old;
-            } catch (e2) {
-            }
-            return bluebird2;
-          }
-          __name(noConflict, "noConflict");
-          var bluebird2 = _dereq_2("./promise")();
-          bluebird2.noConflict = noConflict;
-          module3.exports = bluebird2;
-        }, { "./promise": 22 }], 5: [function(_dereq_2, module3, exports4) {
-          var cr = Object.create;
-          if (cr) {
-            var callerCache = cr(null);
-            var getterCache = cr(null);
-            callerCache[" size"] = getterCache[" size"] = 0;
-          }
-          module3.exports = function(Promise2) {
-            var util2 = _dereq_2("./util");
-            var canEvaluate = util2.canEvaluate;
-            util2.isIdentifier;
-            var getGetter;
-            function ensureMethod(obj, methodName) {
-              var fn2;
-              if (obj != null) fn2 = obj[methodName];
-              if (typeof fn2 !== "function") {
-                var message = "Object " + util2.classString(obj) + " has no method '" + util2.toString(methodName) + "'";
-                throw new Promise2.TypeError(message);
-              }
-              return fn2;
-            }
-            __name(ensureMethod, "ensureMethod");
-            function caller(obj) {
-              var methodName = this.pop();
-              var fn2 = ensureMethod(obj, methodName);
-              return fn2.apply(obj, this);
-            }
-            __name(caller, "caller");
-            Promise2.prototype.call = function(methodName) {
-              var args = [].slice.call(arguments, 1);
-              args.push(methodName);
-              return this._then(caller, void 0, void 0, args, void 0);
-            };
-            function namedGetter(obj) {
-              return obj[this];
-            }
-            __name(namedGetter, "namedGetter");
-            function indexedGetter(obj) {
-              var index2 = +this;
-              if (index2 < 0) index2 = Math.max(0, index2 + obj.length);
-              return obj[index2];
-            }
-            __name(indexedGetter, "indexedGetter");
-            Promise2.prototype.get = function(propertyName) {
-              var isIndex2 = typeof propertyName === "number";
-              var getter;
-              if (!isIndex2) {
-                if (canEvaluate) {
-                  var maybeGetter = getGetter(propertyName);
-                  getter = maybeGetter !== null ? maybeGetter : namedGetter;
-                } else {
-                  getter = namedGetter;
-                }
-              } else {
-                getter = indexedGetter;
-              }
-              return this._then(getter, void 0, void 0, propertyName, void 0);
-            };
-          };
-        }, { "./util": 36 }], 6: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, PromiseArray, apiRejection, debug) {
-            var util2 = _dereq_2("./util");
-            var tryCatch = util2.tryCatch;
-            var errorObj = util2.errorObj;
-            var async = Promise2._async;
-            Promise2.prototype["break"] = Promise2.prototype.cancel = function() {
-              if (!debug.cancellation()) return this._warn("cancellation is disabled");
-              var promise = this;
-              var child = promise;
-              while (promise._isCancellable()) {
-                if (!promise._cancelBy(child)) {
-                  if (child._isFollowing()) {
-                    child._followee().cancel();
-                  } else {
-                    child._cancelBranched();
-                  }
-                  break;
-                }
-                var parent2 = promise._cancellationParent;
-                if (parent2 == null || !parent2._isCancellable()) {
-                  if (promise._isFollowing()) {
-                    promise._followee().cancel();
-                  } else {
-                    promise._cancelBranched();
-                  }
-                  break;
-                } else {
-                  if (promise._isFollowing()) promise._followee().cancel();
-                  promise._setWillBeCancelled();
-                  child = promise;
-                  promise = parent2;
-                }
-              }
-            };
-            Promise2.prototype._branchHasCancelled = function() {
-              this._branchesRemainingToCancel--;
-            };
-            Promise2.prototype._enoughBranchesHaveCancelled = function() {
-              return this._branchesRemainingToCancel === void 0 || this._branchesRemainingToCancel <= 0;
-            };
-            Promise2.prototype._cancelBy = function(canceller) {
-              if (canceller === this) {
-                this._branchesRemainingToCancel = 0;
-                this._invokeOnCancel();
-                return true;
-              } else {
-                this._branchHasCancelled();
-                if (this._enoughBranchesHaveCancelled()) {
-                  this._invokeOnCancel();
-                  return true;
-                }
-              }
-              return false;
-            };
-            Promise2.prototype._cancelBranched = function() {
-              if (this._enoughBranchesHaveCancelled()) {
-                this._cancel();
-              }
-            };
-            Promise2.prototype._cancel = function() {
-              if (!this._isCancellable()) return;
-              this._setCancelled();
-              async.invoke(this._cancelPromises, this, void 0);
-            };
-            Promise2.prototype._cancelPromises = function() {
-              if (this._length() > 0) this._settlePromises();
-            };
-            Promise2.prototype._unsetOnCancel = function() {
-              this._onCancelField = void 0;
-            };
-            Promise2.prototype._isCancellable = function() {
-              return this.isPending() && !this._isCancelled();
-            };
-            Promise2.prototype.isCancellable = function() {
-              return this.isPending() && !this.isCancelled();
-            };
-            Promise2.prototype._doInvokeOnCancel = function(onCancelCallback, internalOnly) {
-              if (util2.isArray(onCancelCallback)) {
-                for (var i2 = 0; i2 < onCancelCallback.length; ++i2) {
-                  this._doInvokeOnCancel(onCancelCallback[i2], internalOnly);
-                }
-              } else if (onCancelCallback !== void 0) {
-                if (typeof onCancelCallback === "function") {
-                  if (!internalOnly) {
-                    var e2 = tryCatch(onCancelCallback).call(this._boundValue());
-                    if (e2 === errorObj) {
-                      this._attachExtraTrace(e2.e);
-                      async.throwLater(e2.e);
-                    }
-                  }
-                } else {
-                  onCancelCallback._resultCancelled(this);
-                }
-              }
-            };
-            Promise2.prototype._invokeOnCancel = function() {
-              var onCancelCallback = this._onCancel();
-              this._unsetOnCancel();
-              async.invoke(this._doInvokeOnCancel, this, onCancelCallback);
-            };
-            Promise2.prototype._invokeInternalOnCancel = function() {
-              if (this._isCancellable()) {
-                this._doInvokeOnCancel(this._onCancel(), true);
-                this._unsetOnCancel();
-              }
-            };
-            Promise2.prototype._resultCancelled = function() {
-              this.cancel();
-            };
-          };
-        }, { "./util": 36 }], 7: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(NEXT_FILTER) {
-            var util2 = _dereq_2("./util");
-            var getKeys = _dereq_2("./es5").keys;
-            var tryCatch = util2.tryCatch;
-            var errorObj = util2.errorObj;
-            function catchFilter(instances, cb, promise) {
-              return function(e2) {
-                var boundTo = promise._boundValue();
-                predicateLoop: for (var i2 = 0; i2 < instances.length; ++i2) {
-                  var item = instances[i2];
-                  if (item === Error || item != null && item.prototype instanceof Error) {
-                    if (e2 instanceof item) {
-                      return tryCatch(cb).call(boundTo, e2);
-                    }
-                  } else if (typeof item === "function") {
-                    var matchesPredicate = tryCatch(item).call(boundTo, e2);
-                    if (matchesPredicate === errorObj) {
-                      return matchesPredicate;
-                    } else if (matchesPredicate) {
-                      return tryCatch(cb).call(boundTo, e2);
-                    }
-                  } else if (util2.isObject(e2)) {
-                    var keys2 = getKeys(item);
-                    for (var j2 = 0; j2 < keys2.length; ++j2) {
-                      var key = keys2[j2];
-                      if (item[key] != e2[key]) {
-                        continue predicateLoop;
-                      }
-                    }
-                    return tryCatch(cb).call(boundTo, e2);
-                  }
-                }
-                return NEXT_FILTER;
-              };
-            }
-            __name(catchFilter, "catchFilter");
-            return catchFilter;
-          };
-        }, { "./es5": 13, "./util": 36 }], 8: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2) {
-            var longStackTraces = false;
-            var contextStack = [];
-            Promise2.prototype._promiseCreated = function() {
-            };
-            Promise2.prototype._pushContext = function() {
-            };
-            Promise2.prototype._popContext = function() {
-              return null;
-            };
-            Promise2._peekContext = Promise2.prototype._peekContext = function() {
-            };
-            function Context2() {
-              this._trace = new Context2.CapturedTrace(peekContext());
-            }
-            __name(Context2, "Context");
-            Context2.prototype._pushContext = function() {
-              if (this._trace !== void 0) {
-                this._trace._promiseCreated = null;
-                contextStack.push(this._trace);
-              }
-            };
-            Context2.prototype._popContext = function() {
-              if (this._trace !== void 0) {
-                var trace = contextStack.pop();
-                var ret = trace._promiseCreated;
-                trace._promiseCreated = null;
-                return ret;
-              }
-              return null;
-            };
-            function createContext2() {
-              if (longStackTraces) return new Context2();
-            }
-            __name(createContext2, "createContext");
-            function peekContext() {
-              var lastIndex = contextStack.length - 1;
-              if (lastIndex >= 0) {
-                return contextStack[lastIndex];
-              }
-              return void 0;
-            }
-            __name(peekContext, "peekContext");
-            Context2.CapturedTrace = null;
-            Context2.create = createContext2;
-            Context2.deactivateLongStackTraces = function() {
-            };
-            Context2.activateLongStackTraces = function() {
-              var Promise_pushContext = Promise2.prototype._pushContext;
-              var Promise_popContext = Promise2.prototype._popContext;
-              var Promise_PeekContext = Promise2._peekContext;
-              var Promise_peekContext = Promise2.prototype._peekContext;
-              var Promise_promiseCreated = Promise2.prototype._promiseCreated;
-              Context2.deactivateLongStackTraces = function() {
-                Promise2.prototype._pushContext = Promise_pushContext;
-                Promise2.prototype._popContext = Promise_popContext;
-                Promise2._peekContext = Promise_PeekContext;
-                Promise2.prototype._peekContext = Promise_peekContext;
-                Promise2.prototype._promiseCreated = Promise_promiseCreated;
-                longStackTraces = false;
-              };
-              longStackTraces = true;
-              Promise2.prototype._pushContext = Context2.prototype._pushContext;
-              Promise2.prototype._popContext = Context2.prototype._popContext;
-              Promise2._peekContext = Promise2.prototype._peekContext = peekContext;
-              Promise2.prototype._promiseCreated = function() {
-                var ctx = this._peekContext();
-                if (ctx && ctx._promiseCreated == null) ctx._promiseCreated = this;
-              };
-            };
-            return Context2;
-          };
-        }, {}], 9: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, Context2, enableAsyncHooks, disableAsyncHooks) {
-            var async = Promise2._async;
-            var Warning = _dereq_2("./errors").Warning;
-            var util2 = _dereq_2("./util");
-            var es5 = _dereq_2("./es5");
-            var canAttachTrace = util2.canAttachTrace;
-            var unhandledRejectionHandled;
-            var possiblyUnhandledRejection;
-            var bluebirdFramePattern = /[\\\/]bluebird[\\\/]js[\\\/](release|debug|instrumented)/;
-            var nodeFramePattern = /\((?:timers\.js):\d+:\d+\)/;
-            var parseLinePattern = /[\/<\(](.+?):(\d+):(\d+)\)?\s*$/;
-            var stackFramePattern = null;
-            var formatStack = null;
-            var indentStackFrames = false;
-            var printWarning;
-            var debugging = !!(util2.env("BLUEBIRD_DEBUG") != 0 && true);
-            var warnings = !!(util2.env("BLUEBIRD_WARNINGS") != 0 && (debugging || util2.env("BLUEBIRD_WARNINGS")));
-            var longStackTraces = !!(util2.env("BLUEBIRD_LONG_STACK_TRACES") != 0 && (debugging || util2.env("BLUEBIRD_LONG_STACK_TRACES")));
-            var wForgottenReturn = util2.env("BLUEBIRD_W_FORGOTTEN_RETURN") != 0 && (warnings || !!util2.env("BLUEBIRD_W_FORGOTTEN_RETURN"));
-            var deferUnhandledRejectionCheck;
-            (function() {
-              var promises = [];
-              function unhandledRejectionCheck() {
-                for (var i2 = 0; i2 < promises.length; ++i2) {
-                  promises[i2]._notifyUnhandledRejection();
-                }
-                unhandledRejectionClear();
-              }
-              __name(unhandledRejectionCheck, "unhandledRejectionCheck");
-              function unhandledRejectionClear() {
-                promises.length = 0;
-              }
-              __name(unhandledRejectionClear, "unhandledRejectionClear");
-              deferUnhandledRejectionCheck = /* @__PURE__ */ __name(function(promise) {
-                promises.push(promise);
-                setTimeout(unhandledRejectionCheck, 1);
-              }, "deferUnhandledRejectionCheck");
-              es5.defineProperty(Promise2, "_unhandledRejectionCheck", {
-                value: unhandledRejectionCheck
-              });
-              es5.defineProperty(Promise2, "_unhandledRejectionClear", {
-                value: unhandledRejectionClear
-              });
-            })();
-            Promise2.prototype.suppressUnhandledRejections = function() {
-              var target = this._target();
-              target._bitField = target._bitField & -1048577 | 524288;
-            };
-            Promise2.prototype._ensurePossibleRejectionHandled = function() {
-              if ((this._bitField & 524288) !== 0) return;
-              this._setRejectionIsUnhandled();
-              deferUnhandledRejectionCheck(this);
-            };
-            Promise2.prototype._notifyUnhandledRejectionIsHandled = function() {
-              fireRejectionEvent(
-                "rejectionHandled",
-                unhandledRejectionHandled,
-                void 0,
-                this
-              );
-            };
-            Promise2.prototype._setReturnedNonUndefined = function() {
-              this._bitField = this._bitField | 268435456;
-            };
-            Promise2.prototype._returnedNonUndefined = function() {
-              return (this._bitField & 268435456) !== 0;
-            };
-            Promise2.prototype._notifyUnhandledRejection = function() {
-              if (this._isRejectionUnhandled()) {
-                var reason = this._settledValue();
-                this._setUnhandledRejectionIsNotified();
-                fireRejectionEvent(
-                  "unhandledRejection",
-                  possiblyUnhandledRejection,
-                  reason,
-                  this
-                );
-              }
-            };
-            Promise2.prototype._setUnhandledRejectionIsNotified = function() {
-              this._bitField = this._bitField | 262144;
-            };
-            Promise2.prototype._unsetUnhandledRejectionIsNotified = function() {
-              this._bitField = this._bitField & -262145;
-            };
-            Promise2.prototype._isUnhandledRejectionNotified = function() {
-              return (this._bitField & 262144) > 0;
-            };
-            Promise2.prototype._setRejectionIsUnhandled = function() {
-              this._bitField = this._bitField | 1048576;
-            };
-            Promise2.prototype._unsetRejectionIsUnhandled = function() {
-              this._bitField = this._bitField & -1048577;
-              if (this._isUnhandledRejectionNotified()) {
-                this._unsetUnhandledRejectionIsNotified();
-                this._notifyUnhandledRejectionIsHandled();
-              }
-            };
-            Promise2.prototype._isRejectionUnhandled = function() {
-              return (this._bitField & 1048576) > 0;
-            };
-            Promise2.prototype._warn = function(message, shouldUseOwnTrace, promise) {
-              return warn(message, shouldUseOwnTrace, promise || this);
-            };
-            Promise2.onPossiblyUnhandledRejection = function(fn2) {
-              var context2 = Promise2._getContext();
-              possiblyUnhandledRejection = util2.contextBind(context2, fn2);
-            };
-            Promise2.onUnhandledRejectionHandled = function(fn2) {
-              var context2 = Promise2._getContext();
-              unhandledRejectionHandled = util2.contextBind(context2, fn2);
-            };
-            var disableLongStackTraces = /* @__PURE__ */ __name(function() {
-            }, "disableLongStackTraces");
-            Promise2.longStackTraces = function() {
-              if (async.haveItemsQueued() && !config.longStackTraces) {
-                throw new Error("cannot enable long stack traces after promises have been created\n\n    See http://goo.gl/MqrFmX\n");
-              }
-              if (!config.longStackTraces && longStackTracesIsSupported()) {
-                var Promise_captureStackTrace = Promise2.prototype._captureStackTrace;
-                var Promise_attachExtraTrace = Promise2.prototype._attachExtraTrace;
-                var Promise_dereferenceTrace = Promise2.prototype._dereferenceTrace;
-                config.longStackTraces = true;
-                disableLongStackTraces = /* @__PURE__ */ __name(function() {
-                  if (async.haveItemsQueued() && !config.longStackTraces) {
-                    throw new Error("cannot enable long stack traces after promises have been created\n\n    See http://goo.gl/MqrFmX\n");
-                  }
-                  Promise2.prototype._captureStackTrace = Promise_captureStackTrace;
-                  Promise2.prototype._attachExtraTrace = Promise_attachExtraTrace;
-                  Promise2.prototype._dereferenceTrace = Promise_dereferenceTrace;
-                  Context2.deactivateLongStackTraces();
-                  config.longStackTraces = false;
-                }, "disableLongStackTraces");
-                Promise2.prototype._captureStackTrace = longStackTracesCaptureStackTrace;
-                Promise2.prototype._attachExtraTrace = longStackTracesAttachExtraTrace;
-                Promise2.prototype._dereferenceTrace = longStackTracesDereferenceTrace;
-                Context2.activateLongStackTraces();
-              }
-            };
-            Promise2.hasLongStackTraces = function() {
-              return config.longStackTraces && longStackTracesIsSupported();
-            };
-            var legacyHandlers = {
-              unhandledrejection: {
-                before: /* @__PURE__ */ __name(function() {
-                  var ret = util2.global.onunhandledrejection;
-                  util2.global.onunhandledrejection = null;
-                  return ret;
-                }, "before"),
-                after: /* @__PURE__ */ __name(function(fn2) {
-                  util2.global.onunhandledrejection = fn2;
-                }, "after")
-              },
-              rejectionhandled: {
-                before: /* @__PURE__ */ __name(function() {
-                  var ret = util2.global.onrejectionhandled;
-                  util2.global.onrejectionhandled = null;
-                  return ret;
-                }, "before"),
-                after: /* @__PURE__ */ __name(function(fn2) {
-                  util2.global.onrejectionhandled = fn2;
-                }, "after")
-              }
-            };
-            var fireDomEvent = function() {
-              var dispatch = /* @__PURE__ */ __name(function(legacy, e2) {
-                if (legacy) {
-                  var fn2;
-                  try {
-                    fn2 = legacy.before();
-                    return !util2.global.dispatchEvent(e2);
-                  } finally {
-                    legacy.after(fn2);
-                  }
-                } else {
-                  return !util2.global.dispatchEvent(e2);
-                }
-              }, "dispatch");
-              try {
-                if (typeof CustomEvent === "function") {
-                  var event = new CustomEvent("CustomEvent");
-                  util2.global.dispatchEvent(event);
-                  return function(name2, event2) {
-                    name2 = name2.toLowerCase();
-                    var eventData = {
-                      detail: event2,
-                      cancelable: true
-                    };
-                    var domEvent2 = new CustomEvent(name2, eventData);
-                    es5.defineProperty(
-                      domEvent2,
-                      "promise",
-                      { value: event2.promise }
-                    );
-                    es5.defineProperty(
-                      domEvent2,
-                      "reason",
-                      { value: event2.reason }
-                    );
-                    return dispatch(legacyHandlers[name2], domEvent2);
-                  };
-                } else if (typeof Event === "function") {
-                  var event = new Event("CustomEvent");
-                  util2.global.dispatchEvent(event);
-                  return function(name2, event2) {
-                    name2 = name2.toLowerCase();
-                    var domEvent2 = new Event(name2, {
-                      cancelable: true
-                    });
-                    domEvent2.detail = event2;
-                    es5.defineProperty(domEvent2, "promise", { value: event2.promise });
-                    es5.defineProperty(domEvent2, "reason", { value: event2.reason });
-                    return dispatch(legacyHandlers[name2], domEvent2);
-                  };
-                } else {
-                  var event = document.createEvent("CustomEvent");
-                  event.initCustomEvent("testingtheevent", false, true, {});
-                  util2.global.dispatchEvent(event);
-                  return function(name2, event2) {
-                    name2 = name2.toLowerCase();
-                    var domEvent2 = document.createEvent("CustomEvent");
-                    domEvent2.initCustomEvent(
-                      name2,
-                      false,
-                      true,
-                      event2
-                    );
-                    return dispatch(legacyHandlers[name2], domEvent2);
-                  };
-                }
-              } catch (e2) {
-              }
-              return function() {
-                return false;
-              };
-            }();
-            var fireGlobalEvent = function() {
-              if (util2.isNode) {
-                return function() {
-                  return process.emit.apply(process, arguments);
-                };
-              } else {
-                if (!util2.global) {
-                  return function() {
-                    return false;
-                  };
-                }
-                return function(name2) {
-                  var methodName = "on" + name2.toLowerCase();
-                  var method = util2.global[methodName];
-                  if (!method) return false;
-                  method.apply(util2.global, [].slice.call(arguments, 1));
-                  return true;
-                };
-              }
-            }();
-            function generatePromiseLifecycleEventObject(name2, promise) {
-              return { promise };
-            }
-            __name(generatePromiseLifecycleEventObject, "generatePromiseLifecycleEventObject");
-            var eventToObjectGenerator = {
-              promiseCreated: generatePromiseLifecycleEventObject,
-              promiseFulfilled: generatePromiseLifecycleEventObject,
-              promiseRejected: generatePromiseLifecycleEventObject,
-              promiseResolved: generatePromiseLifecycleEventObject,
-              promiseCancelled: generatePromiseLifecycleEventObject,
-              promiseChained: /* @__PURE__ */ __name(function(name2, promise, child) {
-                return { promise, child };
-              }, "promiseChained"),
-              warning: /* @__PURE__ */ __name(function(name2, warning2) {
-                return { warning: warning2 };
-              }, "warning"),
-              unhandledRejection: /* @__PURE__ */ __name(function(name2, reason, promise) {
-                return { reason, promise };
-              }, "unhandledRejection"),
-              rejectionHandled: generatePromiseLifecycleEventObject
-            };
-            var activeFireEvent = /* @__PURE__ */ __name(function(name2) {
-              var globalEventFired = false;
-              try {
-                globalEventFired = fireGlobalEvent.apply(null, arguments);
-              } catch (e2) {
-                async.throwLater(e2);
-                globalEventFired = true;
-              }
-              var domEventFired = false;
-              try {
-                domEventFired = fireDomEvent(
-                  name2,
-                  eventToObjectGenerator[name2].apply(null, arguments)
-                );
-              } catch (e2) {
-                async.throwLater(e2);
-                domEventFired = true;
-              }
-              return domEventFired || globalEventFired;
-            }, "activeFireEvent");
-            Promise2.config = function(opts2) {
-              opts2 = Object(opts2);
-              if ("longStackTraces" in opts2) {
-                if (opts2.longStackTraces) {
-                  Promise2.longStackTraces();
-                } else if (!opts2.longStackTraces && Promise2.hasLongStackTraces()) {
-                  disableLongStackTraces();
-                }
-              }
-              if ("warnings" in opts2) {
-                var warningsOption = opts2.warnings;
-                config.warnings = !!warningsOption;
-                wForgottenReturn = config.warnings;
-                if (util2.isObject(warningsOption)) {
-                  if ("wForgottenReturn" in warningsOption) {
-                    wForgottenReturn = !!warningsOption.wForgottenReturn;
-                  }
-                }
-              }
-              if ("cancellation" in opts2 && opts2.cancellation && !config.cancellation) {
-                if (async.haveItemsQueued()) {
-                  throw new Error(
-                    "cannot enable cancellation after promises are in use"
-                  );
-                }
-                Promise2.prototype._clearCancellationData = cancellationClearCancellationData;
-                Promise2.prototype._propagateFrom = cancellationPropagateFrom;
-                Promise2.prototype._onCancel = cancellationOnCancel;
-                Promise2.prototype._setOnCancel = cancellationSetOnCancel;
-                Promise2.prototype._attachCancellationCallback = cancellationAttachCancellationCallback;
-                Promise2.prototype._execute = cancellationExecute;
-                propagateFromFunction = cancellationPropagateFrom;
-                config.cancellation = true;
-              }
-              if ("monitoring" in opts2) {
-                if (opts2.monitoring && !config.monitoring) {
-                  config.monitoring = true;
-                  Promise2.prototype._fireEvent = activeFireEvent;
-                } else if (!opts2.monitoring && config.monitoring) {
-                  config.monitoring = false;
-                  Promise2.prototype._fireEvent = defaultFireEvent;
-                }
-              }
-              if ("asyncHooks" in opts2 && util2.nodeSupportsAsyncResource) {
-                var prev = config.asyncHooks;
-                var cur = !!opts2.asyncHooks;
-                if (prev !== cur) {
-                  config.asyncHooks = cur;
-                  if (cur) {
-                    enableAsyncHooks();
-                  } else {
-                    disableAsyncHooks();
-                  }
-                }
-              }
-              return Promise2;
-            };
-            function defaultFireEvent() {
-              return false;
-            }
-            __name(defaultFireEvent, "defaultFireEvent");
-            Promise2.prototype._fireEvent = defaultFireEvent;
-            Promise2.prototype._execute = function(executor, resolve, reject) {
-              try {
-                executor(resolve, reject);
-              } catch (e2) {
-                return e2;
-              }
-            };
-            Promise2.prototype._onCancel = function() {
-            };
-            Promise2.prototype._setOnCancel = function(handler) {
-            };
-            Promise2.prototype._attachCancellationCallback = function(onCancel) {
-            };
-            Promise2.prototype._captureStackTrace = function() {
-            };
-            Promise2.prototype._attachExtraTrace = function() {
-            };
-            Promise2.prototype._dereferenceTrace = function() {
-            };
-            Promise2.prototype._clearCancellationData = function() {
-            };
-            Promise2.prototype._propagateFrom = function(parent2, flags) {
-            };
-            function cancellationExecute(executor, resolve, reject) {
-              var promise = this;
-              try {
-                executor(resolve, reject, function(onCancel) {
-                  if (typeof onCancel !== "function") {
-                    throw new TypeError("onCancel must be a function, got: " + util2.toString(onCancel));
-                  }
-                  promise._attachCancellationCallback(onCancel);
-                });
-              } catch (e2) {
-                return e2;
-              }
-            }
-            __name(cancellationExecute, "cancellationExecute");
-            function cancellationAttachCancellationCallback(onCancel) {
-              if (!this._isCancellable()) return this;
-              var previousOnCancel = this._onCancel();
-              if (previousOnCancel !== void 0) {
-                if (util2.isArray(previousOnCancel)) {
-                  previousOnCancel.push(onCancel);
-                } else {
-                  this._setOnCancel([previousOnCancel, onCancel]);
-                }
-              } else {
-                this._setOnCancel(onCancel);
-              }
-            }
-            __name(cancellationAttachCancellationCallback, "cancellationAttachCancellationCallback");
-            function cancellationOnCancel() {
-              return this._onCancelField;
-            }
-            __name(cancellationOnCancel, "cancellationOnCancel");
-            function cancellationSetOnCancel(onCancel) {
-              this._onCancelField = onCancel;
-            }
-            __name(cancellationSetOnCancel, "cancellationSetOnCancel");
-            function cancellationClearCancellationData() {
-              this._cancellationParent = void 0;
-              this._onCancelField = void 0;
-            }
-            __name(cancellationClearCancellationData, "cancellationClearCancellationData");
-            function cancellationPropagateFrom(parent2, flags) {
-              if ((flags & 1) !== 0) {
-                this._cancellationParent = parent2;
-                var branchesRemainingToCancel = parent2._branchesRemainingToCancel;
-                if (branchesRemainingToCancel === void 0) {
-                  branchesRemainingToCancel = 0;
-                }
-                parent2._branchesRemainingToCancel = branchesRemainingToCancel + 1;
-              }
-              if ((flags & 2) !== 0 && parent2._isBound()) {
-                this._setBoundTo(parent2._boundTo);
-              }
-            }
-            __name(cancellationPropagateFrom, "cancellationPropagateFrom");
-            function bindingPropagateFrom(parent2, flags) {
-              if ((flags & 2) !== 0 && parent2._isBound()) {
-                this._setBoundTo(parent2._boundTo);
-              }
-            }
-            __name(bindingPropagateFrom, "bindingPropagateFrom");
-            var propagateFromFunction = bindingPropagateFrom;
-            function boundValueFunction() {
-              var ret = this._boundTo;
-              if (ret !== void 0) {
-                if (ret instanceof Promise2) {
-                  if (ret.isFulfilled()) {
-                    return ret.value();
-                  } else {
-                    return void 0;
-                  }
-                }
-              }
-              return ret;
-            }
-            __name(boundValueFunction, "boundValueFunction");
-            function longStackTracesCaptureStackTrace() {
-              this._trace = new CapturedTrace(this._peekContext());
-            }
-            __name(longStackTracesCaptureStackTrace, "longStackTracesCaptureStackTrace");
-            function longStackTracesAttachExtraTrace(error, ignoreSelf) {
-              if (canAttachTrace(error)) {
-                var trace = this._trace;
-                if (trace !== void 0) {
-                  if (ignoreSelf) trace = trace._parent;
-                }
-                if (trace !== void 0) {
-                  trace.attachExtraTrace(error);
-                } else if (!error.__stackCleaned__) {
-                  var parsed = parseStackAndMessage(error);
-                  util2.notEnumerableProp(
-                    error,
-                    "stack",
-                    parsed.message + "\n" + parsed.stack.join("\n")
-                  );
-                  util2.notEnumerableProp(error, "__stackCleaned__", true);
-                }
-              }
-            }
-            __name(longStackTracesAttachExtraTrace, "longStackTracesAttachExtraTrace");
-            function longStackTracesDereferenceTrace() {
-              this._trace = void 0;
-            }
-            __name(longStackTracesDereferenceTrace, "longStackTracesDereferenceTrace");
-            function checkForgottenReturns(returnValue, promiseCreated, name2, promise, parent2) {
-              if (returnValue === void 0 && promiseCreated !== null && wForgottenReturn) {
-                if (parent2 !== void 0 && parent2._returnedNonUndefined()) return;
-                if ((promise._bitField & 65535) === 0) return;
-                if (name2) name2 = name2 + " ";
-                var handlerLine = "";
-                var creatorLine = "";
-                if (promiseCreated._trace) {
-                  var traceLines = promiseCreated._trace.stack.split("\n");
-                  var stack = cleanStack(traceLines);
-                  for (var i2 = stack.length - 1; i2 >= 0; --i2) {
-                    var line = stack[i2];
-                    if (!nodeFramePattern.test(line)) {
-                      var lineMatches = line.match(parseLinePattern);
-                      if (lineMatches) {
-                        handlerLine = "at " + lineMatches[1] + ":" + lineMatches[2] + ":" + lineMatches[3] + " ";
-                      }
-                      break;
-                    }
-                  }
-                  if (stack.length > 0) {
-                    var firstUserLine = stack[0];
-                    for (var i2 = 0; i2 < traceLines.length; ++i2) {
-                      if (traceLines[i2] === firstUserLine) {
-                        if (i2 > 0) {
-                          creatorLine = "\n" + traceLines[i2 - 1];
-                        }
-                        break;
-                      }
-                    }
-                  }
-                }
-                var msg2 = "a promise was created in a " + name2 + "handler " + handlerLine + "but was not returned from it, see http://goo.gl/rRqMUw" + creatorLine;
-                promise._warn(msg2, true, promiseCreated);
-              }
-            }
-            __name(checkForgottenReturns, "checkForgottenReturns");
-            function deprecated(name2, replacement) {
-              var message = name2 + " is deprecated and will be removed in a future version.";
-              if (replacement) message += " Use " + replacement + " instead.";
-              return warn(message);
-            }
-            __name(deprecated, "deprecated");
-            function warn(message, shouldUseOwnTrace, promise) {
-              if (!config.warnings) return;
-              var warning2 = new Warning(message);
-              var ctx;
-              if (shouldUseOwnTrace) {
-                promise._attachExtraTrace(warning2);
-              } else if (config.longStackTraces && (ctx = Promise2._peekContext())) {
-                ctx.attachExtraTrace(warning2);
-              } else {
-                var parsed = parseStackAndMessage(warning2);
-                warning2.stack = parsed.message + "\n" + parsed.stack.join("\n");
-              }
-              if (!activeFireEvent("warning", warning2)) {
-                formatAndLogError(warning2, "", true);
-              }
-            }
-            __name(warn, "warn");
-            function reconstructStack(message, stacks) {
-              for (var i2 = 0; i2 < stacks.length - 1; ++i2) {
-                stacks[i2].push("From previous event:");
-                stacks[i2] = stacks[i2].join("\n");
-              }
-              if (i2 < stacks.length) {
-                stacks[i2] = stacks[i2].join("\n");
-              }
-              return message + "\n" + stacks.join("\n");
-            }
-            __name(reconstructStack, "reconstructStack");
-            function removeDuplicateOrEmptyJumps(stacks) {
-              for (var i2 = 0; i2 < stacks.length; ++i2) {
-                if (stacks[i2].length === 0 || i2 + 1 < stacks.length && stacks[i2][0] === stacks[i2 + 1][0]) {
-                  stacks.splice(i2, 1);
-                  i2--;
-                }
-              }
-            }
-            __name(removeDuplicateOrEmptyJumps, "removeDuplicateOrEmptyJumps");
-            function removeCommonRoots(stacks) {
-              var current = stacks[0];
-              for (var i2 = 1; i2 < stacks.length; ++i2) {
-                var prev = stacks[i2];
-                var currentLastIndex = current.length - 1;
-                var currentLastLine = current[currentLastIndex];
-                var commonRootMeetPoint = -1;
-                for (var j2 = prev.length - 1; j2 >= 0; --j2) {
-                  if (prev[j2] === currentLastLine) {
-                    commonRootMeetPoint = j2;
-                    break;
-                  }
-                }
-                for (var j2 = commonRootMeetPoint; j2 >= 0; --j2) {
-                  var line = prev[j2];
-                  if (current[currentLastIndex] === line) {
-                    current.pop();
-                    currentLastIndex--;
-                  } else {
-                    break;
-                  }
-                }
-                current = prev;
-              }
-            }
-            __name(removeCommonRoots, "removeCommonRoots");
-            function cleanStack(stack) {
-              var ret = [];
-              for (var i2 = 0; i2 < stack.length; ++i2) {
-                var line = stack[i2];
-                var isTraceLine = "    (No stack trace)" === line || stackFramePattern.test(line);
-                var isInternalFrame = isTraceLine && shouldIgnore(line);
-                if (isTraceLine && !isInternalFrame) {
-                  if (indentStackFrames && line.charAt(0) !== " ") {
-                    line = "    " + line;
-                  }
-                  ret.push(line);
-                }
-              }
-              return ret;
-            }
-            __name(cleanStack, "cleanStack");
-            function stackFramesAsArray(error) {
-              var stack = error.stack.replace(/\s+$/g, "").split("\n");
-              for (var i2 = 0; i2 < stack.length; ++i2) {
-                var line = stack[i2];
-                if ("    (No stack trace)" === line || stackFramePattern.test(line)) {
-                  break;
-                }
-              }
-              if (i2 > 0 && error.name != "SyntaxError") {
-                stack = stack.slice(i2);
-              }
-              return stack;
-            }
-            __name(stackFramesAsArray, "stackFramesAsArray");
-            function parseStackAndMessage(error) {
-              var stack = error.stack;
-              var message = error.toString();
-              stack = typeof stack === "string" && stack.length > 0 ? stackFramesAsArray(error) : ["    (No stack trace)"];
-              return {
-                message,
-                stack: error.name == "SyntaxError" ? stack : cleanStack(stack)
-              };
-            }
-            __name(parseStackAndMessage, "parseStackAndMessage");
-            function formatAndLogError(error, title, isSoft) {
-              if (typeof console !== "undefined") {
-                var message;
-                if (util2.isObject(error)) {
-                  var stack = error.stack;
-                  message = title + formatStack(stack, error);
-                } else {
-                  message = title + String(error);
-                }
-                if (typeof printWarning === "function") {
-                  printWarning(message, isSoft);
-                } else if (typeof console.log === "function" || typeof console.log === "object") {
-                  console.log(message);
-                }
-              }
-            }
-            __name(formatAndLogError, "formatAndLogError");
-            function fireRejectionEvent(name2, localHandler, reason, promise) {
-              var localEventFired = false;
-              try {
-                if (typeof localHandler === "function") {
-                  localEventFired = true;
-                  if (name2 === "rejectionHandled") {
-                    localHandler(promise);
-                  } else {
-                    localHandler(reason, promise);
-                  }
-                }
-              } catch (e2) {
-                async.throwLater(e2);
-              }
-              if (name2 === "unhandledRejection") {
-                if (!activeFireEvent(name2, reason, promise) && !localEventFired) {
-                  formatAndLogError(reason, "Unhandled rejection ");
-                }
-              } else {
-                activeFireEvent(name2, promise);
-              }
-            }
-            __name(fireRejectionEvent, "fireRejectionEvent");
-            function formatNonError(obj) {
-              var str;
-              if (typeof obj === "function") {
-                str = "[function " + (obj.name || "anonymous") + "]";
-              } else {
-                str = obj && typeof obj.toString === "function" ? obj.toString() : util2.toString(obj);
-                var ruselessToString = /\[object [a-zA-Z0-9$_]+\]/;
-                if (ruselessToString.test(str)) {
-                  try {
-                    var newStr = JSON.stringify(obj);
-                    str = newStr;
-                  } catch (e2) {
-                  }
-                }
-                if (str.length === 0) {
-                  str = "(empty array)";
-                }
-              }
-              return "(<" + snip(str) + ">, no stack trace)";
-            }
-            __name(formatNonError, "formatNonError");
-            function snip(str) {
-              var maxChars = 41;
-              if (str.length < maxChars) {
-                return str;
-              }
-              return str.substr(0, maxChars - 3) + "...";
-            }
-            __name(snip, "snip");
-            function longStackTracesIsSupported() {
-              return typeof captureStackTrace === "function";
-            }
-            __name(longStackTracesIsSupported, "longStackTracesIsSupported");
-            var shouldIgnore = /* @__PURE__ */ __name(function() {
-              return false;
-            }, "shouldIgnore");
-            var parseLineInfoRegex = /[\/<\(]([^:\/]+):(\d+):(?:\d+)\)?\s*$/;
-            function parseLineInfo(line) {
-              var matches = line.match(parseLineInfoRegex);
-              if (matches) {
-                return {
-                  fileName: matches[1],
-                  line: parseInt(matches[2], 10)
-                };
-              }
-            }
-            __name(parseLineInfo, "parseLineInfo");
-            function setBounds(firstLineError, lastLineError) {
-              if (!longStackTracesIsSupported()) return;
-              var firstStackLines = (firstLineError.stack || "").split("\n");
-              var lastStackLines = (lastLineError.stack || "").split("\n");
-              var firstIndex = -1;
-              var lastIndex = -1;
-              var firstFileName;
-              var lastFileName;
-              for (var i2 = 0; i2 < firstStackLines.length; ++i2) {
-                var result = parseLineInfo(firstStackLines[i2]);
-                if (result) {
-                  firstFileName = result.fileName;
-                  firstIndex = result.line;
-                  break;
-                }
-              }
-              for (var i2 = 0; i2 < lastStackLines.length; ++i2) {
-                var result = parseLineInfo(lastStackLines[i2]);
-                if (result) {
-                  lastFileName = result.fileName;
-                  lastIndex = result.line;
-                  break;
-                }
-              }
-              if (firstIndex < 0 || lastIndex < 0 || !firstFileName || !lastFileName || firstFileName !== lastFileName || firstIndex >= lastIndex) {
-                return;
-              }
-              shouldIgnore = /* @__PURE__ */ __name(function(line) {
-                if (bluebirdFramePattern.test(line)) return true;
-                var info = parseLineInfo(line);
-                if (info) {
-                  if (info.fileName === firstFileName && (firstIndex <= info.line && info.line <= lastIndex)) {
-                    return true;
-                  }
-                }
-                return false;
-              }, "shouldIgnore");
-            }
-            __name(setBounds, "setBounds");
-            function CapturedTrace(parent2) {
-              this._parent = parent2;
-              this._promisesCreated = 0;
-              var length = this._length = 1 + (parent2 === void 0 ? 0 : parent2._length);
-              captureStackTrace(this, CapturedTrace);
-              if (length > 32) this.uncycle();
-            }
-            __name(CapturedTrace, "CapturedTrace");
-            util2.inherits(CapturedTrace, Error);
-            Context2.CapturedTrace = CapturedTrace;
-            CapturedTrace.prototype.uncycle = function() {
-              var length = this._length;
-              if (length < 2) return;
-              var nodes = [];
-              var stackToIndex = {};
-              for (var i2 = 0, node2 = this; node2 !== void 0; ++i2) {
-                nodes.push(node2);
-                node2 = node2._parent;
-              }
-              length = this._length = i2;
-              for (var i2 = length - 1; i2 >= 0; --i2) {
-                var stack = nodes[i2].stack;
-                if (stackToIndex[stack] === void 0) {
-                  stackToIndex[stack] = i2;
-                }
-              }
-              for (var i2 = 0; i2 < length; ++i2) {
-                var currentStack = nodes[i2].stack;
-                var index2 = stackToIndex[currentStack];
-                if (index2 !== void 0 && index2 !== i2) {
-                  if (index2 > 0) {
-                    nodes[index2 - 1]._parent = void 0;
-                    nodes[index2 - 1]._length = 1;
-                  }
-                  nodes[i2]._parent = void 0;
-                  nodes[i2]._length = 1;
-                  var cycleEdgeNode = i2 > 0 ? nodes[i2 - 1] : this;
-                  if (index2 < length - 1) {
-                    cycleEdgeNode._parent = nodes[index2 + 1];
-                    cycleEdgeNode._parent.uncycle();
-                    cycleEdgeNode._length = cycleEdgeNode._parent._length + 1;
-                  } else {
-                    cycleEdgeNode._parent = void 0;
-                    cycleEdgeNode._length = 1;
-                  }
-                  var currentChildLength = cycleEdgeNode._length + 1;
-                  for (var j2 = i2 - 2; j2 >= 0; --j2) {
-                    nodes[j2]._length = currentChildLength;
-                    currentChildLength++;
-                  }
-                  return;
-                }
-              }
-            };
-            CapturedTrace.prototype.attachExtraTrace = function(error) {
-              if (error.__stackCleaned__) return;
-              this.uncycle();
-              var parsed = parseStackAndMessage(error);
-              var message = parsed.message;
-              var stacks = [parsed.stack];
-              var trace = this;
-              while (trace !== void 0) {
-                stacks.push(cleanStack(trace.stack.split("\n")));
-                trace = trace._parent;
-              }
-              removeCommonRoots(stacks);
-              removeDuplicateOrEmptyJumps(stacks);
-              util2.notEnumerableProp(error, "stack", reconstructStack(message, stacks));
-              util2.notEnumerableProp(error, "__stackCleaned__", true);
-            };
-            var captureStackTrace = (/* @__PURE__ */ __name(function stackDetection() {
-              var v8stackFramePattern = /^\s*at\s*/;
-              var v8stackFormatter = /* @__PURE__ */ __name(function(stack, error) {
-                if (typeof stack === "string") return stack;
-                if (error.name !== void 0 && error.message !== void 0) {
-                  return error.toString();
-                }
-                return formatNonError(error);
-              }, "v8stackFormatter");
-              if (typeof Error.stackTraceLimit === "number" && typeof Error.captureStackTrace === "function") {
-                Error.stackTraceLimit += 6;
-                stackFramePattern = v8stackFramePattern;
-                formatStack = v8stackFormatter;
-                var captureStackTrace2 = Error.captureStackTrace;
-                shouldIgnore = /* @__PURE__ */ __name(function(line) {
-                  return bluebirdFramePattern.test(line);
-                }, "shouldIgnore");
-                return function(receiver, ignoreUntil) {
-                  Error.stackTraceLimit += 6;
-                  captureStackTrace2(receiver, ignoreUntil);
-                  Error.stackTraceLimit -= 6;
-                };
-              }
-              var err2 = new Error();
-              if (typeof err2.stack === "string" && err2.stack.split("\n")[0].indexOf("stackDetection@") >= 0) {
-                stackFramePattern = /@/;
-                formatStack = v8stackFormatter;
-                indentStackFrames = true;
-                return /* @__PURE__ */ __name(function captureStackTrace3(o2) {
-                  o2.stack = new Error().stack;
-                }, "captureStackTrace");
-              }
-              var hasStackAfterThrow;
-              try {
-                throw new Error();
-              } catch (e2) {
-                hasStackAfterThrow = "stack" in e2;
-              }
-              if (!("stack" in err2) && hasStackAfterThrow && typeof Error.stackTraceLimit === "number") {
-                stackFramePattern = v8stackFramePattern;
-                formatStack = v8stackFormatter;
-                return /* @__PURE__ */ __name(function captureStackTrace3(o2) {
-                  Error.stackTraceLimit += 6;
-                  try {
-                    throw new Error();
-                  } catch (e2) {
-                    o2.stack = e2.stack;
-                  }
-                  Error.stackTraceLimit -= 6;
-                }, "captureStackTrace");
-              }
-              formatStack = /* @__PURE__ */ __name(function(stack, error) {
-                if (typeof stack === "string") return stack;
-                if ((typeof error === "object" || typeof error === "function") && error.name !== void 0 && error.message !== void 0) {
-                  return error.toString();
-                }
-                return formatNonError(error);
-              }, "formatStack");
-              return null;
-            }, "stackDetection"))();
-            if (typeof console !== "undefined" && typeof console.warn !== "undefined") {
-              printWarning = /* @__PURE__ */ __name(function(message) {
-                console.warn(message);
-              }, "printWarning");
-              if (util2.isNode && process.stderr.isTTY) {
-                printWarning = /* @__PURE__ */ __name(function(message, isSoft) {
-                  var color2 = isSoft ? "\x1B[33m" : "\x1B[31m";
-                  console.warn(color2 + message + "\x1B[0m\n");
-                }, "printWarning");
-              } else if (!util2.isNode && typeof new Error().stack === "string") {
-                printWarning = /* @__PURE__ */ __name(function(message, isSoft) {
-                  console.warn(
-                    "%c" + message,
-                    isSoft ? "color: darkorange" : "color: red"
-                  );
-                }, "printWarning");
-              }
-            }
-            var config = {
-              warnings,
-              longStackTraces: false,
-              cancellation: false,
-              monitoring: false,
-              asyncHooks: false
-            };
-            if (longStackTraces) Promise2.longStackTraces();
-            return {
-              asyncHooks: /* @__PURE__ */ __name(function() {
-                return config.asyncHooks;
-              }, "asyncHooks"),
-              longStackTraces: /* @__PURE__ */ __name(function() {
-                return config.longStackTraces;
-              }, "longStackTraces"),
-              warnings: /* @__PURE__ */ __name(function() {
-                return config.warnings;
-              }, "warnings"),
-              cancellation: /* @__PURE__ */ __name(function() {
-                return config.cancellation;
-              }, "cancellation"),
-              monitoring: /* @__PURE__ */ __name(function() {
-                return config.monitoring;
-              }, "monitoring"),
-              propagateFromFunction: /* @__PURE__ */ __name(function() {
-                return propagateFromFunction;
-              }, "propagateFromFunction"),
-              boundValueFunction: /* @__PURE__ */ __name(function() {
-                return boundValueFunction;
-              }, "boundValueFunction"),
-              checkForgottenReturns,
-              setBounds,
-              warn,
-              deprecated,
-              CapturedTrace,
-              fireDomEvent,
-              fireGlobalEvent
-            };
-          };
-        }, { "./errors": 12, "./es5": 13, "./util": 36 }], 10: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2) {
-            function returner() {
-              return this.value;
-            }
-            __name(returner, "returner");
-            function thrower() {
-              throw this.reason;
-            }
-            __name(thrower, "thrower");
-            Promise2.prototype["return"] = Promise2.prototype.thenReturn = function(value) {
-              if (value instanceof Promise2) value.suppressUnhandledRejections();
-              return this._then(
-                returner,
-                void 0,
-                void 0,
-                { value },
-                void 0
-              );
-            };
-            Promise2.prototype["throw"] = Promise2.prototype.thenThrow = function(reason) {
-              return this._then(
-                thrower,
-                void 0,
-                void 0,
-                { reason },
-                void 0
-              );
-            };
-            Promise2.prototype.catchThrow = function(reason) {
-              if (arguments.length <= 1) {
-                return this._then(
-                  void 0,
-                  thrower,
-                  void 0,
-                  { reason },
-                  void 0
-                );
-              } else {
-                var _reason = arguments[1];
-                var handler = /* @__PURE__ */ __name(function() {
-                  throw _reason;
-                }, "handler");
-                return this.caught(reason, handler);
-              }
-            };
-            Promise2.prototype.catchReturn = function(value) {
-              if (arguments.length <= 1) {
-                if (value instanceof Promise2) value.suppressUnhandledRejections();
-                return this._then(
-                  void 0,
-                  returner,
-                  void 0,
-                  { value },
-                  void 0
-                );
-              } else {
-                var _value = arguments[1];
-                if (_value instanceof Promise2) _value.suppressUnhandledRejections();
-                var handler = /* @__PURE__ */ __name(function() {
-                  return _value;
-                }, "handler");
-                return this.caught(value, handler);
-              }
-            };
-          };
-        }, {}], 11: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, INTERNAL) {
-            var PromiseReduce = Promise2.reduce;
-            var PromiseAll = Promise2.all;
-            function promiseAllThis() {
-              return PromiseAll(this);
-            }
-            __name(promiseAllThis, "promiseAllThis");
-            function PromiseMapSeries(promises, fn2) {
-              return PromiseReduce(promises, fn2, INTERNAL, INTERNAL);
-            }
-            __name(PromiseMapSeries, "PromiseMapSeries");
-            Promise2.prototype.each = function(fn2) {
-              return PromiseReduce(this, fn2, INTERNAL, 0)._then(promiseAllThis, void 0, void 0, this, void 0);
-            };
-            Promise2.prototype.mapSeries = function(fn2) {
-              return PromiseReduce(this, fn2, INTERNAL, INTERNAL);
-            };
-            Promise2.each = function(promises, fn2) {
-              return PromiseReduce(promises, fn2, INTERNAL, 0)._then(promiseAllThis, void 0, void 0, promises, void 0);
-            };
-            Promise2.mapSeries = PromiseMapSeries;
-          };
-        }, {}], 12: [function(_dereq_2, module3, exports4) {
-          var es5 = _dereq_2("./es5");
-          var Objectfreeze = es5.freeze;
-          var util2 = _dereq_2("./util");
-          var inherits = util2.inherits;
-          var notEnumerableProp = util2.notEnumerableProp;
-          function subError(nameProperty, defaultMessage) {
-            function SubError(message) {
-              if (!(this instanceof SubError)) return new SubError(message);
-              notEnumerableProp(
-                this,
-                "message",
-                typeof message === "string" ? message : defaultMessage
-              );
-              notEnumerableProp(this, "name", nameProperty);
-              if (Error.captureStackTrace) {
-                Error.captureStackTrace(this, this.constructor);
-              } else {
-                Error.call(this);
-              }
-            }
-            __name(SubError, "SubError");
-            inherits(SubError, Error);
-            return SubError;
-          }
-          __name(subError, "subError");
-          var _TypeError, _RangeError;
-          var Warning = subError("Warning", "warning");
-          var CancellationError = subError("CancellationError", "cancellation error");
-          var TimeoutError = subError("TimeoutError", "timeout error");
-          var AggregateError2 = subError("AggregateError", "aggregate error");
-          try {
-            _TypeError = TypeError;
-            _RangeError = RangeError;
-          } catch (e2) {
-            _TypeError = subError("TypeError", "type error");
-            _RangeError = subError("RangeError", "range error");
-          }
-          var methods = "join pop push shift unshift slice filter forEach some every map indexOf lastIndexOf reduce reduceRight sort reverse".split(" ");
-          for (var i2 = 0; i2 < methods.length; ++i2) {
-            if (typeof Array.prototype[methods[i2]] === "function") {
-              AggregateError2.prototype[methods[i2]] = Array.prototype[methods[i2]];
-            }
-          }
-          es5.defineProperty(AggregateError2.prototype, "length", {
-            value: 0,
-            configurable: false,
-            writable: true,
-            enumerable: true
-          });
-          AggregateError2.prototype["isOperational"] = true;
-          var level = 0;
-          AggregateError2.prototype.toString = function() {
-            var indent2 = Array(level * 4 + 1).join(" ");
-            var ret = "\n" + indent2 + "AggregateError of:\n";
-            level++;
-            indent2 = Array(level * 4 + 1).join(" ");
-            for (var i3 = 0; i3 < this.length; ++i3) {
-              var str = this[i3] === this ? "[Circular AggregateError]" : this[i3] + "";
-              var lines = str.split("\n");
-              for (var j2 = 0; j2 < lines.length; ++j2) {
-                lines[j2] = indent2 + lines[j2];
-              }
-              str = lines.join("\n");
-              ret += str + "\n";
-            }
-            level--;
-            return ret;
-          };
-          function OperationalError(message) {
-            if (!(this instanceof OperationalError))
-              return new OperationalError(message);
-            notEnumerableProp(this, "name", "OperationalError");
-            notEnumerableProp(this, "message", message);
-            this.cause = message;
-            this["isOperational"] = true;
-            if (message instanceof Error) {
-              notEnumerableProp(this, "message", message.message);
-              notEnumerableProp(this, "stack", message.stack);
-            } else if (Error.captureStackTrace) {
-              Error.captureStackTrace(this, this.constructor);
-            }
-          }
-          __name(OperationalError, "OperationalError");
-          inherits(OperationalError, Error);
-          var errorTypes = Error["__BluebirdErrorTypes__"];
-          if (!errorTypes) {
-            errorTypes = Objectfreeze({
-              CancellationError,
-              TimeoutError,
-              OperationalError,
-              RejectionError: OperationalError,
-              AggregateError: AggregateError2
-            });
-            es5.defineProperty(Error, "__BluebirdErrorTypes__", {
-              value: errorTypes,
-              writable: false,
-              enumerable: false,
-              configurable: false
-            });
-          }
-          module3.exports = {
-            Error,
-            TypeError: _TypeError,
-            RangeError: _RangeError,
-            CancellationError: errorTypes.CancellationError,
-            OperationalError: errorTypes.OperationalError,
-            TimeoutError: errorTypes.TimeoutError,
-            AggregateError: errorTypes.AggregateError,
-            Warning
-          };
-        }, { "./es5": 13, "./util": 36 }], 13: [function(_dereq_2, module3, exports4) {
-          var isES5 = /* @__PURE__ */ function() {
-            return this === void 0;
-          }();
-          if (isES5) {
-            module3.exports = {
-              freeze: Object.freeze,
-              defineProperty: Object.defineProperty,
-              getDescriptor: Object.getOwnPropertyDescriptor,
-              keys: Object.keys,
-              names: Object.getOwnPropertyNames,
-              getPrototypeOf: Object.getPrototypeOf,
-              isArray: Array.isArray,
-              isES5,
-              propertyIsWritable: /* @__PURE__ */ __name(function(obj, prop) {
-                var descriptor = Object.getOwnPropertyDescriptor(obj, prop);
-                return !!(!descriptor || descriptor.writable || descriptor.set);
-              }, "propertyIsWritable")
-            };
-          } else {
-            var has2 = {}.hasOwnProperty;
-            var str = {}.toString;
-            var proto = {}.constructor.prototype;
-            var ObjectKeys = /* @__PURE__ */ __name(function(o2) {
-              var ret = [];
-              for (var key in o2) {
-                if (has2.call(o2, key)) {
-                  ret.push(key);
-                }
-              }
-              return ret;
-            }, "ObjectKeys");
-            var ObjectGetDescriptor = /* @__PURE__ */ __name(function(o2, key) {
-              return { value: o2[key] };
-            }, "ObjectGetDescriptor");
-            var ObjectDefineProperty = /* @__PURE__ */ __name(function(o2, key, desc) {
-              o2[key] = desc.value;
-              return o2;
-            }, "ObjectDefineProperty");
-            var ObjectFreeze = /* @__PURE__ */ __name(function(obj) {
-              return obj;
-            }, "ObjectFreeze");
-            var ObjectGetPrototypeOf = /* @__PURE__ */ __name(function(obj) {
-              try {
-                return Object(obj).constructor.prototype;
-              } catch (e2) {
-                return proto;
-              }
-            }, "ObjectGetPrototypeOf");
-            var ArrayIsArray = /* @__PURE__ */ __name(function(obj) {
-              try {
-                return str.call(obj) === "[object Array]";
-              } catch (e2) {
-                return false;
-              }
-            }, "ArrayIsArray");
-            module3.exports = {
-              isArray: ArrayIsArray,
-              keys: ObjectKeys,
-              names: ObjectKeys,
-              defineProperty: ObjectDefineProperty,
-              getDescriptor: ObjectGetDescriptor,
-              freeze: ObjectFreeze,
-              getPrototypeOf: ObjectGetPrototypeOf,
-              isES5,
-              propertyIsWritable: /* @__PURE__ */ __name(function() {
-                return true;
-              }, "propertyIsWritable")
-            };
-          }
-        }, {}], 14: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, INTERNAL) {
-            var PromiseMap = Promise2.map;
-            Promise2.prototype.filter = function(fn2, options) {
-              return PromiseMap(this, fn2, options, INTERNAL);
-            };
-            Promise2.filter = function(promises, fn2, options) {
-              return PromiseMap(promises, fn2, options, INTERNAL);
-            };
-          };
-        }, {}], 15: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, tryConvertToPromise, NEXT_FILTER) {
-            var util2 = _dereq_2("./util");
-            var CancellationError = Promise2.CancellationError;
-            var errorObj = util2.errorObj;
-            var catchFilter = _dereq_2("./catch_filter")(NEXT_FILTER);
-            function PassThroughHandlerContext(promise, type2, handler) {
-              this.promise = promise;
-              this.type = type2;
-              this.handler = handler;
-              this.called = false;
-              this.cancelPromise = null;
-            }
-            __name(PassThroughHandlerContext, "PassThroughHandlerContext");
-            PassThroughHandlerContext.prototype.isFinallyHandler = function() {
-              return this.type === 0;
-            };
-            function FinallyHandlerCancelReaction(finallyHandler2) {
-              this.finallyHandler = finallyHandler2;
-            }
-            __name(FinallyHandlerCancelReaction, "FinallyHandlerCancelReaction");
-            FinallyHandlerCancelReaction.prototype._resultCancelled = function() {
-              checkCancel(this.finallyHandler);
-            };
-            function checkCancel(ctx, reason) {
-              if (ctx.cancelPromise != null) {
-                if (arguments.length > 1) {
-                  ctx.cancelPromise._reject(reason);
-                } else {
-                  ctx.cancelPromise._cancel();
-                }
-                ctx.cancelPromise = null;
-                return true;
-              }
-              return false;
-            }
-            __name(checkCancel, "checkCancel");
-            function succeed() {
-              return finallyHandler.call(this, this.promise._target()._settledValue());
-            }
-            __name(succeed, "succeed");
-            function fail(reason) {
-              if (checkCancel(this, reason)) return;
-              errorObj.e = reason;
-              return errorObj;
-            }
-            __name(fail, "fail");
-            function finallyHandler(reasonOrValue) {
-              var promise = this.promise;
-              var handler = this.handler;
-              if (!this.called) {
-                this.called = true;
-                var ret = this.isFinallyHandler() ? handler.call(promise._boundValue()) : handler.call(promise._boundValue(), reasonOrValue);
-                if (ret === NEXT_FILTER) {
-                  return ret;
-                } else if (ret !== void 0) {
-                  promise._setReturnedNonUndefined();
-                  var maybePromise = tryConvertToPromise(ret, promise);
-                  if (maybePromise instanceof Promise2) {
-                    if (this.cancelPromise != null) {
-                      if (maybePromise._isCancelled()) {
-                        var reason = new CancellationError("late cancellation observer");
-                        promise._attachExtraTrace(reason);
-                        errorObj.e = reason;
-                        return errorObj;
-                      } else if (maybePromise.isPending()) {
-                        maybePromise._attachCancellationCallback(
-                          new FinallyHandlerCancelReaction(this)
-                        );
-                      }
-                    }
-                    return maybePromise._then(
-                      succeed,
-                      fail,
-                      void 0,
-                      this,
-                      void 0
-                    );
-                  }
-                }
-              }
-              if (promise.isRejected()) {
-                checkCancel(this);
-                errorObj.e = reasonOrValue;
-                return errorObj;
-              } else {
-                checkCancel(this);
-                return reasonOrValue;
-              }
-            }
-            __name(finallyHandler, "finallyHandler");
-            Promise2.prototype._passThrough = function(handler, type2, success, fail2) {
-              if (typeof handler !== "function") return this.then();
-              return this._then(
-                success,
-                fail2,
-                void 0,
-                new PassThroughHandlerContext(this, type2, handler),
-                void 0
-              );
-            };
-            Promise2.prototype.lastly = Promise2.prototype["finally"] = function(handler) {
-              return this._passThrough(
-                handler,
-                0,
-                finallyHandler,
-                finallyHandler
-              );
-            };
-            Promise2.prototype.tap = function(handler) {
-              return this._passThrough(handler, 1, finallyHandler);
-            };
-            Promise2.prototype.tapCatch = function(handlerOrPredicate) {
-              var len = arguments.length;
-              if (len === 1) {
-                return this._passThrough(
-                  handlerOrPredicate,
-                  1,
-                  void 0,
-                  finallyHandler
-                );
-              } else {
-                var catchInstances = new Array(len - 1), j2 = 0, i2;
-                for (i2 = 0; i2 < len - 1; ++i2) {
-                  var item = arguments[i2];
-                  if (util2.isObject(item)) {
-                    catchInstances[j2++] = item;
-                  } else {
-                    return Promise2.reject(new TypeError(
-                      "tapCatch statement predicate: expecting an object but got " + util2.classString(item)
-                    ));
-                  }
-                }
-                catchInstances.length = j2;
-                var handler = arguments[i2];
-                return this._passThrough(
-                  catchFilter(catchInstances, handler, this),
-                  1,
-                  void 0,
-                  finallyHandler
-                );
-              }
-            };
-            return PassThroughHandlerContext;
-          };
-        }, { "./catch_filter": 7, "./util": 36 }], 16: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, apiRejection, INTERNAL, tryConvertToPromise, Proxyable, debug) {
-            var errors = _dereq_2("./errors");
-            var TypeError2 = errors.TypeError;
-            var util2 = _dereq_2("./util");
-            var errorObj = util2.errorObj;
-            var tryCatch = util2.tryCatch;
-            var yieldHandlers = [];
-            function promiseFromYieldHandler(value, yieldHandlers2, traceParent) {
-              for (var i2 = 0; i2 < yieldHandlers2.length; ++i2) {
-                traceParent._pushContext();
-                var result = tryCatch(yieldHandlers2[i2])(value);
-                traceParent._popContext();
-                if (result === errorObj) {
-                  traceParent._pushContext();
-                  var ret = Promise2.reject(errorObj.e);
-                  traceParent._popContext();
-                  return ret;
-                }
-                var maybePromise = tryConvertToPromise(result, traceParent);
-                if (maybePromise instanceof Promise2) return maybePromise;
-              }
-              return null;
-            }
-            __name(promiseFromYieldHandler, "promiseFromYieldHandler");
-            function PromiseSpawn(generatorFunction, receiver, yieldHandler, stack) {
-              if (debug.cancellation()) {
-                var internal = new Promise2(INTERNAL);
-                var _finallyPromise = this._finallyPromise = new Promise2(INTERNAL);
-                this._promise = internal.lastly(function() {
-                  return _finallyPromise;
-                });
-                internal._captureStackTrace();
-                internal._setOnCancel(this);
-              } else {
-                var promise = this._promise = new Promise2(INTERNAL);
-                promise._captureStackTrace();
-              }
-              this._stack = stack;
-              this._generatorFunction = generatorFunction;
-              this._receiver = receiver;
-              this._generator = void 0;
-              this._yieldHandlers = typeof yieldHandler === "function" ? [yieldHandler].concat(yieldHandlers) : yieldHandlers;
-              this._yieldedPromise = null;
-              this._cancellationPhase = false;
-            }
-            __name(PromiseSpawn, "PromiseSpawn");
-            util2.inherits(PromiseSpawn, Proxyable);
-            PromiseSpawn.prototype._isResolved = function() {
-              return this._promise === null;
-            };
-            PromiseSpawn.prototype._cleanup = function() {
-              this._promise = this._generator = null;
-              if (debug.cancellation() && this._finallyPromise !== null) {
-                this._finallyPromise._fulfill();
-                this._finallyPromise = null;
-              }
-            };
-            PromiseSpawn.prototype._promiseCancelled = function() {
-              if (this._isResolved()) return;
-              var implementsReturn = typeof this._generator["return"] !== "undefined";
-              var result;
-              if (!implementsReturn) {
-                var reason = new Promise2.CancellationError(
-                  "generator .return() sentinel"
-                );
-                Promise2.coroutine.returnSentinel = reason;
-                this._promise._attachExtraTrace(reason);
-                this._promise._pushContext();
-                result = tryCatch(this._generator["throw"]).call(
-                  this._generator,
-                  reason
-                );
-                this._promise._popContext();
-              } else {
-                this._promise._pushContext();
-                result = tryCatch(this._generator["return"]).call(
-                  this._generator,
-                  void 0
-                );
-                this._promise._popContext();
-              }
-              this._cancellationPhase = true;
-              this._yieldedPromise = null;
-              this._continue(result);
-            };
-            PromiseSpawn.prototype._promiseFulfilled = function(value) {
-              this._yieldedPromise = null;
-              this._promise._pushContext();
-              var result = tryCatch(this._generator.next).call(this._generator, value);
-              this._promise._popContext();
-              this._continue(result);
-            };
-            PromiseSpawn.prototype._promiseRejected = function(reason) {
-              this._yieldedPromise = null;
-              this._promise._attachExtraTrace(reason);
-              this._promise._pushContext();
-              var result = tryCatch(this._generator["throw"]).call(this._generator, reason);
-              this._promise._popContext();
-              this._continue(result);
-            };
-            PromiseSpawn.prototype._resultCancelled = function() {
-              if (this._yieldedPromise instanceof Promise2) {
-                var promise = this._yieldedPromise;
-                this._yieldedPromise = null;
-                promise.cancel();
-              }
-            };
-            PromiseSpawn.prototype.promise = function() {
-              return this._promise;
-            };
-            PromiseSpawn.prototype._run = function() {
-              this._generator = this._generatorFunction.call(this._receiver);
-              this._receiver = this._generatorFunction = void 0;
-              this._promiseFulfilled(void 0);
-            };
-            PromiseSpawn.prototype._continue = function(result) {
-              var promise = this._promise;
-              if (result === errorObj) {
-                this._cleanup();
-                if (this._cancellationPhase) {
-                  return promise.cancel();
-                } else {
-                  return promise._rejectCallback(result.e, false);
-                }
-              }
-              var value = result.value;
-              if (result.done === true) {
-                this._cleanup();
-                if (this._cancellationPhase) {
-                  return promise.cancel();
-                } else {
-                  return promise._resolveCallback(value);
-                }
-              } else {
-                var maybePromise = tryConvertToPromise(value, this._promise);
-                if (!(maybePromise instanceof Promise2)) {
-                  maybePromise = promiseFromYieldHandler(
-                    maybePromise,
-                    this._yieldHandlers,
-                    this._promise
-                  );
-                  if (maybePromise === null) {
-                    this._promiseRejected(
-                      new TypeError2(
-                        "A value %s was yielded that could not be treated as a promise\n\n    See http://goo.gl/MqrFmX\n\n".replace("%s", String(value)) + "From coroutine:\n" + this._stack.split("\n").slice(1, -7).join("\n")
-                      )
-                    );
-                    return;
-                  }
-                }
-                maybePromise = maybePromise._target();
-                var bitField = maybePromise._bitField;
-                if ((bitField & 50397184) === 0) {
-                  this._yieldedPromise = maybePromise;
-                  maybePromise._proxy(this, null);
-                } else if ((bitField & 33554432) !== 0) {
-                  Promise2._async.invoke(
-                    this._promiseFulfilled,
-                    this,
-                    maybePromise._value()
-                  );
-                } else if ((bitField & 16777216) !== 0) {
-                  Promise2._async.invoke(
-                    this._promiseRejected,
-                    this,
-                    maybePromise._reason()
-                  );
-                } else {
-                  this._promiseCancelled();
-                }
-              }
-            };
-            Promise2.coroutine = function(generatorFunction, options) {
-              if (typeof generatorFunction !== "function") {
-                throw new TypeError2("generatorFunction must be a function\n\n    See http://goo.gl/MqrFmX\n");
-              }
-              var yieldHandler = Object(options).yieldHandler;
-              var PromiseSpawn$ = PromiseSpawn;
-              var stack = new Error().stack;
-              return function() {
-                var generator = generatorFunction.apply(this, arguments);
-                var spawn = new PromiseSpawn$(
-                  void 0,
-                  void 0,
-                  yieldHandler,
-                  stack
-                );
-                var ret = spawn.promise();
-                spawn._generator = generator;
-                spawn._promiseFulfilled(void 0);
-                return ret;
-              };
-            };
-            Promise2.coroutine.addYieldHandler = function(fn2) {
-              if (typeof fn2 !== "function") {
-                throw new TypeError2("expecting a function but got " + util2.classString(fn2));
-              }
-              yieldHandlers.push(fn2);
-            };
-            Promise2.spawn = function(generatorFunction) {
-              debug.deprecated("Promise.spawn()", "Promise.coroutine()");
-              if (typeof generatorFunction !== "function") {
-                return apiRejection("generatorFunction must be a function\n\n    See http://goo.gl/MqrFmX\n");
-              }
-              var spawn = new PromiseSpawn(generatorFunction, this);
-              var ret = spawn.promise();
-              spawn._run(Promise2.spawn);
-              return ret;
-            };
-          };
-        }, { "./errors": 12, "./util": 36 }], 17: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, PromiseArray, tryConvertToPromise, INTERNAL, async) {
-            var util2 = _dereq_2("./util");
-            util2.canEvaluate;
-            util2.tryCatch;
-            util2.errorObj;
-            Promise2.join = function() {
-              var last2 = arguments.length - 1;
-              var fn2;
-              if (last2 > 0 && typeof arguments[last2] === "function") {
-                fn2 = arguments[last2];
-                var ret;
-              }
-              var args = [].slice.call(arguments);
-              if (fn2) args.pop();
-              var ret = new PromiseArray(args).promise();
-              return fn2 !== void 0 ? ret.spread(fn2) : ret;
-            };
-          };
-        }, { "./util": 36 }], 18: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, PromiseArray, apiRejection, tryConvertToPromise, INTERNAL, debug) {
-            var util2 = _dereq_2("./util");
-            var tryCatch = util2.tryCatch;
-            var errorObj = util2.errorObj;
-            var async = Promise2._async;
-            function MappingPromiseArray(promises, fn2, limit, _filter) {
-              this.constructor$(promises);
-              this._promise._captureStackTrace();
-              var context2 = Promise2._getContext();
-              this._callback = util2.contextBind(context2, fn2);
-              this._preservedValues = _filter === INTERNAL ? new Array(this.length()) : null;
-              this._limit = limit;
-              this._inFlight = 0;
-              this._queue = [];
-              async.invoke(this._asyncInit, this, void 0);
-              if (util2.isArray(promises)) {
-                for (var i2 = 0; i2 < promises.length; ++i2) {
-                  var maybePromise = promises[i2];
-                  if (maybePromise instanceof Promise2) {
-                    maybePromise.suppressUnhandledRejections();
-                  }
-                }
-              }
-            }
-            __name(MappingPromiseArray, "MappingPromiseArray");
-            util2.inherits(MappingPromiseArray, PromiseArray);
-            MappingPromiseArray.prototype._asyncInit = function() {
-              this._init$(void 0, -2);
-            };
-            MappingPromiseArray.prototype._init = function() {
-            };
-            MappingPromiseArray.prototype._promiseFulfilled = function(value, index2) {
-              var values2 = this._values;
-              var length = this.length();
-              var preservedValues = this._preservedValues;
-              var limit = this._limit;
-              if (index2 < 0) {
-                index2 = index2 * -1 - 1;
-                values2[index2] = value;
-                if (limit >= 1) {
-                  this._inFlight--;
-                  this._drainQueue();
-                  if (this._isResolved()) return true;
-                }
-              } else {
-                if (limit >= 1 && this._inFlight >= limit) {
-                  values2[index2] = value;
-                  this._queue.push(index2);
-                  return false;
-                }
-                if (preservedValues !== null) preservedValues[index2] = value;
-                var promise = this._promise;
-                var callback2 = this._callback;
-                var receiver = promise._boundValue();
-                promise._pushContext();
-                var ret = tryCatch(callback2).call(receiver, value, index2, length);
-                var promiseCreated = promise._popContext();
-                debug.checkForgottenReturns(
-                  ret,
-                  promiseCreated,
-                  preservedValues !== null ? "Promise.filter" : "Promise.map",
-                  promise
-                );
-                if (ret === errorObj) {
-                  this._reject(ret.e);
-                  return true;
-                }
-                var maybePromise = tryConvertToPromise(ret, this._promise);
-                if (maybePromise instanceof Promise2) {
-                  maybePromise = maybePromise._target();
-                  var bitField = maybePromise._bitField;
-                  if ((bitField & 50397184) === 0) {
-                    if (limit >= 1) this._inFlight++;
-                    values2[index2] = maybePromise;
-                    maybePromise._proxy(this, (index2 + 1) * -1);
-                    return false;
-                  } else if ((bitField & 33554432) !== 0) {
-                    ret = maybePromise._value();
-                  } else if ((bitField & 16777216) !== 0) {
-                    this._reject(maybePromise._reason());
-                    return true;
-                  } else {
-                    this._cancel();
-                    return true;
-                  }
-                }
-                values2[index2] = ret;
-              }
-              var totalResolved = ++this._totalResolved;
-              if (totalResolved >= length) {
-                if (preservedValues !== null) {
-                  this._filter(values2, preservedValues);
-                } else {
-                  this._resolve(values2);
-                }
-                return true;
-              }
-              return false;
-            };
-            MappingPromiseArray.prototype._drainQueue = function() {
-              var queue = this._queue;
-              var limit = this._limit;
-              var values2 = this._values;
-              while (queue.length > 0 && this._inFlight < limit) {
-                if (this._isResolved()) return;
-                var index2 = queue.pop();
-                this._promiseFulfilled(values2[index2], index2);
-              }
-            };
-            MappingPromiseArray.prototype._filter = function(booleans, values2) {
-              var len = values2.length;
-              var ret = new Array(len);
-              var j2 = 0;
-              for (var i2 = 0; i2 < len; ++i2) {
-                if (booleans[i2]) ret[j2++] = values2[i2];
-              }
-              ret.length = j2;
-              this._resolve(ret);
-            };
-            MappingPromiseArray.prototype.preservedValues = function() {
-              return this._preservedValues;
-            };
-            function map2(promises, fn2, options, _filter) {
-              if (typeof fn2 !== "function") {
-                return apiRejection("expecting a function but got " + util2.classString(fn2));
-              }
-              var limit = 0;
-              if (options !== void 0) {
-                if (typeof options === "object" && options !== null) {
-                  if (typeof options.concurrency !== "number") {
-                    return Promise2.reject(
-                      new TypeError("'concurrency' must be a number but it is " + util2.classString(options.concurrency))
-                    );
-                  }
-                  limit = options.concurrency;
-                } else {
-                  return Promise2.reject(new TypeError(
-                    "options argument must be an object but it is " + util2.classString(options)
-                  ));
-                }
-              }
-              limit = typeof limit === "number" && isFinite(limit) && limit >= 1 ? limit : 0;
-              return new MappingPromiseArray(promises, fn2, limit, _filter).promise();
-            }
-            __name(map2, "map");
-            Promise2.prototype.map = function(fn2, options) {
-              return map2(this, fn2, options, null);
-            };
-            Promise2.map = function(promises, fn2, options, _filter) {
-              return map2(promises, fn2, options, _filter);
-            };
-          };
-        }, { "./util": 36 }], 19: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, INTERNAL, tryConvertToPromise, apiRejection, debug) {
-            var util2 = _dereq_2("./util");
-            var tryCatch = util2.tryCatch;
-            Promise2.method = function(fn2) {
-              if (typeof fn2 !== "function") {
-                throw new Promise2.TypeError("expecting a function but got " + util2.classString(fn2));
-              }
-              return function() {
-                var ret = new Promise2(INTERNAL);
-                ret._captureStackTrace();
-                ret._pushContext();
-                var value = tryCatch(fn2).apply(this, arguments);
-                var promiseCreated = ret._popContext();
-                debug.checkForgottenReturns(
-                  value,
-                  promiseCreated,
-                  "Promise.method",
-                  ret
-                );
-                ret._resolveFromSyncValue(value);
-                return ret;
-              };
-            };
-            Promise2.attempt = Promise2["try"] = function(fn2) {
-              if (typeof fn2 !== "function") {
-                return apiRejection("expecting a function but got " + util2.classString(fn2));
-              }
-              var ret = new Promise2(INTERNAL);
-              ret._captureStackTrace();
-              ret._pushContext();
-              var value;
-              if (arguments.length > 1) {
-                debug.deprecated("calling Promise.try with more than 1 argument");
-                var arg = arguments[1];
-                var ctx = arguments[2];
-                value = util2.isArray(arg) ? tryCatch(fn2).apply(ctx, arg) : tryCatch(fn2).call(ctx, arg);
-              } else {
-                value = tryCatch(fn2)();
-              }
-              var promiseCreated = ret._popContext();
-              debug.checkForgottenReturns(
-                value,
-                promiseCreated,
-                "Promise.try",
-                ret
-              );
-              ret._resolveFromSyncValue(value);
-              return ret;
-            };
-            Promise2.prototype._resolveFromSyncValue = function(value) {
-              if (value === util2.errorObj) {
-                this._rejectCallback(value.e, false);
-              } else {
-                this._resolveCallback(value, true);
-              }
-            };
-          };
-        }, { "./util": 36 }], 20: [function(_dereq_2, module3, exports4) {
-          var util2 = _dereq_2("./util");
-          var maybeWrapAsError = util2.maybeWrapAsError;
-          var errors = _dereq_2("./errors");
-          var OperationalError = errors.OperationalError;
-          var es5 = _dereq_2("./es5");
-          function isUntypedError(obj) {
-            return obj instanceof Error && es5.getPrototypeOf(obj) === Error.prototype;
-          }
-          __name(isUntypedError, "isUntypedError");
-          var rErrorKey = /^(?:name|message|stack|cause)$/;
-          function wrapAsOperationalError(obj) {
-            var ret;
-            if (isUntypedError(obj)) {
-              ret = new OperationalError(obj);
-              ret.name = obj.name;
-              ret.message = obj.message;
-              ret.stack = obj.stack;
-              var keys2 = es5.keys(obj);
-              for (var i2 = 0; i2 < keys2.length; ++i2) {
-                var key = keys2[i2];
-                if (!rErrorKey.test(key)) {
-                  ret[key] = obj[key];
-                }
-              }
-              return ret;
-            }
-            util2.markAsOriginatingFromRejection(obj);
-            return obj;
-          }
-          __name(wrapAsOperationalError, "wrapAsOperationalError");
-          function nodebackForPromise(promise, multiArgs) {
-            return function(err2, value) {
-              if (promise === null) return;
-              if (err2) {
-                var wrapped = wrapAsOperationalError(maybeWrapAsError(err2));
-                promise._attachExtraTrace(wrapped);
-                promise._reject(wrapped);
-              } else if (!multiArgs) {
-                promise._fulfill(value);
-              } else {
-                var args = [].slice.call(arguments, 1);
-                promise._fulfill(args);
-              }
-              promise = null;
-            };
-          }
-          __name(nodebackForPromise, "nodebackForPromise");
-          module3.exports = nodebackForPromise;
-        }, { "./errors": 12, "./es5": 13, "./util": 36 }], 21: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2) {
-            var util2 = _dereq_2("./util");
-            var async = Promise2._async;
-            var tryCatch = util2.tryCatch;
-            var errorObj = util2.errorObj;
-            function spreadAdapter(val2, nodeback) {
-              var promise = this;
-              if (!util2.isArray(val2)) return successAdapter.call(promise, val2, nodeback);
-              var ret = tryCatch(nodeback).apply(promise._boundValue(), [null].concat(val2));
-              if (ret === errorObj) {
-                async.throwLater(ret.e);
-              }
-            }
-            __name(spreadAdapter, "spreadAdapter");
-            function successAdapter(val2, nodeback) {
-              var promise = this;
-              var receiver = promise._boundValue();
-              var ret = val2 === void 0 ? tryCatch(nodeback).call(receiver, null) : tryCatch(nodeback).call(receiver, null, val2);
-              if (ret === errorObj) {
-                async.throwLater(ret.e);
-              }
-            }
-            __name(successAdapter, "successAdapter");
-            function errorAdapter(reason, nodeback) {
-              var promise = this;
-              if (!reason) {
-                var newReason = new Error(reason + "");
-                newReason.cause = reason;
-                reason = newReason;
-              }
-              var ret = tryCatch(nodeback).call(promise._boundValue(), reason);
-              if (ret === errorObj) {
-                async.throwLater(ret.e);
-              }
-            }
-            __name(errorAdapter, "errorAdapter");
-            Promise2.prototype.asCallback = Promise2.prototype.nodeify = function(nodeback, options) {
-              if (typeof nodeback == "function") {
-                var adapter = successAdapter;
-                if (options !== void 0 && Object(options).spread) {
-                  adapter = spreadAdapter;
-                }
-                this._then(
-                  adapter,
-                  errorAdapter,
-                  void 0,
-                  this,
-                  nodeback
-                );
-              }
-              return this;
-            };
-          };
-        }, { "./util": 36 }], 22: [function(_dereq_2, module3, exports4) {
-          module3.exports = function() {
-            var makeSelfResolutionError = /* @__PURE__ */ __name(function() {
-              return new TypeError2("circular promise resolution chain\n\n    See http://goo.gl/MqrFmX\n");
-            }, "makeSelfResolutionError");
-            var reflectHandler = /* @__PURE__ */ __name(function() {
-              return new Promise2.PromiseInspection(this._target());
-            }, "reflectHandler");
-            var apiRejection = /* @__PURE__ */ __name(function(msg2) {
-              return Promise2.reject(new TypeError2(msg2));
-            }, "apiRejection");
-            function Proxyable() {
-            }
-            __name(Proxyable, "Proxyable");
-            var UNDEFINED_BINDING = {};
-            var util2 = _dereq_2("./util");
-            util2.setReflectHandler(reflectHandler);
-            var getDomain = /* @__PURE__ */ __name(function() {
-              var domain2 = process.domain;
-              if (domain2 === void 0) {
-                return null;
-              }
-              return domain2;
-            }, "getDomain");
-            var getContextDefault = /* @__PURE__ */ __name(function() {
-              return null;
-            }, "getContextDefault");
-            var getContextDomain = /* @__PURE__ */ __name(function() {
-              return {
-                domain: getDomain(),
-                async: null
-              };
-            }, "getContextDomain");
-            var AsyncResource = util2.isNode && util2.nodeSupportsAsyncResource ? _dereq_2("async_hooks").AsyncResource : null;
-            var getContextAsyncHooks = /* @__PURE__ */ __name(function() {
-              return {
-                domain: getDomain(),
-                async: new AsyncResource("Bluebird::Promise")
-              };
-            }, "getContextAsyncHooks");
-            var getContext2 = util2.isNode ? getContextDomain : getContextDefault;
-            util2.notEnumerableProp(Promise2, "_getContext", getContext2);
-            var enableAsyncHooks = /* @__PURE__ */ __name(function() {
-              getContext2 = getContextAsyncHooks;
-              util2.notEnumerableProp(Promise2, "_getContext", getContextAsyncHooks);
-            }, "enableAsyncHooks");
-            var disableAsyncHooks = /* @__PURE__ */ __name(function() {
-              getContext2 = getContextDomain;
-              util2.notEnumerableProp(Promise2, "_getContext", getContextDomain);
-            }, "disableAsyncHooks");
-            var es5 = _dereq_2("./es5");
-            var Async = _dereq_2("./async");
-            var async = new Async();
-            es5.defineProperty(Promise2, "_async", { value: async });
-            var errors = _dereq_2("./errors");
-            var TypeError2 = Promise2.TypeError = errors.TypeError;
-            Promise2.RangeError = errors.RangeError;
-            var CancellationError = Promise2.CancellationError = errors.CancellationError;
-            Promise2.TimeoutError = errors.TimeoutError;
-            Promise2.OperationalError = errors.OperationalError;
-            Promise2.RejectionError = errors.OperationalError;
-            Promise2.AggregateError = errors.AggregateError;
-            var INTERNAL = /* @__PURE__ */ __name(function() {
-            }, "INTERNAL");
-            var APPLY = {};
-            var NEXT_FILTER = {};
-            var tryConvertToPromise = _dereq_2("./thenables")(Promise2, INTERNAL);
-            var PromiseArray = _dereq_2("./promise_array")(
-              Promise2,
-              INTERNAL,
-              tryConvertToPromise,
-              apiRejection,
-              Proxyable
-            );
-            var Context2 = _dereq_2("./context")(Promise2);
-            var createContext2 = Context2.create;
-            var debug = _dereq_2("./debuggability")(
-              Promise2,
-              Context2,
-              enableAsyncHooks,
-              disableAsyncHooks
-            );
-            debug.CapturedTrace;
-            var PassThroughHandlerContext = _dereq_2("./finally")(Promise2, tryConvertToPromise, NEXT_FILTER);
-            var catchFilter = _dereq_2("./catch_filter")(NEXT_FILTER);
-            var nodebackForPromise = _dereq_2("./nodeback");
-            var errorObj = util2.errorObj;
-            var tryCatch = util2.tryCatch;
-            function check2(self2, executor) {
-              if (self2 == null || self2.constructor !== Promise2) {
-                throw new TypeError2("the promise constructor cannot be invoked directly\n\n    See http://goo.gl/MqrFmX\n");
-              }
-              if (typeof executor !== "function") {
-                throw new TypeError2("expecting a function but got " + util2.classString(executor));
-              }
-            }
-            __name(check2, "check");
-            function Promise2(executor) {
-              if (executor !== INTERNAL) {
-                check2(this, executor);
-              }
-              this._bitField = 0;
-              this._fulfillmentHandler0 = void 0;
-              this._rejectionHandler0 = void 0;
-              this._promise0 = void 0;
-              this._receiver0 = void 0;
-              this._resolveFromExecutor(executor);
-              this._promiseCreated();
-              this._fireEvent("promiseCreated", this);
-            }
-            __name(Promise2, "Promise");
-            Promise2.prototype.toString = function() {
-              return "[object Promise]";
-            };
-            Promise2.prototype.caught = Promise2.prototype["catch"] = function(fn2) {
-              var len = arguments.length;
-              if (len > 1) {
-                var catchInstances = new Array(len - 1), j2 = 0, i2;
-                for (i2 = 0; i2 < len - 1; ++i2) {
-                  var item = arguments[i2];
-                  if (util2.isObject(item)) {
-                    catchInstances[j2++] = item;
-                  } else {
-                    return apiRejection("Catch statement predicate: expecting an object but got " + util2.classString(item));
-                  }
-                }
-                catchInstances.length = j2;
-                fn2 = arguments[i2];
-                if (typeof fn2 !== "function") {
-                  throw new TypeError2("The last argument to .catch() must be a function, got " + util2.toString(fn2));
-                }
-                return this.then(void 0, catchFilter(catchInstances, fn2, this));
-              }
-              return this.then(void 0, fn2);
-            };
-            Promise2.prototype.reflect = function() {
-              return this._then(
-                reflectHandler,
-                reflectHandler,
-                void 0,
-                this,
-                void 0
-              );
-            };
-            Promise2.prototype.then = function(didFulfill, didReject) {
-              if (debug.warnings() && arguments.length > 0 && typeof didFulfill !== "function" && typeof didReject !== "function") {
-                var msg2 = ".then() only accepts functions but was passed: " + util2.classString(didFulfill);
-                if (arguments.length > 1) {
-                  msg2 += ", " + util2.classString(didReject);
-                }
-                this._warn(msg2);
-              }
-              return this._then(didFulfill, didReject, void 0, void 0, void 0);
-            };
-            Promise2.prototype.done = function(didFulfill, didReject) {
-              var promise = this._then(didFulfill, didReject, void 0, void 0, void 0);
-              promise._setIsFinal();
-            };
-            Promise2.prototype.spread = function(fn2) {
-              if (typeof fn2 !== "function") {
-                return apiRejection("expecting a function but got " + util2.classString(fn2));
-              }
-              return this.all()._then(fn2, void 0, void 0, APPLY, void 0);
-            };
-            Promise2.prototype.toJSON = function() {
-              var ret = {
-                isFulfilled: false,
-                isRejected: false,
-                fulfillmentValue: void 0,
-                rejectionReason: void 0
-              };
-              if (this.isFulfilled()) {
-                ret.fulfillmentValue = this.value();
-                ret.isFulfilled = true;
-              } else if (this.isRejected()) {
-                ret.rejectionReason = this.reason();
-                ret.isRejected = true;
-              }
-              return ret;
-            };
-            Promise2.prototype.all = function() {
-              if (arguments.length > 0) {
-                this._warn(".all() was passed arguments but it does not take any");
-              }
-              return new PromiseArray(this).promise();
-            };
-            Promise2.prototype.error = function(fn2) {
-              return this.caught(util2.originatesFromRejection, fn2);
-            };
-            Promise2.getNewLibraryCopy = module3.exports;
-            Promise2.is = function(val2) {
-              return val2 instanceof Promise2;
-            };
-            Promise2.fromNode = Promise2.fromCallback = function(fn2) {
-              var ret = new Promise2(INTERNAL);
-              ret._captureStackTrace();
-              var multiArgs = arguments.length > 1 ? !!Object(arguments[1]).multiArgs : false;
-              var result = tryCatch(fn2)(nodebackForPromise(ret, multiArgs));
-              if (result === errorObj) {
-                ret._rejectCallback(result.e, true);
-              }
-              if (!ret._isFateSealed()) ret._setAsyncGuaranteed();
-              return ret;
-            };
-            Promise2.all = function(promises) {
-              return new PromiseArray(promises).promise();
-            };
-            Promise2.cast = function(obj) {
-              var ret = tryConvertToPromise(obj);
-              if (!(ret instanceof Promise2)) {
-                ret = new Promise2(INTERNAL);
-                ret._captureStackTrace();
-                ret._setFulfilled();
-                ret._rejectionHandler0 = obj;
-              }
-              return ret;
-            };
-            Promise2.resolve = Promise2.fulfilled = Promise2.cast;
-            Promise2.reject = Promise2.rejected = function(reason) {
-              var ret = new Promise2(INTERNAL);
-              ret._captureStackTrace();
-              ret._rejectCallback(reason, true);
-              return ret;
-            };
-            Promise2.setScheduler = function(fn2) {
-              if (typeof fn2 !== "function") {
-                throw new TypeError2("expecting a function but got " + util2.classString(fn2));
-              }
-              return async.setScheduler(fn2);
-            };
-            Promise2.prototype._then = function(didFulfill, didReject, _2, receiver, internalData) {
-              var haveInternalData = internalData !== void 0;
-              var promise = haveInternalData ? internalData : new Promise2(INTERNAL);
-              var target = this._target();
-              var bitField = target._bitField;
-              if (!haveInternalData) {
-                promise._propagateFrom(this, 3);
-                promise._captureStackTrace();
-                if (receiver === void 0 && (this._bitField & 2097152) !== 0) {
-                  if (!((bitField & 50397184) === 0)) {
-                    receiver = this._boundValue();
-                  } else {
-                    receiver = target === this ? void 0 : this._boundTo;
-                  }
-                }
-                this._fireEvent("promiseChained", this, promise);
-              }
-              var context2 = getContext2();
-              if (!((bitField & 50397184) === 0)) {
-                var handler, value, settler = target._settlePromiseCtx;
-                if ((bitField & 33554432) !== 0) {
-                  value = target._rejectionHandler0;
-                  handler = didFulfill;
-                } else if ((bitField & 16777216) !== 0) {
-                  value = target._fulfillmentHandler0;
-                  handler = didReject;
-                  target._unsetRejectionIsUnhandled();
-                } else {
-                  settler = target._settlePromiseLateCancellationObserver;
-                  value = new CancellationError("late cancellation observer");
-                  target._attachExtraTrace(value);
-                  handler = didReject;
-                }
-                async.invoke(settler, target, {
-                  handler: util2.contextBind(context2, handler),
-                  promise,
-                  receiver,
-                  value
-                });
-              } else {
-                target._addCallbacks(
-                  didFulfill,
-                  didReject,
-                  promise,
-                  receiver,
-                  context2
-                );
-              }
-              return promise;
-            };
-            Promise2.prototype._length = function() {
-              return this._bitField & 65535;
-            };
-            Promise2.prototype._isFateSealed = function() {
-              return (this._bitField & 117506048) !== 0;
-            };
-            Promise2.prototype._isFollowing = function() {
-              return (this._bitField & 67108864) === 67108864;
-            };
-            Promise2.prototype._setLength = function(len) {
-              this._bitField = this._bitField & -65536 | len & 65535;
-            };
-            Promise2.prototype._setFulfilled = function() {
-              this._bitField = this._bitField | 33554432;
-              this._fireEvent("promiseFulfilled", this);
-            };
-            Promise2.prototype._setRejected = function() {
-              this._bitField = this._bitField | 16777216;
-              this._fireEvent("promiseRejected", this);
-            };
-            Promise2.prototype._setFollowing = function() {
-              this._bitField = this._bitField | 67108864;
-              this._fireEvent("promiseResolved", this);
-            };
-            Promise2.prototype._setIsFinal = function() {
-              this._bitField = this._bitField | 4194304;
-            };
-            Promise2.prototype._isFinal = function() {
-              return (this._bitField & 4194304) > 0;
-            };
-            Promise2.prototype._unsetCancelled = function() {
-              this._bitField = this._bitField & -65537;
-            };
-            Promise2.prototype._setCancelled = function() {
-              this._bitField = this._bitField | 65536;
-              this._fireEvent("promiseCancelled", this);
-            };
-            Promise2.prototype._setWillBeCancelled = function() {
-              this._bitField = this._bitField | 8388608;
-            };
-            Promise2.prototype._setAsyncGuaranteed = function() {
-              if (async.hasCustomScheduler()) return;
-              var bitField = this._bitField;
-              this._bitField = bitField | (bitField & 536870912) >> 2 ^ 134217728;
-            };
-            Promise2.prototype._setNoAsyncGuarantee = function() {
-              this._bitField = (this._bitField | 536870912) & -134217729;
-            };
-            Promise2.prototype._receiverAt = function(index2) {
-              var ret = index2 === 0 ? this._receiver0 : this[index2 * 4 - 4 + 3];
-              if (ret === UNDEFINED_BINDING) {
-                return void 0;
-              } else if (ret === void 0 && this._isBound()) {
-                return this._boundValue();
-              }
-              return ret;
-            };
-            Promise2.prototype._promiseAt = function(index2) {
-              return this[index2 * 4 - 4 + 2];
-            };
-            Promise2.prototype._fulfillmentHandlerAt = function(index2) {
-              return this[index2 * 4 - 4 + 0];
-            };
-            Promise2.prototype._rejectionHandlerAt = function(index2) {
-              return this[index2 * 4 - 4 + 1];
-            };
-            Promise2.prototype._boundValue = function() {
-            };
-            Promise2.prototype._migrateCallback0 = function(follower) {
-              follower._bitField;
-              var fulfill = follower._fulfillmentHandler0;
-              var reject = follower._rejectionHandler0;
-              var promise = follower._promise0;
-              var receiver = follower._receiverAt(0);
-              if (receiver === void 0) receiver = UNDEFINED_BINDING;
-              this._addCallbacks(fulfill, reject, promise, receiver, null);
-            };
-            Promise2.prototype._migrateCallbackAt = function(follower, index2) {
-              var fulfill = follower._fulfillmentHandlerAt(index2);
-              var reject = follower._rejectionHandlerAt(index2);
-              var promise = follower._promiseAt(index2);
-              var receiver = follower._receiverAt(index2);
-              if (receiver === void 0) receiver = UNDEFINED_BINDING;
-              this._addCallbacks(fulfill, reject, promise, receiver, null);
-            };
-            Promise2.prototype._addCallbacks = function(fulfill, reject, promise, receiver, context2) {
-              var index2 = this._length();
-              if (index2 >= 65535 - 4) {
-                index2 = 0;
-                this._setLength(0);
-              }
-              if (index2 === 0) {
-                this._promise0 = promise;
-                this._receiver0 = receiver;
-                if (typeof fulfill === "function") {
-                  this._fulfillmentHandler0 = util2.contextBind(context2, fulfill);
-                }
-                if (typeof reject === "function") {
-                  this._rejectionHandler0 = util2.contextBind(context2, reject);
-                }
-              } else {
-                var base = index2 * 4 - 4;
-                this[base + 2] = promise;
-                this[base + 3] = receiver;
-                if (typeof fulfill === "function") {
-                  this[base + 0] = util2.contextBind(context2, fulfill);
-                }
-                if (typeof reject === "function") {
-                  this[base + 1] = util2.contextBind(context2, reject);
-                }
-              }
-              this._setLength(index2 + 1);
-              return index2;
-            };
-            Promise2.prototype._proxy = function(proxyable, arg) {
-              this._addCallbacks(void 0, void 0, arg, proxyable, null);
-            };
-            Promise2.prototype._resolveCallback = function(value, shouldBind) {
-              if ((this._bitField & 117506048) !== 0) return;
-              if (value === this)
-                return this._rejectCallback(makeSelfResolutionError(), false);
-              var maybePromise = tryConvertToPromise(value, this);
-              if (!(maybePromise instanceof Promise2)) return this._fulfill(value);
-              if (shouldBind) this._propagateFrom(maybePromise, 2);
-              var promise = maybePromise._target();
-              if (promise === this) {
-                this._reject(makeSelfResolutionError());
-                return;
-              }
-              var bitField = promise._bitField;
-              if ((bitField & 50397184) === 0) {
-                var len = this._length();
-                if (len > 0) promise._migrateCallback0(this);
-                for (var i2 = 1; i2 < len; ++i2) {
-                  promise._migrateCallbackAt(this, i2);
-                }
-                this._setFollowing();
-                this._setLength(0);
-                this._setFollowee(maybePromise);
-              } else if ((bitField & 33554432) !== 0) {
-                this._fulfill(promise._value());
-              } else if ((bitField & 16777216) !== 0) {
-                this._reject(promise._reason());
-              } else {
-                var reason = new CancellationError("late cancellation observer");
-                promise._attachExtraTrace(reason);
-                this._reject(reason);
-              }
-            };
-            Promise2.prototype._rejectCallback = function(reason, synchronous, ignoreNonErrorWarnings) {
-              var trace = util2.ensureErrorObject(reason);
-              var hasStack = trace === reason;
-              if (!hasStack && !ignoreNonErrorWarnings && debug.warnings()) {
-                var message = "a promise was rejected with a non-error: " + util2.classString(reason);
-                this._warn(message, true);
-              }
-              this._attachExtraTrace(trace, synchronous ? hasStack : false);
-              this._reject(reason);
-            };
-            Promise2.prototype._resolveFromExecutor = function(executor) {
-              if (executor === INTERNAL) return;
-              var promise = this;
-              this._captureStackTrace();
-              this._pushContext();
-              var synchronous = true;
-              var r2 = this._execute(executor, function(value) {
-                promise._resolveCallback(value);
-              }, function(reason) {
-                promise._rejectCallback(reason, synchronous);
-              });
-              synchronous = false;
-              this._popContext();
-              if (r2 !== void 0) {
-                promise._rejectCallback(r2, true);
-              }
-            };
-            Promise2.prototype._settlePromiseFromHandler = function(handler, receiver, value, promise) {
-              var bitField = promise._bitField;
-              if ((bitField & 65536) !== 0) return;
-              promise._pushContext();
-              var x2;
-              if (receiver === APPLY) {
-                if (!value || typeof value.length !== "number") {
-                  x2 = errorObj;
-                  x2.e = new TypeError2("cannot .spread() a non-array: " + util2.classString(value));
-                } else {
-                  x2 = tryCatch(handler).apply(this._boundValue(), value);
-                }
-              } else {
-                x2 = tryCatch(handler).call(receiver, value);
-              }
-              var promiseCreated = promise._popContext();
-              bitField = promise._bitField;
-              if ((bitField & 65536) !== 0) return;
-              if (x2 === NEXT_FILTER) {
-                promise._reject(value);
-              } else if (x2 === errorObj) {
-                promise._rejectCallback(x2.e, false);
-              } else {
-                debug.checkForgottenReturns(x2, promiseCreated, "", promise, this);
-                promise._resolveCallback(x2);
-              }
-            };
-            Promise2.prototype._target = function() {
-              var ret = this;
-              while (ret._isFollowing()) ret = ret._followee();
-              return ret;
-            };
-            Promise2.prototype._followee = function() {
-              return this._rejectionHandler0;
-            };
-            Promise2.prototype._setFollowee = function(promise) {
-              this._rejectionHandler0 = promise;
-            };
-            Promise2.prototype._settlePromise = function(promise, handler, receiver, value) {
-              var isPromise2 = promise instanceof Promise2;
-              var bitField = this._bitField;
-              var asyncGuaranteed = (bitField & 134217728) !== 0;
-              if ((bitField & 65536) !== 0) {
-                if (isPromise2) promise._invokeInternalOnCancel();
-                if (receiver instanceof PassThroughHandlerContext && receiver.isFinallyHandler()) {
-                  receiver.cancelPromise = promise;
-                  if (tryCatch(handler).call(receiver, value) === errorObj) {
-                    promise._reject(errorObj.e);
-                  }
-                } else if (handler === reflectHandler) {
-                  promise._fulfill(reflectHandler.call(receiver));
-                } else if (receiver instanceof Proxyable) {
-                  receiver._promiseCancelled(promise);
-                } else if (isPromise2 || promise instanceof PromiseArray) {
-                  promise._cancel();
-                } else {
-                  receiver.cancel();
-                }
-              } else if (typeof handler === "function") {
-                if (!isPromise2) {
-                  handler.call(receiver, value, promise);
-                } else {
-                  if (asyncGuaranteed) promise._setAsyncGuaranteed();
-                  this._settlePromiseFromHandler(handler, receiver, value, promise);
-                }
-              } else if (receiver instanceof Proxyable) {
-                if (!receiver._isResolved()) {
-                  if ((bitField & 33554432) !== 0) {
-                    receiver._promiseFulfilled(value, promise);
-                  } else {
-                    receiver._promiseRejected(value, promise);
-                  }
-                }
-              } else if (isPromise2) {
-                if (asyncGuaranteed) promise._setAsyncGuaranteed();
-                if ((bitField & 33554432) !== 0) {
-                  promise._fulfill(value);
-                } else {
-                  promise._reject(value);
-                }
-              }
-            };
-            Promise2.prototype._settlePromiseLateCancellationObserver = function(ctx) {
-              var handler = ctx.handler;
-              var promise = ctx.promise;
-              var receiver = ctx.receiver;
-              var value = ctx.value;
-              if (typeof handler === "function") {
-                if (!(promise instanceof Promise2)) {
-                  handler.call(receiver, value, promise);
-                } else {
-                  this._settlePromiseFromHandler(handler, receiver, value, promise);
-                }
-              } else if (promise instanceof Promise2) {
-                promise._reject(value);
-              }
-            };
-            Promise2.prototype._settlePromiseCtx = function(ctx) {
-              this._settlePromise(ctx.promise, ctx.handler, ctx.receiver, ctx.value);
-            };
-            Promise2.prototype._settlePromise0 = function(handler, value, bitField) {
-              var promise = this._promise0;
-              var receiver = this._receiverAt(0);
-              this._promise0 = void 0;
-              this._receiver0 = void 0;
-              this._settlePromise(promise, handler, receiver, value);
-            };
-            Promise2.prototype._clearCallbackDataAtIndex = function(index2) {
-              var base = index2 * 4 - 4;
-              this[base + 2] = this[base + 3] = this[base + 0] = this[base + 1] = void 0;
-            };
-            Promise2.prototype._fulfill = function(value) {
-              var bitField = this._bitField;
-              if ((bitField & 117506048) >>> 16) return;
-              if (value === this) {
-                var err2 = makeSelfResolutionError();
-                this._attachExtraTrace(err2);
-                return this._reject(err2);
-              }
-              this._setFulfilled();
-              this._rejectionHandler0 = value;
-              if ((bitField & 65535) > 0) {
-                if ((bitField & 134217728) !== 0) {
-                  this._settlePromises();
-                } else {
-                  async.settlePromises(this);
-                }
-                this._dereferenceTrace();
-              }
-            };
-            Promise2.prototype._reject = function(reason) {
-              var bitField = this._bitField;
-              if ((bitField & 117506048) >>> 16) return;
-              this._setRejected();
-              this._fulfillmentHandler0 = reason;
-              if (this._isFinal()) {
-                return async.fatalError(reason, util2.isNode);
-              }
-              if ((bitField & 65535) > 0) {
-                async.settlePromises(this);
-              } else {
-                this._ensurePossibleRejectionHandled();
-              }
-            };
-            Promise2.prototype._fulfillPromises = function(len, value) {
-              for (var i2 = 1; i2 < len; i2++) {
-                var handler = this._fulfillmentHandlerAt(i2);
-                var promise = this._promiseAt(i2);
-                var receiver = this._receiverAt(i2);
-                this._clearCallbackDataAtIndex(i2);
-                this._settlePromise(promise, handler, receiver, value);
-              }
-            };
-            Promise2.prototype._rejectPromises = function(len, reason) {
-              for (var i2 = 1; i2 < len; i2++) {
-                var handler = this._rejectionHandlerAt(i2);
-                var promise = this._promiseAt(i2);
-                var receiver = this._receiverAt(i2);
-                this._clearCallbackDataAtIndex(i2);
-                this._settlePromise(promise, handler, receiver, reason);
-              }
-            };
-            Promise2.prototype._settlePromises = function() {
-              var bitField = this._bitField;
-              var len = bitField & 65535;
-              if (len > 0) {
-                if ((bitField & 16842752) !== 0) {
-                  var reason = this._fulfillmentHandler0;
-                  this._settlePromise0(this._rejectionHandler0, reason, bitField);
-                  this._rejectPromises(len, reason);
-                } else {
-                  var value = this._rejectionHandler0;
-                  this._settlePromise0(this._fulfillmentHandler0, value, bitField);
-                  this._fulfillPromises(len, value);
-                }
-                this._setLength(0);
-              }
-              this._clearCancellationData();
-            };
-            Promise2.prototype._settledValue = function() {
-              var bitField = this._bitField;
-              if ((bitField & 33554432) !== 0) {
-                return this._rejectionHandler0;
-              } else if ((bitField & 16777216) !== 0) {
-                return this._fulfillmentHandler0;
-              }
-            };
-            if (typeof Symbol !== "undefined" && Symbol.toStringTag) {
-              es5.defineProperty(Promise2.prototype, Symbol.toStringTag, {
-                get: /* @__PURE__ */ __name(function() {
-                  return "Object";
-                }, "get")
-              });
-            }
-            function deferResolve(v2) {
-              this.promise._resolveCallback(v2);
-            }
-            __name(deferResolve, "deferResolve");
-            function deferReject(v2) {
-              this.promise._rejectCallback(v2, false);
-            }
-            __name(deferReject, "deferReject");
-            Promise2.defer = Promise2.pending = function() {
-              debug.deprecated("Promise.defer", "new Promise");
-              var promise = new Promise2(INTERNAL);
-              return {
-                promise,
-                resolve: deferResolve,
-                reject: deferReject
-              };
-            };
-            util2.notEnumerableProp(
-              Promise2,
-              "_makeSelfResolutionError",
-              makeSelfResolutionError
-            );
-            _dereq_2("./method")(
-              Promise2,
-              INTERNAL,
-              tryConvertToPromise,
-              apiRejection,
-              debug
-            );
-            _dereq_2("./bind")(Promise2, INTERNAL, tryConvertToPromise, debug);
-            _dereq_2("./cancel")(Promise2, PromiseArray, apiRejection, debug);
-            _dereq_2("./direct_resolve")(Promise2);
-            _dereq_2("./synchronous_inspection")(Promise2);
-            _dereq_2("./join")(
-              Promise2,
-              PromiseArray,
-              tryConvertToPromise,
-              INTERNAL,
-              async
-            );
-            Promise2.Promise = Promise2;
-            Promise2.version = "3.7.2";
-            _dereq_2("./call_get.js")(Promise2);
-            _dereq_2("./generators.js")(Promise2, apiRejection, INTERNAL, tryConvertToPromise, Proxyable, debug);
-            _dereq_2("./map.js")(Promise2, PromiseArray, apiRejection, tryConvertToPromise, INTERNAL, debug);
-            _dereq_2("./nodeify.js")(Promise2);
-            _dereq_2("./promisify.js")(Promise2, INTERNAL);
-            _dereq_2("./props.js")(Promise2, PromiseArray, tryConvertToPromise, apiRejection);
-            _dereq_2("./race.js")(Promise2, INTERNAL, tryConvertToPromise, apiRejection);
-            _dereq_2("./reduce.js")(Promise2, PromiseArray, apiRejection, tryConvertToPromise, INTERNAL, debug);
-            _dereq_2("./settle.js")(Promise2, PromiseArray, debug);
-            _dereq_2("./some.js")(Promise2, PromiseArray, apiRejection);
-            _dereq_2("./timers.js")(Promise2, INTERNAL, debug);
-            _dereq_2("./using.js")(Promise2, apiRejection, tryConvertToPromise, createContext2, INTERNAL, debug);
-            _dereq_2("./any.js")(Promise2);
-            _dereq_2("./each.js")(Promise2, INTERNAL);
-            _dereq_2("./filter.js")(Promise2, INTERNAL);
-            util2.toFastProperties(Promise2);
-            util2.toFastProperties(Promise2.prototype);
-            function fillTypes(value) {
-              var p2 = new Promise2(INTERNAL);
-              p2._fulfillmentHandler0 = value;
-              p2._rejectionHandler0 = value;
-              p2._promise0 = value;
-              p2._receiver0 = value;
-            }
-            __name(fillTypes, "fillTypes");
-            fillTypes({ a: 1 });
-            fillTypes({ b: 2 });
-            fillTypes({ c: 3 });
-            fillTypes(1);
-            fillTypes(function() {
-            });
-            fillTypes(void 0);
-            fillTypes(false);
-            fillTypes(new Promise2(INTERNAL));
-            debug.setBounds(Async.firstLineError, util2.lastLineError);
-            return Promise2;
-          };
-        }, { "./any.js": 1, "./async": 2, "./bind": 3, "./call_get.js": 5, "./cancel": 6, "./catch_filter": 7, "./context": 8, "./debuggability": 9, "./direct_resolve": 10, "./each.js": 11, "./errors": 12, "./es5": 13, "./filter.js": 14, "./finally": 15, "./generators.js": 16, "./join": 17, "./map.js": 18, "./method": 19, "./nodeback": 20, "./nodeify.js": 21, "./promise_array": 23, "./promisify.js": 24, "./props.js": 25, "./race.js": 27, "./reduce.js": 28, "./settle.js": 30, "./some.js": 31, "./synchronous_inspection": 32, "./thenables": 33, "./timers.js": 34, "./using.js": 35, "./util": 36, "async_hooks": void 0 }], 23: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, INTERNAL, tryConvertToPromise, apiRejection, Proxyable) {
-            var util2 = _dereq_2("./util");
-            util2.isArray;
-            function toResolutionValue(val2) {
-              switch (val2) {
-                case -2:
-                  return [];
-                case -3:
-                  return {};
-                case -6:
-                  return /* @__PURE__ */ new Map();
-              }
-            }
-            __name(toResolutionValue, "toResolutionValue");
-            function PromiseArray(values2) {
-              var promise = this._promise = new Promise2(INTERNAL);
-              if (values2 instanceof Promise2) {
-                promise._propagateFrom(values2, 3);
-                values2.suppressUnhandledRejections();
-              }
-              promise._setOnCancel(this);
-              this._values = values2;
-              this._length = 0;
-              this._totalResolved = 0;
-              this._init(void 0, -2);
-            }
-            __name(PromiseArray, "PromiseArray");
-            util2.inherits(PromiseArray, Proxyable);
-            PromiseArray.prototype.length = function() {
-              return this._length;
-            };
-            PromiseArray.prototype.promise = function() {
-              return this._promise;
-            };
-            PromiseArray.prototype._init = /* @__PURE__ */ __name(function init(_2, resolveValueIfEmpty) {
-              var values2 = tryConvertToPromise(this._values, this._promise);
-              if (values2 instanceof Promise2) {
-                values2 = values2._target();
-                var bitField = values2._bitField;
-                this._values = values2;
-                if ((bitField & 50397184) === 0) {
-                  this._promise._setAsyncGuaranteed();
-                  return values2._then(
-                    init,
-                    this._reject,
-                    void 0,
-                    this,
-                    resolveValueIfEmpty
-                  );
-                } else if ((bitField & 33554432) !== 0) {
-                  values2 = values2._value();
-                } else if ((bitField & 16777216) !== 0) {
-                  return this._reject(values2._reason());
-                } else {
-                  return this._cancel();
-                }
-              }
-              values2 = util2.asArray(values2);
-              if (values2 === null) {
-                var err2 = apiRejection(
-                  "expecting an array or an iterable object but got " + util2.classString(values2)
-                ).reason();
-                this._promise._rejectCallback(err2, false);
-                return;
-              }
-              if (values2.length === 0) {
-                if (resolveValueIfEmpty === -5) {
-                  this._resolveEmptyArray();
-                } else {
-                  this._resolve(toResolutionValue(resolveValueIfEmpty));
-                }
-                return;
-              }
-              this._iterate(values2);
-            }, "init");
-            PromiseArray.prototype._iterate = function(values2) {
-              var len = this.getActualLength(values2.length);
-              this._length = len;
-              this._values = this.shouldCopyValues() ? new Array(len) : this._values;
-              var result = this._promise;
-              var isResolved = false;
-              var bitField = null;
-              for (var i2 = 0; i2 < len; ++i2) {
-                var maybePromise = tryConvertToPromise(values2[i2], result);
-                if (maybePromise instanceof Promise2) {
-                  maybePromise = maybePromise._target();
-                  bitField = maybePromise._bitField;
-                } else {
-                  bitField = null;
-                }
-                if (isResolved) {
-                  if (bitField !== null) {
-                    maybePromise.suppressUnhandledRejections();
-                  }
-                } else if (bitField !== null) {
-                  if ((bitField & 50397184) === 0) {
-                    maybePromise._proxy(this, i2);
-                    this._values[i2] = maybePromise;
-                  } else if ((bitField & 33554432) !== 0) {
-                    isResolved = this._promiseFulfilled(maybePromise._value(), i2);
-                  } else if ((bitField & 16777216) !== 0) {
-                    isResolved = this._promiseRejected(maybePromise._reason(), i2);
-                  } else {
-                    isResolved = this._promiseCancelled(i2);
-                  }
-                } else {
-                  isResolved = this._promiseFulfilled(maybePromise, i2);
-                }
-              }
-              if (!isResolved) result._setAsyncGuaranteed();
-            };
-            PromiseArray.prototype._isResolved = function() {
-              return this._values === null;
-            };
-            PromiseArray.prototype._resolve = function(value) {
-              this._values = null;
-              this._promise._fulfill(value);
-            };
-            PromiseArray.prototype._cancel = function() {
-              if (this._isResolved() || !this._promise._isCancellable()) return;
-              this._values = null;
-              this._promise._cancel();
-            };
-            PromiseArray.prototype._reject = function(reason) {
-              this._values = null;
-              this._promise._rejectCallback(reason, false);
-            };
-            PromiseArray.prototype._promiseFulfilled = function(value, index2) {
-              this._values[index2] = value;
-              var totalResolved = ++this._totalResolved;
-              if (totalResolved >= this._length) {
-                this._resolve(this._values);
-                return true;
-              }
-              return false;
-            };
-            PromiseArray.prototype._promiseCancelled = function() {
-              this._cancel();
-              return true;
-            };
-            PromiseArray.prototype._promiseRejected = function(reason) {
-              this._totalResolved++;
-              this._reject(reason);
-              return true;
-            };
-            PromiseArray.prototype._resultCancelled = function() {
-              if (this._isResolved()) return;
-              var values2 = this._values;
-              this._cancel();
-              if (values2 instanceof Promise2) {
-                values2.cancel();
-              } else {
-                for (var i2 = 0; i2 < values2.length; ++i2) {
-                  if (values2[i2] instanceof Promise2) {
-                    values2[i2].cancel();
-                  }
-                }
-              }
-            };
-            PromiseArray.prototype.shouldCopyValues = function() {
-              return true;
-            };
-            PromiseArray.prototype.getActualLength = function(len) {
-              return len;
-            };
-            return PromiseArray;
-          };
-        }, { "./util": 36 }], 24: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, INTERNAL) {
-            var THIS = {};
-            var util2 = _dereq_2("./util");
-            var nodebackForPromise = _dereq_2("./nodeback");
-            var withAppended = util2.withAppended;
-            var maybeWrapAsError = util2.maybeWrapAsError;
-            var canEvaluate = util2.canEvaluate;
-            var TypeError2 = _dereq_2("./errors").TypeError;
-            var defaultSuffix = "Async";
-            var defaultPromisified = { __isPromisified__: true };
-            var noCopyProps = [
-              "arity",
-              "length",
-              "name",
-              "arguments",
-              "caller",
-              "callee",
-              "prototype",
-              "__isPromisified__"
-            ];
-            var noCopyPropsPattern = new RegExp("^(?:" + noCopyProps.join("|") + ")$");
-            var defaultFilter = /* @__PURE__ */ __name(function(name2) {
-              return util2.isIdentifier(name2) && name2.charAt(0) !== "_" && name2 !== "constructor";
-            }, "defaultFilter");
-            function propsFilter(key) {
-              return !noCopyPropsPattern.test(key);
-            }
-            __name(propsFilter, "propsFilter");
-            function isPromisified(fn2) {
-              try {
-                return fn2.__isPromisified__ === true;
-              } catch (e2) {
-                return false;
-              }
-            }
-            __name(isPromisified, "isPromisified");
-            function hasPromisified(obj, key, suffix) {
-              var val2 = util2.getDataPropertyOrDefault(
-                obj,
-                key + suffix,
-                defaultPromisified
-              );
-              return val2 ? isPromisified(val2) : false;
-            }
-            __name(hasPromisified, "hasPromisified");
-            function checkValid(ret, suffix, suffixRegexp) {
-              for (var i2 = 0; i2 < ret.length; i2 += 2) {
-                var key = ret[i2];
-                if (suffixRegexp.test(key)) {
-                  var keyWithoutAsyncSuffix = key.replace(suffixRegexp, "");
-                  for (var j2 = 0; j2 < ret.length; j2 += 2) {
-                    if (ret[j2] === keyWithoutAsyncSuffix) {
-                      throw new TypeError2("Cannot promisify an API that has normal methods with '%s'-suffix\n\n    See http://goo.gl/MqrFmX\n".replace("%s", suffix));
-                    }
-                  }
-                }
-              }
-            }
-            __name(checkValid, "checkValid");
-            function promisifiableMethods(obj, suffix, suffixRegexp, filter2) {
-              var keys2 = util2.inheritedDataKeys(obj);
-              var ret = [];
-              for (var i2 = 0; i2 < keys2.length; ++i2) {
-                var key = keys2[i2];
-                var value = obj[key];
-                var passesDefaultFilter = filter2 === defaultFilter ? true : defaultFilter(key);
-                if (typeof value === "function" && !isPromisified(value) && !hasPromisified(obj, key, suffix) && filter2(key, value, obj, passesDefaultFilter)) {
-                  ret.push(key, value);
-                }
-              }
-              checkValid(ret, suffix, suffixRegexp);
-              return ret;
-            }
-            __name(promisifiableMethods, "promisifiableMethods");
-            var escapeIdentRegex = /* @__PURE__ */ __name(function(str) {
-              return str.replace(/([$])/, "\\$");
-            }, "escapeIdentRegex");
-            var makeNodePromisifiedEval;
-            function makeNodePromisifiedClosure(callback2, receiver, _2, fn2, __, multiArgs) {
-              var defaultThis = /* @__PURE__ */ function() {
-                return this;
-              }();
-              var method = callback2;
-              if (typeof method === "string") {
-                callback2 = fn2;
-              }
-              function promisified() {
-                var _receiver = receiver;
-                if (receiver === THIS) _receiver = this;
-                var promise = new Promise2(INTERNAL);
-                promise._captureStackTrace();
-                var cb = typeof method === "string" && this !== defaultThis ? this[method] : callback2;
-                var fn3 = nodebackForPromise(promise, multiArgs);
-                try {
-                  cb.apply(_receiver, withAppended(arguments, fn3));
-                } catch (e2) {
-                  promise._rejectCallback(maybeWrapAsError(e2), true, true);
-                }
-                if (!promise._isFateSealed()) promise._setAsyncGuaranteed();
-                return promise;
-              }
-              __name(promisified, "promisified");
-              util2.notEnumerableProp(promisified, "__isPromisified__", true);
-              return promisified;
-            }
-            __name(makeNodePromisifiedClosure, "makeNodePromisifiedClosure");
-            var makeNodePromisified = canEvaluate ? makeNodePromisifiedEval : makeNodePromisifiedClosure;
-            function promisifyAll(obj, suffix, filter2, promisifier, multiArgs) {
-              var suffixRegexp = new RegExp(escapeIdentRegex(suffix) + "$");
-              var methods = promisifiableMethods(obj, suffix, suffixRegexp, filter2);
-              for (var i2 = 0, len = methods.length; i2 < len; i2 += 2) {
-                var key = methods[i2];
-                var fn2 = methods[i2 + 1];
-                var promisifiedKey = key + suffix;
-                if (promisifier === makeNodePromisified) {
-                  obj[promisifiedKey] = makeNodePromisified(key, THIS, key, fn2, suffix, multiArgs);
-                } else {
-                  var promisified = promisifier(fn2, function() {
-                    return makeNodePromisified(
-                      key,
-                      THIS,
-                      key,
-                      fn2,
-                      suffix,
-                      multiArgs
-                    );
-                  });
-                  util2.notEnumerableProp(promisified, "__isPromisified__", true);
-                  obj[promisifiedKey] = promisified;
-                }
-              }
-              util2.toFastProperties(obj);
-              return obj;
-            }
-            __name(promisifyAll, "promisifyAll");
-            function promisify(callback2, receiver, multiArgs) {
-              return makeNodePromisified(
-                callback2,
-                receiver,
-                void 0,
-                callback2,
-                null,
-                multiArgs
-              );
-            }
-            __name(promisify, "promisify");
-            Promise2.promisify = function(fn2, options) {
-              if (typeof fn2 !== "function") {
-                throw new TypeError2("expecting a function but got " + util2.classString(fn2));
-              }
-              if (isPromisified(fn2)) {
-                return fn2;
-              }
-              options = Object(options);
-              var receiver = options.context === void 0 ? THIS : options.context;
-              var multiArgs = !!options.multiArgs;
-              var ret = promisify(fn2, receiver, multiArgs);
-              util2.copyDescriptors(fn2, ret, propsFilter);
-              return ret;
-            };
-            Promise2.promisifyAll = function(target, options) {
-              if (typeof target !== "function" && typeof target !== "object") {
-                throw new TypeError2("the target of promisifyAll must be an object or a function\n\n    See http://goo.gl/MqrFmX\n");
-              }
-              options = Object(options);
-              var multiArgs = !!options.multiArgs;
-              var suffix = options.suffix;
-              if (typeof suffix !== "string") suffix = defaultSuffix;
-              var filter2 = options.filter;
-              if (typeof filter2 !== "function") filter2 = defaultFilter;
-              var promisifier = options.promisifier;
-              if (typeof promisifier !== "function") promisifier = makeNodePromisified;
-              if (!util2.isIdentifier(suffix)) {
-                throw new RangeError("suffix must be a valid identifier\n\n    See http://goo.gl/MqrFmX\n");
-              }
-              var keys2 = util2.inheritedDataKeys(target);
-              for (var i2 = 0; i2 < keys2.length; ++i2) {
-                var value = target[keys2[i2]];
-                if (keys2[i2] !== "constructor" && util2.isClass(value)) {
-                  promisifyAll(
-                    value.prototype,
-                    suffix,
-                    filter2,
-                    promisifier,
-                    multiArgs
-                  );
-                  promisifyAll(value, suffix, filter2, promisifier, multiArgs);
-                }
-              }
-              return promisifyAll(target, suffix, filter2, promisifier, multiArgs);
-            };
-          };
-        }, { "./errors": 12, "./nodeback": 20, "./util": 36 }], 25: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, PromiseArray, tryConvertToPromise, apiRejection) {
-            var util2 = _dereq_2("./util");
-            var isObject2 = util2.isObject;
-            var es5 = _dereq_2("./es5");
-            var Es6Map;
-            if (typeof Map === "function") Es6Map = Map;
-            var mapToEntries = /* @__PURE__ */ function() {
-              var index2 = 0;
-              var size2 = 0;
-              function extractEntry(value, key) {
-                this[index2] = value;
-                this[index2 + size2] = key;
-                index2++;
-              }
-              __name(extractEntry, "extractEntry");
-              return /* @__PURE__ */ __name(function mapToEntries2(map2) {
-                size2 = map2.size;
-                index2 = 0;
-                var ret = new Array(map2.size * 2);
-                map2.forEach(extractEntry, ret);
-                return ret;
-              }, "mapToEntries");
-            }();
-            var entriesToMap = /* @__PURE__ */ __name(function(entries) {
-              var ret = new Es6Map();
-              var length = entries.length / 2 | 0;
-              for (var i2 = 0; i2 < length; ++i2) {
-                var key = entries[length + i2];
-                var value = entries[i2];
-                ret.set(key, value);
-              }
-              return ret;
-            }, "entriesToMap");
-            function PropertiesPromiseArray(obj) {
-              var isMap2 = false;
-              var entries;
-              if (Es6Map !== void 0 && obj instanceof Es6Map) {
-                entries = mapToEntries(obj);
-                isMap2 = true;
-              } else {
-                var keys2 = es5.keys(obj);
-                var len = keys2.length;
-                entries = new Array(len * 2);
-                for (var i2 = 0; i2 < len; ++i2) {
-                  var key = keys2[i2];
-                  entries[i2] = obj[key];
-                  entries[i2 + len] = key;
-                }
-              }
-              this.constructor$(entries);
-              this._isMap = isMap2;
-              this._init$(void 0, isMap2 ? -6 : -3);
-            }
-            __name(PropertiesPromiseArray, "PropertiesPromiseArray");
-            util2.inherits(PropertiesPromiseArray, PromiseArray);
-            PropertiesPromiseArray.prototype._init = function() {
-            };
-            PropertiesPromiseArray.prototype._promiseFulfilled = function(value, index2) {
-              this._values[index2] = value;
-              var totalResolved = ++this._totalResolved;
-              if (totalResolved >= this._length) {
-                var val2;
-                if (this._isMap) {
-                  val2 = entriesToMap(this._values);
-                } else {
-                  val2 = {};
-                  var keyOffset = this.length();
-                  for (var i2 = 0, len = this.length(); i2 < len; ++i2) {
-                    val2[this._values[i2 + keyOffset]] = this._values[i2];
-                  }
-                }
-                this._resolve(val2);
-                return true;
-              }
-              return false;
-            };
-            PropertiesPromiseArray.prototype.shouldCopyValues = function() {
-              return false;
-            };
-            PropertiesPromiseArray.prototype.getActualLength = function(len) {
-              return len >> 1;
-            };
-            function props(promises) {
-              var ret;
-              var castValue = tryConvertToPromise(promises);
-              if (!isObject2(castValue)) {
-                return apiRejection("cannot await properties of a non-object\n\n    See http://goo.gl/MqrFmX\n");
-              } else if (castValue instanceof Promise2) {
-                ret = castValue._then(
-                  Promise2.props,
-                  void 0,
-                  void 0,
-                  void 0,
-                  void 0
-                );
-              } else {
-                ret = new PropertiesPromiseArray(castValue).promise();
-              }
-              if (castValue instanceof Promise2) {
-                ret._propagateFrom(castValue, 2);
-              }
-              return ret;
-            }
-            __name(props, "props");
-            Promise2.prototype.props = function() {
-              return props(this);
-            };
-            Promise2.props = function(promises) {
-              return props(promises);
-            };
-          };
-        }, { "./es5": 13, "./util": 36 }], 26: [function(_dereq_2, module3, exports4) {
-          function arrayMove2(src2, srcIndex, dst, dstIndex, len) {
-            for (var j2 = 0; j2 < len; ++j2) {
-              dst[j2 + dstIndex] = src2[j2 + srcIndex];
-              src2[j2 + srcIndex] = void 0;
-            }
-          }
-          __name(arrayMove2, "arrayMove");
-          function Queue(capacity) {
-            this._capacity = capacity;
-            this._length = 0;
-            this._front = 0;
-          }
-          __name(Queue, "Queue");
-          Queue.prototype._willBeOverCapacity = function(size2) {
-            return this._capacity < size2;
-          };
-          Queue.prototype._pushOne = function(arg) {
-            var length = this.length();
-            this._checkCapacity(length + 1);
-            var i2 = this._front + length & this._capacity - 1;
-            this[i2] = arg;
-            this._length = length + 1;
-          };
-          Queue.prototype.push = function(fn2, receiver, arg) {
-            var length = this.length() + 3;
-            if (this._willBeOverCapacity(length)) {
-              this._pushOne(fn2);
-              this._pushOne(receiver);
-              this._pushOne(arg);
-              return;
-            }
-            var j2 = this._front + length - 3;
-            this._checkCapacity(length);
-            var wrapMask = this._capacity - 1;
-            this[j2 + 0 & wrapMask] = fn2;
-            this[j2 + 1 & wrapMask] = receiver;
-            this[j2 + 2 & wrapMask] = arg;
-            this._length = length;
-          };
-          Queue.prototype.shift = function() {
-            var front = this._front, ret = this[front];
-            this[front] = void 0;
-            this._front = front + 1 & this._capacity - 1;
-            this._length--;
-            return ret;
-          };
-          Queue.prototype.length = function() {
-            return this._length;
-          };
-          Queue.prototype._checkCapacity = function(size2) {
-            if (this._capacity < size2) {
-              this._resizeTo(this._capacity << 1);
-            }
-          };
-          Queue.prototype._resizeTo = function(capacity) {
-            var oldCapacity = this._capacity;
-            this._capacity = capacity;
-            var front = this._front;
-            var length = this._length;
-            var moveItemsCount = front + length & oldCapacity - 1;
-            arrayMove2(this, 0, this, oldCapacity, moveItemsCount);
-          };
-          module3.exports = Queue;
-        }, {}], 27: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, INTERNAL, tryConvertToPromise, apiRejection) {
-            var util2 = _dereq_2("./util");
-            var raceLater = /* @__PURE__ */ __name(function(promise) {
-              return promise.then(function(array) {
-                return race(array, promise);
-              });
-            }, "raceLater");
-            function race(promises, parent2) {
-              var maybePromise = tryConvertToPromise(promises);
-              if (maybePromise instanceof Promise2) {
-                return raceLater(maybePromise);
-              } else {
-                promises = util2.asArray(promises);
-                if (promises === null)
-                  return apiRejection("expecting an array or an iterable object but got " + util2.classString(promises));
-              }
-              var ret = new Promise2(INTERNAL);
-              if (parent2 !== void 0) {
-                ret._propagateFrom(parent2, 3);
-              }
-              var fulfill = ret._fulfill;
-              var reject = ret._reject;
-              for (var i2 = 0, len = promises.length; i2 < len; ++i2) {
-                var val2 = promises[i2];
-                if (val2 === void 0 && !(i2 in promises)) {
-                  continue;
-                }
-                Promise2.cast(val2)._then(fulfill, reject, void 0, ret, null);
-              }
-              return ret;
-            }
-            __name(race, "race");
-            Promise2.race = function(promises) {
-              return race(promises, void 0);
-            };
-            Promise2.prototype.race = function() {
-              return race(this, void 0);
-            };
-          };
-        }, { "./util": 36 }], 28: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, PromiseArray, apiRejection, tryConvertToPromise, INTERNAL, debug) {
-            var util2 = _dereq_2("./util");
-            var tryCatch = util2.tryCatch;
-            function ReductionPromiseArray(promises, fn2, initialValue, _each) {
-              this.constructor$(promises);
-              var context2 = Promise2._getContext();
-              this._fn = util2.contextBind(context2, fn2);
-              if (initialValue !== void 0) {
-                initialValue = Promise2.resolve(initialValue);
-                initialValue._attachCancellationCallback(this);
-              }
-              this._initialValue = initialValue;
-              this._currentCancellable = null;
-              if (_each === INTERNAL) {
-                this._eachValues = Array(this._length);
-              } else if (_each === 0) {
-                this._eachValues = null;
-              } else {
-                this._eachValues = void 0;
-              }
-              this._promise._captureStackTrace();
-              this._init$(void 0, -5);
-            }
-            __name(ReductionPromiseArray, "ReductionPromiseArray");
-            util2.inherits(ReductionPromiseArray, PromiseArray);
-            ReductionPromiseArray.prototype._gotAccum = function(accum) {
-              if (this._eachValues !== void 0 && this._eachValues !== null && accum !== INTERNAL) {
-                this._eachValues.push(accum);
-              }
-            };
-            ReductionPromiseArray.prototype._eachComplete = function(value) {
-              if (this._eachValues !== null) {
-                this._eachValues.push(value);
-              }
-              return this._eachValues;
-            };
-            ReductionPromiseArray.prototype._init = function() {
-            };
-            ReductionPromiseArray.prototype._resolveEmptyArray = function() {
-              this._resolve(this._eachValues !== void 0 ? this._eachValues : this._initialValue);
-            };
-            ReductionPromiseArray.prototype.shouldCopyValues = function() {
-              return false;
-            };
-            ReductionPromiseArray.prototype._resolve = function(value) {
-              this._promise._resolveCallback(value);
-              this._values = null;
-            };
-            ReductionPromiseArray.prototype._resultCancelled = function(sender) {
-              if (sender === this._initialValue) return this._cancel();
-              if (this._isResolved()) return;
-              this._resultCancelled$();
-              if (this._currentCancellable instanceof Promise2) {
-                this._currentCancellable.cancel();
-              }
-              if (this._initialValue instanceof Promise2) {
-                this._initialValue.cancel();
-              }
-            };
-            ReductionPromiseArray.prototype._iterate = function(values2) {
-              this._values = values2;
-              var value;
-              var i2;
-              var length = values2.length;
-              if (this._initialValue !== void 0) {
-                value = this._initialValue;
-                i2 = 0;
-              } else {
-                value = Promise2.resolve(values2[0]);
-                i2 = 1;
-              }
-              this._currentCancellable = value;
-              for (var j2 = i2; j2 < length; ++j2) {
-                var maybePromise = values2[j2];
-                if (maybePromise instanceof Promise2) {
-                  maybePromise.suppressUnhandledRejections();
-                }
-              }
-              if (!value.isRejected()) {
-                for (; i2 < length; ++i2) {
-                  var ctx = {
-                    accum: null,
-                    value: values2[i2],
-                    index: i2,
-                    length,
-                    array: this
-                  };
-                  value = value._then(gotAccum, void 0, void 0, ctx, void 0);
-                  if ((i2 & 127) === 0) {
-                    value._setNoAsyncGuarantee();
-                  }
-                }
-              }
-              if (this._eachValues !== void 0) {
-                value = value._then(this._eachComplete, void 0, void 0, this, void 0);
-              }
-              value._then(completed, completed, void 0, value, this);
-            };
-            Promise2.prototype.reduce = function(fn2, initialValue) {
-              return reduce2(this, fn2, initialValue, null);
-            };
-            Promise2.reduce = function(promises, fn2, initialValue, _each) {
-              return reduce2(promises, fn2, initialValue, _each);
-            };
-            function completed(valueOrReason, array) {
-              if (this.isFulfilled()) {
-                array._resolve(valueOrReason);
-              } else {
-                array._reject(valueOrReason);
-              }
-            }
-            __name(completed, "completed");
-            function reduce2(promises, fn2, initialValue, _each) {
-              if (typeof fn2 !== "function") {
-                return apiRejection("expecting a function but got " + util2.classString(fn2));
-              }
-              var array = new ReductionPromiseArray(promises, fn2, initialValue, _each);
-              return array.promise();
-            }
-            __name(reduce2, "reduce");
-            function gotAccum(accum) {
-              this.accum = accum;
-              this.array._gotAccum(accum);
-              var value = tryConvertToPromise(this.value, this.array._promise);
-              if (value instanceof Promise2) {
-                this.array._currentCancellable = value;
-                return value._then(gotValue, void 0, void 0, this, void 0);
-              } else {
-                return gotValue.call(this, value);
-              }
-            }
-            __name(gotAccum, "gotAccum");
-            function gotValue(value) {
-              var array = this.array;
-              var promise = array._promise;
-              var fn2 = tryCatch(array._fn);
-              promise._pushContext();
-              var ret;
-              if (array._eachValues !== void 0) {
-                ret = fn2.call(promise._boundValue(), value, this.index, this.length);
-              } else {
-                ret = fn2.call(
-                  promise._boundValue(),
-                  this.accum,
-                  value,
-                  this.index,
-                  this.length
-                );
-              }
-              if (ret instanceof Promise2) {
-                array._currentCancellable = ret;
-              }
-              var promiseCreated = promise._popContext();
-              debug.checkForgottenReturns(
-                ret,
-                promiseCreated,
-                array._eachValues !== void 0 ? "Promise.each" : "Promise.reduce",
-                promise
-              );
-              return ret;
-            }
-            __name(gotValue, "gotValue");
-          };
-        }, { "./util": 36 }], 29: [function(_dereq_2, module3, exports4) {
-          var util2 = _dereq_2("./util");
-          var schedule;
-          var noAsyncScheduler = /* @__PURE__ */ __name(function() {
-            throw new Error("No async scheduler available\n\n    See http://goo.gl/MqrFmX\n");
-          }, "noAsyncScheduler");
-          var NativePromise = util2.getNativePromise();
-          if (util2.isNode && typeof MutationObserver === "undefined") {
-            var GlobalSetImmediate = commonjsGlobal$1.setImmediate;
-            var ProcessNextTick = process.nextTick;
-            schedule = util2.isRecentNode ? function(fn2) {
-              GlobalSetImmediate.call(commonjsGlobal$1, fn2);
-            } : function(fn2) {
-              ProcessNextTick.call(process, fn2);
-            };
-          } else if (typeof NativePromise === "function" && typeof NativePromise.resolve === "function") {
-            var nativePromise = NativePromise.resolve();
-            schedule = /* @__PURE__ */ __name(function(fn2) {
-              nativePromise.then(fn2);
-            }, "schedule");
-          } else if (typeof MutationObserver !== "undefined" && !(typeof window !== "undefined" && window.navigator && (window.navigator.standalone || window.cordova)) && "classList" in document.documentElement) {
-            schedule = function() {
-              var div2 = document.createElement("div");
-              var opts2 = { attributes: true };
-              var toggleScheduled = false;
-              var div22 = document.createElement("div");
-              var o2 = new MutationObserver(function() {
-                div2.classList.toggle("foo");
-                toggleScheduled = false;
-              });
-              o2.observe(div22, opts2);
-              var scheduleToggle = /* @__PURE__ */ __name(function() {
-                if (toggleScheduled) return;
-                toggleScheduled = true;
-                div22.classList.toggle("foo");
-              }, "scheduleToggle");
-              return /* @__PURE__ */ __name(function schedule2(fn2) {
-                var o3 = new MutationObserver(function() {
-                  o3.disconnect();
-                  fn2();
-                });
-                o3.observe(div2, opts2);
-                scheduleToggle();
-              }, "schedule");
-            }();
-          } else if (typeof setImmediate !== "undefined") {
-            schedule = /* @__PURE__ */ __name(function(fn2) {
-              setImmediate(fn2);
-            }, "schedule");
-          } else if (typeof setTimeout !== "undefined") {
-            schedule = /* @__PURE__ */ __name(function(fn2) {
-              setTimeout(fn2, 0);
-            }, "schedule");
-          } else {
-            schedule = noAsyncScheduler;
-          }
-          module3.exports = schedule;
-        }, { "./util": 36 }], 30: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, PromiseArray, debug) {
-            var PromiseInspection = Promise2.PromiseInspection;
-            var util2 = _dereq_2("./util");
-            function SettledPromiseArray(values2) {
-              this.constructor$(values2);
-            }
-            __name(SettledPromiseArray, "SettledPromiseArray");
-            util2.inherits(SettledPromiseArray, PromiseArray);
-            SettledPromiseArray.prototype._promiseResolved = function(index2, inspection) {
-              this._values[index2] = inspection;
-              var totalResolved = ++this._totalResolved;
-              if (totalResolved >= this._length) {
-                this._resolve(this._values);
-                return true;
-              }
-              return false;
-            };
-            SettledPromiseArray.prototype._promiseFulfilled = function(value, index2) {
-              var ret = new PromiseInspection();
-              ret._bitField = 33554432;
-              ret._settledValueField = value;
-              return this._promiseResolved(index2, ret);
-            };
-            SettledPromiseArray.prototype._promiseRejected = function(reason, index2) {
-              var ret = new PromiseInspection();
-              ret._bitField = 16777216;
-              ret._settledValueField = reason;
-              return this._promiseResolved(index2, ret);
-            };
-            Promise2.settle = function(promises) {
-              debug.deprecated(".settle()", ".reflect()");
-              return new SettledPromiseArray(promises).promise();
-            };
-            Promise2.allSettled = function(promises) {
-              return new SettledPromiseArray(promises).promise();
-            };
-            Promise2.prototype.settle = function() {
-              return Promise2.settle(this);
-            };
-          };
-        }, { "./util": 36 }], 31: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, PromiseArray, apiRejection) {
-            var util2 = _dereq_2("./util");
-            var RangeError2 = _dereq_2("./errors").RangeError;
-            var AggregateError2 = _dereq_2("./errors").AggregateError;
-            var isArray2 = util2.isArray;
-            var CANCELLATION = {};
-            function SomePromiseArray(values2) {
-              this.constructor$(values2);
-              this._howMany = 0;
-              this._unwrap = false;
-              this._initialized = false;
-            }
-            __name(SomePromiseArray, "SomePromiseArray");
-            util2.inherits(SomePromiseArray, PromiseArray);
-            SomePromiseArray.prototype._init = function() {
-              if (!this._initialized) {
-                return;
-              }
-              if (this._howMany === 0) {
-                this._resolve([]);
-                return;
-              }
-              this._init$(void 0, -5);
-              var isArrayResolved = isArray2(this._values);
-              if (!this._isResolved() && isArrayResolved && this._howMany > this._canPossiblyFulfill()) {
-                this._reject(this._getRangeError(this.length()));
-              }
-            };
-            SomePromiseArray.prototype.init = function() {
-              this._initialized = true;
-              this._init();
-            };
-            SomePromiseArray.prototype.setUnwrap = function() {
-              this._unwrap = true;
-            };
-            SomePromiseArray.prototype.howMany = function() {
-              return this._howMany;
-            };
-            SomePromiseArray.prototype.setHowMany = function(count2) {
-              this._howMany = count2;
-            };
-            SomePromiseArray.prototype._promiseFulfilled = function(value) {
-              this._addFulfilled(value);
-              if (this._fulfilled() === this.howMany()) {
-                this._values.length = this.howMany();
-                if (this.howMany() === 1 && this._unwrap) {
-                  this._resolve(this._values[0]);
-                } else {
-                  this._resolve(this._values);
-                }
-                return true;
-              }
-              return false;
-            };
-            SomePromiseArray.prototype._promiseRejected = function(reason) {
-              this._addRejected(reason);
-              return this._checkOutcome();
-            };
-            SomePromiseArray.prototype._promiseCancelled = function() {
-              if (this._values instanceof Promise2 || this._values == null) {
-                return this._cancel();
-              }
-              this._addRejected(CANCELLATION);
-              return this._checkOutcome();
-            };
-            SomePromiseArray.prototype._checkOutcome = function() {
-              if (this.howMany() > this._canPossiblyFulfill()) {
-                var e2 = new AggregateError2();
-                for (var i2 = this.length(); i2 < this._values.length; ++i2) {
-                  if (this._values[i2] !== CANCELLATION) {
-                    e2.push(this._values[i2]);
-                  }
-                }
-                if (e2.length > 0) {
-                  this._reject(e2);
-                } else {
-                  this._cancel();
-                }
-                return true;
-              }
-              return false;
-            };
-            SomePromiseArray.prototype._fulfilled = function() {
-              return this._totalResolved;
-            };
-            SomePromiseArray.prototype._rejected = function() {
-              return this._values.length - this.length();
-            };
-            SomePromiseArray.prototype._addRejected = function(reason) {
-              this._values.push(reason);
-            };
-            SomePromiseArray.prototype._addFulfilled = function(value) {
-              this._values[this._totalResolved++] = value;
-            };
-            SomePromiseArray.prototype._canPossiblyFulfill = function() {
-              return this.length() - this._rejected();
-            };
-            SomePromiseArray.prototype._getRangeError = function(count2) {
-              var message = "Input array must contain at least " + this._howMany + " items but contains only " + count2 + " items";
-              return new RangeError2(message);
-            };
-            SomePromiseArray.prototype._resolveEmptyArray = function() {
-              this._reject(this._getRangeError(0));
-            };
-            function some2(promises, howMany) {
-              if ((howMany | 0) !== howMany || howMany < 0) {
-                return apiRejection("expecting a positive integer\n\n    See http://goo.gl/MqrFmX\n");
-              }
-              var ret = new SomePromiseArray(promises);
-              var promise = ret.promise();
-              ret.setHowMany(howMany);
-              ret.init();
-              return promise;
-            }
-            __name(some2, "some");
-            Promise2.some = function(promises, howMany) {
-              return some2(promises, howMany);
-            };
-            Promise2.prototype.some = function(howMany) {
-              return some2(this, howMany);
-            };
-            Promise2._SomePromiseArray = SomePromiseArray;
-          };
-        }, { "./errors": 12, "./util": 36 }], 32: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2) {
-            function PromiseInspection(promise) {
-              if (promise !== void 0) {
-                promise = promise._target();
-                this._bitField = promise._bitField;
-                this._settledValueField = promise._isFateSealed() ? promise._settledValue() : void 0;
-              } else {
-                this._bitField = 0;
-                this._settledValueField = void 0;
-              }
-            }
-            __name(PromiseInspection, "PromiseInspection");
-            PromiseInspection.prototype._settledValue = function() {
-              return this._settledValueField;
-            };
-            var value = PromiseInspection.prototype.value = function() {
-              if (!this.isFulfilled()) {
-                throw new TypeError("cannot get fulfillment value of a non-fulfilled promise\n\n    See http://goo.gl/MqrFmX\n");
-              }
-              return this._settledValue();
-            };
-            var reason = PromiseInspection.prototype.error = PromiseInspection.prototype.reason = function() {
-              if (!this.isRejected()) {
-                throw new TypeError("cannot get rejection reason of a non-rejected promise\n\n    See http://goo.gl/MqrFmX\n");
-              }
-              return this._settledValue();
-            };
-            var isFulfilled = PromiseInspection.prototype.isFulfilled = function() {
-              return (this._bitField & 33554432) !== 0;
-            };
-            var isRejected = PromiseInspection.prototype.isRejected = function() {
-              return (this._bitField & 16777216) !== 0;
-            };
-            var isPending = PromiseInspection.prototype.isPending = function() {
-              return (this._bitField & 50397184) === 0;
-            };
-            var isResolved = PromiseInspection.prototype.isResolved = function() {
-              return (this._bitField & 50331648) !== 0;
-            };
-            PromiseInspection.prototype.isCancelled = function() {
-              return (this._bitField & 8454144) !== 0;
-            };
-            Promise2.prototype.__isCancelled = function() {
-              return (this._bitField & 65536) === 65536;
-            };
-            Promise2.prototype._isCancelled = function() {
-              return this._target().__isCancelled();
-            };
-            Promise2.prototype.isCancelled = function() {
-              return (this._target()._bitField & 8454144) !== 0;
-            };
-            Promise2.prototype.isPending = function() {
-              return isPending.call(this._target());
-            };
-            Promise2.prototype.isRejected = function() {
-              return isRejected.call(this._target());
-            };
-            Promise2.prototype.isFulfilled = function() {
-              return isFulfilled.call(this._target());
-            };
-            Promise2.prototype.isResolved = function() {
-              return isResolved.call(this._target());
-            };
-            Promise2.prototype.value = function() {
-              return value.call(this._target());
-            };
-            Promise2.prototype.reason = function() {
-              var target = this._target();
-              target._unsetRejectionIsUnhandled();
-              return reason.call(target);
-            };
-            Promise2.prototype._value = function() {
-              return this._settledValue();
-            };
-            Promise2.prototype._reason = function() {
-              this._unsetRejectionIsUnhandled();
-              return this._settledValue();
-            };
-            Promise2.PromiseInspection = PromiseInspection;
-          };
-        }, {}], 33: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, INTERNAL) {
-            var util2 = _dereq_2("./util");
-            var errorObj = util2.errorObj;
-            var isObject2 = util2.isObject;
-            function tryConvertToPromise(obj, context2) {
-              if (isObject2(obj)) {
-                if (obj instanceof Promise2) return obj;
-                var then = getThen(obj);
-                if (then === errorObj) {
-                  if (context2) context2._pushContext();
-                  var ret = Promise2.reject(then.e);
-                  if (context2) context2._popContext();
-                  return ret;
-                } else if (typeof then === "function") {
-                  if (isAnyBluebirdPromise(obj)) {
-                    var ret = new Promise2(INTERNAL);
-                    obj._then(
-                      ret._fulfill,
-                      ret._reject,
-                      void 0,
-                      ret,
-                      null
-                    );
-                    return ret;
-                  }
-                  return doThenable(obj, then, context2);
-                }
-              }
-              return obj;
-            }
-            __name(tryConvertToPromise, "tryConvertToPromise");
-            function doGetThen(obj) {
-              return obj.then;
-            }
-            __name(doGetThen, "doGetThen");
-            function getThen(obj) {
-              try {
-                return doGetThen(obj);
-              } catch (e2) {
-                errorObj.e = e2;
-                return errorObj;
-              }
-            }
-            __name(getThen, "getThen");
-            var hasProp2 = {}.hasOwnProperty;
-            function isAnyBluebirdPromise(obj) {
-              try {
-                return hasProp2.call(obj, "_promise0");
-              } catch (e2) {
-                return false;
-              }
-            }
-            __name(isAnyBluebirdPromise, "isAnyBluebirdPromise");
-            function doThenable(x2, then, context2) {
-              var promise = new Promise2(INTERNAL);
-              var ret = promise;
-              if (context2) context2._pushContext();
-              promise._captureStackTrace();
-              if (context2) context2._popContext();
-              var synchronous = true;
-              var result = util2.tryCatch(then).call(x2, resolve, reject);
-              synchronous = false;
-              if (promise && result === errorObj) {
-                promise._rejectCallback(result.e, true, true);
-                promise = null;
-              }
-              function resolve(value) {
-                if (!promise) return;
-                promise._resolveCallback(value);
-                promise = null;
-              }
-              __name(resolve, "resolve");
-              function reject(reason) {
-                if (!promise) return;
-                promise._rejectCallback(reason, synchronous, true);
-                promise = null;
-              }
-              __name(reject, "reject");
-              return ret;
-            }
-            __name(doThenable, "doThenable");
-            return tryConvertToPromise;
-          };
-        }, { "./util": 36 }], 34: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, INTERNAL, debug) {
-            var util2 = _dereq_2("./util");
-            var TimeoutError = Promise2.TimeoutError;
-            function HandleWrapper(handle2) {
-              this.handle = handle2;
-            }
-            __name(HandleWrapper, "HandleWrapper");
-            HandleWrapper.prototype._resultCancelled = function() {
-              clearTimeout(this.handle);
-            };
-            var afterValue = /* @__PURE__ */ __name(function(value) {
-              return delay(+this).thenReturn(value);
-            }, "afterValue");
-            var delay = Promise2.delay = function(ms, value) {
-              var ret;
-              var handle2;
-              if (value !== void 0) {
-                ret = Promise2.resolve(value)._then(afterValue, null, null, ms, void 0);
-                if (debug.cancellation() && value instanceof Promise2) {
-                  ret._setOnCancel(value);
-                }
-              } else {
-                ret = new Promise2(INTERNAL);
-                handle2 = setTimeout(function() {
-                  ret._fulfill();
-                }, +ms);
-                if (debug.cancellation()) {
-                  ret._setOnCancel(new HandleWrapper(handle2));
-                }
-                ret._captureStackTrace();
-              }
-              ret._setAsyncGuaranteed();
-              return ret;
-            };
-            Promise2.prototype.delay = function(ms) {
-              return delay(ms, this);
-            };
-            var afterTimeout = /* @__PURE__ */ __name(function(promise, message, parent2) {
-              var err2;
-              if (typeof message !== "string") {
-                if (message instanceof Error) {
-                  err2 = message;
-                } else {
-                  err2 = new TimeoutError("operation timed out");
-                }
-              } else {
-                err2 = new TimeoutError(message);
-              }
-              util2.markAsOriginatingFromRejection(err2);
-              promise._attachExtraTrace(err2);
-              promise._reject(err2);
-              if (parent2 != null) {
-                parent2.cancel();
-              }
-            }, "afterTimeout");
-            function successClear(value) {
-              clearTimeout(this.handle);
-              return value;
-            }
-            __name(successClear, "successClear");
-            function failureClear(reason) {
-              clearTimeout(this.handle);
-              throw reason;
-            }
-            __name(failureClear, "failureClear");
-            Promise2.prototype.timeout = function(ms, message) {
-              ms = +ms;
-              var ret, parent2;
-              var handleWrapper = new HandleWrapper(setTimeout(/* @__PURE__ */ __name(function timeoutTimeout() {
-                if (ret.isPending()) {
-                  afterTimeout(ret, message, parent2);
-                }
-              }, "timeoutTimeout"), ms));
-              if (debug.cancellation()) {
-                parent2 = this.then();
-                ret = parent2._then(
-                  successClear,
-                  failureClear,
-                  void 0,
-                  handleWrapper,
-                  void 0
-                );
-                ret._setOnCancel(handleWrapper);
-              } else {
-                ret = this._then(
-                  successClear,
-                  failureClear,
-                  void 0,
-                  handleWrapper,
-                  void 0
-                );
-              }
-              return ret;
-            };
-          };
-        }, { "./util": 36 }], 35: [function(_dereq_2, module3, exports4) {
-          module3.exports = function(Promise2, apiRejection, tryConvertToPromise, createContext2, INTERNAL, debug) {
-            var util2 = _dereq_2("./util");
-            var TypeError2 = _dereq_2("./errors").TypeError;
-            var inherits = _dereq_2("./util").inherits;
-            var errorObj = util2.errorObj;
-            var tryCatch = util2.tryCatch;
-            var NULL2 = {};
-            function thrower(e2) {
-              setTimeout(function() {
-                throw e2;
-              }, 0);
-            }
-            __name(thrower, "thrower");
-            function castPreservingDisposable(thenable) {
-              var maybePromise = tryConvertToPromise(thenable);
-              if (maybePromise !== thenable && typeof thenable._isDisposable === "function" && typeof thenable._getDisposer === "function" && thenable._isDisposable()) {
-                maybePromise._setDisposable(thenable._getDisposer());
-              }
-              return maybePromise;
-            }
-            __name(castPreservingDisposable, "castPreservingDisposable");
-            function dispose(resources, inspection) {
-              var i2 = 0;
-              var len = resources.length;
-              var ret = new Promise2(INTERNAL);
-              function iterator() {
-                if (i2 >= len) return ret._fulfill();
-                var maybePromise = castPreservingDisposable(resources[i2++]);
-                if (maybePromise instanceof Promise2 && maybePromise._isDisposable()) {
-                  try {
-                    maybePromise = tryConvertToPromise(
-                      maybePromise._getDisposer().tryDispose(inspection),
-                      resources.promise
-                    );
-                  } catch (e2) {
-                    return thrower(e2);
-                  }
-                  if (maybePromise instanceof Promise2) {
-                    return maybePromise._then(
-                      iterator,
-                      thrower,
-                      null,
-                      null,
-                      null
-                    );
-                  }
-                }
-                iterator();
-              }
-              __name(iterator, "iterator");
-              iterator();
-              return ret;
-            }
-            __name(dispose, "dispose");
-            function Disposer(data, promise, context2) {
-              this._data = data;
-              this._promise = promise;
-              this._context = context2;
-            }
-            __name(Disposer, "Disposer");
-            Disposer.prototype.data = function() {
-              return this._data;
-            };
-            Disposer.prototype.promise = function() {
-              return this._promise;
-            };
-            Disposer.prototype.resource = function() {
-              if (this.promise().isFulfilled()) {
-                return this.promise().value();
-              }
-              return NULL2;
-            };
-            Disposer.prototype.tryDispose = function(inspection) {
-              var resource = this.resource();
-              var context2 = this._context;
-              if (context2 !== void 0) context2._pushContext();
-              var ret = resource !== NULL2 ? this.doDispose(resource, inspection) : null;
-              if (context2 !== void 0) context2._popContext();
-              this._promise._unsetDisposable();
-              this._data = null;
-              return ret;
-            };
-            Disposer.isDisposer = function(d2) {
-              return d2 != null && typeof d2.resource === "function" && typeof d2.tryDispose === "function";
-            };
-            function FunctionDisposer(fn2, promise, context2) {
-              this.constructor$(fn2, promise, context2);
-            }
-            __name(FunctionDisposer, "FunctionDisposer");
-            inherits(FunctionDisposer, Disposer);
-            FunctionDisposer.prototype.doDispose = function(resource, inspection) {
-              var fn2 = this.data();
-              return fn2.call(resource, resource, inspection);
-            };
-            function maybeUnwrapDisposer(value) {
-              if (Disposer.isDisposer(value)) {
-                this.resources[this.index]._setDisposable(value);
-                return value.promise();
-              }
-              return value;
-            }
-            __name(maybeUnwrapDisposer, "maybeUnwrapDisposer");
-            function ResourceList(length) {
-              this.length = length;
-              this.promise = null;
-              this[length - 1] = null;
-            }
-            __name(ResourceList, "ResourceList");
-            ResourceList.prototype._resultCancelled = function() {
-              var len = this.length;
-              for (var i2 = 0; i2 < len; ++i2) {
-                var item = this[i2];
-                if (item instanceof Promise2) {
-                  item.cancel();
-                }
-              }
-            };
-            Promise2.using = function() {
-              var len = arguments.length;
-              if (len < 2) return apiRejection(
-                "you must pass at least 2 arguments to Promise.using"
-              );
-              var fn2 = arguments[len - 1];
-              if (typeof fn2 !== "function") {
-                return apiRejection("expecting a function but got " + util2.classString(fn2));
-              }
-              var input;
-              var spreadArgs = true;
-              if (len === 2 && Array.isArray(arguments[0])) {
-                input = arguments[0];
-                len = input.length;
-                spreadArgs = false;
-              } else {
-                input = arguments;
-                len--;
-              }
-              var resources = new ResourceList(len);
-              for (var i2 = 0; i2 < len; ++i2) {
-                var resource = input[i2];
-                if (Disposer.isDisposer(resource)) {
-                  var disposer = resource;
-                  resource = resource.promise();
-                  resource._setDisposable(disposer);
-                } else {
-                  var maybePromise = tryConvertToPromise(resource);
-                  if (maybePromise instanceof Promise2) {
-                    resource = maybePromise._then(maybeUnwrapDisposer, null, null, {
-                      resources,
-                      index: i2
-                    }, void 0);
-                  }
-                }
-                resources[i2] = resource;
-              }
-              var reflectedResources = new Array(resources.length);
-              for (var i2 = 0; i2 < reflectedResources.length; ++i2) {
-                reflectedResources[i2] = Promise2.resolve(resources[i2]).reflect();
-              }
-              var resultPromise = Promise2.all(reflectedResources).then(function(inspections) {
-                for (var i3 = 0; i3 < inspections.length; ++i3) {
-                  var inspection = inspections[i3];
-                  if (inspection.isRejected()) {
-                    errorObj.e = inspection.error();
-                    return errorObj;
-                  } else if (!inspection.isFulfilled()) {
-                    resultPromise.cancel();
-                    return;
-                  }
-                  inspections[i3] = inspection.value();
-                }
-                promise._pushContext();
-                fn2 = tryCatch(fn2);
-                var ret = spreadArgs ? fn2.apply(void 0, inspections) : fn2(inspections);
-                var promiseCreated = promise._popContext();
-                debug.checkForgottenReturns(
-                  ret,
-                  promiseCreated,
-                  "Promise.using",
-                  promise
-                );
-                return ret;
-              });
-              var promise = resultPromise.lastly(function() {
-                var inspection = new Promise2.PromiseInspection(resultPromise);
-                return dispose(resources, inspection);
-              });
-              resources.promise = promise;
-              promise._setOnCancel(resources);
-              return promise;
-            };
-            Promise2.prototype._setDisposable = function(disposer) {
-              this._bitField = this._bitField | 131072;
-              this._disposer = disposer;
-            };
-            Promise2.prototype._isDisposable = function() {
-              return (this._bitField & 131072) > 0;
-            };
-            Promise2.prototype._getDisposer = function() {
-              return this._disposer;
-            };
-            Promise2.prototype._unsetDisposable = function() {
-              this._bitField = this._bitField & -131073;
-              this._disposer = void 0;
-            };
-            Promise2.prototype.disposer = function(fn2) {
-              if (typeof fn2 === "function") {
-                return new FunctionDisposer(fn2, this, createContext2());
-              }
-              throw new TypeError2();
-            };
-          };
-        }, { "./errors": 12, "./util": 36 }], 36: [function(_dereq_2, module3, exports4) {
-          var es5 = _dereq_2("./es5");
-          var canEvaluate = typeof navigator == "undefined";
-          var errorObj = { e: {} };
-          var tryCatchTarget;
-          var globalObject = typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : typeof commonjsGlobal$1 !== "undefined" ? commonjsGlobal$1 : this !== void 0 ? this : null;
-          function tryCatcher() {
-            try {
-              var target = tryCatchTarget;
-              tryCatchTarget = null;
-              return target.apply(this, arguments);
-            } catch (e2) {
-              errorObj.e = e2;
-              return errorObj;
-            }
-          }
-          __name(tryCatcher, "tryCatcher");
-          function tryCatch(fn2) {
-            tryCatchTarget = fn2;
-            return tryCatcher;
-          }
-          __name(tryCatch, "tryCatch");
-          var inherits = /* @__PURE__ */ __name(function(Child, Parent) {
-            var hasProp2 = {}.hasOwnProperty;
-            function T2() {
-              this.constructor = Child;
-              this.constructor$ = Parent;
-              for (var propertyName in Parent.prototype) {
-                if (hasProp2.call(Parent.prototype, propertyName) && propertyName.charAt(propertyName.length - 1) !== "$") {
-                  this[propertyName + "$"] = Parent.prototype[propertyName];
-                }
-              }
-            }
-            __name(T2, "T");
-            T2.prototype = Parent.prototype;
-            Child.prototype = new T2();
-            return Child.prototype;
-          }, "inherits");
-          function isPrimitive(val2) {
-            return val2 == null || val2 === true || val2 === false || typeof val2 === "string" || typeof val2 === "number";
-          }
-          __name(isPrimitive, "isPrimitive");
-          function isObject2(value) {
-            return typeof value === "function" || typeof value === "object" && value !== null;
-          }
-          __name(isObject2, "isObject");
-          function maybeWrapAsError(maybeError) {
-            if (!isPrimitive(maybeError)) return maybeError;
-            return new Error(safeToString(maybeError));
-          }
-          __name(maybeWrapAsError, "maybeWrapAsError");
-          function withAppended(target, appendee) {
-            var len = target.length;
-            var ret2 = new Array(len + 1);
-            var i2;
-            for (i2 = 0; i2 < len; ++i2) {
-              ret2[i2] = target[i2];
-            }
-            ret2[i2] = appendee;
-            return ret2;
-          }
-          __name(withAppended, "withAppended");
-          function getDataPropertyOrDefault(obj, key, defaultValue2) {
-            if (es5.isES5) {
-              var desc = Object.getOwnPropertyDescriptor(obj, key);
-              if (desc != null) {
-                return desc.get == null && desc.set == null ? desc.value : defaultValue2;
-              }
-            } else {
-              return {}.hasOwnProperty.call(obj, key) ? obj[key] : void 0;
-            }
-          }
-          __name(getDataPropertyOrDefault, "getDataPropertyOrDefault");
-          function notEnumerableProp(obj, name2, value) {
-            if (isPrimitive(obj)) return obj;
-            var descriptor = {
-              value,
-              configurable: true,
-              enumerable: false,
-              writable: true
-            };
-            es5.defineProperty(obj, name2, descriptor);
-            return obj;
-          }
-          __name(notEnumerableProp, "notEnumerableProp");
-          function thrower(r2) {
-            throw r2;
-          }
-          __name(thrower, "thrower");
-          var inheritedDataKeys = function() {
-            var excludedPrototypes = [
-              Array.prototype,
-              Object.prototype,
-              Function.prototype
-            ];
-            var isExcludedProto = /* @__PURE__ */ __name(function(val2) {
-              for (var i2 = 0; i2 < excludedPrototypes.length; ++i2) {
-                if (excludedPrototypes[i2] === val2) {
-                  return true;
-                }
-              }
-              return false;
-            }, "isExcludedProto");
-            if (es5.isES5) {
-              var getKeys = Object.getOwnPropertyNames;
-              return function(obj) {
-                var ret2 = [];
-                var visitedKeys = /* @__PURE__ */ Object.create(null);
-                while (obj != null && !isExcludedProto(obj)) {
-                  var keys2;
-                  try {
-                    keys2 = getKeys(obj);
-                  } catch (e2) {
-                    return ret2;
-                  }
-                  for (var i2 = 0; i2 < keys2.length; ++i2) {
-                    var key = keys2[i2];
-                    if (visitedKeys[key]) continue;
-                    visitedKeys[key] = true;
-                    var desc = Object.getOwnPropertyDescriptor(obj, key);
-                    if (desc != null && desc.get == null && desc.set == null) {
-                      ret2.push(key);
-                    }
-                  }
-                  obj = es5.getPrototypeOf(obj);
-                }
-                return ret2;
-              };
-            } else {
-              var hasProp2 = {}.hasOwnProperty;
-              return function(obj) {
-                if (isExcludedProto(obj)) return [];
-                var ret2 = [];
-                enumeration: for (var key in obj) {
-                  if (hasProp2.call(obj, key)) {
-                    ret2.push(key);
-                  } else {
-                    for (var i2 = 0; i2 < excludedPrototypes.length; ++i2) {
-                      if (hasProp2.call(excludedPrototypes[i2], key)) {
-                        continue enumeration;
-                      }
-                    }
-                    ret2.push(key);
-                  }
-                }
-                return ret2;
-              };
-            }
-          }();
-          var thisAssignmentPattern = /this\s*\.\s*\S+\s*=/;
-          function isClass(fn2) {
-            try {
-              if (typeof fn2 === "function") {
-                var keys2 = es5.names(fn2.prototype);
-                var hasMethods = es5.isES5 && keys2.length > 1;
-                var hasMethodsOtherThanConstructor = keys2.length > 0 && !(keys2.length === 1 && keys2[0] === "constructor");
-                var hasThisAssignmentAndStaticMethods = thisAssignmentPattern.test(fn2 + "") && es5.names(fn2).length > 0;
-                if (hasMethods || hasMethodsOtherThanConstructor || hasThisAssignmentAndStaticMethods) {
-                  return true;
-                }
-              }
-              return false;
-            } catch (e2) {
-              return false;
-            }
-          }
-          __name(isClass, "isClass");
-          function toFastProperties(obj) {
-            function FakeConstructor() {
-            }
-            __name(FakeConstructor, "FakeConstructor");
-            FakeConstructor.prototype = obj;
-            var receiver = new FakeConstructor();
-            function ic() {
-              return typeof receiver.foo;
-            }
-            __name(ic, "ic");
-            ic();
-            ic();
-            return obj;
-          }
-          __name(toFastProperties, "toFastProperties");
-          var rident = /^[a-z$_][a-z$_0-9]*$/i;
-          function isIdentifier(str) {
-            return rident.test(str);
-          }
-          __name(isIdentifier, "isIdentifier");
-          function filledRange(count2, prefix2, suffix) {
-            var ret2 = new Array(count2);
-            for (var i2 = 0; i2 < count2; ++i2) {
-              ret2[i2] = prefix2 + i2 + suffix;
-            }
-            return ret2;
-          }
-          __name(filledRange, "filledRange");
-          function safeToString(obj) {
-            try {
-              return obj + "";
-            } catch (e2) {
-              return "[no string representation]";
-            }
-          }
-          __name(safeToString, "safeToString");
-          function isError(obj) {
-            return obj instanceof Error || obj !== null && typeof obj === "object" && typeof obj.message === "string" && typeof obj.name === "string";
-          }
-          __name(isError, "isError");
-          function markAsOriginatingFromRejection(e2) {
-            try {
-              notEnumerableProp(e2, "isOperational", true);
-            } catch (ignore2) {
-            }
-          }
-          __name(markAsOriginatingFromRejection, "markAsOriginatingFromRejection");
-          function originatesFromRejection(e2) {
-            if (e2 == null) return false;
-            return e2 instanceof Error["__BluebirdErrorTypes__"].OperationalError || e2["isOperational"] === true;
-          }
-          __name(originatesFromRejection, "originatesFromRejection");
-          function canAttachTrace(obj) {
-            return isError(obj) && es5.propertyIsWritable(obj, "stack");
-          }
-          __name(canAttachTrace, "canAttachTrace");
-          var ensureErrorObject = function() {
-            if (!("stack" in new Error())) {
-              return function(value) {
-                if (canAttachTrace(value)) return value;
-                try {
-                  throw new Error(safeToString(value));
-                } catch (err2) {
-                  return err2;
-                }
-              };
-            } else {
-              return function(value) {
-                if (canAttachTrace(value)) return value;
-                return new Error(safeToString(value));
-              };
-            }
-          }();
-          function classString(obj) {
-            return {}.toString.call(obj);
-          }
-          __name(classString, "classString");
-          function copyDescriptors(from, to, filter2) {
-            var keys2 = es5.names(from);
-            for (var i2 = 0; i2 < keys2.length; ++i2) {
-              var key = keys2[i2];
-              if (filter2(key)) {
-                try {
-                  es5.defineProperty(to, key, es5.getDescriptor(from, key));
-                } catch (ignore2) {
-                }
-              }
-            }
-          }
-          __name(copyDescriptors, "copyDescriptors");
-          var asArray = /* @__PURE__ */ __name(function(v2) {
-            if (es5.isArray(v2)) {
-              return v2;
-            }
-            return null;
-          }, "asArray");
-          if (typeof Symbol !== "undefined" && Symbol.iterator) {
-            var ArrayFrom = typeof Array.from === "function" ? function(v2) {
-              return Array.from(v2);
-            } : function(v2) {
-              var ret2 = [];
-              var it = v2[Symbol.iterator]();
-              var itResult;
-              while (!(itResult = it.next()).done) {
-                ret2.push(itResult.value);
-              }
-              return ret2;
-            };
-            asArray = /* @__PURE__ */ __name(function(v2) {
-              if (es5.isArray(v2)) {
-                return v2;
-              } else if (v2 != null && typeof v2[Symbol.iterator] === "function") {
-                return ArrayFrom(v2);
-              }
-              return null;
-            }, "asArray");
-          }
-          var isNode2 = typeof process !== "undefined" && classString(process).toLowerCase() === "[object process]";
-          var hasEnvVariables = typeof process !== "undefined" && typeof process.env !== "undefined";
-          function env2(key) {
-            return hasEnvVariables ? process.env[key] : void 0;
-          }
-          __name(env2, "env");
-          function getNativePromise() {
-            if (typeof Promise === "function") {
-              try {
-                var promise = new Promise(function() {
-                });
-                if (classString(promise) === "[object Promise]") {
-                  return Promise;
-                }
-              } catch (e2) {
-              }
-            }
-          }
-          __name(getNativePromise, "getNativePromise");
-          var reflectHandler;
-          function contextBind(ctx, cb) {
-            if (ctx === null || typeof cb !== "function" || cb === reflectHandler) {
-              return cb;
-            }
-            if (ctx.domain !== null) {
-              cb = ctx.domain.bind(cb);
-            }
-            var async = ctx.async;
-            if (async !== null) {
-              var old = cb;
-              cb = /* @__PURE__ */ __name(function() {
-                var args = new Array(2).concat([].slice.call(arguments));
-                args[0] = old;
-                args[1] = this;
-                return async.runInAsyncScope.apply(async, args);
-              }, "cb");
-            }
-            return cb;
-          }
-          __name(contextBind, "contextBind");
-          var ret = {
-            setReflectHandler: /* @__PURE__ */ __name(function(fn2) {
-              reflectHandler = fn2;
-            }, "setReflectHandler"),
-            isClass,
-            isIdentifier,
-            inheritedDataKeys,
-            getDataPropertyOrDefault,
-            thrower,
-            isArray: es5.isArray,
-            asArray,
-            notEnumerableProp,
-            isPrimitive,
-            isObject: isObject2,
-            isError,
-            canEvaluate,
-            errorObj,
-            tryCatch,
-            inherits,
-            withAppended,
-            maybeWrapAsError,
-            toFastProperties,
-            filledRange,
-            toString: safeToString,
-            canAttachTrace,
-            ensureErrorObject,
-            originatesFromRejection,
-            markAsOriginatingFromRejection,
-            classString,
-            copyDescriptors,
-            isNode: isNode2,
-            hasEnvVariables,
-            env: env2,
-            global: globalObject,
-            getNativePromise,
-            contextBind
-          };
-          ret.isRecentNode = ret.isNode && function() {
-            var version2;
-            if (process.versions && process.versions.node) {
-              version2 = process.versions.node.split(".").map(Number);
-            } else if (process.version) {
-              version2 = process.version.split(".").map(Number);
-            }
-            return version2[0] === 0 && version2[1] > 10 || version2[0] > 0;
-          }();
-          ret.nodeSupportsAsyncResource = ret.isNode && function() {
-            var supportsAsync = false;
-            try {
-              var res = _dereq_2("async_hooks").AsyncResource;
-              supportsAsync = typeof res.prototype.runInAsyncScope === "function";
-            } catch (e2) {
-              supportsAsync = false;
-            }
-            return supportsAsync;
-          }();
-          if (ret.isNode) ret.toFastProperties(process);
-          try {
-            throw new Error();
-          } catch (e2) {
-            ret.lastLineError = e2;
-          }
-          module3.exports = ret;
-        }, { "./es5": 13, "async_hooks": void 0 }] }, {}, [4])(4);
-      });
-      if (typeof window !== "undefined" && window !== null) {
-        window.P = window.Promise;
-      } else if (typeof self !== "undefined" && self !== null) {
-        self.P = self.Promise;
-      }
-    })(bluebird);
-    return bluebird.exports;
-  }
-  __name(requireBluebird, "requireBluebird");
-  var bluebirdExports = requireBluebird();
-  const Promise$1 = /* @__PURE__ */ getDefaultExportFromCjs(bluebirdExports);
   const isZipFile = /* @__PURE__ */ __name((file) => {
     if (getExt(file) === "zip") return true;
     if (getExt(file) === "geneious") return false;
@@ -97903,26 +93688,29 @@ ${latestSubscriptionCallbackError.current.stack}
     const zipFiles = remove$1(allFiles, isZipFile);
     if (!zipFiles.length) return allFiles;
     const zipFilesArray = Array.isArray(zipFiles) ? zipFiles : [zipFiles];
-    const parsedZips = yield Promise$1.map(
-      zipFilesArray,
-      (file) => jszip_minExports.loadAsync(
-        file instanceof (typeof Blob !== "undefined" ? Blob : require("buffer").Blob) ? file : file.originFileObj
+    const parsedZips = yield Promise.all(
+      zipFilesArray.map(
+        (file) => jszip_minExports.loadAsync(
+          file instanceof (typeof Blob !== "undefined" ? Blob : require("buffer").Blob) ? file : file.originFileObj
+        )
       )
     );
     const zippedFiles = flatMap(
       parsedZips,
       (zip) => Object.keys(zip.files).map((key) => zip.files[key])
     );
-    const unzippedFiles = yield Promise$1.map(zippedFiles, (file) => {
-      return file.async("blob").then(function(fileData) {
-        const newFileObj = new File([fileData], file.name);
-        return {
-          name: file.name,
-          originFileObj: newFileObj,
-          originalFileObj: newFileObj
-        };
-      });
-    });
+    const unzippedFiles = yield Promise.all(
+      zippedFiles.map((file) => {
+        return file.async("blob").then(function(fileData) {
+          const newFileObj = new File([fileData], file.name);
+          return {
+            name: file.name,
+            originFileObj: newFileObj,
+            originalFileObj: newFileObj
+          };
+        });
+      })
+    );
     if (unzippedFiles.length) {
       return allFiles.concat(
         unzippedFiles.filter(
@@ -97972,7 +93760,7 @@ ${latestSubscriptionCallbackError.current.stack}
     return papaParseOpts;
   }, "setupCsvParserOptions");
   const parseCsvFile = /* @__PURE__ */ __name((csvFile, parserOptions = {}) => {
-    return new Promise$1((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const opts2 = __spreadProps(__spreadValues(__spreadValues({}, defaultCsvParserOptions), setupCsvParserOptions(parserOptions)), {
         complete: /* @__PURE__ */ __name((results) => {
           var _a2;
@@ -100510,9 +96298,19 @@ ${latestSubscriptionCallbackError.current.stack}
     content: content2,
     label,
     style: style2,
-    isOpenByDefault
+    isOpenByDefault,
+    localStorageKey
   }) {
-    const [isOpen2, setOpen] = reactExports.useState(isOpenByDefault);
+    const [isOpen2, setOpen] = reactExports.useState(() => {
+      if (localStorageKey) {
+        if (window.localStorage.getItem(localStorageKey) === "true") {
+          return true;
+        } else if (window.localStorage.getItem(localStorageKey) === "false") {
+          return false;
+        }
+      }
+      return isOpenByDefault;
+    });
     if (!(content2 || children)) {
       return null;
     }
@@ -100520,39 +96318,47 @@ ${latestSubscriptionCallbackError.current.stack}
       "div",
       {
         onClick: /* @__PURE__ */ __name(() => {
-          setOpen(!isOpen2);
+          const newIsOpen = !isOpen2;
+          setOpen(newIsOpen);
+          if (localStorageKey) {
+            window.localStorage.setItem(localStorageKey, newIsOpen);
+          }
         }, "onClick"),
-        style: { cursor: "pointer", display: "flex", alignItems: "flex-end" },
-        className: "tg-toggle-advanced-options"
+        style: {
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          userSelect: "none"
+        },
+        className: `tg-toggle-advanced-options`
       },
-      label || "Advanced",
-      " ",
       /* @__PURE__ */ React.createElement(
         Icon,
         {
           icon: isOpen2 ? "caret-down" : "caret-right",
-          style: { marginLeft: 5 }
+          style: { marginRight: 5 }
         }
-      )
+      ),
+      /* @__PURE__ */ React.createElement("strong", null, label || "Advanced")
     ), isOpen2 && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 10 } }, content2 || children));
   }
   __name(AdvancedOptions, "AdvancedOptions");
-  const TgHTMLSelect = /* @__PURE__ */ __name((_w) => {
-    var _x = _w, { disabled } = _x, rest = __objRest(_x, ["disabled"]);
+  const TgHTMLSelect = /* @__PURE__ */ __name((_y) => {
+    var _z = _y, { disabled } = _z, rest = __objRest(_z, ["disabled"]);
     if (disabled) {
       const opt = rest.options.find((o2) => o2.value === rest.value);
       return /* @__PURE__ */ React.createElement("div", __spreadProps(__spreadValues({}, rest), { className: classNames$1("bp3-html-select", rest.className) }), opt.label);
     }
     return /* @__PURE__ */ React.createElement(HTMLSelect, __spreadValues({}, rest));
   }, "TgHTMLSelect");
-  function DropdownButton(_y) {
-    var _z = _y, {
+  function DropdownButton(_A) {
+    var _B = _A, {
       disabled,
       menu,
       noRightIcon,
       popoverProps,
       className
-    } = _z, rest = __objRest(_z, [
+    } = _B, rest = __objRest(_B, [
       "disabled",
       "menu",
       "noRightIcon",
@@ -103821,6 +99627,7 @@ ${latestSubscriptionCallbackError.current.stack}
               topLeft: true,
               topRight: true
             },
+            resizeHandleWrapperClass: "tg-dialog-resize-handle",
             maxHeight: windowHeight,
             maxWidth: windowWidth,
             bounds: "window",
@@ -103839,12 +99646,21 @@ ${latestSubscriptionCallbackError.current.stack}
           }, RndProps),
           /* @__PURE__ */ React.createElement(
             Dialog,
-            __spreadValues({
+            __spreadProps(__spreadValues({
               enforceFocus: false,
               hasBackdrop: false,
               usePortal: false,
               canEscapeKeyClose: true
-            }, rest)
+            }, rest), {
+              title: /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement(
+                Icon,
+                {
+                  size: "14",
+                  "data-tip": "I'm a resizable draggable dialog!",
+                  icon: "move"
+                }
+              ), rest.title)
+            })
           )
         )
       );
@@ -103852,238 +99668,6 @@ ${latestSubscriptionCallbackError.current.stack}
   };
   __name(_ResizableDraggableDialog, "ResizableDraggableDialog");
   let ResizableDraggableDialog = _ResizableDraggableDialog;
-  function MenuItemLink({ text: text2, onClick, icon, navTo, active: active2, disabled }) {
-    if (disabled) {
-      return /* @__PURE__ */ React.createElement("li", { className: POPOVER_DISMISS }, /* @__PURE__ */ React.createElement(MenuItem, { icon, disabled: true, text: text2 }));
-    }
-    const handleLinkClick = /* @__PURE__ */ __name((e2) => {
-      e2.target.closest(`.${POPOVER_DISMISS}`).click();
-    }, "handleLinkClick");
-    return /* @__PURE__ */ React.createElement("li", { className: POPOVER_DISMISS, onClick }, /* @__PURE__ */ React.createElement(
-      Link,
-      {
-        onClick: handleLinkClick,
-        to: navTo,
-        className: classNames$1(MENU_ITEM, {
-          [ACTIVE]: active2,
-          [INTENT_PRIMARY]: active2
-        })
-      },
-      icon && /* @__PURE__ */ React.createElement(Icon, { icon }),
-      /* @__PURE__ */ React.createElement("div", { className: "bp3-text-overflow-ellipsis bp3-fill" }, text2)
-    ));
-  }
-  __name(MenuItemLink, "MenuItemLink");
-  const EnhancedMenuItem = compose(
-    lifecycle({
-      componentDidMount: /* @__PURE__ */ __name(function() {
-        const { didMount = noop$8, className } = this.props;
-        didMount({ className });
-      }, "componentDidMount"),
-      componentWillUnmount: /* @__PURE__ */ __name(function() {
-        const { willUnmount = noop$8, className } = this.props;
-        willUnmount({ className });
-      }, "componentWillUnmount")
-    }),
-    branch(({ navTo }) => navTo, withRouter)
-  )(function(_A) {
-    var _B = _A, {
-      navTo,
-      context: context2,
-      staticContext,
-      didMount,
-      willUnmount
-    } = _B, props = __objRest(_B, [
-      "navTo",
-      "context",
-      "staticContext",
-      "didMount",
-      "willUnmount"
-    ]);
-    let MenuItemComp = MenuItem;
-    if (navTo) {
-      MenuItemComp = MenuItemLink;
-    }
-    return /* @__PURE__ */ React.createElement(
-      MenuItemComp,
-      __spreadProps(__spreadValues(__spreadValues({
-        popoverProps: {
-          autoFocus: false
-        }
-      }, navTo && { navTo }), props), {
-        onClick: props.onClick ? (...args) => {
-          return props.onClick(...args, context2);
-        } : void 0
-      })
-    );
-  });
-  function fnu(...args) {
-    return args.find((v2) => v2 !== void 0);
-  }
-  __name(fnu, "fnu");
-  const tickMenuEnhancer = /* @__PURE__ */ __name((def) => {
-    const out = __spreadValues({}, def);
-    if (out.checked !== void 0) {
-      out.icon = out.checked ? "small-tick" : "blank";
-    }
-    return out;
-  }, "tickMenuEnhancer");
-  const commandMenuEnhancer = /* @__PURE__ */ __name((commands, config = {}) => (def, context2) => {
-    const cmdId = typeof def === "string" ? def : def.cmd;
-    let item = typeof def === "string" ? { cmd: def } : __spreadValues({}, def);
-    const useTicks = fnu(item.useTicks, config.useTicks);
-    delete item.useTicks;
-    if (cmdId && commands[cmdId] && def.divider === void 0) {
-      const command = commands[cmdId];
-      const { isActive: isActive2, isDisabled, isHidden: isHidden2 } = command;
-      const toggles = isActive2 !== void 0;
-      item.hidden = fnu(item.hidden, isHidden2);
-      item.disabled = fnu(item.disabled, isDisabled);
-      item.key = item.key || cmdId;
-      item.submenu = item.submenu || command.submenu;
-      item.component = item.component || command.component;
-      if (toggles) {
-        if (useTicks) {
-          item.text = item.text || command.shortName || command.name;
-          item.checked = item.checked || isActive2;
-        } else {
-          item.text = item.text || (isActive2 ? command.name : command.inactiveName || command.name);
-          item.icon = item.icon || (isActive2 ? command.icon : command.inactiveIcon || command.icon);
-        }
-      } else {
-        item.text = item.text || command.name;
-        item.icon = item.icon || command.icon;
-      }
-      item.hotkey = item.hotkey || command.hotkey;
-      if (!item.onClick) {
-        item.onClick = (event) => command.execute({
-          event,
-          context: context2,
-          menuItem: item,
-          viaMenu: true
-        });
-      }
-    } else if (cmdId && !commands[cmdId]) {
-      item.text = item.text || startCase(cmdId);
-      item.disabled = true;
-    }
-    if (config.omitIcons) {
-      item.icon = void 0;
-    }
-    if (config.forceIconAlignment !== false) {
-      item.icon = item.icon || "blank";
-    }
-    if (useTicks) {
-      item = tickMenuEnhancer(item);
-    }
-    return item;
-  }, "commandMenuEnhancer");
-  const ident$1 = /* @__PURE__ */ __name((x2) => x2, "ident$1");
-  const dividerShorthandEnhancer = /* @__PURE__ */ __name((def) => typeof def === "string" && def.startsWith("--") ? { divider: def.substr(2) } : def, "dividerShorthandEnhancer");
-  const unwantedAttrs = [
-    "isSimpleText",
-    "justText",
-    "submenu",
-    "component",
-    "hotkey",
-    "changingProps",
-    "showInSearchMenu",
-    "hideFromMenuSearch"
-  ];
-  const DynamicMenuItem = /* @__PURE__ */ __name(({
-    def,
-    enhancers = [ident$1],
-    context: context2,
-    doNotEnhanceTopLevelItem
-  }) => {
-    if (React.isValidElement(def)) return def;
-    const item = [
-      dividerShorthandEnhancer,
-      ...doNotEnhanceTopLevelItem ? [ident$1] : enhancers
-    ].reduce((v2, f2) => f2(v2, context2), def);
-    let out;
-    if (item.divider !== void 0) {
-      out = /* @__PURE__ */ React.createElement(
-        MenuDivider,
-        __spreadValues({}, item.divider ? { title: item.divider, className: item.className } : {})
-      );
-    } else {
-      const ItemComponent = item.component || EnhancedMenuItem;
-      out = /* @__PURE__ */ React.createElement(
-        ItemComponent,
-        __spreadProps(__spreadValues({}, omit$1(item, unwantedAttrs)), {
-          context: context2,
-          icon: item.icon || item.iconName,
-          labelElement: item.hotkey && /* @__PURE__ */ React.createElement(KeyCombo, { minimal: true, combo: item.hotkey }),
-          text: item.text
-        }),
-        item.submenu ? item.submenu.filter(ident$1).map((def2, index2) => /* @__PURE__ */ React.createElement(DynamicMenuItem, __spreadValues({ key: index2 }, { def: def2, enhancers, context: context2 }))) : void 0
-      );
-    }
-    if (item.disabled && typeof item.disabled === "string") {
-      item.tooltip = item.disabled;
-    }
-    if (item.tooltip) {
-      out = /* @__PURE__ */ React.createElement(Tooltip, { content: item.tooltip }, out);
-    }
-    return item.hidden ? null : out;
-  }, "DynamicMenuItem");
-  const createDynamicMenu = /* @__PURE__ */ __name((menuDef2, enhancers, context2) => {
-    if (menuDef2 instanceof Array) {
-      return menuDef2.map((def, index2) => /* @__PURE__ */ React.createElement(DynamicMenuItem, __spreadValues({ key: index2 }, { def, enhancers, context: context2 })));
-    } else {
-      return /* @__PURE__ */ React.createElement(DynamicMenuItem, __spreadValues({}, { def: menuDef2, enhancers, context: context2 }));
-    }
-  }, "createDynamicMenu");
-  const createCommandMenu = /* @__PURE__ */ __name((menuDef2, commands, config, context2) => {
-    return createDynamicMenu(
-      menuDef2,
-      [commandMenuEnhancer(commands, config)],
-      context2
-    );
-  }, "createCommandMenu");
-  function showContextMenu(menuDef2, enhancers, event, onClose, context2, menuComp = Menu) {
-    menuDef2 = filterMenuForCorrectness(menuDef2);
-    if (!menuDef2) return;
-    const MenuComponent = menuComp;
-    event.persist && event.persist();
-    ContextMenu.show(
-      /* @__PURE__ */ React.createElement(MenuComponent, null, createDynamicMenu(menuDef2, enhancers, context2)),
-      { left: event.clientX, top: event.clientY },
-      onClose
-    );
-    event.stopPropagation && event.stopPropagation();
-    event.preventDefault && event.preventDefault();
-  }
-  __name(showContextMenu, "showContextMenu");
-  function filterMenuForCorrectness(menuDef2) {
-    return menuDef2 && menuDef2.length && menuDef2.filter(ident$1);
-  }
-  __name(filterMenuForCorrectness, "filterMenuForCorrectness");
-  function getStringFromReactComponent(comp) {
-    var _a2;
-    if (!comp) return "";
-    if (isString$1(comp) || isNumber$2(comp)) return comp;
-    if ((_a2 = comp.props) == null ? void 0 : _a2.text) {
-      return getStringFromReactComponent(comp.props.text);
-    }
-    const { children } = comp.props || {};
-    if (!children) return "";
-    if (isArray$2(children))
-      return flatMap(children, getStringFromReactComponent).join("");
-    if (isString$1(children)) return children;
-    if (children.props) {
-      return getStringFromReactComponent(children.props);
-    }
-  }
-  __name(getStringFromReactComponent, "getStringFromReactComponent");
-  function doesSearchValMatchText(searchVal, justText) {
-    return fuzzysearch(
-      searchVal ? searchVal.toLowerCase() : "",
-      justText ? justText.toLowerCase() : ""
-    );
-  }
-  __name(doesSearchValMatchText, "doesSearchValMatchText");
   function comboToLabel(def, useSymbols = true) {
     const combo = typeof def === "string" ? def : def.combo;
     if (useSymbols) {
@@ -104963,6 +100547,12 @@ ${latestSubscriptionCallbackError.current.stack}
     ))),
     400
   );
+  const pure = /* @__PURE__ */ __name((BaseComponent) => {
+    const hoc = shouldUpdate(
+      (props, nextProps) => !isEqualIgnoreFunctions(props, nextProps)
+    );
+    return hoc(BaseComponent);
+  }, "pure");
   const isSafari = /^((?!chrome|android).)*safari/i.test(
     navigator.userAgent
   );
@@ -105229,8 +100819,8 @@ ${latestSubscriptionCallbackError.current.stack}
     }
     return actions2;
   });
-  function _extends() {
-    _extends = Object.assign || function(target) {
+  function _extends$1() {
+    _extends$1 = Object.assign || function(target) {
       for (var i2 = 1; i2 < arguments.length; i2++) {
         var source = arguments[i2];
         for (var key in source) {
@@ -105241,9 +100831,9 @@ ${latestSubscriptionCallbackError.current.stack}
       }
       return target;
     };
-    return _extends.apply(this, arguments);
+    return _extends$1.apply(this, arguments);
   }
-  __name(_extends, "_extends");
+  __name(_extends$1, "_extends$1");
   function normalizeType(typeOrActionCreator) {
     if (typeOrActionCreator && typeOrActionCreator.getType) {
       return typeOrActionCreator.toString();
@@ -105258,7 +100848,7 @@ ${latestSubscriptionCallbackError.current.stack}
       payload: true,
       fallback: null
     };
-    var reducer2 = _extends(reduce2, {
+    var reducer2 = _extends$1(reduce2, {
       has: has2,
       on: on2,
       off,
@@ -106096,25 +101686,6 @@ ${latestSubscriptionCallbackError.current.stack}
     frameTranslationToggleOff,
     frameTranslationToggleOn,
     getMinimumOrfSize: getMinimumOrfSize$1
-  }, Symbol.toStringTag, { value: "Module" }));
-  const hoveredAnnotationUpdate = createMetaAction("HOVEREDANNOTATIONUPDATE");
-  const hoveredAnnotationClear = createMetaAction("HOVEREDANNOTATIONCLEAR");
-  const hoveredAnnotation = createReducer(
-    {
-      [hoveredAnnotationUpdate]: (state2, payload) => {
-        return payload || null;
-      },
-      [hoveredAnnotationClear]: () => {
-        return "";
-      }
-    },
-    ""
-  );
-  const hoveredAnnotationActions = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-    __proto__: null,
-    default: hoveredAnnotation,
-    hoveredAnnotationClear,
-    hoveredAnnotationUpdate
   }, Symbol.toStringTag, { value: "Module" }));
   const minimumOrfSizeUpdate = createMetaAction("minimumOrfSizeUpdate");
   const minimumOrfSize = createReducer(
@@ -107222,7 +102793,7 @@ ${latestSubscriptionCallbackError.current.stack}
     { name: "regulatory", color: "#3F6C51" },
     { name: "SecStr", color: "#7B4B94" },
     { name: "Site", color: "#7D82B8" },
-    { name: "telomere", color: "DE9151" },
+    { name: "telomere", color: "#DE9151" },
     { name: "tmRNA", color: "#B7E3CC" },
     { name: "unsure", color: "#C4FFB2" },
     { name: "V_segment", color: "#D6F7A3" },
@@ -107868,3914 +103439,6 @@ ${latestSubscriptionCallbackError.current.stack}
     return cutsitesByName;
   }
   __name(getCutsitesFromSequence, "getCutsitesFromSequence");
-  var jsondiffpatch_umd$1 = { exports: {} };
-  var empty$1 = {};
-  var hasRequiredEmpty;
-  function requireEmpty() {
-    if (hasRequiredEmpty) return empty$1;
-    hasRequiredEmpty = 1;
-    return empty$1;
-  }
-  __name(requireEmpty, "requireEmpty");
-  var jsondiffpatch_umd = jsondiffpatch_umd$1.exports;
-  var hasRequiredJsondiffpatch_umd;
-  function requireJsondiffpatch_umd() {
-    if (hasRequiredJsondiffpatch_umd) return jsondiffpatch_umd$1.exports;
-    hasRequiredJsondiffpatch_umd = 1;
-    (function(module2, exports3) {
-      (function(global2, factory) {
-        factory(exports3, requireEmpty());
-      })(jsondiffpatch_umd, function(exports4, chalk) {
-        chalk = chalk && chalk.hasOwnProperty("default") ? chalk["default"] : chalk;
-        var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function(obj) {
-          return typeof obj;
-        } : function(obj) {
-          return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-        };
-        var classCallCheck2 = /* @__PURE__ */ __name(function(instance, Constructor) {
-          if (!(instance instanceof Constructor)) {
-            throw new TypeError("Cannot call a class as a function");
-          }
-        }, "classCallCheck");
-        var createClass2 = /* @__PURE__ */ function() {
-          function defineProperties(target, props) {
-            for (var i2 = 0; i2 < props.length; i2++) {
-              var descriptor = props[i2];
-              descriptor.enumerable = descriptor.enumerable || false;
-              descriptor.configurable = true;
-              if ("value" in descriptor) descriptor.writable = true;
-              Object.defineProperty(target, descriptor.key, descriptor);
-            }
-          }
-          __name(defineProperties, "defineProperties");
-          return function(Constructor, protoProps, staticProps) {
-            if (protoProps) defineProperties(Constructor.prototype, protoProps);
-            if (staticProps) defineProperties(Constructor, staticProps);
-            return Constructor;
-          };
-        }();
-        var get2 = /* @__PURE__ */ __name(function get3(object2, property2, receiver) {
-          if (object2 === null) object2 = Function.prototype;
-          var desc = Object.getOwnPropertyDescriptor(object2, property2);
-          if (desc === void 0) {
-            var parent2 = Object.getPrototypeOf(object2);
-            if (parent2 === null) {
-              return void 0;
-            } else {
-              return get3(parent2, property2, receiver);
-            }
-          } else if ("value" in desc) {
-            return desc.value;
-          } else {
-            var getter = desc.get;
-            if (getter === void 0) {
-              return void 0;
-            }
-            return getter.call(receiver);
-          }
-        }, "get");
-        var inherits = /* @__PURE__ */ __name(function(subClass, superClass) {
-          if (typeof superClass !== "function" && superClass !== null) {
-            throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-          }
-          subClass.prototype = Object.create(superClass && superClass.prototype, {
-            constructor: {
-              value: subClass,
-              enumerable: false,
-              writable: true,
-              configurable: true
-            }
-          });
-          if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-        }, "inherits");
-        var possibleConstructorReturn = /* @__PURE__ */ __name(function(self2, call2) {
-          if (!self2) {
-            throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-          }
-          return call2 && (typeof call2 === "object" || typeof call2 === "function") ? call2 : self2;
-        }, "possibleConstructorReturn");
-        var slicedToArray = /* @__PURE__ */ function() {
-          function sliceIterator(arr, i2) {
-            var _arr = [];
-            var _n = true;
-            var _d2 = false;
-            var _e = void 0;
-            try {
-              for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
-                _arr.push(_s.value);
-                if (i2 && _arr.length === i2) break;
-              }
-            } catch (err2) {
-              _d2 = true;
-              _e = err2;
-            } finally {
-              try {
-                if (!_n && _i["return"]) _i["return"]();
-              } finally {
-                if (_d2) throw _e;
-              }
-            }
-            return _arr;
-          }
-          __name(sliceIterator, "sliceIterator");
-          return function(arr, i2) {
-            if (Array.isArray(arr)) {
-              return arr;
-            } else if (Symbol.iterator in Object(arr)) {
-              return sliceIterator(arr, i2);
-            } else {
-              throw new TypeError("Invalid attempt to destructure non-iterable instance");
-            }
-          };
-        }();
-        var toConsumableArray = /* @__PURE__ */ __name(function(arr) {
-          if (Array.isArray(arr)) {
-            for (var i2 = 0, arr2 = Array(arr.length); i2 < arr.length; i2++) arr2[i2] = arr[i2];
-            return arr2;
-          } else {
-            return Array.from(arr);
-          }
-        }, "toConsumableArray");
-        var Processor2 = function() {
-          function Processor3(options) {
-            classCallCheck2(this, Processor3);
-            this.selfOptions = options || {};
-            this.pipes = {};
-          }
-          __name(Processor3, "Processor");
-          createClass2(Processor3, [{
-            key: "options",
-            value: /* @__PURE__ */ __name(function options(_options) {
-              if (_options) {
-                this.selfOptions = _options;
-              }
-              return this.selfOptions;
-            }, "options")
-          }, {
-            key: "pipe",
-            value: /* @__PURE__ */ __name(function pipe(name2, pipeArg) {
-              var pipe2 = pipeArg;
-              if (typeof name2 === "string") {
-                if (typeof pipe2 === "undefined") {
-                  return this.pipes[name2];
-                } else {
-                  this.pipes[name2] = pipe2;
-                }
-              }
-              if (name2 && name2.name) {
-                pipe2 = name2;
-                if (pipe2.processor === this) {
-                  return pipe2;
-                }
-                this.pipes[pipe2.name] = pipe2;
-              }
-              pipe2.processor = this;
-              return pipe2;
-            }, "pipe")
-          }, {
-            key: "process",
-            value: /* @__PURE__ */ __name(function process2(input, pipe) {
-              var context2 = input;
-              context2.options = this.options();
-              var nextPipe = pipe || input.pipe || "default";
-              var lastPipe = void 0;
-              var lastContext = void 0;
-              while (nextPipe) {
-                if (typeof context2.nextAfterChildren !== "undefined") {
-                  context2.next = context2.nextAfterChildren;
-                  context2.nextAfterChildren = null;
-                }
-                if (typeof nextPipe === "string") {
-                  nextPipe = this.pipe(nextPipe);
-                }
-                nextPipe.process(context2);
-                lastContext = context2;
-                lastPipe = nextPipe;
-                nextPipe = null;
-                if (context2) {
-                  if (context2.next) {
-                    context2 = context2.next;
-                    nextPipe = lastContext.nextPipe || context2.pipe || lastPipe;
-                  }
-                }
-              }
-              return context2.hasResult ? context2.result : void 0;
-            }, "process")
-          }]);
-          return Processor3;
-        }();
-        var Pipe = function() {
-          function Pipe2(name2) {
-            classCallCheck2(this, Pipe2);
-            this.name = name2;
-            this.filters = [];
-          }
-          __name(Pipe2, "Pipe");
-          createClass2(Pipe2, [{
-            key: "process",
-            value: /* @__PURE__ */ __name(function process2(input) {
-              if (!this.processor) {
-                throw new Error("add this pipe to a processor before using it");
-              }
-              var debug = this.debug;
-              var length = this.filters.length;
-              var context2 = input;
-              for (var index3 = 0; index3 < length; index3++) {
-                var filter2 = this.filters[index3];
-                if (debug) {
-                  this.log("filter: " + filter2.filterName);
-                }
-                filter2(context2);
-                if ((typeof context2 === "undefined" ? "undefined" : _typeof2(context2)) === "object" && context2.exiting) {
-                  context2.exiting = false;
-                  break;
-                }
-              }
-              if (!context2.next && this.resultCheck) {
-                this.resultCheck(context2);
-              }
-            }, "process")
-          }, {
-            key: "log",
-            value: /* @__PURE__ */ __name(function log3(msg2) {
-              console.log("[jsondiffpatch] " + this.name + " pipe, " + msg2);
-            }, "log")
-          }, {
-            key: "append",
-            value: /* @__PURE__ */ __name(function append() {
-              var _filters;
-              (_filters = this.filters).push.apply(_filters, arguments);
-              return this;
-            }, "append")
-          }, {
-            key: "prepend",
-            value: /* @__PURE__ */ __name(function prepend() {
-              var _filters2;
-              (_filters2 = this.filters).unshift.apply(_filters2, arguments);
-              return this;
-            }, "prepend")
-          }, {
-            key: "indexOf",
-            value: /* @__PURE__ */ __name(function indexOf(filterName) {
-              if (!filterName) {
-                throw new Error("a filter name is required");
-              }
-              for (var index3 = 0; index3 < this.filters.length; index3++) {
-                var filter2 = this.filters[index3];
-                if (filter2.filterName === filterName) {
-                  return index3;
-                }
-              }
-              throw new Error("filter not found: " + filterName);
-            }, "indexOf")
-          }, {
-            key: "list",
-            value: /* @__PURE__ */ __name(function list2() {
-              return this.filters.map(function(f2) {
-                return f2.filterName;
-              });
-            }, "list")
-          }, {
-            key: "after",
-            value: /* @__PURE__ */ __name(function after(filterName) {
-              var index3 = this.indexOf(filterName);
-              var params = Array.prototype.slice.call(arguments, 1);
-              if (!params.length) {
-                throw new Error("a filter is required");
-              }
-              params.unshift(index3 + 1, 0);
-              Array.prototype.splice.apply(this.filters, params);
-              return this;
-            }, "after")
-          }, {
-            key: "before",
-            value: /* @__PURE__ */ __name(function before(filterName) {
-              var index3 = this.indexOf(filterName);
-              var params = Array.prototype.slice.call(arguments, 1);
-              if (!params.length) {
-                throw new Error("a filter is required");
-              }
-              params.unshift(index3, 0);
-              Array.prototype.splice.apply(this.filters, params);
-              return this;
-            }, "before")
-          }, {
-            key: "replace",
-            value: /* @__PURE__ */ __name(function replace2(filterName) {
-              var index3 = this.indexOf(filterName);
-              var params = Array.prototype.slice.call(arguments, 1);
-              if (!params.length) {
-                throw new Error("a filter is required");
-              }
-              params.unshift(index3, 1);
-              Array.prototype.splice.apply(this.filters, params);
-              return this;
-            }, "replace")
-          }, {
-            key: "remove",
-            value: /* @__PURE__ */ __name(function remove2(filterName) {
-              var index3 = this.indexOf(filterName);
-              this.filters.splice(index3, 1);
-              return this;
-            }, "remove")
-          }, {
-            key: "clear",
-            value: /* @__PURE__ */ __name(function clear() {
-              this.filters.length = 0;
-              return this;
-            }, "clear")
-          }, {
-            key: "shouldHaveResult",
-            value: /* @__PURE__ */ __name(function shouldHaveResult(should) {
-              if (should === false) {
-                this.resultCheck = null;
-                return;
-              }
-              if (this.resultCheck) {
-                return;
-              }
-              var pipe = this;
-              this.resultCheck = function(context2) {
-                if (!context2.hasResult) {
-                  console.log(context2);
-                  var error = new Error(pipe.name + " failed");
-                  error.noResult = true;
-                  throw error;
-                }
-              };
-              return this;
-            }, "shouldHaveResult")
-          }]);
-          return Pipe2;
-        }();
-        var Context2 = function() {
-          function Context3() {
-            classCallCheck2(this, Context3);
-          }
-          __name(Context3, "Context");
-          createClass2(Context3, [{
-            key: "setResult",
-            value: /* @__PURE__ */ __name(function setResult(result) {
-              this.result = result;
-              this.hasResult = true;
-              return this;
-            }, "setResult")
-          }, {
-            key: "exit",
-            value: /* @__PURE__ */ __name(function exit2() {
-              this.exiting = true;
-              return this;
-            }, "exit")
-          }, {
-            key: "switchTo",
-            value: /* @__PURE__ */ __name(function switchTo(next, pipe) {
-              if (typeof next === "string" || next instanceof Pipe) {
-                this.nextPipe = next;
-              } else {
-                this.next = next;
-                if (pipe) {
-                  this.nextPipe = pipe;
-                }
-              }
-              return this;
-            }, "switchTo")
-          }, {
-            key: "push",
-            value: /* @__PURE__ */ __name(function push2(child, name2) {
-              child.parent = this;
-              if (typeof name2 !== "undefined") {
-                child.childName = name2;
-              }
-              child.root = this.root || this;
-              child.options = child.options || this.options;
-              if (!this.children) {
-                this.children = [child];
-                this.nextAfterChildren = this.next || null;
-                this.next = child;
-              } else {
-                this.children[this.children.length - 1].next = child;
-                this.children.push(child);
-              }
-              child.next = this;
-              return this;
-            }, "push")
-          }]);
-          return Context3;
-        }();
-        var isArray2 = typeof Array.isArray === "function" ? Array.isArray : function(a2) {
-          return a2 instanceof Array;
-        };
-        function cloneRegExp2(re2) {
-          var regexMatch = /^\/(.*)\/([gimyu]*)$/.exec(re2.toString());
-          return new RegExp(regexMatch[1], regexMatch[2]);
-        }
-        __name(cloneRegExp2, "cloneRegExp");
-        function clone2(arg) {
-          if ((typeof arg === "undefined" ? "undefined" : _typeof2(arg)) !== "object") {
-            return arg;
-          }
-          if (arg === null) {
-            return null;
-          }
-          if (isArray2(arg)) {
-            return arg.map(clone2);
-          }
-          if (arg instanceof Date) {
-            return new Date(arg.getTime());
-          }
-          if (arg instanceof RegExp) {
-            return cloneRegExp2(arg);
-          }
-          var cloned = {};
-          for (var name2 in arg) {
-            if (Object.prototype.hasOwnProperty.call(arg, name2)) {
-              cloned[name2] = clone2(arg[name2]);
-            }
-          }
-          return cloned;
-        }
-        __name(clone2, "clone");
-        var DiffContext = function(_Context) {
-          inherits(DiffContext2, _Context);
-          function DiffContext2(left2, right2) {
-            classCallCheck2(this, DiffContext2);
-            var _this = possibleConstructorReturn(this, (DiffContext2.__proto__ || Object.getPrototypeOf(DiffContext2)).call(this));
-            _this.left = left2;
-            _this.right = right2;
-            _this.pipe = "diff";
-            return _this;
-          }
-          __name(DiffContext2, "DiffContext");
-          createClass2(DiffContext2, [{
-            key: "setResult",
-            value: /* @__PURE__ */ __name(function setResult(result) {
-              if (this.options.cloneDiffValues && (typeof result === "undefined" ? "undefined" : _typeof2(result)) === "object") {
-                var clone$$1 = typeof this.options.cloneDiffValues === "function" ? this.options.cloneDiffValues : clone2;
-                if (_typeof2(result[0]) === "object") {
-                  result[0] = clone$$1(result[0]);
-                }
-                if (_typeof2(result[1]) === "object") {
-                  result[1] = clone$$1(result[1]);
-                }
-              }
-              return Context2.prototype.setResult.apply(this, arguments);
-            }, "setResult")
-          }]);
-          return DiffContext2;
-        }(Context2);
-        var PatchContext = function(_Context) {
-          inherits(PatchContext2, _Context);
-          function PatchContext2(left2, delta) {
-            classCallCheck2(this, PatchContext2);
-            var _this = possibleConstructorReturn(this, (PatchContext2.__proto__ || Object.getPrototypeOf(PatchContext2)).call(this));
-            _this.left = left2;
-            _this.delta = delta;
-            _this.pipe = "patch";
-            return _this;
-          }
-          __name(PatchContext2, "PatchContext");
-          return PatchContext2;
-        }(Context2);
-        var ReverseContext = function(_Context) {
-          inherits(ReverseContext2, _Context);
-          function ReverseContext2(delta) {
-            classCallCheck2(this, ReverseContext2);
-            var _this = possibleConstructorReturn(this, (ReverseContext2.__proto__ || Object.getPrototypeOf(ReverseContext2)).call(this));
-            _this.delta = delta;
-            _this.pipe = "reverse";
-            return _this;
-          }
-          __name(ReverseContext2, "ReverseContext");
-          return ReverseContext2;
-        }(Context2);
-        var isArray$12 = typeof Array.isArray === "function" ? Array.isArray : function(a2) {
-          return a2 instanceof Array;
-        };
-        var diffFilter = /* @__PURE__ */ __name(function trivialMatchesDiffFilter(context2) {
-          if (context2.left === context2.right) {
-            context2.setResult(void 0).exit();
-            return;
-          }
-          if (typeof context2.left === "undefined") {
-            if (typeof context2.right === "function") {
-              throw new Error("functions are not supported");
-            }
-            context2.setResult([context2.right]).exit();
-            return;
-          }
-          if (typeof context2.right === "undefined") {
-            context2.setResult([context2.left, 0, 0]).exit();
-            return;
-          }
-          if (typeof context2.left === "function" || typeof context2.right === "function") {
-            throw new Error("functions are not supported");
-          }
-          context2.leftType = context2.left === null ? "null" : _typeof2(context2.left);
-          context2.rightType = context2.right === null ? "null" : _typeof2(context2.right);
-          if (context2.leftType !== context2.rightType) {
-            context2.setResult([context2.left, context2.right]).exit();
-            return;
-          }
-          if (context2.leftType === "boolean" || context2.leftType === "number") {
-            context2.setResult([context2.left, context2.right]).exit();
-            return;
-          }
-          if (context2.leftType === "object") {
-            context2.leftIsArray = isArray$12(context2.left);
-          }
-          if (context2.rightType === "object") {
-            context2.rightIsArray = isArray$12(context2.right);
-          }
-          if (context2.leftIsArray !== context2.rightIsArray) {
-            context2.setResult([context2.left, context2.right]).exit();
-            return;
-          }
-          if (context2.left instanceof RegExp) {
-            if (context2.right instanceof RegExp) {
-              context2.setResult([context2.left.toString(), context2.right.toString()]).exit();
-            } else {
-              context2.setResult([context2.left, context2.right]).exit();
-            }
-          }
-        }, "trivialMatchesDiffFilter");
-        diffFilter.filterName = "trivial";
-        var patchFilter = /* @__PURE__ */ __name(function trivialMatchesPatchFilter(context2) {
-          if (typeof context2.delta === "undefined") {
-            context2.setResult(context2.left).exit();
-            return;
-          }
-          context2.nested = !isArray$12(context2.delta);
-          if (context2.nested) {
-            return;
-          }
-          if (context2.delta.length === 1) {
-            context2.setResult(context2.delta[0]).exit();
-            return;
-          }
-          if (context2.delta.length === 2) {
-            if (context2.left instanceof RegExp) {
-              var regexArgs = /^\/(.*)\/([gimyu]+)$/.exec(context2.delta[1]);
-              if (regexArgs) {
-                context2.setResult(new RegExp(regexArgs[1], regexArgs[2])).exit();
-                return;
-              }
-            }
-            context2.setResult(context2.delta[1]).exit();
-            return;
-          }
-          if (context2.delta.length === 3 && context2.delta[2] === 0) {
-            context2.setResult(void 0).exit();
-          }
-        }, "trivialMatchesPatchFilter");
-        patchFilter.filterName = "trivial";
-        var reverseFilter = /* @__PURE__ */ __name(function trivialReferseFilter(context2) {
-          if (typeof context2.delta === "undefined") {
-            context2.setResult(context2.delta).exit();
-            return;
-          }
-          context2.nested = !isArray$12(context2.delta);
-          if (context2.nested) {
-            return;
-          }
-          if (context2.delta.length === 1) {
-            context2.setResult([context2.delta[0], 0, 0]).exit();
-            return;
-          }
-          if (context2.delta.length === 2) {
-            context2.setResult([context2.delta[1], context2.delta[0]]).exit();
-            return;
-          }
-          if (context2.delta.length === 3 && context2.delta[2] === 0) {
-            context2.setResult([context2.delta[0]]).exit();
-          }
-        }, "trivialReferseFilter");
-        reverseFilter.filterName = "trivial";
-        function collectChildrenDiffFilter(context2) {
-          if (!context2 || !context2.children) {
-            return;
-          }
-          var length = context2.children.length;
-          var child = void 0;
-          var result = context2.result;
-          for (var index3 = 0; index3 < length; index3++) {
-            child = context2.children[index3];
-            if (typeof child.result === "undefined") {
-              continue;
-            }
-            result = result || {};
-            result[child.childName] = child.result;
-          }
-          if (result && context2.leftIsArray) {
-            result._t = "a";
-          }
-          context2.setResult(result).exit();
-        }
-        __name(collectChildrenDiffFilter, "collectChildrenDiffFilter");
-        collectChildrenDiffFilter.filterName = "collectChildren";
-        function objectsDiffFilter(context2) {
-          if (context2.leftIsArray || context2.leftType !== "object") {
-            return;
-          }
-          var name2 = void 0;
-          var child = void 0;
-          var propertyFilter = context2.options.propertyFilter;
-          for (name2 in context2.left) {
-            if (!Object.prototype.hasOwnProperty.call(context2.left, name2)) {
-              continue;
-            }
-            if (propertyFilter && !propertyFilter(name2, context2)) {
-              continue;
-            }
-            child = new DiffContext(context2.left[name2], context2.right[name2]);
-            context2.push(child, name2);
-          }
-          for (name2 in context2.right) {
-            if (!Object.prototype.hasOwnProperty.call(context2.right, name2)) {
-              continue;
-            }
-            if (propertyFilter && !propertyFilter(name2, context2)) {
-              continue;
-            }
-            if (typeof context2.left[name2] === "undefined") {
-              child = new DiffContext(void 0, context2.right[name2]);
-              context2.push(child, name2);
-            }
-          }
-          if (!context2.children || context2.children.length === 0) {
-            context2.setResult(void 0).exit();
-            return;
-          }
-          context2.exit();
-        }
-        __name(objectsDiffFilter, "objectsDiffFilter");
-        objectsDiffFilter.filterName = "objects";
-        var patchFilter$1 = /* @__PURE__ */ __name(function nestedPatchFilter(context2) {
-          if (!context2.nested) {
-            return;
-          }
-          if (context2.delta._t) {
-            return;
-          }
-          var name2 = void 0;
-          var child = void 0;
-          for (name2 in context2.delta) {
-            child = new PatchContext(context2.left[name2], context2.delta[name2]);
-            context2.push(child, name2);
-          }
-          context2.exit();
-        }, "nestedPatchFilter");
-        patchFilter$1.filterName = "objects";
-        var collectChildrenPatchFilter = /* @__PURE__ */ __name(function collectChildrenPatchFilter2(context2) {
-          if (!context2 || !context2.children) {
-            return;
-          }
-          if (context2.delta._t) {
-            return;
-          }
-          var length = context2.children.length;
-          var child = void 0;
-          for (var index3 = 0; index3 < length; index3++) {
-            child = context2.children[index3];
-            if (Object.prototype.hasOwnProperty.call(context2.left, child.childName) && child.result === void 0) {
-              delete context2.left[child.childName];
-            } else if (context2.left[child.childName] !== child.result) {
-              context2.left[child.childName] = child.result;
-            }
-          }
-          context2.setResult(context2.left).exit();
-        }, "collectChildrenPatchFilter");
-        collectChildrenPatchFilter.filterName = "collectChildren";
-        var reverseFilter$1 = /* @__PURE__ */ __name(function nestedReverseFilter(context2) {
-          if (!context2.nested) {
-            return;
-          }
-          if (context2.delta._t) {
-            return;
-          }
-          var name2 = void 0;
-          var child = void 0;
-          for (name2 in context2.delta) {
-            child = new ReverseContext(context2.delta[name2]);
-            context2.push(child, name2);
-          }
-          context2.exit();
-        }, "nestedReverseFilter");
-        reverseFilter$1.filterName = "objects";
-        function collectChildrenReverseFilter(context2) {
-          if (!context2 || !context2.children) {
-            return;
-          }
-          if (context2.delta._t) {
-            return;
-          }
-          var length = context2.children.length;
-          var child = void 0;
-          var delta = {};
-          for (var index3 = 0; index3 < length; index3++) {
-            child = context2.children[index3];
-            if (delta[child.childName] !== child.result) {
-              delta[child.childName] = child.result;
-            }
-          }
-          context2.setResult(delta).exit();
-        }
-        __name(collectChildrenReverseFilter, "collectChildrenReverseFilter");
-        collectChildrenReverseFilter.filterName = "collectChildren";
-        var defaultMatch = /* @__PURE__ */ __name(function defaultMatch2(array1, array2, index1, index22) {
-          return array1[index1] === array2[index22];
-        }, "defaultMatch");
-        var lengthMatrix = /* @__PURE__ */ __name(function lengthMatrix2(array1, array2, match, context2) {
-          var len1 = array1.length;
-          var len2 = array2.length;
-          var x2 = void 0, y2 = void 0;
-          var matrix2 = [len1 + 1];
-          for (x2 = 0; x2 < len1 + 1; x2++) {
-            matrix2[x2] = [len2 + 1];
-            for (y2 = 0; y2 < len2 + 1; y2++) {
-              matrix2[x2][y2] = 0;
-            }
-          }
-          matrix2.match = match;
-          for (x2 = 1; x2 < len1 + 1; x2++) {
-            for (y2 = 1; y2 < len2 + 1; y2++) {
-              if (match(array1, array2, x2 - 1, y2 - 1, context2)) {
-                matrix2[x2][y2] = matrix2[x2 - 1][y2 - 1] + 1;
-              } else {
-                matrix2[x2][y2] = Math.max(matrix2[x2 - 1][y2], matrix2[x2][y2 - 1]);
-              }
-            }
-          }
-          return matrix2;
-        }, "lengthMatrix");
-        var backtrack = /* @__PURE__ */ __name(function backtrack2(matrix2, array1, array2, context2) {
-          var index1 = array1.length;
-          var index22 = array2.length;
-          var subsequence = {
-            sequence: [],
-            indices1: [],
-            indices2: []
-          };
-          while (index1 !== 0 && index22 !== 0) {
-            var sameLetter = matrix2.match(array1, array2, index1 - 1, index22 - 1, context2);
-            if (sameLetter) {
-              subsequence.sequence.unshift(array1[index1 - 1]);
-              subsequence.indices1.unshift(index1 - 1);
-              subsequence.indices2.unshift(index22 - 1);
-              --index1;
-              --index22;
-            } else {
-              var valueAtMatrixAbove = matrix2[index1][index22 - 1];
-              var valueAtMatrixLeft = matrix2[index1 - 1][index22];
-              if (valueAtMatrixAbove > valueAtMatrixLeft) {
-                --index22;
-              } else {
-                --index1;
-              }
-            }
-          }
-          return subsequence;
-        }, "backtrack");
-        var get$12 = /* @__PURE__ */ __name(function get3(array1, array2, match, context2) {
-          var innerContext = context2 || {};
-          var matrix2 = lengthMatrix(array1, array2, match || defaultMatch, innerContext);
-          var result = backtrack(matrix2, array1, array2, innerContext);
-          if (typeof array1 === "string" && typeof array2 === "string") {
-            result.sequence = result.sequence.join("");
-          }
-          return result;
-        }, "get");
-        var lcs = {
-          get: get$12
-        };
-        var ARRAY_MOVE2 = 3;
-        var isArray$22 = typeof Array.isArray === "function" ? Array.isArray : function(a2) {
-          return a2 instanceof Array;
-        };
-        var arrayIndexOf = typeof Array.prototype.indexOf === "function" ? function(array, item) {
-          return array.indexOf(item);
-        } : function(array, item) {
-          var length = array.length;
-          for (var i2 = 0; i2 < length; i2++) {
-            if (array[i2] === item) {
-              return i2;
-            }
-          }
-          return -1;
-        };
-        function arraysHaveMatchByRef(array1, array2, len1, len2) {
-          for (var index1 = 0; index1 < len1; index1++) {
-            var val1 = array1[index1];
-            for (var index22 = 0; index22 < len2; index22++) {
-              var val2 = array2[index22];
-              if (index1 !== index22 && val1 === val2) {
-                return true;
-              }
-            }
-          }
-        }
-        __name(arraysHaveMatchByRef, "arraysHaveMatchByRef");
-        function matchItems(array1, array2, index1, index22, context2) {
-          var value1 = array1[index1];
-          var value2 = array2[index22];
-          if (value1 === value2) {
-            return true;
-          }
-          if ((typeof value1 === "undefined" ? "undefined" : _typeof2(value1)) !== "object" || (typeof value2 === "undefined" ? "undefined" : _typeof2(value2)) !== "object") {
-            return false;
-          }
-          var objectHash = context2.objectHash;
-          if (!objectHash) {
-            return context2.matchByPosition && index1 === index22;
-          }
-          var hash1 = void 0;
-          var hash2 = void 0;
-          if (typeof index1 === "number") {
-            context2.hashCache1 = context2.hashCache1 || [];
-            hash1 = context2.hashCache1[index1];
-            if (typeof hash1 === "undefined") {
-              context2.hashCache1[index1] = hash1 = objectHash(value1, index1);
-            }
-          } else {
-            hash1 = objectHash(value1);
-          }
-          if (typeof hash1 === "undefined") {
-            return false;
-          }
-          if (typeof index22 === "number") {
-            context2.hashCache2 = context2.hashCache2 || [];
-            hash2 = context2.hashCache2[index22];
-            if (typeof hash2 === "undefined") {
-              context2.hashCache2[index22] = hash2 = objectHash(value2, index22);
-            }
-          } else {
-            hash2 = objectHash(value2);
-          }
-          if (typeof hash2 === "undefined") {
-            return false;
-          }
-          return hash1 === hash2;
-        }
-        __name(matchItems, "matchItems");
-        var diffFilter$1 = /* @__PURE__ */ __name(function arraysDiffFilter(context2) {
-          if (!context2.leftIsArray) {
-            return;
-          }
-          var matchContext = {
-            objectHash: context2.options && context2.options.objectHash,
-            matchByPosition: context2.options && context2.options.matchByPosition
-          };
-          var commonHead = 0;
-          var commonTail = 0;
-          var index3 = void 0;
-          var index1 = void 0;
-          var index22 = void 0;
-          var array1 = context2.left;
-          var array2 = context2.right;
-          var len1 = array1.length;
-          var len2 = array2.length;
-          var child = void 0;
-          if (len1 > 0 && len2 > 0 && !matchContext.objectHash && typeof matchContext.matchByPosition !== "boolean") {
-            matchContext.matchByPosition = !arraysHaveMatchByRef(array1, array2, len1, len2);
-          }
-          while (commonHead < len1 && commonHead < len2 && matchItems(array1, array2, commonHead, commonHead, matchContext)) {
-            index3 = commonHead;
-            child = new DiffContext(context2.left[index3], context2.right[index3]);
-            context2.push(child, index3);
-            commonHead++;
-          }
-          while (commonTail + commonHead < len1 && commonTail + commonHead < len2 && matchItems(array1, array2, len1 - 1 - commonTail, len2 - 1 - commonTail, matchContext)) {
-            index1 = len1 - 1 - commonTail;
-            index22 = len2 - 1 - commonTail;
-            child = new DiffContext(context2.left[index1], context2.right[index22]);
-            context2.push(child, index22);
-            commonTail++;
-          }
-          var result = void 0;
-          if (commonHead + commonTail === len1) {
-            if (len1 === len2) {
-              context2.setResult(void 0).exit();
-              return;
-            }
-            result = result || {
-              _t: "a"
-            };
-            for (index3 = commonHead; index3 < len2 - commonTail; index3++) {
-              result[index3] = [array2[index3]];
-            }
-            context2.setResult(result).exit();
-            return;
-          }
-          if (commonHead + commonTail === len2) {
-            result = result || {
-              _t: "a"
-            };
-            for (index3 = commonHead; index3 < len1 - commonTail; index3++) {
-              result["_" + index3] = [array1[index3], 0, 0];
-            }
-            context2.setResult(result).exit();
-            return;
-          }
-          delete matchContext.hashCache1;
-          delete matchContext.hashCache2;
-          var trimmed1 = array1.slice(commonHead, len1 - commonTail);
-          var trimmed2 = array2.slice(commonHead, len2 - commonTail);
-          var seq = lcs.get(trimmed1, trimmed2, matchItems, matchContext);
-          var removedItems = [];
-          result = result || {
-            _t: "a"
-          };
-          for (index3 = commonHead; index3 < len1 - commonTail; index3++) {
-            if (arrayIndexOf(seq.indices1, index3 - commonHead) < 0) {
-              result["_" + index3] = [array1[index3], 0, 0];
-              removedItems.push(index3);
-            }
-          }
-          var detectMove = true;
-          if (context2.options && context2.options.arrays && context2.options.arrays.detectMove === false) {
-            detectMove = false;
-          }
-          var includeValueOnMove = false;
-          if (context2.options && context2.options.arrays && context2.options.arrays.includeValueOnMove) {
-            includeValueOnMove = true;
-          }
-          var removedItemsLength = removedItems.length;
-          for (index3 = commonHead; index3 < len2 - commonTail; index3++) {
-            var indexOnArray2 = arrayIndexOf(seq.indices2, index3 - commonHead);
-            if (indexOnArray2 < 0) {
-              var isMove = false;
-              if (detectMove && removedItemsLength > 0) {
-                for (var removeItemIndex1 = 0; removeItemIndex1 < removedItemsLength; removeItemIndex1++) {
-                  index1 = removedItems[removeItemIndex1];
-                  if (matchItems(trimmed1, trimmed2, index1 - commonHead, index3 - commonHead, matchContext)) {
-                    result["_" + index1].splice(1, 2, index3, ARRAY_MOVE2);
-                    if (!includeValueOnMove) {
-                      result["_" + index1][0] = "";
-                    }
-                    index22 = index3;
-                    child = new DiffContext(context2.left[index1], context2.right[index22]);
-                    context2.push(child, index22);
-                    removedItems.splice(removeItemIndex1, 1);
-                    isMove = true;
-                    break;
-                  }
-                }
-              }
-              if (!isMove) {
-                result[index3] = [array2[index3]];
-              }
-            } else {
-              index1 = seq.indices1[indexOnArray2] + commonHead;
-              index22 = seq.indices2[indexOnArray2] + commonHead;
-              child = new DiffContext(context2.left[index1], context2.right[index22]);
-              context2.push(child, index22);
-            }
-          }
-          context2.setResult(result).exit();
-        }, "arraysDiffFilter");
-        diffFilter$1.filterName = "arrays";
-        var compare = {
-          numerically: /* @__PURE__ */ __name(function numerically(a2, b3) {
-            return a2 - b3;
-          }, "numerically"),
-          numericallyBy: /* @__PURE__ */ __name(function numericallyBy(name2) {
-            return function(a2, b3) {
-              return a2[name2] - b3[name2];
-            };
-          }, "numericallyBy")
-        };
-        var patchFilter$2 = /* @__PURE__ */ __name(function nestedPatchFilter(context2) {
-          if (!context2.nested) {
-            return;
-          }
-          if (context2.delta._t !== "a") {
-            return;
-          }
-          var index3 = void 0;
-          var index1 = void 0;
-          var delta = context2.delta;
-          var array = context2.left;
-          var toRemove = [];
-          var toInsert = [];
-          var toModify = [];
-          for (index3 in delta) {
-            if (index3 !== "_t") {
-              if (index3[0] === "_") {
-                if (delta[index3][2] === 0 || delta[index3][2] === ARRAY_MOVE2) {
-                  toRemove.push(parseInt(index3.slice(1), 10));
-                } else {
-                  throw new Error("only removal or move can be applied at original array indices," + (" invalid diff type: " + delta[index3][2]));
-                }
-              } else {
-                if (delta[index3].length === 1) {
-                  toInsert.push({
-                    index: parseInt(index3, 10),
-                    value: delta[index3][0]
-                  });
-                } else {
-                  toModify.push({
-                    index: parseInt(index3, 10),
-                    delta: delta[index3]
-                  });
-                }
-              }
-            }
-          }
-          toRemove = toRemove.sort(compare.numerically);
-          for (index3 = toRemove.length - 1; index3 >= 0; index3--) {
-            index1 = toRemove[index3];
-            var indexDiff = delta["_" + index1];
-            var removedValue = array.splice(index1, 1)[0];
-            if (indexDiff[2] === ARRAY_MOVE2) {
-              toInsert.push({
-                index: indexDiff[1],
-                value: removedValue
-              });
-            }
-          }
-          toInsert = toInsert.sort(compare.numericallyBy("index"));
-          var toInsertLength = toInsert.length;
-          for (index3 = 0; index3 < toInsertLength; index3++) {
-            var insertion = toInsert[index3];
-            array.splice(insertion.index, 0, insertion.value);
-          }
-          var toModifyLength = toModify.length;
-          var child = void 0;
-          if (toModifyLength > 0) {
-            for (index3 = 0; index3 < toModifyLength; index3++) {
-              var modification = toModify[index3];
-              child = new PatchContext(context2.left[modification.index], modification.delta);
-              context2.push(child, modification.index);
-            }
-          }
-          if (!context2.children) {
-            context2.setResult(context2.left).exit();
-            return;
-          }
-          context2.exit();
-        }, "nestedPatchFilter");
-        patchFilter$2.filterName = "arrays";
-        var collectChildrenPatchFilter$1 = /* @__PURE__ */ __name(function collectChildrenPatchFilter2(context2) {
-          if (!context2 || !context2.children) {
-            return;
-          }
-          if (context2.delta._t !== "a") {
-            return;
-          }
-          var length = context2.children.length;
-          var child = void 0;
-          for (var index3 = 0; index3 < length; index3++) {
-            child = context2.children[index3];
-            context2.left[child.childName] = child.result;
-          }
-          context2.setResult(context2.left).exit();
-        }, "collectChildrenPatchFilter");
-        collectChildrenPatchFilter$1.filterName = "arraysCollectChildren";
-        var reverseFilter$2 = /* @__PURE__ */ __name(function arraysReverseFilter(context2) {
-          if (!context2.nested) {
-            if (context2.delta[2] === ARRAY_MOVE2) {
-              context2.newName = "_" + context2.delta[1];
-              context2.setResult([context2.delta[0], parseInt(context2.childName.substr(1), 10), ARRAY_MOVE2]).exit();
-            }
-            return;
-          }
-          if (context2.delta._t !== "a") {
-            return;
-          }
-          var name2 = void 0;
-          var child = void 0;
-          for (name2 in context2.delta) {
-            if (name2 === "_t") {
-              continue;
-            }
-            child = new ReverseContext(context2.delta[name2]);
-            context2.push(child, name2);
-          }
-          context2.exit();
-        }, "arraysReverseFilter");
-        reverseFilter$2.filterName = "arrays";
-        var reverseArrayDeltaIndex = /* @__PURE__ */ __name(function reverseArrayDeltaIndex2(delta, index3, itemDelta) {
-          if (typeof index3 === "string" && index3[0] === "_") {
-            return parseInt(index3.substr(1), 10);
-          } else if (isArray$22(itemDelta) && itemDelta[2] === 0) {
-            return "_" + index3;
-          }
-          var reverseIndex = +index3;
-          for (var deltaIndex in delta) {
-            var deltaItem = delta[deltaIndex];
-            if (isArray$22(deltaItem)) {
-              if (deltaItem[2] === ARRAY_MOVE2) {
-                var moveFromIndex = parseInt(deltaIndex.substr(1), 10);
-                var moveToIndex = deltaItem[1];
-                if (moveToIndex === +index3) {
-                  return moveFromIndex;
-                }
-                if (moveFromIndex <= reverseIndex && moveToIndex > reverseIndex) {
-                  reverseIndex++;
-                } else if (moveFromIndex >= reverseIndex && moveToIndex < reverseIndex) {
-                  reverseIndex--;
-                }
-              } else if (deltaItem[2] === 0) {
-                var deleteIndex = parseInt(deltaIndex.substr(1), 10);
-                if (deleteIndex <= reverseIndex) {
-                  reverseIndex++;
-                }
-              } else if (deltaItem.length === 1 && deltaIndex <= reverseIndex) {
-                reverseIndex--;
-              }
-            }
-          }
-          return reverseIndex;
-        }, "reverseArrayDeltaIndex");
-        function collectChildrenReverseFilter$1(context2) {
-          if (!context2 || !context2.children) {
-            return;
-          }
-          if (context2.delta._t !== "a") {
-            return;
-          }
-          var length = context2.children.length;
-          var child = void 0;
-          var delta = {
-            _t: "a"
-          };
-          for (var index3 = 0; index3 < length; index3++) {
-            child = context2.children[index3];
-            var name2 = child.newName;
-            if (typeof name2 === "undefined") {
-              name2 = reverseArrayDeltaIndex(context2.delta, child.childName, child.result);
-            }
-            if (delta[name2] !== child.result) {
-              delta[name2] = child.result;
-            }
-          }
-          context2.setResult(delta).exit();
-        }
-        __name(collectChildrenReverseFilter$1, "collectChildrenReverseFilter$1");
-        collectChildrenReverseFilter$1.filterName = "arraysCollectChildren";
-        var diffFilter$2 = /* @__PURE__ */ __name(function datesDiffFilter(context2) {
-          if (context2.left instanceof Date) {
-            if (context2.right instanceof Date) {
-              if (context2.left.getTime() !== context2.right.getTime()) {
-                context2.setResult([context2.left, context2.right]);
-              } else {
-                context2.setResult(void 0);
-              }
-            } else {
-              context2.setResult([context2.left, context2.right]);
-            }
-            context2.exit();
-          } else if (context2.right instanceof Date) {
-            context2.setResult([context2.left, context2.right]).exit();
-          }
-        }, "datesDiffFilter");
-        diffFilter$2.filterName = "dates";
-        function createCommonjsModule(fn2, module3) {
-          return module3 = { exports: {} }, fn2(module3, module3.exports), module3.exports;
-        }
-        __name(createCommonjsModule, "createCommonjsModule");
-        var diffMatchPatch = createCommonjsModule(function(module3) {
-          function diff_match_patch2() {
-            this.Diff_Timeout = 1;
-            this.Diff_EditCost = 4;
-            this.Match_Threshold = 0.5;
-            this.Match_Distance = 1e3;
-            this.Patch_DeleteThreshold = 0.5;
-            this.Patch_Margin = 4;
-            this.Match_MaxBits = 32;
-          }
-          __name(diff_match_patch2, "diff_match_patch");
-          var DIFF_DELETE = -1;
-          var DIFF_INSERT = 1;
-          var DIFF_EQUAL = 0;
-          diff_match_patch2.prototype.diff_main = function(text1, text2, opt_checklines, opt_deadline) {
-            if (typeof opt_deadline == "undefined") {
-              if (this.Diff_Timeout <= 0) {
-                opt_deadline = Number.MAX_VALUE;
-              } else {
-                opt_deadline = (/* @__PURE__ */ new Date()).getTime() + this.Diff_Timeout * 1e3;
-              }
-            }
-            var deadline = opt_deadline;
-            if (text1 == null || text2 == null) {
-              throw new Error("Null input. (diff_main)");
-            }
-            if (text1 == text2) {
-              if (text1) {
-                return [[DIFF_EQUAL, text1]];
-              }
-              return [];
-            }
-            if (typeof opt_checklines == "undefined") {
-              opt_checklines = true;
-            }
-            var checklines = opt_checklines;
-            var commonlength = this.diff_commonPrefix(text1, text2);
-            var commonprefix = text1.substring(0, commonlength);
-            text1 = text1.substring(commonlength);
-            text2 = text2.substring(commonlength);
-            commonlength = this.diff_commonSuffix(text1, text2);
-            var commonsuffix = text1.substring(text1.length - commonlength);
-            text1 = text1.substring(0, text1.length - commonlength);
-            text2 = text2.substring(0, text2.length - commonlength);
-            var diffs = this.diff_compute_(text1, text2, checklines, deadline);
-            if (commonprefix) {
-              diffs.unshift([DIFF_EQUAL, commonprefix]);
-            }
-            if (commonsuffix) {
-              diffs.push([DIFF_EQUAL, commonsuffix]);
-            }
-            this.diff_cleanupMerge(diffs);
-            return diffs;
-          };
-          diff_match_patch2.prototype.diff_compute_ = function(text1, text2, checklines, deadline) {
-            var diffs;
-            if (!text1) {
-              return [[DIFF_INSERT, text2]];
-            }
-            if (!text2) {
-              return [[DIFF_DELETE, text1]];
-            }
-            var longtext = text1.length > text2.length ? text1 : text2;
-            var shorttext = text1.length > text2.length ? text2 : text1;
-            var i2 = longtext.indexOf(shorttext);
-            if (i2 != -1) {
-              diffs = [
-                [DIFF_INSERT, longtext.substring(0, i2)],
-                [DIFF_EQUAL, shorttext],
-                [DIFF_INSERT, longtext.substring(i2 + shorttext.length)]
-              ];
-              if (text1.length > text2.length) {
-                diffs[0][0] = diffs[2][0] = DIFF_DELETE;
-              }
-              return diffs;
-            }
-            if (shorttext.length == 1) {
-              return [[DIFF_DELETE, text1], [DIFF_INSERT, text2]];
-            }
-            var hm = this.diff_halfMatch_(text1, text2);
-            if (hm) {
-              var text1_a = hm[0];
-              var text1_b = hm[1];
-              var text2_a = hm[2];
-              var text2_b = hm[3];
-              var mid_common = hm[4];
-              var diffs_a = this.diff_main(text1_a, text2_a, checklines, deadline);
-              var diffs_b = this.diff_main(text1_b, text2_b, checklines, deadline);
-              return diffs_a.concat([[DIFF_EQUAL, mid_common]], diffs_b);
-            }
-            if (checklines && text1.length > 100 && text2.length > 100) {
-              return this.diff_lineMode_(text1, text2, deadline);
-            }
-            return this.diff_bisect_(text1, text2, deadline);
-          };
-          diff_match_patch2.prototype.diff_lineMode_ = function(text1, text2, deadline) {
-            var a2 = this.diff_linesToChars_(text1, text2);
-            text1 = a2.chars1;
-            text2 = a2.chars2;
-            var linearray = a2.lineArray;
-            var diffs = this.diff_main(text1, text2, false, deadline);
-            this.diff_charsToLines_(diffs, linearray);
-            this.diff_cleanupSemantic(diffs);
-            diffs.push([DIFF_EQUAL, ""]);
-            var pointer = 0;
-            var count_delete = 0;
-            var count_insert = 0;
-            var text_delete = "";
-            var text_insert = "";
-            while (pointer < diffs.length) {
-              switch (diffs[pointer][0]) {
-                case DIFF_INSERT:
-                  count_insert++;
-                  text_insert += diffs[pointer][1];
-                  break;
-                case DIFF_DELETE:
-                  count_delete++;
-                  text_delete += diffs[pointer][1];
-                  break;
-                case DIFF_EQUAL:
-                  if (count_delete >= 1 && count_insert >= 1) {
-                    diffs.splice(
-                      pointer - count_delete - count_insert,
-                      count_delete + count_insert
-                    );
-                    pointer = pointer - count_delete - count_insert;
-                    var a2 = this.diff_main(text_delete, text_insert, false, deadline);
-                    for (var j2 = a2.length - 1; j2 >= 0; j2--) {
-                      diffs.splice(pointer, 0, a2[j2]);
-                    }
-                    pointer = pointer + a2.length;
-                  }
-                  count_insert = 0;
-                  count_delete = 0;
-                  text_delete = "";
-                  text_insert = "";
-                  break;
-              }
-              pointer++;
-            }
-            diffs.pop();
-            return diffs;
-          };
-          diff_match_patch2.prototype.diff_bisect_ = function(text1, text2, deadline) {
-            var text1_length = text1.length;
-            var text2_length = text2.length;
-            var max_d = Math.ceil((text1_length + text2_length) / 2);
-            var v_offset = max_d;
-            var v_length = 2 * max_d;
-            var v1 = new Array(v_length);
-            var v2 = new Array(v_length);
-            for (var x2 = 0; x2 < v_length; x2++) {
-              v1[x2] = -1;
-              v2[x2] = -1;
-            }
-            v1[v_offset + 1] = 0;
-            v2[v_offset + 1] = 0;
-            var delta = text1_length - text2_length;
-            var front = delta % 2 != 0;
-            var k1start = 0;
-            var k1end = 0;
-            var k2start = 0;
-            var k2end = 0;
-            for (var d2 = 0; d2 < max_d; d2++) {
-              if ((/* @__PURE__ */ new Date()).getTime() > deadline) {
-                break;
-              }
-              for (var k1 = -d2 + k1start; k1 <= d2 - k1end; k1 += 2) {
-                var k1_offset = v_offset + k1;
-                var x1;
-                if (k1 == -d2 || k1 != d2 && v1[k1_offset - 1] < v1[k1_offset + 1]) {
-                  x1 = v1[k1_offset + 1];
-                } else {
-                  x1 = v1[k1_offset - 1] + 1;
-                }
-                var y1 = x1 - k1;
-                while (x1 < text1_length && y1 < text2_length && text1.charAt(x1) == text2.charAt(y1)) {
-                  x1++;
-                  y1++;
-                }
-                v1[k1_offset] = x1;
-                if (x1 > text1_length) {
-                  k1end += 2;
-                } else if (y1 > text2_length) {
-                  k1start += 2;
-                } else if (front) {
-                  var k2_offset = v_offset + delta - k1;
-                  if (k2_offset >= 0 && k2_offset < v_length && v2[k2_offset] != -1) {
-                    var x22 = text1_length - v2[k2_offset];
-                    if (x1 >= x22) {
-                      return this.diff_bisectSplit_(text1, text2, x1, y1, deadline);
-                    }
-                  }
-                }
-              }
-              for (var k2 = -d2 + k2start; k2 <= d2 - k2end; k2 += 2) {
-                var k2_offset = v_offset + k2;
-                var x22;
-                if (k2 == -d2 || k2 != d2 && v2[k2_offset - 1] < v2[k2_offset + 1]) {
-                  x22 = v2[k2_offset + 1];
-                } else {
-                  x22 = v2[k2_offset - 1] + 1;
-                }
-                var y2 = x22 - k2;
-                while (x22 < text1_length && y2 < text2_length && text1.charAt(text1_length - x22 - 1) == text2.charAt(text2_length - y2 - 1)) {
-                  x22++;
-                  y2++;
-                }
-                v2[k2_offset] = x22;
-                if (x22 > text1_length) {
-                  k2end += 2;
-                } else if (y2 > text2_length) {
-                  k2start += 2;
-                } else if (!front) {
-                  var k1_offset = v_offset + delta - k2;
-                  if (k1_offset >= 0 && k1_offset < v_length && v1[k1_offset] != -1) {
-                    var x1 = v1[k1_offset];
-                    var y1 = v_offset + x1 - k1_offset;
-                    x22 = text1_length - x22;
-                    if (x1 >= x22) {
-                      return this.diff_bisectSplit_(text1, text2, x1, y1, deadline);
-                    }
-                  }
-                }
-              }
-            }
-            return [[DIFF_DELETE, text1], [DIFF_INSERT, text2]];
-          };
-          diff_match_patch2.prototype.diff_bisectSplit_ = function(text1, text2, x2, y2, deadline) {
-            var text1a = text1.substring(0, x2);
-            var text2a = text2.substring(0, y2);
-            var text1b = text1.substring(x2);
-            var text2b = text2.substring(y2);
-            var diffs = this.diff_main(text1a, text2a, false, deadline);
-            var diffsb = this.diff_main(text1b, text2b, false, deadline);
-            return diffs.concat(diffsb);
-          };
-          diff_match_patch2.prototype.diff_linesToChars_ = function(text1, text2) {
-            var lineArray = [];
-            var lineHash = {};
-            lineArray[0] = "";
-            function diff_linesToCharsMunge_(text3) {
-              var chars3 = "";
-              var lineStart = 0;
-              var lineEnd = -1;
-              var lineArrayLength = lineArray.length;
-              while (lineEnd < text3.length - 1) {
-                lineEnd = text3.indexOf("\n", lineStart);
-                if (lineEnd == -1) {
-                  lineEnd = text3.length - 1;
-                }
-                var line = text3.substring(lineStart, lineEnd + 1);
-                lineStart = lineEnd + 1;
-                if (lineHash.hasOwnProperty ? lineHash.hasOwnProperty(line) : lineHash[line] !== void 0) {
-                  chars3 += String.fromCharCode(lineHash[line]);
-                } else {
-                  chars3 += String.fromCharCode(lineArrayLength);
-                  lineHash[line] = lineArrayLength;
-                  lineArray[lineArrayLength++] = line;
-                }
-              }
-              return chars3;
-            }
-            __name(diff_linesToCharsMunge_, "diff_linesToCharsMunge_");
-            var chars1 = diff_linesToCharsMunge_(text1);
-            var chars2 = diff_linesToCharsMunge_(text2);
-            return { chars1, chars2, lineArray };
-          };
-          diff_match_patch2.prototype.diff_charsToLines_ = function(diffs, lineArray) {
-            for (var x2 = 0; x2 < diffs.length; x2++) {
-              var chars2 = diffs[x2][1];
-              var text2 = [];
-              for (var y2 = 0; y2 < chars2.length; y2++) {
-                text2[y2] = lineArray[chars2.charCodeAt(y2)];
-              }
-              diffs[x2][1] = text2.join("");
-            }
-          };
-          diff_match_patch2.prototype.diff_commonPrefix = function(text1, text2) {
-            if (!text1 || !text2 || text1.charAt(0) != text2.charAt(0)) {
-              return 0;
-            }
-            var pointermin = 0;
-            var pointermax = Math.min(text1.length, text2.length);
-            var pointermid = pointermax;
-            var pointerstart = 0;
-            while (pointermin < pointermid) {
-              if (text1.substring(pointerstart, pointermid) == text2.substring(pointerstart, pointermid)) {
-                pointermin = pointermid;
-                pointerstart = pointermin;
-              } else {
-                pointermax = pointermid;
-              }
-              pointermid = Math.floor((pointermax - pointermin) / 2 + pointermin);
-            }
-            return pointermid;
-          };
-          diff_match_patch2.prototype.diff_commonSuffix = function(text1, text2) {
-            if (!text1 || !text2 || text1.charAt(text1.length - 1) != text2.charAt(text2.length - 1)) {
-              return 0;
-            }
-            var pointermin = 0;
-            var pointermax = Math.min(text1.length, text2.length);
-            var pointermid = pointermax;
-            var pointerend = 0;
-            while (pointermin < pointermid) {
-              if (text1.substring(text1.length - pointermid, text1.length - pointerend) == text2.substring(text2.length - pointermid, text2.length - pointerend)) {
-                pointermin = pointermid;
-                pointerend = pointermin;
-              } else {
-                pointermax = pointermid;
-              }
-              pointermid = Math.floor((pointermax - pointermin) / 2 + pointermin);
-            }
-            return pointermid;
-          };
-          diff_match_patch2.prototype.diff_commonOverlap_ = function(text1, text2) {
-            var text1_length = text1.length;
-            var text2_length = text2.length;
-            if (text1_length == 0 || text2_length == 0) {
-              return 0;
-            }
-            if (text1_length > text2_length) {
-              text1 = text1.substring(text1_length - text2_length);
-            } else if (text1_length < text2_length) {
-              text2 = text2.substring(0, text1_length);
-            }
-            var text_length = Math.min(text1_length, text2_length);
-            if (text1 == text2) {
-              return text_length;
-            }
-            var best = 0;
-            var length = 1;
-            while (true) {
-              var pattern = text1.substring(text_length - length);
-              var found = text2.indexOf(pattern);
-              if (found == -1) {
-                return best;
-              }
-              length += found;
-              if (found == 0 || text1.substring(text_length - length) == text2.substring(0, length)) {
-                best = length;
-                length++;
-              }
-            }
-          };
-          diff_match_patch2.prototype.diff_halfMatch_ = function(text1, text2) {
-            if (this.Diff_Timeout <= 0) {
-              return null;
-            }
-            var longtext = text1.length > text2.length ? text1 : text2;
-            var shorttext = text1.length > text2.length ? text2 : text1;
-            if (longtext.length < 4 || shorttext.length * 2 < longtext.length) {
-              return null;
-            }
-            var dmp = this;
-            function diff_halfMatchI_(longtext2, shorttext2, i2) {
-              var seed = longtext2.substring(i2, i2 + Math.floor(longtext2.length / 4));
-              var j2 = -1;
-              var best_common = "";
-              var best_longtext_a, best_longtext_b, best_shorttext_a, best_shorttext_b;
-              while ((j2 = shorttext2.indexOf(seed, j2 + 1)) != -1) {
-                var prefixLength = dmp.diff_commonPrefix(
-                  longtext2.substring(i2),
-                  shorttext2.substring(j2)
-                );
-                var suffixLength = dmp.diff_commonSuffix(
-                  longtext2.substring(0, i2),
-                  shorttext2.substring(0, j2)
-                );
-                if (best_common.length < suffixLength + prefixLength) {
-                  best_common = shorttext2.substring(j2 - suffixLength, j2) + shorttext2.substring(j2, j2 + prefixLength);
-                  best_longtext_a = longtext2.substring(0, i2 - suffixLength);
-                  best_longtext_b = longtext2.substring(i2 + prefixLength);
-                  best_shorttext_a = shorttext2.substring(0, j2 - suffixLength);
-                  best_shorttext_b = shorttext2.substring(j2 + prefixLength);
-                }
-              }
-              if (best_common.length * 2 >= longtext2.length) {
-                return [
-                  best_longtext_a,
-                  best_longtext_b,
-                  best_shorttext_a,
-                  best_shorttext_b,
-                  best_common
-                ];
-              } else {
-                return null;
-              }
-            }
-            __name(diff_halfMatchI_, "diff_halfMatchI_");
-            var hm1 = diff_halfMatchI_(
-              longtext,
-              shorttext,
-              Math.ceil(longtext.length / 4)
-            );
-            var hm2 = diff_halfMatchI_(
-              longtext,
-              shorttext,
-              Math.ceil(longtext.length / 2)
-            );
-            var hm;
-            if (!hm1 && !hm2) {
-              return null;
-            } else if (!hm2) {
-              hm = hm1;
-            } else if (!hm1) {
-              hm = hm2;
-            } else {
-              hm = hm1[4].length > hm2[4].length ? hm1 : hm2;
-            }
-            var text1_a, text1_b, text2_a, text2_b;
-            if (text1.length > text2.length) {
-              text1_a = hm[0];
-              text1_b = hm[1];
-              text2_a = hm[2];
-              text2_b = hm[3];
-            } else {
-              text2_a = hm[0];
-              text2_b = hm[1];
-              text1_a = hm[2];
-              text1_b = hm[3];
-            }
-            var mid_common = hm[4];
-            return [text1_a, text1_b, text2_a, text2_b, mid_common];
-          };
-          diff_match_patch2.prototype.diff_cleanupSemantic = function(diffs) {
-            var changes = false;
-            var equalities = [];
-            var equalitiesLength = 0;
-            var lastequality = null;
-            var pointer = 0;
-            var length_insertions1 = 0;
-            var length_deletions1 = 0;
-            var length_insertions2 = 0;
-            var length_deletions2 = 0;
-            while (pointer < diffs.length) {
-              if (diffs[pointer][0] == DIFF_EQUAL) {
-                equalities[equalitiesLength++] = pointer;
-                length_insertions1 = length_insertions2;
-                length_deletions1 = length_deletions2;
-                length_insertions2 = 0;
-                length_deletions2 = 0;
-                lastequality = diffs[pointer][1];
-              } else {
-                if (diffs[pointer][0] == DIFF_INSERT) {
-                  length_insertions2 += diffs[pointer][1].length;
-                } else {
-                  length_deletions2 += diffs[pointer][1].length;
-                }
-                if (lastequality && lastequality.length <= Math.max(length_insertions1, length_deletions1) && lastequality.length <= Math.max(
-                  length_insertions2,
-                  length_deletions2
-                )) {
-                  diffs.splice(
-                    equalities[equalitiesLength - 1],
-                    0,
-                    [DIFF_DELETE, lastequality]
-                  );
-                  diffs[equalities[equalitiesLength - 1] + 1][0] = DIFF_INSERT;
-                  equalitiesLength--;
-                  equalitiesLength--;
-                  pointer = equalitiesLength > 0 ? equalities[equalitiesLength - 1] : -1;
-                  length_insertions1 = 0;
-                  length_deletions1 = 0;
-                  length_insertions2 = 0;
-                  length_deletions2 = 0;
-                  lastequality = null;
-                  changes = true;
-                }
-              }
-              pointer++;
-            }
-            if (changes) {
-              this.diff_cleanupMerge(diffs);
-            }
-            this.diff_cleanupSemanticLossless(diffs);
-            pointer = 1;
-            while (pointer < diffs.length) {
-              if (diffs[pointer - 1][0] == DIFF_DELETE && diffs[pointer][0] == DIFF_INSERT) {
-                var deletion = diffs[pointer - 1][1];
-                var insertion = diffs[pointer][1];
-                var overlap_length1 = this.diff_commonOverlap_(deletion, insertion);
-                var overlap_length2 = this.diff_commonOverlap_(insertion, deletion);
-                if (overlap_length1 >= overlap_length2) {
-                  if (overlap_length1 >= deletion.length / 2 || overlap_length1 >= insertion.length / 2) {
-                    diffs.splice(
-                      pointer,
-                      0,
-                      [DIFF_EQUAL, insertion.substring(0, overlap_length1)]
-                    );
-                    diffs[pointer - 1][1] = deletion.substring(0, deletion.length - overlap_length1);
-                    diffs[pointer + 1][1] = insertion.substring(overlap_length1);
-                    pointer++;
-                  }
-                } else {
-                  if (overlap_length2 >= deletion.length / 2 || overlap_length2 >= insertion.length / 2) {
-                    diffs.splice(
-                      pointer,
-                      0,
-                      [DIFF_EQUAL, deletion.substring(0, overlap_length2)]
-                    );
-                    diffs[pointer - 1][0] = DIFF_INSERT;
-                    diffs[pointer - 1][1] = insertion.substring(0, insertion.length - overlap_length2);
-                    diffs[pointer + 1][0] = DIFF_DELETE;
-                    diffs[pointer + 1][1] = deletion.substring(overlap_length2);
-                    pointer++;
-                  }
-                }
-                pointer++;
-              }
-              pointer++;
-            }
-          };
-          diff_match_patch2.prototype.diff_cleanupSemanticLossless = function(diffs) {
-            function diff_cleanupSemanticScore_(one2, two) {
-              if (!one2 || !two) {
-                return 6;
-              }
-              var char1 = one2.charAt(one2.length - 1);
-              var char2 = two.charAt(0);
-              var nonAlphaNumeric1 = char1.match(diff_match_patch2.nonAlphaNumericRegex_);
-              var nonAlphaNumeric2 = char2.match(diff_match_patch2.nonAlphaNumericRegex_);
-              var whitespace1 = nonAlphaNumeric1 && char1.match(diff_match_patch2.whitespaceRegex_);
-              var whitespace2 = nonAlphaNumeric2 && char2.match(diff_match_patch2.whitespaceRegex_);
-              var lineBreak1 = whitespace1 && char1.match(diff_match_patch2.linebreakRegex_);
-              var lineBreak2 = whitespace2 && char2.match(diff_match_patch2.linebreakRegex_);
-              var blankLine1 = lineBreak1 && one2.match(diff_match_patch2.blanklineEndRegex_);
-              var blankLine2 = lineBreak2 && two.match(diff_match_patch2.blanklineStartRegex_);
-              if (blankLine1 || blankLine2) {
-                return 5;
-              } else if (lineBreak1 || lineBreak2) {
-                return 4;
-              } else if (nonAlphaNumeric1 && !whitespace1 && whitespace2) {
-                return 3;
-              } else if (whitespace1 || whitespace2) {
-                return 2;
-              } else if (nonAlphaNumeric1 || nonAlphaNumeric2) {
-                return 1;
-              }
-              return 0;
-            }
-            __name(diff_cleanupSemanticScore_, "diff_cleanupSemanticScore_");
-            var pointer = 1;
-            while (pointer < diffs.length - 1) {
-              if (diffs[pointer - 1][0] == DIFF_EQUAL && diffs[pointer + 1][0] == DIFF_EQUAL) {
-                var equality1 = diffs[pointer - 1][1];
-                var edit = diffs[pointer][1];
-                var equality2 = diffs[pointer + 1][1];
-                var commonOffset = this.diff_commonSuffix(equality1, edit);
-                if (commonOffset) {
-                  var commonString = edit.substring(edit.length - commonOffset);
-                  equality1 = equality1.substring(0, equality1.length - commonOffset);
-                  edit = commonString + edit.substring(0, edit.length - commonOffset);
-                  equality2 = commonString + equality2;
-                }
-                var bestEquality1 = equality1;
-                var bestEdit = edit;
-                var bestEquality2 = equality2;
-                var bestScore = diff_cleanupSemanticScore_(equality1, edit) + diff_cleanupSemanticScore_(edit, equality2);
-                while (edit.charAt(0) === equality2.charAt(0)) {
-                  equality1 += edit.charAt(0);
-                  edit = edit.substring(1) + equality2.charAt(0);
-                  equality2 = equality2.substring(1);
-                  var score = diff_cleanupSemanticScore_(equality1, edit) + diff_cleanupSemanticScore_(edit, equality2);
-                  if (score >= bestScore) {
-                    bestScore = score;
-                    bestEquality1 = equality1;
-                    bestEdit = edit;
-                    bestEquality2 = equality2;
-                  }
-                }
-                if (diffs[pointer - 1][1] != bestEquality1) {
-                  if (bestEquality1) {
-                    diffs[pointer - 1][1] = bestEquality1;
-                  } else {
-                    diffs.splice(pointer - 1, 1);
-                    pointer--;
-                  }
-                  diffs[pointer][1] = bestEdit;
-                  if (bestEquality2) {
-                    diffs[pointer + 1][1] = bestEquality2;
-                  } else {
-                    diffs.splice(pointer + 1, 1);
-                    pointer--;
-                  }
-                }
-              }
-              pointer++;
-            }
-          };
-          diff_match_patch2.nonAlphaNumericRegex_ = /[^a-zA-Z0-9]/;
-          diff_match_patch2.whitespaceRegex_ = /\s/;
-          diff_match_patch2.linebreakRegex_ = /[\r\n]/;
-          diff_match_patch2.blanklineEndRegex_ = /\n\r?\n$/;
-          diff_match_patch2.blanklineStartRegex_ = /^\r?\n\r?\n/;
-          diff_match_patch2.prototype.diff_cleanupEfficiency = function(diffs) {
-            var changes = false;
-            var equalities = [];
-            var equalitiesLength = 0;
-            var lastequality = null;
-            var pointer = 0;
-            var pre_ins = false;
-            var pre_del = false;
-            var post_ins = false;
-            var post_del = false;
-            while (pointer < diffs.length) {
-              if (diffs[pointer][0] == DIFF_EQUAL) {
-                if (diffs[pointer][1].length < this.Diff_EditCost && (post_ins || post_del)) {
-                  equalities[equalitiesLength++] = pointer;
-                  pre_ins = post_ins;
-                  pre_del = post_del;
-                  lastequality = diffs[pointer][1];
-                } else {
-                  equalitiesLength = 0;
-                  lastequality = null;
-                }
-                post_ins = post_del = false;
-              } else {
-                if (diffs[pointer][0] == DIFF_DELETE) {
-                  post_del = true;
-                } else {
-                  post_ins = true;
-                }
-                if (lastequality && (pre_ins && pre_del && post_ins && post_del || lastequality.length < this.Diff_EditCost / 2 && pre_ins + pre_del + post_ins + post_del == 3)) {
-                  diffs.splice(
-                    equalities[equalitiesLength - 1],
-                    0,
-                    [DIFF_DELETE, lastequality]
-                  );
-                  diffs[equalities[equalitiesLength - 1] + 1][0] = DIFF_INSERT;
-                  equalitiesLength--;
-                  lastequality = null;
-                  if (pre_ins && pre_del) {
-                    post_ins = post_del = true;
-                    equalitiesLength = 0;
-                  } else {
-                    equalitiesLength--;
-                    pointer = equalitiesLength > 0 ? equalities[equalitiesLength - 1] : -1;
-                    post_ins = post_del = false;
-                  }
-                  changes = true;
-                }
-              }
-              pointer++;
-            }
-            if (changes) {
-              this.diff_cleanupMerge(diffs);
-            }
-          };
-          diff_match_patch2.prototype.diff_cleanupMerge = function(diffs) {
-            diffs.push([DIFF_EQUAL, ""]);
-            var pointer = 0;
-            var count_delete = 0;
-            var count_insert = 0;
-            var text_delete = "";
-            var text_insert = "";
-            var commonlength;
-            while (pointer < diffs.length) {
-              switch (diffs[pointer][0]) {
-                case DIFF_INSERT:
-                  count_insert++;
-                  text_insert += diffs[pointer][1];
-                  pointer++;
-                  break;
-                case DIFF_DELETE:
-                  count_delete++;
-                  text_delete += diffs[pointer][1];
-                  pointer++;
-                  break;
-                case DIFF_EQUAL:
-                  if (count_delete + count_insert > 1) {
-                    if (count_delete !== 0 && count_insert !== 0) {
-                      commonlength = this.diff_commonPrefix(text_insert, text_delete);
-                      if (commonlength !== 0) {
-                        if (pointer - count_delete - count_insert > 0 && diffs[pointer - count_delete - count_insert - 1][0] == DIFF_EQUAL) {
-                          diffs[pointer - count_delete - count_insert - 1][1] += text_insert.substring(0, commonlength);
-                        } else {
-                          diffs.splice(0, 0, [
-                            DIFF_EQUAL,
-                            text_insert.substring(0, commonlength)
-                          ]);
-                          pointer++;
-                        }
-                        text_insert = text_insert.substring(commonlength);
-                        text_delete = text_delete.substring(commonlength);
-                      }
-                      commonlength = this.diff_commonSuffix(text_insert, text_delete);
-                      if (commonlength !== 0) {
-                        diffs[pointer][1] = text_insert.substring(text_insert.length - commonlength) + diffs[pointer][1];
-                        text_insert = text_insert.substring(0, text_insert.length - commonlength);
-                        text_delete = text_delete.substring(0, text_delete.length - commonlength);
-                      }
-                    }
-                    if (count_delete === 0) {
-                      diffs.splice(
-                        pointer - count_insert,
-                        count_delete + count_insert,
-                        [DIFF_INSERT, text_insert]
-                      );
-                    } else if (count_insert === 0) {
-                      diffs.splice(
-                        pointer - count_delete,
-                        count_delete + count_insert,
-                        [DIFF_DELETE, text_delete]
-                      );
-                    } else {
-                      diffs.splice(
-                        pointer - count_delete - count_insert,
-                        count_delete + count_insert,
-                        [DIFF_DELETE, text_delete],
-                        [DIFF_INSERT, text_insert]
-                      );
-                    }
-                    pointer = pointer - count_delete - count_insert + (count_delete ? 1 : 0) + (count_insert ? 1 : 0) + 1;
-                  } else if (pointer !== 0 && diffs[pointer - 1][0] == DIFF_EQUAL) {
-                    diffs[pointer - 1][1] += diffs[pointer][1];
-                    diffs.splice(pointer, 1);
-                  } else {
-                    pointer++;
-                  }
-                  count_insert = 0;
-                  count_delete = 0;
-                  text_delete = "";
-                  text_insert = "";
-                  break;
-              }
-            }
-            if (diffs[diffs.length - 1][1] === "") {
-              diffs.pop();
-            }
-            var changes = false;
-            pointer = 1;
-            while (pointer < diffs.length - 1) {
-              if (diffs[pointer - 1][0] == DIFF_EQUAL && diffs[pointer + 1][0] == DIFF_EQUAL) {
-                if (diffs[pointer][1].substring(diffs[pointer][1].length - diffs[pointer - 1][1].length) == diffs[pointer - 1][1]) {
-                  diffs[pointer][1] = diffs[pointer - 1][1] + diffs[pointer][1].substring(0, diffs[pointer][1].length - diffs[pointer - 1][1].length);
-                  diffs[pointer + 1][1] = diffs[pointer - 1][1] + diffs[pointer + 1][1];
-                  diffs.splice(pointer - 1, 1);
-                  changes = true;
-                } else if (diffs[pointer][1].substring(0, diffs[pointer + 1][1].length) == diffs[pointer + 1][1]) {
-                  diffs[pointer - 1][1] += diffs[pointer + 1][1];
-                  diffs[pointer][1] = diffs[pointer][1].substring(diffs[pointer + 1][1].length) + diffs[pointer + 1][1];
-                  diffs.splice(pointer + 1, 1);
-                  changes = true;
-                }
-              }
-              pointer++;
-            }
-            if (changes) {
-              this.diff_cleanupMerge(diffs);
-            }
-          };
-          diff_match_patch2.prototype.diff_xIndex = function(diffs, loc) {
-            var chars1 = 0;
-            var chars2 = 0;
-            var last_chars1 = 0;
-            var last_chars2 = 0;
-            var x2;
-            for (x2 = 0; x2 < diffs.length; x2++) {
-              if (diffs[x2][0] !== DIFF_INSERT) {
-                chars1 += diffs[x2][1].length;
-              }
-              if (diffs[x2][0] !== DIFF_DELETE) {
-                chars2 += diffs[x2][1].length;
-              }
-              if (chars1 > loc) {
-                break;
-              }
-              last_chars1 = chars1;
-              last_chars2 = chars2;
-            }
-            if (diffs.length != x2 && diffs[x2][0] === DIFF_DELETE) {
-              return last_chars2;
-            }
-            return last_chars2 + (loc - last_chars1);
-          };
-          diff_match_patch2.prototype.diff_prettyHtml = function(diffs) {
-            var html3 = [];
-            var pattern_amp = /&/g;
-            var pattern_lt = /</g;
-            var pattern_gt = />/g;
-            var pattern_para = /\n/g;
-            for (var x2 = 0; x2 < diffs.length; x2++) {
-              var op = diffs[x2][0];
-              var data = diffs[x2][1];
-              var text2 = data.replace(pattern_amp, "&amp;").replace(pattern_lt, "&lt;").replace(pattern_gt, "&gt;").replace(pattern_para, "&para;<br>");
-              switch (op) {
-                case DIFF_INSERT:
-                  html3[x2] = '<ins style="background:#e6ffe6;">' + text2 + "</ins>";
-                  break;
-                case DIFF_DELETE:
-                  html3[x2] = '<del style="background:#ffe6e6;">' + text2 + "</del>";
-                  break;
-                case DIFF_EQUAL:
-                  html3[x2] = "<span>" + text2 + "</span>";
-                  break;
-              }
-            }
-            return html3.join("");
-          };
-          diff_match_patch2.prototype.diff_text1 = function(diffs) {
-            var text2 = [];
-            for (var x2 = 0; x2 < diffs.length; x2++) {
-              if (diffs[x2][0] !== DIFF_INSERT) {
-                text2[x2] = diffs[x2][1];
-              }
-            }
-            return text2.join("");
-          };
-          diff_match_patch2.prototype.diff_text2 = function(diffs) {
-            var text2 = [];
-            for (var x2 = 0; x2 < diffs.length; x2++) {
-              if (diffs[x2][0] !== DIFF_DELETE) {
-                text2[x2] = diffs[x2][1];
-              }
-            }
-            return text2.join("");
-          };
-          diff_match_patch2.prototype.diff_levenshtein = function(diffs) {
-            var levenshtein = 0;
-            var insertions = 0;
-            var deletions = 0;
-            for (var x2 = 0; x2 < diffs.length; x2++) {
-              var op = diffs[x2][0];
-              var data = diffs[x2][1];
-              switch (op) {
-                case DIFF_INSERT:
-                  insertions += data.length;
-                  break;
-                case DIFF_DELETE:
-                  deletions += data.length;
-                  break;
-                case DIFF_EQUAL:
-                  levenshtein += Math.max(insertions, deletions);
-                  insertions = 0;
-                  deletions = 0;
-                  break;
-              }
-            }
-            levenshtein += Math.max(insertions, deletions);
-            return levenshtein;
-          };
-          diff_match_patch2.prototype.diff_toDelta = function(diffs) {
-            var text2 = [];
-            for (var x2 = 0; x2 < diffs.length; x2++) {
-              switch (diffs[x2][0]) {
-                case DIFF_INSERT:
-                  text2[x2] = "+" + encodeURI(diffs[x2][1]);
-                  break;
-                case DIFF_DELETE:
-                  text2[x2] = "-" + diffs[x2][1].length;
-                  break;
-                case DIFF_EQUAL:
-                  text2[x2] = "=" + diffs[x2][1].length;
-                  break;
-              }
-            }
-            return text2.join("	").replace(/%20/g, " ");
-          };
-          diff_match_patch2.prototype.diff_fromDelta = function(text1, delta) {
-            var diffs = [];
-            var diffsLength = 0;
-            var pointer = 0;
-            var tokens = delta.split(/\t/g);
-            for (var x2 = 0; x2 < tokens.length; x2++) {
-              var param = tokens[x2].substring(1);
-              switch (tokens[x2].charAt(0)) {
-                case "+":
-                  try {
-                    diffs[diffsLength++] = [DIFF_INSERT, decodeURI(param)];
-                  } catch (ex) {
-                    throw new Error("Illegal escape in diff_fromDelta: " + param);
-                  }
-                  break;
-                case "-":
-                // Fall through.
-                case "=":
-                  var n2 = parseInt(param, 10);
-                  if (isNaN(n2) || n2 < 0) {
-                    throw new Error("Invalid number in diff_fromDelta: " + param);
-                  }
-                  var text2 = text1.substring(pointer, pointer += n2);
-                  if (tokens[x2].charAt(0) == "=") {
-                    diffs[diffsLength++] = [DIFF_EQUAL, text2];
-                  } else {
-                    diffs[diffsLength++] = [DIFF_DELETE, text2];
-                  }
-                  break;
-                default:
-                  if (tokens[x2]) {
-                    throw new Error("Invalid diff operation in diff_fromDelta: " + tokens[x2]);
-                  }
-              }
-            }
-            if (pointer != text1.length) {
-              throw new Error("Delta length (" + pointer + ") does not equal source text length (" + text1.length + ").");
-            }
-            return diffs;
-          };
-          diff_match_patch2.prototype.match_main = function(text2, pattern, loc) {
-            if (text2 == null || pattern == null || loc == null) {
-              throw new Error("Null input. (match_main)");
-            }
-            loc = Math.max(0, Math.min(loc, text2.length));
-            if (text2 == pattern) {
-              return 0;
-            } else if (!text2.length) {
-              return -1;
-            } else if (text2.substring(loc, loc + pattern.length) == pattern) {
-              return loc;
-            } else {
-              return this.match_bitap_(text2, pattern, loc);
-            }
-          };
-          diff_match_patch2.prototype.match_bitap_ = function(text2, pattern, loc) {
-            if (pattern.length > this.Match_MaxBits) {
-              throw new Error("Pattern too long for this browser.");
-            }
-            var s2 = this.match_alphabet_(pattern);
-            var dmp = this;
-            function match_bitapScore_(e2, x2) {
-              var accuracy = e2 / pattern.length;
-              var proximity = Math.abs(loc - x2);
-              if (!dmp.Match_Distance) {
-                return proximity ? 1 : accuracy;
-              }
-              return accuracy + proximity / dmp.Match_Distance;
-            }
-            __name(match_bitapScore_, "match_bitapScore_");
-            var score_threshold = this.Match_Threshold;
-            var best_loc = text2.indexOf(pattern, loc);
-            if (best_loc != -1) {
-              score_threshold = Math.min(match_bitapScore_(0, best_loc), score_threshold);
-              best_loc = text2.lastIndexOf(pattern, loc + pattern.length);
-              if (best_loc != -1) {
-                score_threshold = Math.min(match_bitapScore_(0, best_loc), score_threshold);
-              }
-            }
-            var matchmask = 1 << pattern.length - 1;
-            best_loc = -1;
-            var bin_min, bin_mid;
-            var bin_max = pattern.length + text2.length;
-            var last_rd;
-            for (var d2 = 0; d2 < pattern.length; d2++) {
-              bin_min = 0;
-              bin_mid = bin_max;
-              while (bin_min < bin_mid) {
-                if (match_bitapScore_(d2, loc + bin_mid) <= score_threshold) {
-                  bin_min = bin_mid;
-                } else {
-                  bin_max = bin_mid;
-                }
-                bin_mid = Math.floor((bin_max - bin_min) / 2 + bin_min);
-              }
-              bin_max = bin_mid;
-              var start2 = Math.max(1, loc - bin_mid + 1);
-              var finish = Math.min(loc + bin_mid, text2.length) + pattern.length;
-              var rd = Array(finish + 2);
-              rd[finish + 1] = (1 << d2) - 1;
-              for (var j2 = finish; j2 >= start2; j2--) {
-                var charMatch = s2[text2.charAt(j2 - 1)];
-                if (d2 === 0) {
-                  rd[j2] = (rd[j2 + 1] << 1 | 1) & charMatch;
-                } else {
-                  rd[j2] = (rd[j2 + 1] << 1 | 1) & charMatch | ((last_rd[j2 + 1] | last_rd[j2]) << 1 | 1) | last_rd[j2 + 1];
-                }
-                if (rd[j2] & matchmask) {
-                  var score = match_bitapScore_(d2, j2 - 1);
-                  if (score <= score_threshold) {
-                    score_threshold = score;
-                    best_loc = j2 - 1;
-                    if (best_loc > loc) {
-                      start2 = Math.max(1, 2 * loc - best_loc);
-                    } else {
-                      break;
-                    }
-                  }
-                }
-              }
-              if (match_bitapScore_(d2 + 1, loc) > score_threshold) {
-                break;
-              }
-              last_rd = rd;
-            }
-            return best_loc;
-          };
-          diff_match_patch2.prototype.match_alphabet_ = function(pattern) {
-            var s2 = {};
-            for (var i2 = 0; i2 < pattern.length; i2++) {
-              s2[pattern.charAt(i2)] = 0;
-            }
-            for (var i2 = 0; i2 < pattern.length; i2++) {
-              s2[pattern.charAt(i2)] |= 1 << pattern.length - i2 - 1;
-            }
-            return s2;
-          };
-          diff_match_patch2.prototype.patch_addContext_ = function(patch3, text2) {
-            if (text2.length == 0) {
-              return;
-            }
-            var pattern = text2.substring(patch3.start2, patch3.start2 + patch3.length1);
-            var padding = 0;
-            while (text2.indexOf(pattern) != text2.lastIndexOf(pattern) && pattern.length < this.Match_MaxBits - this.Patch_Margin - this.Patch_Margin) {
-              padding += this.Patch_Margin;
-              pattern = text2.substring(
-                patch3.start2 - padding,
-                patch3.start2 + patch3.length1 + padding
-              );
-            }
-            padding += this.Patch_Margin;
-            var prefix2 = text2.substring(patch3.start2 - padding, patch3.start2);
-            if (prefix2) {
-              patch3.diffs.unshift([DIFF_EQUAL, prefix2]);
-            }
-            var suffix = text2.substring(
-              patch3.start2 + patch3.length1,
-              patch3.start2 + patch3.length1 + padding
-            );
-            if (suffix) {
-              patch3.diffs.push([DIFF_EQUAL, suffix]);
-            }
-            patch3.start1 -= prefix2.length;
-            patch3.start2 -= prefix2.length;
-            patch3.length1 += prefix2.length + suffix.length;
-            patch3.length2 += prefix2.length + suffix.length;
-          };
-          diff_match_patch2.prototype.patch_make = function(a2, opt_b, opt_c) {
-            var text1, diffs;
-            if (typeof a2 == "string" && typeof opt_b == "string" && typeof opt_c == "undefined") {
-              text1 = /** @type {string} */
-              a2;
-              diffs = this.diff_main(
-                text1,
-                /** @type {string} */
-                opt_b,
-                true
-              );
-              if (diffs.length > 2) {
-                this.diff_cleanupSemantic(diffs);
-                this.diff_cleanupEfficiency(diffs);
-              }
-            } else if (a2 && typeof a2 == "object" && typeof opt_b == "undefined" && typeof opt_c == "undefined") {
-              diffs = /** @type {!Array.<!diff_match_patch.Diff>} */
-              a2;
-              text1 = this.diff_text1(diffs);
-            } else if (typeof a2 == "string" && opt_b && typeof opt_b == "object" && typeof opt_c == "undefined") {
-              text1 = /** @type {string} */
-              a2;
-              diffs = /** @type {!Array.<!diff_match_patch.Diff>} */
-              opt_b;
-            } else if (typeof a2 == "string" && typeof opt_b == "string" && opt_c && typeof opt_c == "object") {
-              text1 = /** @type {string} */
-              a2;
-              diffs = /** @type {!Array.<!diff_match_patch.Diff>} */
-              opt_c;
-            } else {
-              throw new Error("Unknown call format to patch_make.");
-            }
-            if (diffs.length === 0) {
-              return [];
-            }
-            var patches = [];
-            var patch3 = new diff_match_patch2.patch_obj();
-            var patchDiffLength = 0;
-            var char_count1 = 0;
-            var char_count2 = 0;
-            var prepatch_text = text1;
-            var postpatch_text = text1;
-            for (var x2 = 0; x2 < diffs.length; x2++) {
-              var diff_type = diffs[x2][0];
-              var diff_text = diffs[x2][1];
-              if (!patchDiffLength && diff_type !== DIFF_EQUAL) {
-                patch3.start1 = char_count1;
-                patch3.start2 = char_count2;
-              }
-              switch (diff_type) {
-                case DIFF_INSERT:
-                  patch3.diffs[patchDiffLength++] = diffs[x2];
-                  patch3.length2 += diff_text.length;
-                  postpatch_text = postpatch_text.substring(0, char_count2) + diff_text + postpatch_text.substring(char_count2);
-                  break;
-                case DIFF_DELETE:
-                  patch3.length1 += diff_text.length;
-                  patch3.diffs[patchDiffLength++] = diffs[x2];
-                  postpatch_text = postpatch_text.substring(0, char_count2) + postpatch_text.substring(char_count2 + diff_text.length);
-                  break;
-                case DIFF_EQUAL:
-                  if (diff_text.length <= 2 * this.Patch_Margin && patchDiffLength && diffs.length != x2 + 1) {
-                    patch3.diffs[patchDiffLength++] = diffs[x2];
-                    patch3.length1 += diff_text.length;
-                    patch3.length2 += diff_text.length;
-                  } else if (diff_text.length >= 2 * this.Patch_Margin) {
-                    if (patchDiffLength) {
-                      this.patch_addContext_(patch3, prepatch_text);
-                      patches.push(patch3);
-                      patch3 = new diff_match_patch2.patch_obj();
-                      patchDiffLength = 0;
-                      prepatch_text = postpatch_text;
-                      char_count1 = char_count2;
-                    }
-                  }
-                  break;
-              }
-              if (diff_type !== DIFF_INSERT) {
-                char_count1 += diff_text.length;
-              }
-              if (diff_type !== DIFF_DELETE) {
-                char_count2 += diff_text.length;
-              }
-            }
-            if (patchDiffLength) {
-              this.patch_addContext_(patch3, prepatch_text);
-              patches.push(patch3);
-            }
-            return patches;
-          };
-          diff_match_patch2.prototype.patch_deepCopy = function(patches) {
-            var patchesCopy = [];
-            for (var x2 = 0; x2 < patches.length; x2++) {
-              var patch3 = patches[x2];
-              var patchCopy = new diff_match_patch2.patch_obj();
-              patchCopy.diffs = [];
-              for (var y2 = 0; y2 < patch3.diffs.length; y2++) {
-                patchCopy.diffs[y2] = patch3.diffs[y2].slice();
-              }
-              patchCopy.start1 = patch3.start1;
-              patchCopy.start2 = patch3.start2;
-              patchCopy.length1 = patch3.length1;
-              patchCopy.length2 = patch3.length2;
-              patchesCopy[x2] = patchCopy;
-            }
-            return patchesCopy;
-          };
-          diff_match_patch2.prototype.patch_apply = function(patches, text2) {
-            if (patches.length == 0) {
-              return [text2, []];
-            }
-            patches = this.patch_deepCopy(patches);
-            var nullPadding = this.patch_addPadding(patches);
-            text2 = nullPadding + text2 + nullPadding;
-            this.patch_splitMax(patches);
-            var delta = 0;
-            var results = [];
-            for (var x2 = 0; x2 < patches.length; x2++) {
-              var expected_loc = patches[x2].start2 + delta;
-              var text1 = this.diff_text1(patches[x2].diffs);
-              var start_loc;
-              var end_loc = -1;
-              if (text1.length > this.Match_MaxBits) {
-                start_loc = this.match_main(
-                  text2,
-                  text1.substring(0, this.Match_MaxBits),
-                  expected_loc
-                );
-                if (start_loc != -1) {
-                  end_loc = this.match_main(
-                    text2,
-                    text1.substring(text1.length - this.Match_MaxBits),
-                    expected_loc + text1.length - this.Match_MaxBits
-                  );
-                  if (end_loc == -1 || start_loc >= end_loc) {
-                    start_loc = -1;
-                  }
-                }
-              } else {
-                start_loc = this.match_main(text2, text1, expected_loc);
-              }
-              if (start_loc == -1) {
-                results[x2] = false;
-                delta -= patches[x2].length2 - patches[x2].length1;
-              } else {
-                results[x2] = true;
-                delta = start_loc - expected_loc;
-                var text22;
-                if (end_loc == -1) {
-                  text22 = text2.substring(start_loc, start_loc + text1.length);
-                } else {
-                  text22 = text2.substring(start_loc, end_loc + this.Match_MaxBits);
-                }
-                if (text1 == text22) {
-                  text2 = text2.substring(0, start_loc) + this.diff_text2(patches[x2].diffs) + text2.substring(start_loc + text1.length);
-                } else {
-                  var diffs = this.diff_main(text1, text22, false);
-                  if (text1.length > this.Match_MaxBits && this.diff_levenshtein(diffs) / text1.length > this.Patch_DeleteThreshold) {
-                    results[x2] = false;
-                  } else {
-                    this.diff_cleanupSemanticLossless(diffs);
-                    var index1 = 0;
-                    var index22;
-                    for (var y2 = 0; y2 < patches[x2].diffs.length; y2++) {
-                      var mod2 = patches[x2].diffs[y2];
-                      if (mod2[0] !== DIFF_EQUAL) {
-                        index22 = this.diff_xIndex(diffs, index1);
-                      }
-                      if (mod2[0] === DIFF_INSERT) {
-                        text2 = text2.substring(0, start_loc + index22) + mod2[1] + text2.substring(start_loc + index22);
-                      } else if (mod2[0] === DIFF_DELETE) {
-                        text2 = text2.substring(0, start_loc + index22) + text2.substring(start_loc + this.diff_xIndex(
-                          diffs,
-                          index1 + mod2[1].length
-                        ));
-                      }
-                      if (mod2[0] !== DIFF_DELETE) {
-                        index1 += mod2[1].length;
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            text2 = text2.substring(nullPadding.length, text2.length - nullPadding.length);
-            return [text2, results];
-          };
-          diff_match_patch2.prototype.patch_addPadding = function(patches) {
-            var paddingLength = this.Patch_Margin;
-            var nullPadding = "";
-            for (var x2 = 1; x2 <= paddingLength; x2++) {
-              nullPadding += String.fromCharCode(x2);
-            }
-            for (var x2 = 0; x2 < patches.length; x2++) {
-              patches[x2].start1 += paddingLength;
-              patches[x2].start2 += paddingLength;
-            }
-            var patch3 = patches[0];
-            var diffs = patch3.diffs;
-            if (diffs.length == 0 || diffs[0][0] != DIFF_EQUAL) {
-              diffs.unshift([DIFF_EQUAL, nullPadding]);
-              patch3.start1 -= paddingLength;
-              patch3.start2 -= paddingLength;
-              patch3.length1 += paddingLength;
-              patch3.length2 += paddingLength;
-            } else if (paddingLength > diffs[0][1].length) {
-              var extraLength = paddingLength - diffs[0][1].length;
-              diffs[0][1] = nullPadding.substring(diffs[0][1].length) + diffs[0][1];
-              patch3.start1 -= extraLength;
-              patch3.start2 -= extraLength;
-              patch3.length1 += extraLength;
-              patch3.length2 += extraLength;
-            }
-            patch3 = patches[patches.length - 1];
-            diffs = patch3.diffs;
-            if (diffs.length == 0 || diffs[diffs.length - 1][0] != DIFF_EQUAL) {
-              diffs.push([DIFF_EQUAL, nullPadding]);
-              patch3.length1 += paddingLength;
-              patch3.length2 += paddingLength;
-            } else if (paddingLength > diffs[diffs.length - 1][1].length) {
-              var extraLength = paddingLength - diffs[diffs.length - 1][1].length;
-              diffs[diffs.length - 1][1] += nullPadding.substring(0, extraLength);
-              patch3.length1 += extraLength;
-              patch3.length2 += extraLength;
-            }
-            return nullPadding;
-          };
-          diff_match_patch2.prototype.patch_splitMax = function(patches) {
-            var patch_size = this.Match_MaxBits;
-            for (var x2 = 0; x2 < patches.length; x2++) {
-              if (patches[x2].length1 <= patch_size) {
-                continue;
-              }
-              var bigpatch = patches[x2];
-              patches.splice(x2--, 1);
-              var start1 = bigpatch.start1;
-              var start2 = bigpatch.start2;
-              var precontext = "";
-              while (bigpatch.diffs.length !== 0) {
-                var patch3 = new diff_match_patch2.patch_obj();
-                var empty2 = true;
-                patch3.start1 = start1 - precontext.length;
-                patch3.start2 = start2 - precontext.length;
-                if (precontext !== "") {
-                  patch3.length1 = patch3.length2 = precontext.length;
-                  patch3.diffs.push([DIFF_EQUAL, precontext]);
-                }
-                while (bigpatch.diffs.length !== 0 && patch3.length1 < patch_size - this.Patch_Margin) {
-                  var diff_type = bigpatch.diffs[0][0];
-                  var diff_text = bigpatch.diffs[0][1];
-                  if (diff_type === DIFF_INSERT) {
-                    patch3.length2 += diff_text.length;
-                    start2 += diff_text.length;
-                    patch3.diffs.push(bigpatch.diffs.shift());
-                    empty2 = false;
-                  } else if (diff_type === DIFF_DELETE && patch3.diffs.length == 1 && patch3.diffs[0][0] == DIFF_EQUAL && diff_text.length > 2 * patch_size) {
-                    patch3.length1 += diff_text.length;
-                    start1 += diff_text.length;
-                    empty2 = false;
-                    patch3.diffs.push([diff_type, diff_text]);
-                    bigpatch.diffs.shift();
-                  } else {
-                    diff_text = diff_text.substring(
-                      0,
-                      patch_size - patch3.length1 - this.Patch_Margin
-                    );
-                    patch3.length1 += diff_text.length;
-                    start1 += diff_text.length;
-                    if (diff_type === DIFF_EQUAL) {
-                      patch3.length2 += diff_text.length;
-                      start2 += diff_text.length;
-                    } else {
-                      empty2 = false;
-                    }
-                    patch3.diffs.push([diff_type, diff_text]);
-                    if (diff_text == bigpatch.diffs[0][1]) {
-                      bigpatch.diffs.shift();
-                    } else {
-                      bigpatch.diffs[0][1] = bigpatch.diffs[0][1].substring(diff_text.length);
-                    }
-                  }
-                }
-                precontext = this.diff_text2(patch3.diffs);
-                precontext = precontext.substring(precontext.length - this.Patch_Margin);
-                var postcontext = this.diff_text1(bigpatch.diffs).substring(0, this.Patch_Margin);
-                if (postcontext !== "") {
-                  patch3.length1 += postcontext.length;
-                  patch3.length2 += postcontext.length;
-                  if (patch3.diffs.length !== 0 && patch3.diffs[patch3.diffs.length - 1][0] === DIFF_EQUAL) {
-                    patch3.diffs[patch3.diffs.length - 1][1] += postcontext;
-                  } else {
-                    patch3.diffs.push([DIFF_EQUAL, postcontext]);
-                  }
-                }
-                if (!empty2) {
-                  patches.splice(++x2, 0, patch3);
-                }
-              }
-            }
-          };
-          diff_match_patch2.prototype.patch_toText = function(patches) {
-            var text2 = [];
-            for (var x2 = 0; x2 < patches.length; x2++) {
-              text2[x2] = patches[x2];
-            }
-            return text2.join("");
-          };
-          diff_match_patch2.prototype.patch_fromText = function(textline) {
-            var patches = [];
-            if (!textline) {
-              return patches;
-            }
-            var text2 = textline.split("\n");
-            var textPointer = 0;
-            var patchHeader = /^@@ -(\d+),?(\d*) \+(\d+),?(\d*) @@$/;
-            while (textPointer < text2.length) {
-              var m2 = text2[textPointer].match(patchHeader);
-              if (!m2) {
-                throw new Error("Invalid patch string: " + text2[textPointer]);
-              }
-              var patch3 = new diff_match_patch2.patch_obj();
-              patches.push(patch3);
-              patch3.start1 = parseInt(m2[1], 10);
-              if (m2[2] === "") {
-                patch3.start1--;
-                patch3.length1 = 1;
-              } else if (m2[2] == "0") {
-                patch3.length1 = 0;
-              } else {
-                patch3.start1--;
-                patch3.length1 = parseInt(m2[2], 10);
-              }
-              patch3.start2 = parseInt(m2[3], 10);
-              if (m2[4] === "") {
-                patch3.start2--;
-                patch3.length2 = 1;
-              } else if (m2[4] == "0") {
-                patch3.length2 = 0;
-              } else {
-                patch3.start2--;
-                patch3.length2 = parseInt(m2[4], 10);
-              }
-              textPointer++;
-              while (textPointer < text2.length) {
-                var sign = text2[textPointer].charAt(0);
-                try {
-                  var line = decodeURI(text2[textPointer].substring(1));
-                } catch (ex) {
-                  throw new Error("Illegal escape in patch_fromText: " + line);
-                }
-                if (sign == "-") {
-                  patch3.diffs.push([DIFF_DELETE, line]);
-                } else if (sign == "+") {
-                  patch3.diffs.push([DIFF_INSERT, line]);
-                } else if (sign == " ") {
-                  patch3.diffs.push([DIFF_EQUAL, line]);
-                } else if (sign == "@") {
-                  break;
-                } else if (sign === "") ;
-                else {
-                  throw new Error('Invalid patch mode "' + sign + '" in: ' + line);
-                }
-                textPointer++;
-              }
-            }
-            return patches;
-          };
-          diff_match_patch2.patch_obj = function() {
-            this.diffs = [];
-            this.start1 = null;
-            this.start2 = null;
-            this.length1 = 0;
-            this.length2 = 0;
-          };
-          diff_match_patch2.patch_obj.prototype.toString = function() {
-            var coords1, coords2;
-            if (this.length1 === 0) {
-              coords1 = this.start1 + ",0";
-            } else if (this.length1 == 1) {
-              coords1 = this.start1 + 1;
-            } else {
-              coords1 = this.start1 + 1 + "," + this.length1;
-            }
-            if (this.length2 === 0) {
-              coords2 = this.start2 + ",0";
-            } else if (this.length2 == 1) {
-              coords2 = this.start2 + 1;
-            } else {
-              coords2 = this.start2 + 1 + "," + this.length2;
-            }
-            var text2 = ["@@ -" + coords1 + " +" + coords2 + " @@\n"];
-            var op;
-            for (var x2 = 0; x2 < this.diffs.length; x2++) {
-              switch (this.diffs[x2][0]) {
-                case DIFF_INSERT:
-                  op = "+";
-                  break;
-                case DIFF_DELETE:
-                  op = "-";
-                  break;
-                case DIFF_EQUAL:
-                  op = " ";
-                  break;
-              }
-              text2[x2 + 1] = op + encodeURI(this.diffs[x2][1]) + "\n";
-            }
-            return text2.join("").replace(/%20/g, " ");
-          };
-          module3.exports = diff_match_patch2;
-          module3.exports["diff_match_patch"] = diff_match_patch2;
-          module3.exports["DIFF_DELETE"] = DIFF_DELETE;
-          module3.exports["DIFF_INSERT"] = DIFF_INSERT;
-          module3.exports["DIFF_EQUAL"] = DIFF_EQUAL;
-        });
-        var TEXT_DIFF = 2;
-        var DEFAULT_MIN_LENGTH = 60;
-        var cachedDiffPatch = null;
-        var getDiffMatchPatch = /* @__PURE__ */ __name(function getDiffMatchPatch2(required2) {
-          if (!cachedDiffPatch) {
-            var instance = void 0;
-            if (typeof diff_match_patch !== "undefined") {
-              instance = typeof diff_match_patch === "function" ? new diff_match_patch() : new diff_match_patch.diff_match_patch();
-            } else if (diffMatchPatch) {
-              try {
-                instance = diffMatchPatch && new diffMatchPatch();
-              } catch (err2) {
-                instance = null;
-              }
-            }
-            if (!instance) {
-              if (!required2) {
-                return null;
-              }
-              var error = new Error("text diff_match_patch library not found");
-              error.diff_match_patch_not_found = true;
-              throw error;
-            }
-            cachedDiffPatch = {
-              diff: /* @__PURE__ */ __name(function diff2(txt1, txt2) {
-                return instance.patch_toText(instance.patch_make(txt1, txt2));
-              }, "diff"),
-              patch: /* @__PURE__ */ __name(function patch3(txt1, _patch) {
-                var results = instance.patch_apply(instance.patch_fromText(_patch), txt1);
-                for (var i2 = 0; i2 < results[1].length; i2++) {
-                  if (!results[1][i2]) {
-                    var _error = new Error("text patch failed");
-                    _error.textPatchFailed = true;
-                  }
-                }
-                return results[0];
-              }, "patch")
-            };
-          }
-          return cachedDiffPatch;
-        }, "getDiffMatchPatch");
-        var diffFilter$3 = /* @__PURE__ */ __name(function textsDiffFilter(context2) {
-          if (context2.leftType !== "string") {
-            return;
-          }
-          var minLength = context2.options && context2.options.textDiff && context2.options.textDiff.minLength || DEFAULT_MIN_LENGTH;
-          if (context2.left.length < minLength || context2.right.length < minLength) {
-            context2.setResult([context2.left, context2.right]).exit();
-            return;
-          }
-          var diffMatchPatch$$1 = getDiffMatchPatch();
-          if (!diffMatchPatch$$1) {
-            context2.setResult([context2.left, context2.right]).exit();
-            return;
-          }
-          var diff2 = diffMatchPatch$$1.diff;
-          context2.setResult([diff2(context2.left, context2.right), 0, TEXT_DIFF]).exit();
-        }, "textsDiffFilter");
-        diffFilter$3.filterName = "texts";
-        var patchFilter$3 = /* @__PURE__ */ __name(function textsPatchFilter(context2) {
-          if (context2.nested) {
-            return;
-          }
-          if (context2.delta[2] !== TEXT_DIFF) {
-            return;
-          }
-          var patch3 = getDiffMatchPatch(true).patch;
-          context2.setResult(patch3(context2.left, context2.delta[0])).exit();
-        }, "textsPatchFilter");
-        patchFilter$3.filterName = "texts";
-        var textDeltaReverse = /* @__PURE__ */ __name(function textDeltaReverse2(delta) {
-          var i2 = void 0;
-          var l2 = void 0;
-          var lines = void 0;
-          var line = void 0;
-          var lineTmp = void 0;
-          var header = null;
-          var headerRegex = /^@@ +-(\d+),(\d+) +\+(\d+),(\d+) +@@$/;
-          var lineHeader = void 0;
-          lines = delta.split("\n");
-          for (i2 = 0, l2 = lines.length; i2 < l2; i2++) {
-            line = lines[i2];
-            var lineStart = line.slice(0, 1);
-            if (lineStart === "@") {
-              header = headerRegex.exec(line);
-              lineHeader = i2;
-              lines[lineHeader] = "@@ -" + header[3] + "," + header[4] + " +" + header[1] + "," + header[2] + " @@";
-            } else if (lineStart === "+") {
-              lines[i2] = "-" + lines[i2].slice(1);
-              if (lines[i2 - 1].slice(0, 1) === "+") {
-                lineTmp = lines[i2];
-                lines[i2] = lines[i2 - 1];
-                lines[i2 - 1] = lineTmp;
-              }
-            } else if (lineStart === "-") {
-              lines[i2] = "+" + lines[i2].slice(1);
-            }
-          }
-          return lines.join("\n");
-        }, "textDeltaReverse");
-        var reverseFilter$3 = /* @__PURE__ */ __name(function textsReverseFilter(context2) {
-          if (context2.nested) {
-            return;
-          }
-          if (context2.delta[2] !== TEXT_DIFF) {
-            return;
-          }
-          context2.setResult([textDeltaReverse(context2.delta[0]), 0, TEXT_DIFF]).exit();
-        }, "textsReverseFilter");
-        reverseFilter$3.filterName = "texts";
-        var DiffPatcher = function() {
-          function DiffPatcher2(options) {
-            classCallCheck2(this, DiffPatcher2);
-            this.processor = new Processor2(options);
-            this.processor.pipe(new Pipe("diff").append(collectChildrenDiffFilter, diffFilter, diffFilter$2, diffFilter$3, objectsDiffFilter, diffFilter$1).shouldHaveResult());
-            this.processor.pipe(new Pipe("patch").append(collectChildrenPatchFilter, collectChildrenPatchFilter$1, patchFilter, patchFilter$3, patchFilter$1, patchFilter$2).shouldHaveResult());
-            this.processor.pipe(new Pipe("reverse").append(collectChildrenReverseFilter, collectChildrenReverseFilter$1, reverseFilter, reverseFilter$3, reverseFilter$1, reverseFilter$2).shouldHaveResult());
-          }
-          __name(DiffPatcher2, "DiffPatcher");
-          createClass2(DiffPatcher2, [{
-            key: "options",
-            value: /* @__PURE__ */ __name(function options() {
-              var _processor;
-              return (_processor = this.processor).options.apply(_processor, arguments);
-            }, "options")
-          }, {
-            key: "diff",
-            value: /* @__PURE__ */ __name(function diff2(left2, right2) {
-              return this.processor.process(new DiffContext(left2, right2));
-            }, "diff")
-          }, {
-            key: "patch",
-            value: /* @__PURE__ */ __name(function patch3(left2, delta) {
-              return this.processor.process(new PatchContext(left2, delta));
-            }, "patch")
-          }, {
-            key: "reverse",
-            value: /* @__PURE__ */ __name(function reverse2(delta) {
-              return this.processor.process(new ReverseContext(delta));
-            }, "reverse")
-          }, {
-            key: "unpatch",
-            value: /* @__PURE__ */ __name(function unpatch2(right2, delta) {
-              return this.patch(right2, this.reverse(delta));
-            }, "unpatch")
-          }, {
-            key: "clone",
-            value: /* @__PURE__ */ __name(function clone$$1(value) {
-              return clone2(value);
-            }, "clone$$1")
-          }]);
-          return DiffPatcher2;
-        }();
-        var isArray$3 = typeof Array.isArray === "function" ? Array.isArray : function(a2) {
-          return a2 instanceof Array;
-        };
-        var getObjectKeys = typeof Object.keys === "function" ? function(obj) {
-          return Object.keys(obj);
-        } : function(obj) {
-          var names2 = [];
-          for (var property2 in obj) {
-            if (Object.prototype.hasOwnProperty.call(obj, property2)) {
-              names2.push(property2);
-            }
-          }
-          return names2;
-        };
-        var trimUnderscore = /* @__PURE__ */ __name(function trimUnderscore2(str) {
-          if (str.substr(0, 1) === "_") {
-            return str.slice(1);
-          }
-          return str;
-        }, "trimUnderscore");
-        var arrayKeyToSortNumber = /* @__PURE__ */ __name(function arrayKeyToSortNumber2(key) {
-          if (key === "_t") {
-            return -1;
-          } else {
-            if (key.substr(0, 1) === "_") {
-              return parseInt(key.slice(1), 10);
-            } else {
-              return parseInt(key, 10) + 0.1;
-            }
-          }
-        }, "arrayKeyToSortNumber");
-        var arrayKeyComparer = /* @__PURE__ */ __name(function arrayKeyComparer2(key1, key2) {
-          return arrayKeyToSortNumber(key1) - arrayKeyToSortNumber(key2);
-        }, "arrayKeyComparer");
-        var BaseFormatter = function() {
-          function BaseFormatter2() {
-            classCallCheck2(this, BaseFormatter2);
-          }
-          __name(BaseFormatter2, "BaseFormatter");
-          createClass2(BaseFormatter2, [{
-            key: "format",
-            value: /* @__PURE__ */ __name(function format3(delta, left2) {
-              var context2 = {};
-              this.prepareContext(context2);
-              this.recurse(context2, delta, left2);
-              return this.finalize(context2);
-            }, "format")
-          }, {
-            key: "prepareContext",
-            value: /* @__PURE__ */ __name(function prepareContext(context2) {
-              context2.buffer = [];
-              context2.out = function() {
-                var _buffer;
-                (_buffer = this.buffer).push.apply(_buffer, arguments);
-              };
-            }, "prepareContext")
-          }, {
-            key: "typeFormattterNotFound",
-            value: /* @__PURE__ */ __name(function typeFormattterNotFound(context2, deltaType) {
-              throw new Error("cannot format delta type: " + deltaType);
-            }, "typeFormattterNotFound")
-          }, {
-            key: "typeFormattterErrorFormatter",
-            value: /* @__PURE__ */ __name(function typeFormattterErrorFormatter(context2, err2) {
-              return err2.toString();
-            }, "typeFormattterErrorFormatter")
-          }, {
-            key: "finalize",
-            value: /* @__PURE__ */ __name(function finalize(_ref) {
-              var buffer2 = _ref.buffer;
-              if (isArray$3(buffer2)) {
-                return buffer2.join("");
-              }
-            }, "finalize")
-          }, {
-            key: "recurse",
-            value: /* @__PURE__ */ __name(function recurse(context2, delta, left2, key, leftKey, movedFrom, isLast) {
-              var useMoveOriginHere = delta && movedFrom;
-              var leftValue = useMoveOriginHere ? movedFrom.value : left2;
-              if (typeof delta === "undefined" && typeof key === "undefined") {
-                return void 0;
-              }
-              var type2 = this.getDeltaType(delta, movedFrom);
-              var nodeType = type2 === "node" ? delta._t === "a" ? "array" : "object" : "";
-              if (typeof key !== "undefined") {
-                this.nodeBegin(context2, key, leftKey, type2, nodeType, isLast);
-              } else {
-                this.rootBegin(context2, type2, nodeType);
-              }
-              var typeFormattter = void 0;
-              try {
-                typeFormattter = this["format_" + type2] || this.typeFormattterNotFound(context2, type2);
-                typeFormattter.call(this, context2, delta, leftValue, key, leftKey, movedFrom);
-              } catch (err2) {
-                this.typeFormattterErrorFormatter(context2, err2, delta, leftValue, key, leftKey, movedFrom);
-                if (typeof console !== "undefined" && console.error) {
-                  console.error(err2.stack);
-                }
-              }
-              if (typeof key !== "undefined") {
-                this.nodeEnd(context2, key, leftKey, type2, nodeType, isLast);
-              } else {
-                this.rootEnd(context2, type2, nodeType);
-              }
-            }, "recurse")
-          }, {
-            key: "formatDeltaChildren",
-            value: /* @__PURE__ */ __name(function formatDeltaChildren(context2, delta, left2) {
-              var self2 = this;
-              this.forEachDeltaKey(delta, left2, function(key, leftKey, movedFrom, isLast) {
-                self2.recurse(context2, delta[key], left2 ? left2[leftKey] : void 0, key, leftKey, movedFrom, isLast);
-              });
-            }, "formatDeltaChildren")
-          }, {
-            key: "forEachDeltaKey",
-            value: /* @__PURE__ */ __name(function forEachDeltaKey(delta, left2, fn2) {
-              var keys2 = getObjectKeys(delta);
-              var arrayKeys = delta._t === "a";
-              var moveDestinations = {};
-              var name2 = void 0;
-              if (typeof left2 !== "undefined") {
-                for (name2 in left2) {
-                  if (Object.prototype.hasOwnProperty.call(left2, name2)) {
-                    if (typeof delta[name2] === "undefined" && (!arrayKeys || typeof delta["_" + name2] === "undefined")) {
-                      keys2.push(name2);
-                    }
-                  }
-                }
-              }
-              for (name2 in delta) {
-                if (Object.prototype.hasOwnProperty.call(delta, name2)) {
-                  var value = delta[name2];
-                  if (isArray$3(value) && value[2] === 3) {
-                    moveDestinations[value[1].toString()] = {
-                      key: name2,
-                      value: left2 && left2[parseInt(name2.substr(1))]
-                    };
-                    if (this.includeMoveDestinations !== false) {
-                      if (typeof left2 === "undefined" && typeof delta[value[1]] === "undefined") {
-                        keys2.push(value[1].toString());
-                      }
-                    }
-                  }
-                }
-              }
-              if (arrayKeys) {
-                keys2.sort(arrayKeyComparer);
-              } else {
-                keys2.sort();
-              }
-              for (var index3 = 0, length = keys2.length; index3 < length; index3++) {
-                var key = keys2[index3];
-                if (arrayKeys && key === "_t") {
-                  continue;
-                }
-                var leftKey = arrayKeys ? typeof key === "number" ? key : parseInt(trimUnderscore(key), 10) : key;
-                var isLast = index3 === length - 1;
-                fn2(key, leftKey, moveDestinations[leftKey], isLast);
-              }
-            }, "forEachDeltaKey")
-          }, {
-            key: "getDeltaType",
-            value: /* @__PURE__ */ __name(function getDeltaType(delta, movedFrom) {
-              if (typeof delta === "undefined") {
-                if (typeof movedFrom !== "undefined") {
-                  return "movedestination";
-                }
-                return "unchanged";
-              }
-              if (isArray$3(delta)) {
-                if (delta.length === 1) {
-                  return "added";
-                }
-                if (delta.length === 2) {
-                  return "modified";
-                }
-                if (delta.length === 3 && delta[2] === 0) {
-                  return "deleted";
-                }
-                if (delta.length === 3 && delta[2] === 2) {
-                  return "textdiff";
-                }
-                if (delta.length === 3 && delta[2] === 3) {
-                  return "moved";
-                }
-              } else if ((typeof delta === "undefined" ? "undefined" : _typeof2(delta)) === "object") {
-                return "node";
-              }
-              return "unknown";
-            }, "getDeltaType")
-          }, {
-            key: "parseTextDiff",
-            value: /* @__PURE__ */ __name(function parseTextDiff(value) {
-              var output = [];
-              var lines = value.split("\n@@ ");
-              for (var i2 = 0, l2 = lines.length; i2 < l2; i2++) {
-                var line = lines[i2];
-                var lineOutput = {
-                  pieces: []
-                };
-                var location2 = /^(?:@@ )?[-+]?(\d+),(\d+)/.exec(line).slice(1);
-                lineOutput.location = {
-                  line: location2[0],
-                  chr: location2[1]
-                };
-                var pieces = line.split("\n").slice(1);
-                for (var pieceIndex = 0, piecesLength = pieces.length; pieceIndex < piecesLength; pieceIndex++) {
-                  var piece = pieces[pieceIndex];
-                  if (!piece.length) {
-                    continue;
-                  }
-                  var pieceOutput = {
-                    type: "context"
-                  };
-                  if (piece.substr(0, 1) === "+") {
-                    pieceOutput.type = "added";
-                  } else if (piece.substr(0, 1) === "-") {
-                    pieceOutput.type = "deleted";
-                  }
-                  pieceOutput.text = piece.slice(1);
-                  lineOutput.pieces.push(pieceOutput);
-                }
-                output.push(lineOutput);
-              }
-              return output;
-            }, "parseTextDiff")
-          }]);
-          return BaseFormatter2;
-        }();
-        var base = Object.freeze({
-          default: BaseFormatter
-        });
-        var HtmlFormatter = function(_BaseFormatter) {
-          inherits(HtmlFormatter2, _BaseFormatter);
-          function HtmlFormatter2() {
-            classCallCheck2(this, HtmlFormatter2);
-            return possibleConstructorReturn(this, (HtmlFormatter2.__proto__ || Object.getPrototypeOf(HtmlFormatter2)).apply(this, arguments));
-          }
-          __name(HtmlFormatter2, "HtmlFormatter");
-          createClass2(HtmlFormatter2, [{
-            key: "typeFormattterErrorFormatter",
-            value: /* @__PURE__ */ __name(function typeFormattterErrorFormatter(context2, err2) {
-              context2.out('<pre class="jsondiffpatch-error">' + err2 + "</pre>");
-            }, "typeFormattterErrorFormatter")
-          }, {
-            key: "formatValue",
-            value: /* @__PURE__ */ __name(function formatValue(context2, value) {
-              context2.out("<pre>" + htmlEscape(JSON.stringify(value, null, 2)) + "</pre>");
-            }, "formatValue")
-          }, {
-            key: "formatTextDiffString",
-            value: /* @__PURE__ */ __name(function formatTextDiffString(context2, value) {
-              var lines = this.parseTextDiff(value);
-              context2.out('<ul class="jsondiffpatch-textdiff">');
-              for (var i2 = 0, l2 = lines.length; i2 < l2; i2++) {
-                var line = lines[i2];
-                context2.out('<li><div class="jsondiffpatch-textdiff-location">' + ('<span class="jsondiffpatch-textdiff-line-number">' + line.location.line + '</span><span class="jsondiffpatch-textdiff-char">' + line.location.chr + '</span></div><div class="jsondiffpatch-textdiff-line">'));
-                var pieces = line.pieces;
-                for (var pieceIndex = 0, piecesLength = pieces.length; pieceIndex < piecesLength; pieceIndex++) {
-                  var piece = pieces[pieceIndex];
-                  context2.out('<span class="jsondiffpatch-textdiff-' + piece.type + '">' + htmlEscape(decodeURI(piece.text)) + "</span>");
-                }
-                context2.out("</div></li>");
-              }
-              context2.out("</ul>");
-            }, "formatTextDiffString")
-          }, {
-            key: "rootBegin",
-            value: /* @__PURE__ */ __name(function rootBegin(context2, type2, nodeType) {
-              var nodeClass = "jsondiffpatch-" + type2 + (nodeType ? " jsondiffpatch-child-node-type-" + nodeType : "");
-              context2.out('<div class="jsondiffpatch-delta ' + nodeClass + '">');
-            }, "rootBegin")
-          }, {
-            key: "rootEnd",
-            value: /* @__PURE__ */ __name(function rootEnd(context2) {
-              context2.out("</div>" + (context2.hasArrows ? '<script type="text/javascript">setTimeout(' + (adjustArrows.toString() + ",10);<\/script>") : ""));
-            }, "rootEnd")
-          }, {
-            key: "nodeBegin",
-            value: /* @__PURE__ */ __name(function nodeBegin(context2, key, leftKey, type2, nodeType) {
-              var nodeClass = "jsondiffpatch-" + type2 + (nodeType ? " jsondiffpatch-child-node-type-" + nodeType : "");
-              context2.out('<li class="' + nodeClass + '" data-key="' + leftKey + '">' + ('<div class="jsondiffpatch-property-name">' + leftKey + "</div>"));
-            }, "nodeBegin")
-          }, {
-            key: "nodeEnd",
-            value: /* @__PURE__ */ __name(function nodeEnd(context2) {
-              context2.out("</li>");
-            }, "nodeEnd")
-            /* jshint camelcase: false */
-            /* eslint-disable camelcase */
-          }, {
-            key: "format_unchanged",
-            value: /* @__PURE__ */ __name(function format_unchanged(context2, delta, left2) {
-              if (typeof left2 === "undefined") {
-                return;
-              }
-              context2.out('<div class="jsondiffpatch-value">');
-              this.formatValue(context2, left2);
-              context2.out("</div>");
-            }, "format_unchanged")
-          }, {
-            key: "format_movedestination",
-            value: /* @__PURE__ */ __name(function format_movedestination(context2, delta, left2) {
-              if (typeof left2 === "undefined") {
-                return;
-              }
-              context2.out('<div class="jsondiffpatch-value">');
-              this.formatValue(context2, left2);
-              context2.out("</div>");
-            }, "format_movedestination")
-          }, {
-            key: "format_node",
-            value: /* @__PURE__ */ __name(function format_node(context2, delta, left2) {
-              var nodeType = delta._t === "a" ? "array" : "object";
-              context2.out('<ul class="jsondiffpatch-node jsondiffpatch-node-type-' + nodeType + '">');
-              this.formatDeltaChildren(context2, delta, left2);
-              context2.out("</ul>");
-            }, "format_node")
-          }, {
-            key: "format_added",
-            value: /* @__PURE__ */ __name(function format_added(context2, delta) {
-              context2.out('<div class="jsondiffpatch-value">');
-              this.formatValue(context2, delta[0]);
-              context2.out("</div>");
-            }, "format_added")
-          }, {
-            key: "format_modified",
-            value: /* @__PURE__ */ __name(function format_modified(context2, delta) {
-              context2.out('<div class="jsondiffpatch-value jsondiffpatch-left-value">');
-              this.formatValue(context2, delta[0]);
-              context2.out('</div><div class="jsondiffpatch-value jsondiffpatch-right-value">');
-              this.formatValue(context2, delta[1]);
-              context2.out("</div>");
-            }, "format_modified")
-          }, {
-            key: "format_deleted",
-            value: /* @__PURE__ */ __name(function format_deleted(context2, delta) {
-              context2.out('<div class="jsondiffpatch-value">');
-              this.formatValue(context2, delta[0]);
-              context2.out("</div>");
-            }, "format_deleted")
-          }, {
-            key: "format_moved",
-            value: /* @__PURE__ */ __name(function format_moved(context2, delta) {
-              context2.out('<div class="jsondiffpatch-value">');
-              this.formatValue(context2, delta[0]);
-              context2.out('</div><div class="jsondiffpatch-moved-destination">' + delta[1] + "</div>");
-              context2.out(
-                /* jshint multistr: true */
-                '<div class="jsondiffpatch-arrow" style="position: relative; left: -34px;">\n          <svg width="30" height="60" style="position: absolute; display: none;">\n          <defs>\n              <marker id="markerArrow" markerWidth="8" markerHeight="8"\n                 refx="2" refy="4"\n                     orient="auto" markerUnits="userSpaceOnUse">\n                  <path d="M1,1 L1,7 L7,4 L1,1" style="fill: #339;" />\n              </marker>\n          </defs>\n          <path d="M30,0 Q-10,25 26,50"\n            style="stroke: #88f; stroke-width: 2px; fill: none; stroke-opacity: 0.5; marker-end: url(#markerArrow);"\n          ></path>\n          </svg>\n      </div>'
-              );
-              context2.hasArrows = true;
-            }, "format_moved")
-          }, {
-            key: "format_textdiff",
-            value: /* @__PURE__ */ __name(function format_textdiff(context2, delta) {
-              context2.out('<div class="jsondiffpatch-value">');
-              this.formatTextDiffString(context2, delta[0]);
-              context2.out("</div>");
-            }, "format_textdiff")
-          }]);
-          return HtmlFormatter2;
-        }(BaseFormatter);
-        function htmlEscape(text2) {
-          var html3 = text2;
-          var replacements = [[/&/g, "&amp;"], [/</g, "&lt;"], [/>/g, "&gt;"], [/'/g, "&apos;"], [/"/g, "&quot;"]];
-          for (var i2 = 0; i2 < replacements.length; i2++) {
-            html3 = html3.replace(replacements[i2][0], replacements[i2][1]);
-          }
-          return html3;
-        }
-        __name(htmlEscape, "htmlEscape");
-        var adjustArrows = /* @__PURE__ */ __name(function jsondiffpatchHtmlFormatterAdjustArrows(nodeArg) {
-          var node2 = nodeArg || document;
-          var getElementText = /* @__PURE__ */ __name(function getElementText2(_ref) {
-            var textContent = _ref.textContent, innerText = _ref.innerText;
-            return textContent || innerText;
-          }, "getElementText");
-          var eachByQuery = /* @__PURE__ */ __name(function eachByQuery2(el, query, fn2) {
-            var elems = el.querySelectorAll(query);
-            for (var i2 = 0, l2 = elems.length; i2 < l2; i2++) {
-              fn2(elems[i2]);
-            }
-          }, "eachByQuery");
-          var eachChildren = /* @__PURE__ */ __name(function eachChildren2(_ref2, fn2) {
-            var children = _ref2.children;
-            for (var i2 = 0, l2 = children.length; i2 < l2; i2++) {
-              fn2(children[i2], i2);
-            }
-          }, "eachChildren");
-          eachByQuery(node2, ".jsondiffpatch-arrow", function(_ref3) {
-            var parentNode = _ref3.parentNode, children = _ref3.children, style2 = _ref3.style;
-            var arrowParent = parentNode;
-            var svg2 = children[0];
-            var path2 = svg2.children[1];
-            svg2.style.display = "none";
-            var destination = getElementText(arrowParent.querySelector(".jsondiffpatch-moved-destination"));
-            var container = arrowParent.parentNode;
-            var destinationElem = void 0;
-            eachChildren(container, function(child) {
-              if (child.getAttribute("data-key") === destination) {
-                destinationElem = child;
-              }
-            });
-            if (!destinationElem) {
-              return;
-            }
-            try {
-              var distance2 = destinationElem.offsetTop - arrowParent.offsetTop;
-              svg2.setAttribute("height", Math.abs(distance2) + 6);
-              style2.top = -8 + (distance2 > 0 ? 0 : distance2) + "px";
-              var curve = distance2 > 0 ? "M30,0 Q-10," + Math.round(distance2 / 2) + " 26," + (distance2 - 4) : "M30," + -distance2 + " Q-10," + Math.round(-distance2 / 2) + " 26,4";
-              path2.setAttribute("d", curve);
-              svg2.style.display = "";
-            } catch (err2) {
-            }
-          });
-        }, "jsondiffpatchHtmlFormatterAdjustArrows");
-        var showUnchanged = /* @__PURE__ */ __name(function showUnchanged2(show2, node2, delay) {
-          var el = node2 || document.body;
-          var prefix2 = "jsondiffpatch-unchanged-";
-          var classes = {
-            showing: prefix2 + "showing",
-            hiding: prefix2 + "hiding",
-            visible: prefix2 + "visible",
-            hidden: prefix2 + "hidden"
-          };
-          var list2 = el.classList;
-          if (!list2) {
-            return;
-          }
-          if (!delay) {
-            list2.remove(classes.showing);
-            list2.remove(classes.hiding);
-            list2.remove(classes.visible);
-            list2.remove(classes.hidden);
-            if (show2 === false) {
-              list2.add(classes.hidden);
-            }
-            return;
-          }
-          if (show2 === false) {
-            list2.remove(classes.showing);
-            list2.add(classes.visible);
-            setTimeout(function() {
-              list2.add(classes.hiding);
-            }, 10);
-          } else {
-            list2.remove(classes.hiding);
-            list2.add(classes.showing);
-            list2.remove(classes.hidden);
-          }
-          var intervalId = setInterval(function() {
-            adjustArrows(el);
-          }, 100);
-          setTimeout(function() {
-            list2.remove(classes.showing);
-            list2.remove(classes.hiding);
-            if (show2 === false) {
-              list2.add(classes.hidden);
-              list2.remove(classes.visible);
-            } else {
-              list2.add(classes.visible);
-              list2.remove(classes.hidden);
-            }
-            setTimeout(function() {
-              list2.remove(classes.visible);
-              clearInterval(intervalId);
-            }, delay + 400);
-          }, delay);
-        }, "showUnchanged");
-        var hideUnchanged = /* @__PURE__ */ __name(function hideUnchanged2(node2, delay) {
-          return showUnchanged(false, node2, delay);
-        }, "hideUnchanged");
-        var defaultInstance = void 0;
-        function format2(delta, left2) {
-          if (!defaultInstance) {
-            defaultInstance = new HtmlFormatter();
-          }
-          return defaultInstance.format(delta, left2);
-        }
-        __name(format2, "format");
-        var html2 = Object.freeze({
-          showUnchanged,
-          hideUnchanged,
-          default: HtmlFormatter,
-          format: format2
-        });
-        var AnnotatedFormatter = function(_BaseFormatter) {
-          inherits(AnnotatedFormatter2, _BaseFormatter);
-          function AnnotatedFormatter2() {
-            classCallCheck2(this, AnnotatedFormatter2);
-            var _this = possibleConstructorReturn(this, (AnnotatedFormatter2.__proto__ || Object.getPrototypeOf(AnnotatedFormatter2)).call(this));
-            _this.includeMoveDestinations = false;
-            return _this;
-          }
-          __name(AnnotatedFormatter2, "AnnotatedFormatter");
-          createClass2(AnnotatedFormatter2, [{
-            key: "prepareContext",
-            value: /* @__PURE__ */ __name(function prepareContext(context2) {
-              get2(AnnotatedFormatter2.prototype.__proto__ || Object.getPrototypeOf(AnnotatedFormatter2.prototype), "prepareContext", this).call(this, context2);
-              context2.indent = function(levels) {
-                this.indentLevel = (this.indentLevel || 0) + (typeof levels === "undefined" ? 1 : levels);
-                this.indentPad = new Array(this.indentLevel + 1).join("&nbsp;&nbsp;");
-              };
-              context2.row = function(json, htmlNote) {
-                context2.out('<tr><td style="white-space: nowrap;"><pre class="jsondiffpatch-annotated-indent" style="display: inline-block">');
-                context2.out(context2.indentPad);
-                context2.out('</pre><pre style="display: inline-block">');
-                context2.out(json);
-                context2.out('</pre></td><td class="jsondiffpatch-delta-note"><div>');
-                context2.out(htmlNote);
-                context2.out("</div></td></tr>");
-              };
-            }, "prepareContext")
-          }, {
-            key: "typeFormattterErrorFormatter",
-            value: /* @__PURE__ */ __name(function typeFormattterErrorFormatter(context2, err2) {
-              context2.row("", '<pre class="jsondiffpatch-error">' + err2 + "</pre>");
-            }, "typeFormattterErrorFormatter")
-          }, {
-            key: "formatTextDiffString",
-            value: /* @__PURE__ */ __name(function formatTextDiffString(context2, value) {
-              var lines = this.parseTextDiff(value);
-              context2.out('<ul class="jsondiffpatch-textdiff">');
-              for (var i2 = 0, l2 = lines.length; i2 < l2; i2++) {
-                var line = lines[i2];
-                context2.out('<li><div class="jsondiffpatch-textdiff-location">' + ('<span class="jsondiffpatch-textdiff-line-number">' + line.location.line + '</span><span class="jsondiffpatch-textdiff-char">' + line.location.chr + '</span></div><div class="jsondiffpatch-textdiff-line">'));
-                var pieces = line.pieces;
-                for (var pieceIndex = 0, piecesLength = pieces.length; pieceIndex < piecesLength; pieceIndex++) {
-                  var piece = pieces[pieceIndex];
-                  context2.out('<span class="jsondiffpatch-textdiff-' + piece.type + '">' + piece.text + "</span>");
-                }
-                context2.out("</div></li>");
-              }
-              context2.out("</ul>");
-            }, "formatTextDiffString")
-          }, {
-            key: "rootBegin",
-            value: /* @__PURE__ */ __name(function rootBegin(context2, type2, nodeType) {
-              context2.out('<table class="jsondiffpatch-annotated-delta">');
-              if (type2 === "node") {
-                context2.row("{");
-                context2.indent();
-              }
-              if (nodeType === "array") {
-                context2.row('"_t": "a",', "Array delta (member names indicate array indices)");
-              }
-            }, "rootBegin")
-          }, {
-            key: "rootEnd",
-            value: /* @__PURE__ */ __name(function rootEnd(context2, type2) {
-              if (type2 === "node") {
-                context2.indent(-1);
-                context2.row("}");
-              }
-              context2.out("</table>");
-            }, "rootEnd")
-          }, {
-            key: "nodeBegin",
-            value: /* @__PURE__ */ __name(function nodeBegin(context2, key, leftKey, type2, nodeType) {
-              context2.row("&quot;" + key + "&quot;: {");
-              if (type2 === "node") {
-                context2.indent();
-              }
-              if (nodeType === "array") {
-                context2.row('"_t": "a",', "Array delta (member names indicate array indices)");
-              }
-            }, "nodeBegin")
-          }, {
-            key: "nodeEnd",
-            value: /* @__PURE__ */ __name(function nodeEnd(context2, key, leftKey, type2, nodeType, isLast) {
-              if (type2 === "node") {
-                context2.indent(-1);
-              }
-              context2.row("}" + (isLast ? "" : ","));
-            }, "nodeEnd")
-            /* jshint camelcase: false */
-            /* eslint-disable camelcase */
-          }, {
-            key: "format_unchanged",
-            value: /* @__PURE__ */ __name(function format_unchanged() {
-            }, "format_unchanged")
-          }, {
-            key: "format_movedestination",
-            value: /* @__PURE__ */ __name(function format_movedestination() {
-            }, "format_movedestination")
-          }, {
-            key: "format_node",
-            value: /* @__PURE__ */ __name(function format_node(context2, delta, left2) {
-              this.formatDeltaChildren(context2, delta, left2);
-            }, "format_node")
-          }]);
-          return AnnotatedFormatter2;
-        }(BaseFormatter);
-        var wrapPropertyName = /* @__PURE__ */ __name(function wrapPropertyName2(name2) {
-          return '<pre style="display:inline-block">&quot;' + name2 + "&quot;</pre>";
-        }, "wrapPropertyName");
-        var deltaAnnotations = {
-          added: /* @__PURE__ */ __name(function added(delta, left2, key, leftKey) {
-            var formatLegend = " <pre>([newValue])</pre>";
-            if (typeof leftKey === "undefined") {
-              return "new value" + formatLegend;
-            }
-            if (typeof leftKey === "number") {
-              return "insert at index " + leftKey + formatLegend;
-            }
-            return "add property " + wrapPropertyName(leftKey) + formatLegend;
-          }, "added"),
-          modified: /* @__PURE__ */ __name(function modified(delta, left2, key, leftKey) {
-            var formatLegend = " <pre>([previousValue, newValue])</pre>";
-            if (typeof leftKey === "undefined") {
-              return "modify value" + formatLegend;
-            }
-            if (typeof leftKey === "number") {
-              return "modify at index " + leftKey + formatLegend;
-            }
-            return "modify property " + wrapPropertyName(leftKey) + formatLegend;
-          }, "modified"),
-          deleted: /* @__PURE__ */ __name(function deleted(delta, left2, key, leftKey) {
-            var formatLegend = " <pre>([previousValue, 0, 0])</pre>";
-            if (typeof leftKey === "undefined") {
-              return "delete value" + formatLegend;
-            }
-            if (typeof leftKey === "number") {
-              return "remove index " + leftKey + formatLegend;
-            }
-            return "delete property " + wrapPropertyName(leftKey) + formatLegend;
-          }, "deleted"),
-          moved: /* @__PURE__ */ __name(function moved(delta, left2, key, leftKey) {
-            return 'move from <span title="(position to remove at original state)">' + ("index " + leftKey + '</span> to <span title="(position to insert at final') + (' state)">index ' + delta[1] + "</span>");
-          }, "moved"),
-          textdiff: /* @__PURE__ */ __name(function textdiff(delta, left2, key, leftKey) {
-            var location2 = typeof leftKey === "undefined" ? "" : typeof leftKey === "number" ? " at index " + leftKey : " at property " + wrapPropertyName(leftKey);
-            return "text diff" + location2 + ', format is <a href="https://code.google.com/p/google-diff-match-patch/wiki/Unidiff">a variation of Unidiff</a>';
-          }, "textdiff")
-        };
-        var formatAnyChange = /* @__PURE__ */ __name(function formatAnyChange2(context2, delta) {
-          var deltaType = this.getDeltaType(delta);
-          var annotator = deltaAnnotations[deltaType];
-          var htmlNote = annotator && annotator.apply(annotator, Array.prototype.slice.call(arguments, 1));
-          var json = JSON.stringify(delta, null, 2);
-          if (deltaType === "textdiff") {
-            json = json.split("\\n").join('\\n"+\n   "');
-          }
-          context2.indent();
-          context2.row(json, htmlNote);
-          context2.indent(-1);
-        }, "formatAnyChange");
-        AnnotatedFormatter.prototype.format_added = formatAnyChange;
-        AnnotatedFormatter.prototype.format_modified = formatAnyChange;
-        AnnotatedFormatter.prototype.format_deleted = formatAnyChange;
-        AnnotatedFormatter.prototype.format_moved = formatAnyChange;
-        AnnotatedFormatter.prototype.format_textdiff = formatAnyChange;
-        var defaultInstance$1 = void 0;
-        function format$1(delta, left2) {
-          if (!defaultInstance$1) {
-            defaultInstance$1 = new AnnotatedFormatter();
-          }
-          return defaultInstance$1.format(delta, left2);
-        }
-        __name(format$1, "format$1");
-        var annotated = Object.freeze({
-          default: AnnotatedFormatter,
-          format: format$1
-        });
-        var OPERATIONS = {
-          add: "add",
-          remove: "remove",
-          replace: "replace",
-          move: "move"
-        };
-        var JSONFormatter = function(_BaseFormatter) {
-          inherits(JSONFormatter2, _BaseFormatter);
-          function JSONFormatter2() {
-            classCallCheck2(this, JSONFormatter2);
-            var _this = possibleConstructorReturn(this, (JSONFormatter2.__proto__ || Object.getPrototypeOf(JSONFormatter2)).call(this));
-            _this.includeMoveDestinations = true;
-            return _this;
-          }
-          __name(JSONFormatter2, "JSONFormatter");
-          createClass2(JSONFormatter2, [{
-            key: "prepareContext",
-            value: /* @__PURE__ */ __name(function prepareContext(context2) {
-              get2(JSONFormatter2.prototype.__proto__ || Object.getPrototypeOf(JSONFormatter2.prototype), "prepareContext", this).call(this, context2);
-              context2.result = [];
-              context2.path = [];
-              context2.pushCurrentOp = function(obj) {
-                var op = obj.op, value = obj.value;
-                var val2 = {
-                  op,
-                  path: this.currentPath()
-                };
-                if (typeof value !== "undefined") {
-                  val2.value = value;
-                }
-                this.result.push(val2);
-              };
-              context2.pushMoveOp = function(to) {
-                var from = this.currentPath();
-                this.result.push({
-                  op: OPERATIONS.move,
-                  from,
-                  path: this.toPath(to)
-                });
-              };
-              context2.currentPath = function() {
-                return "/" + this.path.join("/");
-              };
-              context2.toPath = function(toPath) {
-                var to = this.path.slice();
-                to[to.length - 1] = toPath;
-                return "/" + to.join("/");
-              };
-            }, "prepareContext")
-          }, {
-            key: "typeFormattterErrorFormatter",
-            value: /* @__PURE__ */ __name(function typeFormattterErrorFormatter(context2, err2) {
-              context2.out("[ERROR] " + err2);
-            }, "typeFormattterErrorFormatter")
-          }, {
-            key: "rootBegin",
-            value: /* @__PURE__ */ __name(function rootBegin() {
-            }, "rootBegin")
-          }, {
-            key: "rootEnd",
-            value: /* @__PURE__ */ __name(function rootEnd() {
-            }, "rootEnd")
-          }, {
-            key: "nodeBegin",
-            value: /* @__PURE__ */ __name(function nodeBegin(_ref, key, leftKey) {
-              var path2 = _ref.path;
-              path2.push(leftKey);
-            }, "nodeBegin")
-          }, {
-            key: "nodeEnd",
-            value: /* @__PURE__ */ __name(function nodeEnd(_ref2) {
-              var path2 = _ref2.path;
-              path2.pop();
-            }, "nodeEnd")
-            /* jshint camelcase: false */
-            /* eslint-disable camelcase */
-          }, {
-            key: "format_unchanged",
-            value: /* @__PURE__ */ __name(function format_unchanged() {
-            }, "format_unchanged")
-          }, {
-            key: "format_movedestination",
-            value: /* @__PURE__ */ __name(function format_movedestination() {
-            }, "format_movedestination")
-          }, {
-            key: "format_node",
-            value: /* @__PURE__ */ __name(function format_node(context2, delta, left2) {
-              this.formatDeltaChildren(context2, delta, left2);
-            }, "format_node")
-          }, {
-            key: "format_added",
-            value: /* @__PURE__ */ __name(function format_added(context2, delta) {
-              context2.pushCurrentOp({ op: OPERATIONS.add, value: delta[0] });
-            }, "format_added")
-          }, {
-            key: "format_modified",
-            value: /* @__PURE__ */ __name(function format_modified(context2, delta) {
-              context2.pushCurrentOp({ op: OPERATIONS.replace, value: delta[1] });
-            }, "format_modified")
-          }, {
-            key: "format_deleted",
-            value: /* @__PURE__ */ __name(function format_deleted(context2) {
-              context2.pushCurrentOp({ op: OPERATIONS.remove });
-            }, "format_deleted")
-          }, {
-            key: "format_moved",
-            value: /* @__PURE__ */ __name(function format_moved(context2, delta) {
-              var to = delta[1];
-              context2.pushMoveOp(to);
-            }, "format_moved")
-          }, {
-            key: "format_textdiff",
-            value: /* @__PURE__ */ __name(function format_textdiff() {
-              throw new Error("Not implemented");
-            }, "format_textdiff")
-          }, {
-            key: "format",
-            value: /* @__PURE__ */ __name(function format3(delta, left2) {
-              var context2 = {};
-              this.prepareContext(context2);
-              this.recurse(context2, delta, left2);
-              return context2.result;
-            }, "format")
-          }]);
-          return JSONFormatter2;
-        }(BaseFormatter);
-        var last2 = /* @__PURE__ */ __name(function last3(arr) {
-          return arr[arr.length - 1];
-        }, "last");
-        var sortBy2 = /* @__PURE__ */ __name(function sortBy3(arr, pred) {
-          arr.sort(pred);
-          return arr;
-        }, "sortBy");
-        var compareByIndexDesc = /* @__PURE__ */ __name(function compareByIndexDesc2(indexA, indexB) {
-          var lastA = parseInt(indexA, 10);
-          var lastB = parseInt(indexB, 10);
-          if (!(isNaN(lastA) || isNaN(lastB))) {
-            return lastB - lastA;
-          } else {
-            return 0;
-          }
-        }, "compareByIndexDesc");
-        var opsByDescendingOrder = /* @__PURE__ */ __name(function opsByDescendingOrder2(removeOps) {
-          return sortBy2(removeOps, function(a2, b3) {
-            var splitA = a2.path.split("/");
-            var splitB = b3.path.split("/");
-            if (splitA.length !== splitB.length) {
-              return splitA.length - splitB.length;
-            } else {
-              return compareByIndexDesc(last2(splitA), last2(splitB));
-            }
-          });
-        }, "opsByDescendingOrder");
-        var partitionOps = /* @__PURE__ */ __name(function partitionOps2(arr, fns) {
-          var initArr = Array(fns.length + 1).fill().map(function() {
-            return [];
-          });
-          return arr.map(function(item) {
-            var position2 = fns.map(function(fn2) {
-              return fn2(item);
-            }).indexOf(true);
-            if (position2 < 0) {
-              position2 = fns.length;
-            }
-            return { item, position: position2 };
-          }).reduce(function(acc, item) {
-            acc[item.position].push(item.item);
-            return acc;
-          }, initArr);
-        }, "partitionOps");
-        var isMoveOp = /* @__PURE__ */ __name(function isMoveOp2(_ref3) {
-          var op = _ref3.op;
-          return op === "move";
-        }, "isMoveOp");
-        var isRemoveOp = /* @__PURE__ */ __name(function isRemoveOp2(_ref4) {
-          var op = _ref4.op;
-          return op === "remove";
-        }, "isRemoveOp");
-        var reorderOps = /* @__PURE__ */ __name(function reorderOps2(diff2) {
-          var _partitionOps = partitionOps(diff2, [isMoveOp, isRemoveOp]), _partitionOps2 = slicedToArray(_partitionOps, 3), moveOps = _partitionOps2[0], removedOps = _partitionOps2[1], restOps = _partitionOps2[2];
-          var removeOpsReverse = opsByDescendingOrder(removedOps);
-          return [].concat(toConsumableArray(removeOpsReverse), toConsumableArray(moveOps), toConsumableArray(restOps));
-        }, "reorderOps");
-        var defaultInstance$2 = void 0;
-        var format$2 = /* @__PURE__ */ __name(function format3(delta, left2) {
-          if (!defaultInstance$2) {
-            defaultInstance$2 = new JSONFormatter();
-          }
-          return reorderOps(defaultInstance$2.format(delta, left2));
-        }, "format");
-        var log2 = /* @__PURE__ */ __name(function log3(delta, left2) {
-          console.log(format$2(delta, left2));
-        }, "log");
-        var jsonpatch = Object.freeze({
-          default: JSONFormatter,
-          partitionOps,
-          format: format$2,
-          log: log2
-        });
-        function chalkColor(name2) {
-          return chalk && chalk[name2] || function() {
-            for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-              args[_key] = arguments[_key];
-            }
-            return args;
-          };
-        }
-        __name(chalkColor, "chalkColor");
-        var colors = {
-          added: chalkColor("green"),
-          deleted: chalkColor("red"),
-          movedestination: chalkColor("gray"),
-          moved: chalkColor("yellow"),
-          unchanged: chalkColor("gray"),
-          error: chalkColor("white.bgRed"),
-          textDiffLine: chalkColor("gray")
-        };
-        var ConsoleFormatter = function(_BaseFormatter) {
-          inherits(ConsoleFormatter2, _BaseFormatter);
-          function ConsoleFormatter2() {
-            classCallCheck2(this, ConsoleFormatter2);
-            var _this = possibleConstructorReturn(this, (ConsoleFormatter2.__proto__ || Object.getPrototypeOf(ConsoleFormatter2)).call(this));
-            _this.includeMoveDestinations = false;
-            return _this;
-          }
-          __name(ConsoleFormatter2, "ConsoleFormatter");
-          createClass2(ConsoleFormatter2, [{
-            key: "prepareContext",
-            value: /* @__PURE__ */ __name(function prepareContext(context2) {
-              get2(ConsoleFormatter2.prototype.__proto__ || Object.getPrototypeOf(ConsoleFormatter2.prototype), "prepareContext", this).call(this, context2);
-              context2.indent = function(levels) {
-                this.indentLevel = (this.indentLevel || 0) + (typeof levels === "undefined" ? 1 : levels);
-                this.indentPad = new Array(this.indentLevel + 1).join("  ");
-                this.outLine();
-              };
-              context2.outLine = function() {
-                this.buffer.push("\n" + (this.indentPad || ""));
-              };
-              context2.out = function() {
-                for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-                  args[_key2] = arguments[_key2];
-                }
-                for (var i2 = 0, l2 = args.length; i2 < l2; i2++) {
-                  var lines = args[i2].split("\n");
-                  var text2 = lines.join("\n" + (this.indentPad || ""));
-                  if (this.color && this.color[0]) {
-                    text2 = this.color[0](text2);
-                  }
-                  this.buffer.push(text2);
-                }
-              };
-              context2.pushColor = function(color2) {
-                this.color = this.color || [];
-                this.color.unshift(color2);
-              };
-              context2.popColor = function() {
-                this.color = this.color || [];
-                this.color.shift();
-              };
-            }, "prepareContext")
-          }, {
-            key: "typeFormattterErrorFormatter",
-            value: /* @__PURE__ */ __name(function typeFormattterErrorFormatter(context2, err2) {
-              context2.pushColor(colors.error);
-              context2.out("[ERROR]" + err2);
-              context2.popColor();
-            }, "typeFormattterErrorFormatter")
-          }, {
-            key: "formatValue",
-            value: /* @__PURE__ */ __name(function formatValue(context2, value) {
-              context2.out(JSON.stringify(value, null, 2));
-            }, "formatValue")
-          }, {
-            key: "formatTextDiffString",
-            value: /* @__PURE__ */ __name(function formatTextDiffString(context2, value) {
-              var lines = this.parseTextDiff(value);
-              context2.indent();
-              for (var i2 = 0, l2 = lines.length; i2 < l2; i2++) {
-                var line = lines[i2];
-                context2.pushColor(colors.textDiffLine);
-                context2.out(line.location.line + "," + line.location.chr + " ");
-                context2.popColor();
-                var pieces = line.pieces;
-                for (var pieceIndex = 0, piecesLength = pieces.length; pieceIndex < piecesLength; pieceIndex++) {
-                  var piece = pieces[pieceIndex];
-                  context2.pushColor(colors[piece.type]);
-                  context2.out(piece.text);
-                  context2.popColor();
-                }
-                if (i2 < l2 - 1) {
-                  context2.outLine();
-                }
-              }
-              context2.indent(-1);
-            }, "formatTextDiffString")
-          }, {
-            key: "rootBegin",
-            value: /* @__PURE__ */ __name(function rootBegin(context2, type2, nodeType) {
-              context2.pushColor(colors[type2]);
-              if (type2 === "node") {
-                context2.out(nodeType === "array" ? "[" : "{");
-                context2.indent();
-              }
-            }, "rootBegin")
-          }, {
-            key: "rootEnd",
-            value: /* @__PURE__ */ __name(function rootEnd(context2, type2, nodeType) {
-              if (type2 === "node") {
-                context2.indent(-1);
-                context2.out(nodeType === "array" ? "]" : "}");
-              }
-              context2.popColor();
-            }, "rootEnd")
-          }, {
-            key: "nodeBegin",
-            value: /* @__PURE__ */ __name(function nodeBegin(context2, key, leftKey, type2, nodeType) {
-              context2.pushColor(colors[type2]);
-              context2.out(leftKey + ": ");
-              if (type2 === "node") {
-                context2.out(nodeType === "array" ? "[" : "{");
-                context2.indent();
-              }
-            }, "nodeBegin")
-          }, {
-            key: "nodeEnd",
-            value: /* @__PURE__ */ __name(function nodeEnd(context2, key, leftKey, type2, nodeType, isLast) {
-              if (type2 === "node") {
-                context2.indent(-1);
-                context2.out(nodeType === "array" ? "]" : "}" + (isLast ? "" : ","));
-              }
-              if (!isLast) {
-                context2.outLine();
-              }
-              context2.popColor();
-            }, "nodeEnd")
-            /* jshint camelcase: false */
-            /* eslint-disable camelcase */
-          }, {
-            key: "format_unchanged",
-            value: /* @__PURE__ */ __name(function format_unchanged(context2, delta, left2) {
-              if (typeof left2 === "undefined") {
-                return;
-              }
-              this.formatValue(context2, left2);
-            }, "format_unchanged")
-          }, {
-            key: "format_movedestination",
-            value: /* @__PURE__ */ __name(function format_movedestination(context2, delta, left2) {
-              if (typeof left2 === "undefined") {
-                return;
-              }
-              this.formatValue(context2, left2);
-            }, "format_movedestination")
-          }, {
-            key: "format_node",
-            value: /* @__PURE__ */ __name(function format_node(context2, delta, left2) {
-              this.formatDeltaChildren(context2, delta, left2);
-            }, "format_node")
-          }, {
-            key: "format_added",
-            value: /* @__PURE__ */ __name(function format_added(context2, delta) {
-              this.formatValue(context2, delta[0]);
-            }, "format_added")
-          }, {
-            key: "format_modified",
-            value: /* @__PURE__ */ __name(function format_modified(context2, delta) {
-              context2.pushColor(colors.deleted);
-              this.formatValue(context2, delta[0]);
-              context2.popColor();
-              context2.out(" => ");
-              context2.pushColor(colors.added);
-              this.formatValue(context2, delta[1]);
-              context2.popColor();
-            }, "format_modified")
-          }, {
-            key: "format_deleted",
-            value: /* @__PURE__ */ __name(function format_deleted(context2, delta) {
-              this.formatValue(context2, delta[0]);
-            }, "format_deleted")
-          }, {
-            key: "format_moved",
-            value: /* @__PURE__ */ __name(function format_moved(context2, delta) {
-              context2.out("==> " + delta[1]);
-            }, "format_moved")
-          }, {
-            key: "format_textdiff",
-            value: /* @__PURE__ */ __name(function format_textdiff(context2, delta) {
-              this.formatTextDiffString(context2, delta[0]);
-            }, "format_textdiff")
-          }]);
-          return ConsoleFormatter2;
-        }(BaseFormatter);
-        var defaultInstance$3 = void 0;
-        var format$3 = /* @__PURE__ */ __name(function format3(delta, left2) {
-          if (!defaultInstance$3) {
-            defaultInstance$3 = new ConsoleFormatter();
-          }
-          return defaultInstance$3.format(delta, left2);
-        }, "format");
-        function log$12(delta, left2) {
-          console.log(format$3(delta, left2));
-        }
-        __name(log$12, "log$1");
-        var console$1 = Object.freeze({
-          default: ConsoleFormatter,
-          format: format$3,
-          log: log$12
-        });
-        var index2 = Object.freeze({
-          base,
-          html: html2,
-          annotated,
-          jsonpatch,
-          console: console$1
-        });
-        function dateReviver(key, value) {
-          var parts2 = void 0;
-          if (typeof value === "string") {
-            parts2 = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d*))?(Z|([+-])(\d{2}):(\d{2}))$/.exec(value);
-            if (parts2) {
-              return new Date(Date.UTC(+parts2[1], +parts2[2] - 1, +parts2[3], +parts2[4], +parts2[5], +parts2[6], +(parts2[7] || 0)));
-            }
-          }
-          return value;
-        }
-        __name(dateReviver, "dateReviver");
-        function create2(options) {
-          return new DiffPatcher(options);
-        }
-        __name(create2, "create");
-        var defaultInstance$4 = void 0;
-        function diff() {
-          if (!defaultInstance$4) {
-            defaultInstance$4 = new DiffPatcher();
-          }
-          return defaultInstance$4.diff.apply(defaultInstance$4, arguments);
-        }
-        __name(diff, "diff");
-        function patch2() {
-          if (!defaultInstance$4) {
-            defaultInstance$4 = new DiffPatcher();
-          }
-          return defaultInstance$4.patch.apply(defaultInstance$4, arguments);
-        }
-        __name(patch2, "patch");
-        function unpatch() {
-          if (!defaultInstance$4) {
-            defaultInstance$4 = new DiffPatcher();
-          }
-          return defaultInstance$4.unpatch.apply(defaultInstance$4, arguments);
-        }
-        __name(unpatch, "unpatch");
-        function reverse() {
-          if (!defaultInstance$4) {
-            defaultInstance$4 = new DiffPatcher();
-          }
-          return defaultInstance$4.reverse.apply(defaultInstance$4, arguments);
-        }
-        __name(reverse, "reverse");
-        function clone$12() {
-          if (!defaultInstance$4) {
-            defaultInstance$4 = new DiffPatcher();
-          }
-          return defaultInstance$4.clone.apply(defaultInstance$4, arguments);
-        }
-        __name(clone$12, "clone$1");
-        exports4.DiffPatcher = DiffPatcher;
-        exports4.formatters = index2;
-        exports4.console = console$1;
-        exports4.create = create2;
-        exports4.dateReviver = dateReviver;
-        exports4.diff = diff;
-        exports4.patch = patch2;
-        exports4.unpatch = unpatch;
-        exports4.reverse = reverse;
-        exports4.clone = clone$12;
-        Object.defineProperty(exports4, "__esModule", { value: true });
-      });
-    })(jsondiffpatch_umd$1, jsondiffpatch_umd$1.exports);
-    return jsondiffpatch_umd$1.exports;
-  }
-  __name(requireJsondiffpatch_umd, "requireJsondiffpatch_umd");
-  requireJsondiffpatch_umd();
   const proteinAlphabet = {
     A: {
       value: "A",
@@ -111884,6 +103547,14 @@ ${latestSubscriptionCallbackError.current.stack}
       colorByFamily: "#FFC0CB",
       color: "hsl(264.7, 100%, 69%)",
       mass: 128.17228
+    },
+    O: {
+      value: "O",
+      name: "Pyrrolysine",
+      threeLettersName: "Pyl",
+      colorByFamily: "#FFC0CB",
+      color: "hsl(264.7, 100%, 69%)",
+      mass: 255.313
     },
     M: {
       value: "M",
@@ -112031,7 +103702,7 @@ ${latestSubscriptionCallbackError.current.stack}
       mass: 0
     }
   };
-  const threeLetterSequenceStringToAminoAcidMap = {
+  const initThreeLetterSequenceStringToAminoAcidMap = {
     gct: proteinAlphabet.A,
     gcc: proteinAlphabet.A,
     gca: proteinAlphabet.A,
@@ -112130,9 +103801,74 @@ ${latestSubscriptionCallbackError.current.stack}
     taa: proteinAlphabet["*"],
     tag: proteinAlphabet["*"],
     tga: proteinAlphabet["*"],
+    uaa: proteinAlphabet["*"],
+    uag: proteinAlphabet["*"],
+    uga: proteinAlphabet["*"],
     "...": proteinAlphabet["."],
     "---": proteinAlphabet["-"]
   };
+  const IUPAC = {
+    A: ["A"],
+    C: ["C"],
+    G: ["G"],
+    T: ["T"],
+    U: ["U"],
+    R: ["A", "G"],
+    Y: ["C", "T", "U"],
+    K: ["G", "T", "U"],
+    M: ["A", "C"],
+    S: ["G", "C"],
+    W: ["A", "T", "U"],
+    B: ["C", "G", "T", "U"],
+    D: ["A", "G", "T", "U"],
+    H: ["A", "C", "T", "U"],
+    V: ["A", "C", "G"],
+    N: ["A", "C", "G", "T", "U"],
+    X: ["A", "C", "G", "T", "U"]
+  };
+  function expandAndResolve(threeLetterCodon) {
+    var _a2, _b2;
+    const chars2 = threeLetterCodon.toUpperCase().split("");
+    const picks = chars2.map((c2) => IUPAC[c2] || [c2]);
+    let allPossibleThreeLetterCodons = [""];
+    for (const set2 of picks) {
+      const next = [];
+      for (const prefix2 of allPossibleThreeLetterCodons) for (const b3 of set2) next.push(prefix2 + b3);
+      allPossibleThreeLetterCodons = next;
+    }
+    let foundAminoAcid = null;
+    for (const codon of allPossibleThreeLetterCodons) {
+      const lowerCodon = codon.toLowerCase();
+      const aminoAcidObj = (_b2 = (_a2 = initThreeLetterSequenceStringToAminoAcidMap[lowerCodon]) != null ? _a2 : initThreeLetterSequenceStringToAminoAcidMap[lowerCodon.replace(/u/g, "t")]) != null ? _b2 : initThreeLetterSequenceStringToAminoAcidMap[lowerCodon.replace(/t/g, "u")];
+      if (aminoAcidObj) {
+        if (!foundAminoAcid) {
+          foundAminoAcid = aminoAcidObj;
+        } else if (foundAminoAcid.value !== aminoAcidObj.value) {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }
+    return foundAminoAcid;
+  }
+  __name(expandAndResolve, "expandAndResolve");
+  function getCodonToAminoAcidMap() {
+    const map2 = initThreeLetterSequenceStringToAminoAcidMap;
+    const codes = Object.keys(IUPAC);
+    for (const a2 of codes)
+      for (const b3 of codes)
+        for (const c2 of codes) {
+          const codon = a2 + b3 + c2;
+          const lowerCodon = codon.toLowerCase();
+          if (map2[lowerCodon]) continue;
+          const aminoAcidObj = expandAndResolve(codon);
+          if (aminoAcidObj) map2[lowerCodon] = aminoAcidObj;
+        }
+    return map2;
+  }
+  __name(getCodonToAminoAcidMap, "getCodonToAminoAcidMap");
+  const threeLetterSequenceStringToAminoAcidMap = getCodonToAminoAcidMap();
   const degenerateDnaToAminoAcidMap = invert(aminoAcidToDegenerateDnaMap);
   function getAminoAcidFromSequenceTriplet(sequenceString) {
     sequenceString = sequenceString.toLowerCase();
@@ -112245,7 +103981,7 @@ ${latestSubscriptionCallbackError.current.stack}
     const aminoAcidDataForEachBaseOfDNA = [];
     for (let index2 = 0; index2 < sequenceStringLength; index2 += 3) {
       let aminoAcid;
-      const aminoAcidIndex = index2 / 3;
+      const aminoAcidIndex = Math.floor(index2 / 3);
       let codonPositionsInCDS;
       let basesRead;
       if (isProteinSequence) {
@@ -112360,14 +104096,16 @@ ${latestSubscriptionCallbackError.current.stack}
     name: name2,
     isProtein: isProtein2,
     isRna: isRna2,
-    isMixedRnaAndDna
+    isMixedRnaAndDna,
+    getAcceptedInsertChars
   } = {}) {
-    const acceptedChars = getAcceptedChars({
+    const sequenceTypeInfo = {
       isOligo: isOligo2,
       isProtein: isProtein2,
       isRna: isRna2,
       isMixedRnaAndDna
-    });
+    };
+    const acceptedChars = isFunction$1(getAcceptedInsertChars) ? getAcceptedInsertChars(sequenceTypeInfo) : getAcceptedChars(sequenceTypeInfo);
     const replaceChars = getReplaceChars({
       isOligo: isOligo2,
       isProtein: isProtein2,
@@ -112419,7 +104157,7 @@ ${latestSubscriptionCallbackError.current.stack}
     isRna: isRna2,
     isMixedRnaAndDna
   } = {}) {
-    return isProtein2 ? `${extended_protein_letters.toLowerCase()}}` : isOligo2 ? ambiguous_rna_letters.toLowerCase() + "t" : isRna2 ? ambiguous_rna_letters.toLowerCase() + "t" : isMixedRnaAndDna ? ambiguous_rna_letters.toLowerCase() + ambiguous_dna_letters.toLowerCase() : (
+    return isProtein2 ? `${extended_protein_letters.toLowerCase()}` : isOligo2 ? ambiguous_rna_letters.toLowerCase() + "t" : isRna2 ? ambiguous_rna_letters.toLowerCase() + "t" : isMixedRnaAndDna ? ambiguous_rna_letters.toLowerCase() + ambiguous_dna_letters.toLowerCase() : (
       //just plain old dna
       ambiguous_rna_letters.toLowerCase() + ambiguous_dna_letters.toLowerCase()
     );
@@ -112603,6 +104341,7 @@ ${latestSubscriptionCallbackError.current.stack}
       doNotProvideIdsForAnnotations,
       noCdsTranslations,
       convertAnnotationsFromAAIndices,
+      getAcceptedInsertChars,
       topLevelSeqData
     } = options;
     let seqData = cloneDeep(pSeqData);
@@ -112634,13 +104373,16 @@ ${latestSubscriptionCallbackError.current.stack}
     if (!doNotRemoveInvalidChars) {
       if (seqData.isProtein) {
         const [newSeq] = filterSequenceString(seqData.proteinSequence, __spreadProps(__spreadValues({}, topLevelSeqData || seqData), {
-          isProtein: true
+          isProtein: true,
+          getAcceptedInsertChars
         }));
         seqData.proteinSequence = newSeq;
       } else {
-        const [newSeq] = filterSequenceString(seqData.sequence, __spreadValues({
+        const [newSeq] = filterSequenceString(seqData.sequence, __spreadProps(__spreadValues({
           additionalValidChars
-        }, topLevelSeqData || seqData));
+        }, topLevelSeqData || seqData), {
+          getAcceptedInsertChars
+        }));
         seqData.sequence = newSeq;
       }
     }
@@ -112695,17 +104437,25 @@ ${latestSubscriptionCallbackError.current.stack}
     });
     if (!noTranslationData) {
       seqData.translations = flatMap(seqData.translations, (translation) => {
+        var _a2, _b2;
         if (noCdsTranslations && translation.translationType === "CDS Feature") {
           return [];
         }
-        if (!translation.aminoAcids && !seqData.noSequence) {
-          translation.aminoAcids = getAminoAcidDataForEachBaseOfDna(
+        const codonStart = ((_b2 = (_a2 = translation == null ? void 0 : translation.notes) == null ? void 0 : _a2.codon_start) == null ? void 0 : _b2[0]) - 1 || 0;
+        const expandedRange = expandOrContractRangeByLength(
+          translation,
+          -codonStart,
+          true,
+          seqData.sequence.length
+        );
+        if (!expandedRange.aminoAcids && !seqData.noSequence) {
+          expandedRange.aminoAcids = getAminoAcidDataForEachBaseOfDna(
             seqData.sequence,
-            translation.forward,
-            translation
+            expandedRange.forward,
+            expandedRange
           );
         }
-        return translation;
+        return expandedRange;
       });
     }
     if (annotationsAsObjects) {
@@ -113433,7 +105183,7 @@ ${latestSubscriptionCallbackError.current.stack}
         return __spreadValues(__spreadProps(__spreadValues({}, newRange), {
           start: newLocations[0].start,
           end: newLocations[newLocations.length - 1].end
-        }), newLocations.length > 1 && { locations: newLocations });
+        }), newLocations.length > 0 && { locations: newLocations });
       } else {
         return newRange;
       }
@@ -121188,7 +112938,10 @@ ${latestSubscriptionCallbackError.current.stack}
     return nonDuplicatedOrfRanges;
   }
   __name(getOrfsFromSequence, "getOrfsFromSequence");
-  function findOrfsInPlasmid(sequence2, circular2, minimumOrfSize2, useAdditionalOrfStartCodons2) {
+  function findOrfsInPlasmid(sequence2, circular2, minimumOrfSize2, useAdditionalOrfStartCodons2, isProteinOrOligo) {
+    if (isProteinOrOligo) {
+      return [];
+    }
     const forwardOrfs = getOrfsFromSequence({
       sequence: sequence2,
       minimumOrfSize: minimumOrfSize2,
@@ -121416,6 +113169,15 @@ ${latestSubscriptionCallbackError.current.stack}
       }
       const overlaps = getZeroedRangeOverlaps(annotation, range2, maxLength).map(
         (overlap) => {
+          const allLocations = annotation.locations;
+          if (allLocations && allLocations.length) {
+            const newLocations = allLocations.filter((loc) => {
+              return isRangeWithinRange(loc, overlap, maxLength);
+            });
+            return assignIn({}, annotation, overlap, {
+              locations: newLocations
+            });
+          }
           return assignIn({}, annotation, overlap);
         }
       );
@@ -121818,6 +113580,160 @@ ${latestSubscriptionCallbackError.current.stack}
     }
   }
   __name(calculateNebTm, "calculateNebTm");
+  const PRIMER3_PARAMS = {
+    saltMonovalent: 50,
+    // mM
+    saltDivalent: 1.5,
+    // mM
+    dntpConc: 0.6,
+    // mM
+    dnaConc: 50,
+    // nM
+    R: 1.987
+    // Gas constant (cal/K·mol)
+  };
+  const SANTA_LUCIA_NN = {
+    AA: { dH: -7.9, dS: -22.2 },
+    TT: { dH: -7.9, dS: -22.2 },
+    AT: { dH: -7.2, dS: -20.4 },
+    TA: { dH: -7.2, dS: -21.3 },
+    CA: { dH: -8.5, dS: -22.7 },
+    TG: { dH: -8.5, dS: -22.7 },
+    GT: { dH: -8.4, dS: -22.4 },
+    AC: { dH: -8.4, dS: -22.4 },
+    CT: { dH: -7.8, dS: -21 },
+    AG: { dH: -7.8, dS: -21 },
+    GA: { dH: -8.2, dS: -22.2 },
+    TC: { dH: -8.2, dS: -22.2 },
+    CG: { dH: -10.6, dS: -27.2 },
+    GC: { dH: -9.8, dS: -24.4 },
+    GG: { dH: -8, dS: -19.9 },
+    CC: { dH: -8, dS: -19.9 }
+  };
+  const SANTA_LUCIA_INIT = {
+    GC: { dH: 0.1, dS: -2.8 },
+    // initiation with terminal GC
+    AT: { dH: 2.3, dS: 4.1 }
+    // initiation with terminal AT
+  };
+  function getEffectiveMonovalentConc() {
+    let effectiveMono = PRIMER3_PARAMS.saltMonovalent;
+    {
+      const freeMg = Math.max(
+        0,
+        PRIMER3_PARAMS.saltDivalent - PRIMER3_PARAMS.dntpConc
+      );
+      effectiveMono += 120 * Math.sqrt(freeMg);
+    }
+    return effectiveMono;
+  }
+  __name(getEffectiveMonovalentConc, "getEffectiveMonovalentConc");
+  function applySaltCorrection(deltaS, nnPairs) {
+    const effectiveMono = getEffectiveMonovalentConc();
+    return deltaS + 0.368 * nnPairs * Math.log(effectiveMono / 1e3);
+  }
+  __name(applySaltCorrection, "applySaltCorrection");
+  function isValidSequence(sequence2) {
+    return /^[ATGCN]+$/.test(sequence2);
+  }
+  __name(isValidSequence, "isValidSequence");
+  function calculateSantaLuciaTm(sequence2) {
+    try {
+      sequence2 = sequence2 == null ? void 0 : sequence2.toUpperCase().trim();
+      if (!isValidSequence(sequence2)) {
+        throw new Error("Invalid sequence: contains non-DNA characters");
+      }
+      if (sequence2.length < 2) {
+        throw new Error("Sequence too short: minimum length is 2 bases");
+      }
+      let deltaH = 0;
+      let deltaS = 0;
+      for (let i2 = 0; i2 < sequence2.length - 1; i2++) {
+        const dinucleotide = sequence2.substring(i2, i2 + 2);
+        if (dinucleotide.includes("N")) {
+          continue;
+        }
+        const params = SANTA_LUCIA_NN[dinucleotide];
+        if (params) {
+          deltaH += params.dH;
+          deltaS += params.dS;
+        }
+      }
+      const firstBase = sequence2[0];
+      const lastBase = sequence2[sequence2.length - 1];
+      if (firstBase === "G" || firstBase === "C") {
+        deltaH += SANTA_LUCIA_INIT.GC.dH;
+        deltaS += SANTA_LUCIA_INIT.GC.dS;
+      } else {
+        deltaH += SANTA_LUCIA_INIT.AT.dH;
+        deltaS += SANTA_LUCIA_INIT.AT.dS;
+      }
+      if (lastBase === "G" || lastBase === "C") {
+        deltaH += SANTA_LUCIA_INIT.GC.dH;
+        deltaS += SANTA_LUCIA_INIT.GC.dS;
+      } else {
+        deltaH += SANTA_LUCIA_INIT.AT.dH;
+        deltaS += SANTA_LUCIA_INIT.AT.dS;
+      }
+      const nnPairs = sequence2.length - 1;
+      deltaS = applySaltCorrection(deltaS, nnPairs);
+      const C = PRIMER3_PARAMS.dnaConc * 1e-9;
+      const Tm = deltaH * 1e3 / (deltaS + PRIMER3_PARAMS.R * Math.log(C / 4));
+      return Tm - 273.15;
+    } catch (e2) {
+      return `Error calculating Tm for sequence ${sequence2}. ${e2}`;
+    }
+  }
+  __name(calculateSantaLuciaTm, "calculateSantaLuciaTm");
+  function calculateEndStability(sequence2) {
+    try {
+      sequence2 = sequence2 == null ? void 0 : sequence2.toUpperCase().trim();
+      if (!isValidSequence(sequence2)) {
+        throw new Error("Invalid sequence: contains non-DNA characters");
+      }
+      if (sequence2.length < 5) {
+        throw new Error(
+          "Sequence too short: minimum length is 5 bases for end stability calculation"
+        );
+      }
+      const last5Bases = sequence2.substring(sequence2.length - 5);
+      let deltaH = 0;
+      let deltaS = 0;
+      for (let i2 = 0; i2 < 4; i2++) {
+        const dinucleotide = last5Bases.substring(i2, i2 + 2);
+        if (dinucleotide.includes("N")) {
+          continue;
+        }
+        const params = SANTA_LUCIA_NN[dinucleotide];
+        if (params) {
+          deltaH += params.dH;
+          deltaS += params.dS;
+        }
+      }
+      const firstBase = last5Bases[0];
+      const lastBase = last5Bases[last5Bases.length - 1];
+      if (firstBase === "G" || firstBase === "C") {
+        deltaH += SANTA_LUCIA_INIT.GC.dH;
+        deltaS += SANTA_LUCIA_INIT.GC.dS;
+      } else {
+        deltaH += SANTA_LUCIA_INIT.AT.dH;
+        deltaS += SANTA_LUCIA_INIT.AT.dS;
+      }
+      if (lastBase === "G" || lastBase === "C") {
+        deltaH += SANTA_LUCIA_INIT.GC.dH;
+        deltaS += SANTA_LUCIA_INIT.GC.dS;
+      } else {
+        deltaH += SANTA_LUCIA_INIT.AT.dH;
+        deltaS += SANTA_LUCIA_INIT.AT.dS;
+      }
+      const T2 = 310.15;
+      const deltaG = deltaH - T2 * deltaS / 1e3;
+      return Math.round(Math.abs(deltaG) * 100) / 100;
+    } catch (e2) {
+      return `Error calculating end stability for sequence ${sequence2}. ${e2}`;
+    }
+  }
+  __name(calculateEndStability, "calculateEndStability");
   function convertAACaretPositionOrRangeToDna(rangeOrCaret) {
     if (typeof rangeOrCaret === "object" && rangeOrCaret !== null) {
       return convertAARangeToDnaRange(__spreadProps(__spreadValues({}, rangeOrCaret), {
@@ -122325,7 +114241,9 @@ ${latestSubscriptionCallbackError.current.stack}
           if (!sequence2[type2]) {
             sequence2[type2] = [];
           }
-          feature.type = type2.slice(0, -1);
+          if (type2 !== "parts") {
+            feature.type = type2.slice(0, -1);
+          }
           delete feature.notes.pragma;
           sequence2[type2].push(feature);
           return false;
@@ -122590,8 +114508,9 @@ ${latestSubscriptionCallbackError.current.stack}
         if (line === null) {
           return true;
         }
-        const key = getLineKey(line);
-        const val2 = getLineVal(line);
+        const shouldUseSpaceAsDelimiter = !line.trim().startsWith("/");
+        const key = getLineKey(line, shouldUseSpaceAsDelimiter);
+        const val2 = getLineVal(line, shouldUseSpaceAsDelimiter);
         const isKeyRunon = isKeywordRunon(line);
         const isSubKey = isSubKeyword(line);
         const isKey2 = isKeyword(line);
@@ -122962,10 +114881,10 @@ ${latestSubscriptionCallbackError.current.stack}
       currentFeatureNote = currentNotes[key];
     }
     __name(parseFeatureNote, "parseFeatureNote");
-    function getLineKey(line) {
+    function getLineKey(line, shouldUseSpaceAsDelimiter) {
       let arr;
       line = line.replace(/^[\s]*/, "");
-      if (line.indexOf("=") < 0) {
+      if (line.indexOf("=") < 0 || shouldUseSpaceAsDelimiter) {
         arr = line.split(/[\s]+/);
       } else {
         arr = line.split(/=/);
@@ -122973,9 +114892,9 @@ ${latestSubscriptionCallbackError.current.stack}
       return arr[0];
     }
     __name(getLineKey, "getLineKey");
-    function getLineVal(line) {
+    function getLineVal(line, shouldUseSpaceAsDelimiter) {
       let arr;
-      if (line.indexOf("=") < 0) {
+      if (line.indexOf("=") < 0 || shouldUseSpaceAsDelimiter) {
         line = line.replace(/^[\s]*[\S]+[\s]+|[\s]+$/, "");
         line = line.trim();
         return line;
@@ -123020,6 +114939,10 @@ ${latestSubscriptionCallbackError.current.stack}
         feat.name = feat.notes.ApEinfo_label[0];
       } else if (feat.notes.name) {
         feat.name = feat.notes.name[0];
+      } else if (feat.notes.product) {
+        feat.name = feat.notes.product[0];
+      } else if (feat.notes.region_name) {
+        feat.name = feat.notes.region_name[0];
       } else if (feat.notes.organism) {
         feat.name = feat.notes.organism[0];
       } else if (feat.notes.locus_tag) {
@@ -123044,6 +114967,11 @@ ${latestSubscriptionCallbackError.current.stack}
         feat.arrowheadType = feat.notes.direction[0].toUpperCase() === "BOTH" ? "BOTH" : feat.notes.direction[0].toUpperCase() === "NONE" ? "NONE" : void 0;
         delete feat.notes.direction;
       }
+      if (feat.locations && feat.locations.length > 1 && feat.locations[0].start > feat.locations[feat.locations.length - 1].end) {
+        if (parsedSequence.circular === void 0) {
+          parsedSequence.circular = true;
+        }
+      }
       if (parsedSequence.circular) {
         const { inclusive1BasedStart: inclusive1BasedStart2, inclusive1BasedEnd: inclusive1BasedEnd2 } = options2;
         feat.locations = wrapOriginSpanningFeatures(
@@ -123052,6 +114980,8 @@ ${latestSubscriptionCallbackError.current.stack}
           inclusive1BasedStart2,
           inclusive1BasedEnd2
         );
+      } else if (feat.locations && feat.locations.length > 1) {
+        feat.locations.sort((a2, b3) => a2.start - b3.start);
       }
       return feat;
     }
@@ -127287,17 +119217,20 @@ ${latestSubscriptionCallbackError.current.stack}
             const b3 = new fxpExports.XMLParser({
               ignoreAttributes: false,
               attributeNamePrefix: "",
-              isArray: /* @__PURE__ */ __name((name2) => name2 === "Feature" || name2 === "Segment", "isArray")
+              isArray: /* @__PURE__ */ __name((name2) => ["Feature", "Segment", "Q", "V"].includes(name2), "isArray")
             }).parse(xml2);
             const { Features: { Feature: Feature2 = [] } = {} } = b3;
             data.features = [];
             Feature2.forEach((feat) => {
+              var _a2, _b2, _c2, _d2;
               const { directionality, Segment = [], name: name2, type: type2 } = feat;
+              let color2;
               let maxStart = 0;
               let maxEnd = 0;
               const locations = Segment && Segment.map((seg) => {
                 if (!seg) throw new Error("invalid feature definition");
                 const { range: range2 } = seg;
+                if (seg.color) color2 = seg.color;
                 let { start: start2, end: end2 } = getStartAndEndFromRangeString(range2);
                 start2 = isProtein2 ? start2 * 3 : start2;
                 end2 = isProtein2 ? end2 * 3 + 2 : end2;
@@ -127308,6 +119241,10 @@ ${latestSubscriptionCallbackError.current.stack}
                   end: end2
                 };
               });
+              const colorQual = (_a2 = feat.Q) == null ? void 0 : _a2.find((q2) => q2.name === "color");
+              if (colorQual) {
+                color2 = ((_c2 = (_b2 = colorQual.V) == null ? void 0 : _b2[0]) == null ? void 0 : _c2.text) || ((_d2 = colorQual.V) == null ? void 0 : _d2[0]);
+              }
               data.features.push(__spreadProps(__spreadValues({
                 name: name2,
                 type: type2
@@ -127315,8 +119252,8 @@ ${latestSubscriptionCallbackError.current.stack}
                 strand: directionality ? strand_dict[directionality][0] : 1,
                 arrowheadType: directionality ? strand_dict[directionality][1] : "NONE",
                 start: maxStart,
-                end: maxEnd
-                // color,
+                end: maxEnd,
+                color: color2
               }));
             });
           } else if (ord(next_byte) === 6) {
@@ -132166,7 +124103,44 @@ ${seq.sequence}
     return day2 + "-" + month + "-" + year;
   }
   __name(getCurrentDateString, "getCurrentDateString");
+  const standardLineLength = 79;
   function featureNoteInDataToGenbankString(name2, value, options) {
+    const valueString = mangleOrStripUrls(value, options);
+    if (valueString.length > standardLineLength - 25 - name2.length) {
+      const lines = [];
+      let currentIndex = 0;
+      while (currentIndex < valueString.length) {
+        if (currentIndex === 0) {
+          const chunk = valueString.substring(
+            currentIndex,
+            currentIndex + standardLineLength - name2.length - 24
+          );
+          lines.push(
+            StringUtil.lpad("/", " ", 22) + name2 + '="' + chunk + (currentIndex + standardLineLength - 22 - name2.length >= valueString.length ? '"' : "")
+          );
+          currentIndex += standardLineLength - name2.length - 24;
+        } else {
+          const chunk = valueString.substring(
+            currentIndex,
+            currentIndex + standardLineLength - 21
+          );
+          if (currentIndex + standardLineLength - 21 >= valueString.length) {
+            const lineString = " ".repeat(21) + chunk;
+            if (lineString.length === standardLineLength) {
+              lines.push(lineString);
+              lines.push(" ".repeat(21) + '"');
+            } else {
+              lines.push(lineString + '"');
+            }
+          } else {
+            const lineString = " ".repeat(21) + chunk;
+            lines.push(lineString);
+          }
+          currentIndex += standardLineLength - 21;
+        }
+      }
+      return lines.join("\r\n");
+    }
     return StringUtil.lpad("/", " ", 22) + name2 + '="' + mangleOrStripUrls(value, options) + '"';
   }
   __name(featureNoteInDataToGenbankString, "featureNoteInDataToGenbankString");
@@ -132444,12 +124418,34 @@ ${seq.sequence}
         track.alignmentData.sequence
       );
       const mismatches = matchHighlightRanges.filter(({ isMatch }) => !isMatch);
+      const alignedSeq = track.alignmentData.sequence;
+      const seqLen = alignedSeq.length;
+      const startIndex = seqLen - alignedSeq.replace(/^-+/, "").length;
+      const endIndex = alignedSeq.replace(/-+$/, "").length;
+      const gapRanges = [
+        startIndex > 0 && {
+          start: 0,
+          end: startIndex - 1,
+          differenceType: "gap"
+        },
+        endIndex < seqLen && {
+          start: endIndex,
+          end: seqLen - 1,
+          differenceType: "gap"
+        }
+      ].filter(Boolean);
       return __spreadProps(__spreadValues({}, track), {
         sequenceData: sequenceData2,
         matchHighlightRanges,
-        additionalSelectionLayers: matchHighlightRanges.filter(({ isMatch }) => !isMatch).map((range2) => {
-          return __spreadValues(__spreadValues({}, range2), highlightRangeProps);
-        }),
+        additionalSelectionLayers: [
+          ...matchHighlightRanges.filter(({ isMatch }) => !isMatch).map((range2) => __spreadProps(__spreadValues(__spreadValues({}, range2), highlightRangeProps), {
+            className: "veAlignmentMismatch"
+          })),
+          ...gapRanges.map((range2) => __spreadProps(__spreadValues(__spreadValues({}, range2), highlightRangeProps), {
+            className: "veAlignmentMismatch"
+          }))
+        ],
+        gapRanges,
         mismatches
       });
     });
@@ -132514,10 +124510,12 @@ ${seq.sequence}
           let match;
           const additionalSelectionLayers = [];
           while ((match = re2.exec(condensedSeq)) != null) {
-            additionalSelectionLayers.push(__spreadValues({
+            additionalSelectionLayers.push(__spreadProps(__spreadValues({
               start: match.index,
               end: match.index + match[0].length - 1
-            }, highlightRangeProps));
+            }, highlightRangeProps), {
+              className: "veAlignmentMismatch"
+            }));
           }
           re2 = /g+/gi;
           while ((match = re2.exec(condensedSeq)) != null) {
@@ -132581,23 +124579,30 @@ ${seq.sequence}
     const startIndex = seqLength - nonTempSeqWithoutLeadingDashes.length;
     const endIndex = seqLength - (seqLength - nonTempSeqWithoutTrailingDashes.length);
     for (let index2 = startIndex; index2 < endIndex; index2++) {
-      const isMatch = tempSeq[index2].toLowerCase() === nonTempSeq[index2].toLowerCase();
-      const previousRange = ranges[ranges.length - 1];
-      if (previousRange) {
-        if (previousRange.isMatch === isMatch) {
-          previousRange.end++;
+      const tempBase = tempSeq[index2].toLowerCase();
+      const nonTempBase = nonTempSeq[index2].toLowerCase();
+      const isMatch = tempBase === nonTempBase;
+      let differenceType = null;
+      if (!isMatch) {
+        if (tempBase === "-") {
+          differenceType = "insertion";
+        } else if (nonTempBase === "-") {
+          differenceType = "deletion";
         } else {
-          ranges.push({
-            start: index2,
-            end: index2,
-            isMatch
-          });
+          differenceType = "mismatch";
         }
+      }
+      const previousRange = ranges[ranges.length - 1];
+      if (previousRange && previousRange.isMatch === isMatch && previousRange.differenceType === differenceType) {
+        previousRange.end++;
+      } else if (previousRange) {
+        ranges.push({ start: index2, end: index2, isMatch, differenceType });
       } else {
         ranges.push({
           start: startIndex,
           end: startIndex,
-          isMatch
+          isMatch,
+          differenceType
         });
       }
     }
@@ -132698,7 +124703,7 @@ ${seq.sequence}
   const collapsePanel = createMetaAction("collapsePanel");
   const closePanel = createMetaAction("closePanel");
   const _collapseSplitScreen = createMetaAction("_collapseSplitScreen");
-  const setPanelAsActive = createMetaAction("setPanelAsActive");
+  const setPanelAsActive = createMetaAction("SET_PANEL_AS_ACTIVE");
   const flipActiveTabFromLinearOrCircularIfNecessary = createMetaAction(
     "flipActiveTabFromLinearOrCircularIfNecessary"
   );
@@ -133743,6 +125748,30 @@ ${seq.sequence}
     default: selectedPartTags,
     updateSelectedPartTags
   }, Symbol.toStringTag, { value: "Module" }));
+  const updateTemporaryAnnotations = createMetaAction(
+    "TEMPORARY_ANNOTATIONS_UPDATE"
+  );
+  const temporaryAnnotations = createMergedDefaultStateReducer(
+    {
+      TEMPORARY_ANNOTATIONS_UPDATE: /* @__PURE__ */ __name((state2, payload) => {
+        return __spreadValues(__spreadValues({}, state2), payload);
+      }, "TEMPORARY_ANNOTATIONS_UPDATE"),
+      VECTOR_EDITOR_UPDATE: /* @__PURE__ */ __name((state2, payload) => {
+        return __spreadValues(__spreadValues({}, state2), payload.temporaryAnnotations);
+      }, "VECTOR_EDITOR_UPDATE")
+    },
+    {
+      features: {},
+      primers: {},
+      parts: {},
+      searchLayers: []
+    }
+  );
+  const temporaryAnnotations$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+    __proto__: null,
+    default: temporaryAnnotations,
+    updateTemporaryAnnotations
+  }, Symbol.toStringTag, { value: "Module" }));
   const vectorEditorMiddleware = /* @__PURE__ */ __name((store2) => (next) => (action2) => {
     if (action2.meta && action2.meta.disregardUndo) {
       return next(action2);
@@ -133836,7 +125865,6 @@ ${seq.sequence}
     toolBar: toolBar$1,
     findTool: findTool$1,
     frameTranslations: frameTranslations$1,
-    hoveredAnnotation: hoveredAnnotationActions,
     minimumOrfSize: minimumOrfSize$1,
     panelsShown: panelsShown$1,
     propertiesTool: propertiesTool$1,
@@ -133858,7 +125886,8 @@ ${seq.sequence}
     partLengthsToHide: partLengthsToHide$1,
     primerLengthsToHide: primerLengthsToHide$1,
     featureLengthsToHide: featureLengthsToHide$1,
-    selectedPartTags: selectedPartTags$1
+    selectedPartTags: selectedPartTags$1,
+    temporaryAnnotations: temporaryAnnotations$1
   };
   const vectorEditorInitialize = createMetaAction("VECTOR_EDITOR_UPDATE");
   const vectorEditorClear = createMetaAction("VECTOR_EDITOR_CLEAR");
@@ -133959,7 +125988,7 @@ ${seq.sequence}
       //   replacer: (key, value) => {
       //   }
       // },
-      actionsDenylist: ["HOVEREDANNOTATIONUPDATE", "HOVEREDANNOTATIONCLEAR"]
+      actionsDenylist: []
     }) || compose$1;
     const store2 = createStore$2(
       combineReducers({
@@ -134034,195 +126063,6 @@ ${seq.sequence}
     return sequenceDataSelector(state2).sequence;
   }
   __name(sequenceSelector, "sequenceSelector");
-  var NOT_FOUND = "NOT_FOUND";
-  function createSingletonCache(equals) {
-    var entry;
-    return {
-      get: /* @__PURE__ */ __name(function get2(key) {
-        if (entry && equals(entry.key, key)) {
-          return entry.value;
-        }
-        return NOT_FOUND;
-      }, "get"),
-      put: /* @__PURE__ */ __name(function put(key, value) {
-        entry = {
-          key,
-          value
-        };
-      }, "put"),
-      getEntries: /* @__PURE__ */ __name(function getEntries() {
-        return entry ? [entry] : [];
-      }, "getEntries"),
-      clear: /* @__PURE__ */ __name(function clear() {
-        entry = void 0;
-      }, "clear")
-    };
-  }
-  __name(createSingletonCache, "createSingletonCache");
-  function createLruCache(maxSize, equals) {
-    var entries = [];
-    function get2(key) {
-      var cacheIndex = entries.findIndex(function(entry2) {
-        return equals(key, entry2.key);
-      });
-      if (cacheIndex > -1) {
-        var entry = entries[cacheIndex];
-        if (cacheIndex > 0) {
-          entries.splice(cacheIndex, 1);
-          entries.unshift(entry);
-        }
-        return entry.value;
-      }
-      return NOT_FOUND;
-    }
-    __name(get2, "get");
-    function put(key, value) {
-      if (get2(key) === NOT_FOUND) {
-        entries.unshift({
-          key,
-          value
-        });
-        if (entries.length > maxSize) {
-          entries.pop();
-        }
-      }
-    }
-    __name(put, "put");
-    function getEntries() {
-      return entries;
-    }
-    __name(getEntries, "getEntries");
-    function clear() {
-      entries = [];
-    }
-    __name(clear, "clear");
-    return {
-      get: get2,
-      put,
-      getEntries,
-      clear
-    };
-  }
-  __name(createLruCache, "createLruCache");
-  var defaultEqualityCheck = /* @__PURE__ */ __name(function defaultEqualityCheck2(a2, b3) {
-    return a2 === b3;
-  }, "defaultEqualityCheck");
-  function createCacheKeyComparator(equalityCheck) {
-    return /* @__PURE__ */ __name(function areArgumentsShallowlyEqual(prev, next) {
-      if (prev === null || next === null || prev.length !== next.length) {
-        return false;
-      }
-      var length = prev.length;
-      for (var i2 = 0; i2 < length; i2++) {
-        if (!equalityCheck(prev[i2], next[i2])) {
-          return false;
-        }
-      }
-      return true;
-    }, "areArgumentsShallowlyEqual");
-  }
-  __name(createCacheKeyComparator, "createCacheKeyComparator");
-  function defaultMemoize(func, equalityCheckOrOptions) {
-    var providedOptions = typeof equalityCheckOrOptions === "object" ? equalityCheckOrOptions : {
-      equalityCheck: equalityCheckOrOptions
-    };
-    var _providedOptions$equa = providedOptions.equalityCheck, equalityCheck = _providedOptions$equa === void 0 ? defaultEqualityCheck : _providedOptions$equa, _providedOptions$maxS = providedOptions.maxSize, maxSize = _providedOptions$maxS === void 0 ? 1 : _providedOptions$maxS, resultEqualityCheck = providedOptions.resultEqualityCheck;
-    var comparator = createCacheKeyComparator(equalityCheck);
-    var cache2 = maxSize === 1 ? createSingletonCache(comparator) : createLruCache(maxSize, comparator);
-    function memoized() {
-      var value = cache2.get(arguments);
-      if (value === NOT_FOUND) {
-        value = func.apply(null, arguments);
-        if (resultEqualityCheck) {
-          var entries = cache2.getEntries();
-          var matchingEntry = entries.find(function(entry) {
-            return resultEqualityCheck(entry.value, value);
-          });
-          if (matchingEntry) {
-            value = matchingEntry.value;
-          }
-        }
-        cache2.put(arguments, value);
-      }
-      return value;
-    }
-    __name(memoized, "memoized");
-    memoized.clearCache = function() {
-      return cache2.clear();
-    };
-    return memoized;
-  }
-  __name(defaultMemoize, "defaultMemoize");
-  function getDependencies(funcs) {
-    var dependencies = Array.isArray(funcs[0]) ? funcs[0] : funcs;
-    if (!dependencies.every(function(dep) {
-      return typeof dep === "function";
-    })) {
-      var dependencyTypes = dependencies.map(function(dep) {
-        return typeof dep === "function" ? "function " + (dep.name || "unnamed") + "()" : typeof dep;
-      }).join(", ");
-      throw new Error("createSelector expects all input-selectors to be functions, but received the following types: [" + dependencyTypes + "]");
-    }
-    return dependencies;
-  }
-  __name(getDependencies, "getDependencies");
-  function createSelectorCreator(memoize2) {
-    for (var _len = arguments.length, memoizeOptionsFromArgs = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      memoizeOptionsFromArgs[_key - 1] = arguments[_key];
-    }
-    var createSelector2 = /* @__PURE__ */ __name(function createSelector3() {
-      for (var _len2 = arguments.length, funcs = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        funcs[_key2] = arguments[_key2];
-      }
-      var _recomputations = 0;
-      var _lastResult;
-      var directlyPassedOptions = {
-        memoizeOptions: void 0
-      };
-      var resultFunc = funcs.pop();
-      if (typeof resultFunc === "object") {
-        directlyPassedOptions = resultFunc;
-        resultFunc = funcs.pop();
-      }
-      if (typeof resultFunc !== "function") {
-        throw new Error("createSelector expects an output function after the inputs, but received: [" + typeof resultFunc + "]");
-      }
-      var _directlyPassedOption = directlyPassedOptions, _directlyPassedOption2 = _directlyPassedOption.memoizeOptions, memoizeOptions = _directlyPassedOption2 === void 0 ? memoizeOptionsFromArgs : _directlyPassedOption2;
-      var finalMemoizeOptions = Array.isArray(memoizeOptions) ? memoizeOptions : [memoizeOptions];
-      var dependencies = getDependencies(funcs);
-      var memoizedResultFunc = memoize2.apply(void 0, [/* @__PURE__ */ __name(function recomputationWrapper() {
-        _recomputations++;
-        return resultFunc.apply(null, arguments);
-      }, "recomputationWrapper")].concat(finalMemoizeOptions));
-      var selector = memoize2(/* @__PURE__ */ __name(function dependenciesChecker() {
-        var params = [];
-        var length = dependencies.length;
-        for (var i2 = 0; i2 < length; i2++) {
-          params.push(dependencies[i2].apply(null, arguments));
-        }
-        _lastResult = memoizedResultFunc.apply(null, params);
-        return _lastResult;
-      }, "dependenciesChecker"));
-      Object.assign(selector, {
-        resultFunc,
-        memoizedResultFunc,
-        dependencies,
-        lastResult: /* @__PURE__ */ __name(function lastResult() {
-          return _lastResult;
-        }, "lastResult"),
-        recomputations: /* @__PURE__ */ __name(function recomputations() {
-          return _recomputations;
-        }, "recomputations"),
-        resetRecomputations: /* @__PURE__ */ __name(function resetRecomputations() {
-          return _recomputations = 0;
-        }, "resetRecomputations")
-      });
-      return selector;
-    }, "createSelector");
-    return createSelector2;
-  }
-  __name(createSelectorCreator, "createSelectorCreator");
-  var createSelector = /* @__PURE__ */ createSelectorCreator(defaultMemoize);
   const restrictionEnzymesSelector = createSelector(
     () => defaultEnzymesByName,
     (state2, additionalEnzymes) => {
@@ -134248,7 +126088,34 @@ ${seq.sequence}
   const cutsiteLabelColorSelector = createSelector(sequenceDataSelector, function(sequenceData2) {
     return sequenceData2.cutsiteLabelColors;
   });
-  function cutsitesSelector(sequence2, circular2, enzymeList, cutsiteLabelColors) {
+  const cutsitesCache = [];
+  function getCachedResult(argsObj) {
+    const idx = cutsitesCache.findIndex(
+      (entry) => entry && isEqual$3(entry.args, argsObj)
+    );
+    if (idx === -1) return;
+    const hit = cutsitesCache[idx];
+    return hit.result;
+  }
+  __name(getCachedResult, "getCachedResult");
+  function setCachedResult(argsObj, result, cacheSize = 1) {
+    cutsitesCache.push({
+      args: argsObj,
+      result
+    });
+    if (cutsitesCache.length > cacheSize) cutsitesCache.shift();
+  }
+  __name(setCachedResult, "setCachedResult");
+  function cutsitesSelector(sequence2, circular2, enzymeList, cutsiteLabelColors, editorSize = 1) {
+    const cachedResult = getCachedResult({
+      sequence: sequence2,
+      circular: circular2,
+      enzymeList,
+      cutsiteLabelColors
+    });
+    if (cachedResult) {
+      return cachedResult;
+    }
     const cutsitesByName = getLowerCaseObj(
       getCutsitesFromSequence(sequence2, circular2, map$3(enzymeList))
     );
@@ -134281,11 +126148,22 @@ ${seq.sequence}
     const cutsitesArray = flatMap(cutsitesByName, function(cutsitesForEnzyme) {
       return cutsitesForEnzyme;
     });
-    return {
+    const result = {
       cutsitesByName,
       cutsitesById,
       cutsitesArray
     };
+    setCachedResult(
+      {
+        sequence: sequence2,
+        circular: circular2,
+        enzymeList,
+        cutsiteLabelColors
+      },
+      result,
+      editorSize
+    );
+    return result;
   }
   __name(cutsitesSelector, "cutsitesSelector");
   const cutsitesSelector$1 = createSelector(
@@ -134293,6 +126171,7 @@ ${seq.sequence}
     circularSelector,
     restrictionEnzymesSelector,
     cutsiteLabelColorSelector,
+    (editorState) => editorState.editorSize,
     cutsitesSelector
   );
   function divideBy3(num, shouldDivideBy3) {
@@ -134323,7 +126202,8 @@ ${seq.sequence}
     //these are only passed in for the status bar
     GCDecimalDigits,
     //these are only passed in for the status bar
-    isProtein: isProtein2
+    isProtein: isProtein2,
+    showAminoAcidUnitAsCodon
   }) {
     let _selectionLayer = selectionLayer2;
     const isSelecting = selectionLayer2.start > -1;
@@ -134334,7 +126214,7 @@ ${seq.sequence}
         getSequenceWithinRange(_selectionLayer, sequenceData2.sequence)
       ).toFixed(numDecimalDigits), "GCContent");
       const seqLen = divideBy3(length, isProtein2);
-      return `${customTitle || "Selecting"} ${seqLen} ${(isProtein2 ? "AA" : "bp") + (seqLen === 1 ? "" : "s")} from ${divideBy3(_selectionLayer.start, isProtein2) + 1} to ${divideBy3(
+      return `${customTitle || "Selecting"} ${seqLen} ${(isProtein2 ? `${showAminoAcidUnitAsCodon ? "codon" : "AA"}` : "bp") + (seqLen === 1 ? "" : "s")} from ${divideBy3(_selectionLayer.start, isProtein2) + 1} to ${divideBy3(
         _selectionLayer.end + 1,
         isProtein2
       )}${showGCContent2 && !isProtein2 ? ` (${GCContent(GCDecimalDigits)}% GC)` : ""}`;
@@ -134344,7 +126224,7 @@ ${seq.sequence}
         _selectionLayer,
         sequenceLength
       );
-      return `Caret Between ` + (isProtein2 ? `AAs ${divideBy3(insertBetween[0], true)} and ${divideBy3(
+      return `Caret Between ` + (isProtein2 ? `${showAminoAcidUnitAsCodon ? "codons" : "AAs"} ${divideBy3(insertBetween[0], true)} and ${divideBy3(
         insertBetween[1] + 2,
         true
       )}` : `Bases ${insertBetween[0]} and ${insertBetween[1]}`);
@@ -134398,13 +126278,13 @@ ${seq.sequence}
     );
   }
   __name(addCustomEnzyme, "addCustomEnzyme");
-  function pareDownAnnotations(annotations, max2) {
+  function pareDownAnnotations(annotations, max2, sequenceLength) {
     let annotationsToPass = annotations;
     let paredDown = false;
     if (Object.keys(annotations).length > max2) {
       paredDown = true;
       const sortedAnnotations = sortBy$1(annotations, function(annotation) {
-        return -getRangeLength(annotation);
+        return -getRangeLength(annotation, sequenceLength);
       });
       annotationsToPass = sortedAnnotations.slice(0, max2).reduce(function(obj, item) {
         obj[item.id] = item;
@@ -134529,42 +126409,21 @@ ${seq.sequence}
     circularSelector,
     minimumOrfSizeSelector,
     (state2) => state2.useAdditionalOrfStartCodons,
+    (state2) => {
+      var _a2, _b2;
+      return ((_a2 = state2.sequenceData) == null ? void 0 : _a2.isProtein) || ((_b2 = state2.sequenceData) == null ? void 0 : _b2.isOligo);
+    },
     findOrfsInPlasmid
   );
-  var forEach_1;
-  var hasRequiredForEach;
-  function requireForEach() {
-    if (hasRequiredForEach) return forEach_1;
-    hasRequiredForEach = 1;
-    var arrayEach2 = require_arrayEach(), baseEach2 = require_baseEach(), castFunction2 = require_castFunction(), isArray2 = requireIsArray();
-    function forEach2(collection, iteratee) {
-      var func = isArray2(collection) ? arrayEach2 : baseEach2;
-      return func(collection, castFunction2(iteratee));
-    }
-    __name(forEach2, "forEach");
-    forEach_1 = forEach2;
-    return forEach_1;
-  }
-  __name(requireForEach, "requireForEach");
-  var each$1;
-  var hasRequiredEach;
-  function requireEach() {
-    if (hasRequiredEach) return each$1;
-    hasRequiredEach = 1;
-    each$1 = requireForEach();
-    return each$1;
-  }
-  __name(requireEach, "requireEach");
-  var eachExports = requireEach();
-  const each = /* @__PURE__ */ getDefaultExportFromCjs(eachExports);
   function translationsRawSelector(sequenceData2) {
     return sequenceData2.translations;
   }
   __name(translationsRawSelector, "translationsRawSelector");
   const translationsRawSelector$1 = createSelector(sequenceDataSelector, translationsRawSelector);
-  function searchLayersSelector(sequence2, isCircular, isOpen2, searchString, ambiguousOrLiteral, dnaOrAA, isProtein2, proteinSequence, mismatchesAllowed) {
+  function searchLayersSelector(sequence2, isCircular, isOpen2, searchString, ambiguousOrLiteral, dnaOrAA, isProtein2, proteinSequence, mismatchesAllowed, tempSearchLayers = []) {
+    const toReturn = [...tempSearchLayers];
     if (!searchString || !isOpen2) {
-      return [];
+      return toReturn;
     }
     if (isProtein2) {
       const searchingDna = dnaOrAA === "DNA";
@@ -134581,7 +126440,7 @@ ${seq.sequence}
       ).sort(({ start: start2 }, { start: start22 }) => {
         return start2 - start22;
       });
-      return searchingDna ? matches2 : matches2.map((_a2) => {
+      const r2 = searchingDna ? matches2 : matches2.map((_a2) => {
         var _b2 = _a2, { start: start2, end: end2 } = _b2, rest = __objRest(_b2, ["start", "end"]);
         return __spreadProps(__spreadValues({}, rest), {
           isSearchLayer: true,
@@ -134589,6 +126448,7 @@ ${seq.sequence}
           end: end2 * 3 + 2
         });
       });
+      return [...toReturn, ...r2];
     }
     if (dnaOrAA === "DNA" && ambiguousOrLiteral === "LITERAL" && mismatchesAllowed > 0) {
       const approxMatches = findApproxMatches(
@@ -134606,9 +126466,12 @@ ${seq.sequence}
         isSearchLayer: true,
         forward: true
       })).sort((a2, b3) => a2.start - b3.start);
-      return matches2.map((match) => __spreadProps(__spreadValues({}, match), {
-        className: "veSearchLayer"
-      }));
+      return [
+        ...toReturn,
+        ...matches2.map((match) => __spreadProps(__spreadValues({}, match), {
+          className: "veSearchLayer"
+        }))
+      ];
     }
     const matches = findSequenceMatches(sequence2, searchString, {
       isCircular,
@@ -134618,11 +126481,14 @@ ${seq.sequence}
     }).sort(({ start: start2 }, { start: start22 }) => {
       return start2 - start22;
     });
-    return matches.map((match) => __spreadProps(__spreadValues({}, match), {
-      forward: !match.bottomStrand,
-      className: "veSearchLayer " + (match.bottomStrand ? " veSearchLayerBottomStrand" : ""),
-      isSearchLayer: true
-    }));
+    return [
+      ...toReturn,
+      ...matches.map((match) => __spreadProps(__spreadValues({}, match), {
+        forward: !match.bottomStrand,
+        className: "veSearchLayer " + (match.bottomStrand ? " veSearchLayerBottomStrand" : ""),
+        isSearchLayer: true
+      }))
+    ];
   }
   __name(searchLayersSelector, "searchLayersSelector");
   const searchLayersSelector$1 = createSelector(
@@ -134635,6 +126501,10 @@ ${seq.sequence}
     (state2) => state2.sequenceData.isProtein,
     (state2) => state2.sequenceData.proteinSequence,
     (state2) => state2.findTool && state2.findTool.mismatchesAllowed,
+    (state2) => {
+      var _a2;
+      return (_a2 = state2.temporaryAnnotations) == null ? void 0 : _a2.searchLayers;
+    },
     searchLayersSelector
   );
   const translationSearchMatchesSelector = createSelector(
@@ -134648,11 +126518,16 @@ ${seq.sequence}
       return searchLayers;
     }
   );
-  function featuresRawSelector(sequenceData2) {
-    return sequenceData2.features;
+  const temporaryAnnotationsSelector = /* @__PURE__ */ __name((editor) => editor.temporaryAnnotations, "temporaryAnnotationsSelector");
+  function featuresRawSelector(sequenceData2, temporaryAnnotations2) {
+    return __spreadValues(__spreadValues({}, sequenceData2.features), temporaryAnnotations2 == null ? void 0 : temporaryAnnotations2.features);
   }
   __name(featuresRawSelector, "featuresRawSelector");
-  const featuresSelector = createSelector(sequenceDataSelector, featuresRawSelector);
+  const featuresSelector = createSelector(
+    sequenceDataSelector,
+    temporaryAnnotationsSelector,
+    featuresRawSelector
+  );
   function cdsFeaturesRawSelector(features2) {
     return filter(features2, ({ type: type2 }) => type2 && type2.toUpperCase() === "CDS");
   }
@@ -134723,14 +126598,22 @@ ${seq.sequence}
       },
       {}
     ));
-    each(translationsToPass, function(translation) {
-      translation.aminoAcids = getAminoAcidDataForEachBaseOfDna(
-        sequence2,
-        translation.forward,
-        translation
+    return mapValues$1(translationsToPass, (translation) => {
+      var _a2, _b2;
+      const codonStart = ((_b2 = (_a2 = translation == null ? void 0 : translation.notes) == null ? void 0 : _a2.codon_start) == null ? void 0 : _b2[0]) - 1 || 0;
+      const expandedRange = expandOrContractRangeByLength(
+        translation,
+        -codonStart,
+        true,
+        sequence2.length
       );
+      expandedRange.aminoAcids = getAminoAcidDataForEachBaseOfDna(
+        sequence2,
+        expandedRange.forward,
+        expandedRange
+      );
+      return expandedRange;
     });
-    return translationsToPass;
   }
   __name(translationsSelector, "translationsSelector");
   const translationsSelector$1 = createSelector(
@@ -134924,11 +126807,15 @@ ${seq.sequence}
     (state2) => state2.featureLengthsToHide,
     filteredFeaturesSelector
   );
-  function primersRawSelector(sequenceData2) {
-    return sequenceData2.primers;
+  function primersRawSelector(sequenceData2, temporaryAnnotations2) {
+    return __spreadValues(__spreadValues({}, sequenceData2.primers), temporaryAnnotations2 == null ? void 0 : temporaryAnnotations2.primers);
   }
   __name(primersRawSelector, "primersRawSelector");
-  const primersSelector = createSelector(sequenceDataSelector, primersRawSelector);
+  const primersSelector = createSelector(
+    sequenceDataSelector,
+    temporaryAnnotationsSelector,
+    primersRawSelector
+  );
   function filteredPrimersSelector(primers2, seqLen, primerIndividualToHide, lengthsToHide) {
     return omitBy(primers2, (ann) => {
       const hideIndividually = primerIndividualToHide[ann.id];
@@ -134943,11 +126830,15 @@ ${seq.sequence}
     (state2) => state2.primerLengthsToHide,
     filteredPrimersSelector
   );
-  function partsRawSelector(sequenceData2) {
-    return sequenceData2.parts;
+  function partsRawSelector(sequenceData2, temporaryAnnotations2) {
+    return __spreadValues(__spreadValues({}, sequenceData2.parts), temporaryAnnotations2 == null ? void 0 : temporaryAnnotations2.parts);
   }
   __name(partsRawSelector, "partsRawSelector");
-  const partsSelector = createSelector(sequenceDataSelector, partsRawSelector);
+  const partsSelector = createSelector(
+    sequenceDataSelector,
+    temporaryAnnotationsSelector,
+    partsRawSelector
+  );
   const tagsToBoldSelector = /* @__PURE__ */ __name((state2) => state2.selectedPartTags.parts, "tagsToBoldSelector");
   function addWrappedAddons(anns, seqLen) {
     return flatMap(anns, (ann) => {
@@ -135696,11 +127587,12 @@ ${seq.sequence}
     props,
     overrideName
   }) {
-    var _a2;
+    var _a2, _b2, _c2, _d2;
     dialogHolder.dialogType = dialogType;
     if (!dialogHolder.dialogType && ModalComponent) {
       dialogHolder.dialogType = "TGCustomModal";
     }
+    dialogHolder.editorName = props == null ? void 0 : props.editorName;
     if (document.activeElement && document.activeElement.closest(".veEditor")) {
       let editorName;
       (_a2 = document.activeElement.closest(".veEditor")) == null ? void 0 : _a2.className.split(" ").forEach((c2) => {
@@ -135714,16 +127606,28 @@ ${seq.sequence}
     dialogHolder.CustomModalComponent = ModalComponent;
     dialogHolder.props = props;
     dialogHolder.overrideName = overrideName;
-    dialogHolder.setUniqKeyToForceRerender(uuid());
+    if (dialogHolder.editorName && (dialogHolder == null ? void 0 : dialogHolder[dialogHolder.editorName])) {
+      (_c2 = (_b2 = dialogHolder == null ? void 0 : dialogHolder[dialogHolder.editorName]) == null ? void 0 : _b2.setUniqKeyToForceRerender) == null ? void 0 : _c2.call(
+        _b2,
+        uuid()
+      );
+    } else {
+      (_d2 = dialogHolder == null ? void 0 : dialogHolder.setUniqKeyToForceRerender) == null ? void 0 : _d2.call(dialogHolder, uuid());
+    }
   }
   __name(showDialog, "showDialog");
   function hideDialog() {
+    var _a2, _b2, _c2;
     delete dialogHolder.dialogType;
     delete dialogHolder.CustomModalComponent;
     delete dialogHolder.props;
     delete dialogHolder.overrideName;
+    if (dialogHolder.editorName && (dialogHolder == null ? void 0 : dialogHolder[dialogHolder.editorName])) {
+      (_b2 = (_a2 = dialogHolder == null ? void 0 : dialogHolder[dialogHolder.editorName]) == null ? void 0 : _a2.setUniqKeyToForceRerender) == null ? void 0 : _b2.call(_a2);
+    } else {
+      (_c2 = dialogHolder == null ? void 0 : dialogHolder.setUniqKeyToForceRerender) == null ? void 0 : _c2.call(dialogHolder);
+    }
     delete dialogHolder.editorName;
-    dialogHolder.setUniqKeyToForceRerender();
   }
   __name(hideDialog, "hideDialog");
   const typeToDialogType = {
@@ -135774,7 +127678,8 @@ ${seq.sequence}
       annotationVisibility: annotationVisibility2,
       annotationsToSupport: annotationsToSupport2,
       findTool: findTool2,
-      justPassingPartialSeqData
+      justPassingPartialSeqData,
+      temporaryAnnotations: temporaryAnnotations2
     } = initialValues2;
     const currentEditor = store2.getState().VectorEditor[editorName] || {};
     const isAlreadyProteinEditor = currentEditor.sequenceData && currentEditor.sequenceData.isProtein;
@@ -135896,12 +127801,14 @@ ${seq.sequence}
           };
         }
       }
-      payload = __spreadValues(__spreadValues(__spreadValues({}, initialValues2), toSpread), sequenceData2 && {
+      payload = __spreadValues(__spreadValues(__spreadValues(__spreadValues({}, initialValues2), toSpread), sequenceData2 && {
         sequenceData: tidyUpSequenceData(sequenceData2, {
           convertAnnotationsFromAAIndices,
           //if we have sequence data coming in make sure to tidy it up for the user :)
           annotationsAsObjects: true
         })
+      }), temporaryAnnotations2 && {
+        temporaryAnnotations: temporaryAnnotations2
       });
     }
     annotationTypes.forEach((t2) => {
@@ -135995,7 +127902,8 @@ ${seq.sequence}
       readOnly: readOnly2,
       alwaysAllowSave,
       sequenceData: sequenceData2,
-      lastSavedIdUpdate: lastSavedIdUpdate2
+      lastSavedIdUpdate: lastSavedIdUpdate2,
+      getAcceptedInsertChars
     } = props;
     const saveHandler = opts2.isSaveAs ? onSaveAs || onSave : onSave;
     const updateLastSavedIdToCurrent = /* @__PURE__ */ __name(() => {
@@ -136008,7 +127916,8 @@ ${seq.sequence}
       opts2,
       tidyUpSequenceData(sequenceData2, {
         doNotRemoveInvalidChars: true,
-        annotationsAsObjects: true
+        annotationsAsObjects: true,
+        getAcceptedInsertChars
       }),
       props,
       updateLastSavedIdToCurrent
@@ -136190,8 +128099,8 @@ ${seq.sequence}
             caretPositionOrRange,
             options
           } = props.beforeSequenceInsertOrDelete ? (yield props.beforeSequenceInsertOrDelete(
-            tidyUpSequenceData(_sequenceDataToInsert),
-            tidyUpSequenceData(_existingSequenceData),
+            tidyUpSequenceData(_sequenceDataToInsert, { getAcceptedInsertChars: props.getAcceptedInsertChars }),
+            tidyUpSequenceData(_existingSequenceData, { getAcceptedInsertChars: props.getAcceptedInsertChars }),
             _caretPositionOrRange,
             _options
           )) || {} : {};
@@ -136354,7 +128263,11 @@ ${seq.sequence}
     (state2) => state2.VectorEditor,
     (state2, editorName) => editorName,
     (VectorEditor, editorName) => {
-      return VectorEditor[editorName];
+      const editorState = VectorEditor[editorName];
+      editorState && (editorState.editorSize = Object.values(VectorEditor).filter(
+        (editorItem) => editorItem == null ? void 0 : editorItem.sequenceData
+      ).length);
+      return editorState;
     }
   );
   function mapStateToProps(state2, ownProps) {
@@ -136391,6 +128304,9 @@ ${seq.sequence}
           annotationTypePlural,
           sequenceLength
         );
+        if (dialogHolder.editorName) {
+          annotationToAdd = dialogHolder.editorName === editorName ? annotationToAdd : void 0;
+        }
       }
     });
     const toReturn = __spreadProps(__spreadValues({}, editorState), {
@@ -136458,7 +128374,8 @@ ${seq.sequence}
       editorName,
       actions,
       actionOverrides,
-      dispatch
+      dispatch,
+      ownProps
     );
     const updateSel = ownProps.selectionLayerUpdate || actionsToPass.selectionLayerUpdate;
     const updateCar = ownProps.caretPositionUpdate || actionsToPass.caretPositionUpdate;
@@ -136486,7 +128403,7 @@ ${seq.sequence}
     return defaultOverrides;
   }
   __name(fakeActionOverrides, "fakeActionOverrides");
-  function getCombinedActions(editorName, actions2, actionOverrides, dispatch) {
+  function getCombinedActions(editorName, actions2, actionOverrides, dispatch, ownProps) {
     const meta = { editorName };
     let metaActions = addMetaToActionCreators(actions2, meta);
     const overrides = {};
@@ -136511,6 +128428,21 @@ ${seq.sequence}
       }, "redo")
     }, metaActions), overrides);
     const actionsToPass = __spreadValues({}, metaActions);
+    function addGenericHook(hookName) {
+      const oldHook = actionsToPass[hookName];
+      actionsToPass[hookName] = (...args) => {
+        const toRet = oldHook(...args);
+        const newHookName = `on_${hookName}`;
+        if (ownProps[newHookName]) {
+          setTimeout(() => {
+            ownProps[newHookName](...args);
+          }, 0);
+        }
+        return toRet;
+      };
+    }
+    __name(addGenericHook, "addGenericHook");
+    ["setPanelAsActive", "propertiesViewTabUpdate"].forEach(addGenericHook);
     return bindActionCreators(actionsToPass, dispatch);
   }
   __name(getCombinedActions, "getCombinedActions");
@@ -136602,13 +128534,15 @@ ${seq.sequence}
     return toRet;
   }
   __name(getShowGCContent, "getShowGCContent");
-  function jsonToJson(incomingJson) {
+  function jsonToJson(incomingJson, options) {
+    const { getAcceptedInsertChars } = options || {};
     return JSON.stringify(
       omit$1(
         cleanUpTeselagenJsonForExport(
           tidyUpSequenceData(incomingJson, {
             doNotRemoveInvalidChars: true,
-            annotationsAsObjects: false
+            annotationsAsObjects: false,
+            getAcceptedInsertChars
           })
         ),
         [
@@ -137215,6 +129149,16 @@ ${seq.sequence}
     };
     return wrapperFn;
   }, "rafSchd");
+  function _extends() {
+    return _extends = Object.assign ? Object.assign.bind() : function(n2) {
+      for (var e2 = 1; e2 < arguments.length; e2++) {
+        var t2 = arguments[e2];
+        for (var r2 in t2) ({}).hasOwnProperty.call(t2, r2) && (n2[r2] = t2[r2]);
+      }
+      return n2;
+    }, _extends.apply(null, arguments);
+  }
+  __name(_extends, "_extends");
   function log(type2, message) {
     {
       return;
@@ -141746,7 +133690,7 @@ ${seq.sequence}
       el.id = id2;
       el.setAttribute("aria-live", "assertive");
       el.setAttribute("aria-atomic", "true");
-      _extends$j(el.style, visuallyHidden$1);
+      _extends(el.style, visuallyHidden$1);
       getBodyElement().appendChild(el);
       return /* @__PURE__ */ __name(function cleanup() {
         setTimeout(/* @__PURE__ */ __name(function remove2() {
@@ -143622,7 +135566,7 @@ ${seq.sequence}
     const isEnabled = typeof props.isDragDisabled === "boolean" ? !props.isDragDisabled : true;
     const canDragInteractiveElements = Boolean(props.disableInteractiveElementBlocking);
     const shouldRespectForcePress = Boolean(props.shouldRespectForcePress);
-    return React.createElement(PrivateDraggable, _extends$j({}, props, {
+    return React.createElement(PrivateDraggable, _extends({}, props, {
       isClone: false,
       isEnabled,
       canDragInteractiveElements,
@@ -145461,7 +137405,8 @@ ${seq.sequence}
     onRightClick,
     style: style2,
     selectionMessage,
-    className = ""
+    className = "",
+    showAminoAcidUnitAsCodon
   }) {
     if (row.start <= caretPosition2 && row.end + 1 >= caretPosition2 || row.end === sequenceLength - 1 && row.end < caretPosition2) {
       const cursorEl = /* @__PURE__ */ React.createElement(
@@ -145471,7 +137416,12 @@ ${seq.sequence}
           onContextMenu: onRightClick ? (e2) => {
             onRightClick(e2);
           } : void 0,
-          title: selectionMessage || getSelectionMessage({ caretPosition: caretPosition2, isProtein: isProtein2, sequenceLength }),
+          title: selectionMessage || getSelectionMessage({
+            caretPosition: caretPosition2,
+            isProtein: isProtein2,
+            sequenceLength,
+            showAminoAcidUnitAsCodon
+          }),
           className: classNames$1(
             {
               notClickable: !isDraggable
@@ -145491,18 +137441,6 @@ ${seq.sequence}
     }
   }
   __name(Caret$2, "Caret$2");
-  const isEq = /* @__PURE__ */ __name((o1, o2) => {
-    const isEq2 = isEqualWith(o1, o2, function(val1, val2) {
-      if (isFunction$1(val1) && isFunction$1(val2)) {
-        return val1 === val2 || val1.toString() === val2.toString();
-      }
-    });
-    return isEq2;
-  }, "isEq");
-  const pure = /* @__PURE__ */ __name((BaseComponent) => {
-    const hoc = shouldUpdate((props, nextProps) => !isEq(props, nextProps));
-    return hoc(BaseComponent);
-  }, "pure");
   function getXStartAndWidthOfRangeWrtRow({
     range: range2,
     row,
@@ -145531,6 +137469,7 @@ ${seq.sequence}
       regions,
       leftMargin = 0,
       isProtein: isProtein2,
+      showAminoAcidUnitAsCodon,
       getGaps,
       hideTitle: topLevelHideTitle,
       customTitle: topLevelCustomTitle,
@@ -145564,7 +137503,8 @@ ${seq.sequence}
         selectionLayer: selectionLayer2,
         customTitle: customTitle || topLevelCustomTitle,
         sequenceLength,
-        isProtein: isProtein2
+        isProtein: isProtein2,
+        showAminoAcidUnitAsCodon
       });
       const onSelectionContextMenu = /* @__PURE__ */ __name(function(event) {
         selectionLayerRightClicked && selectionLayerRightClicked({
@@ -145604,6 +137544,8 @@ ${seq.sequence}
                 __spreadValues({
                   key: key + "caret1"
                 }, {
+                  isProtein: isProtein2,
+                  showAminoAcidUnitAsCodon,
                   leftMargin,
                   onClick: _onClick || preventDefaultStopPropagation,
                   onRightClick: onSelectionContextMenu,
@@ -145623,6 +137565,8 @@ ${seq.sequence}
                 __spreadValues({
                   key: key + "caret2"
                 }, {
+                  isProtein: isProtein2,
+                  showAminoAcidUnitAsCodon,
                   leftMargin,
                   onClick: _onClick || preventDefaultStopPropagation,
                   onRightClick: onSelectionContextMenu,
@@ -145711,89 +137655,286 @@ ${seq.sequence}
     return dnaToColor[isReverse ? DNAComplementMap[char.toLowerCase()] : char.toLowerCase()] || "lightgrey";
   }
   __name(getDnaColor, "getDnaColor");
+  const serineThreonineToColor = {
+    s: "#FF69B4",
+    t: "#FF69B4"
+  };
+  const hydrophobicityColor = {
+    i: "#F84C52",
+    // isoleucine
+    v: "#F84C52",
+    // valine
+    l: "#F84C52",
+    // leucine
+    f: "#F84C52",
+    // phenylalanine
+    c: "#F84C52",
+    // cysteine
+    m: "#C44C86",
+    // methionine
+    a: "#C44C86",
+    // alanine
+    g: "#8D4CBD",
+    // glycine
+    t: "#8D4CBD",
+    // threonine
+    s: "#8D4CBD",
+    // serine
+    w: "#8D4CBD",
+    // tryptophan
+    y: "#8D4CBD",
+    // tyrosine
+    p: "#8D4CBD",
+    // proline
+    h: "#544CF7",
+    // histidine
+    q: "#544CF7",
+    // glutamine
+    n: "#544CF7",
+    // asparagine
+    e: "#544CF7",
+    // glutamate
+    d: "#544CF7",
+    // aspartate
+    k: "#4B4CFF",
+    // lysine
+    r: "#4B4CFF"
+    // arginine
+  };
+  const mainHighlighter = "#4B91B8";
+  const polarColors = {
+    s: mainHighlighter,
+    t: mainHighlighter,
+    n: mainHighlighter,
+    c: mainHighlighter,
+    q: mainHighlighter,
+    y: mainHighlighter
+  };
+  const negativeColors = {
+    e: mainHighlighter,
+    d: mainHighlighter
+  };
+  const positiveColors = {
+    k: mainHighlighter,
+    r: mainHighlighter,
+    h: mainHighlighter
+  };
+  const chargedColors = __spreadValues(__spreadValues({}, negativeColors), positiveColors);
+  const aliphaticColors = {
+    g: mainHighlighter,
+    a: mainHighlighter,
+    v: mainHighlighter,
+    l: mainHighlighter,
+    i: mainHighlighter,
+    p: mainHighlighter,
+    m: mainHighlighter
+  };
+  const aromaticColors = {
+    f: mainHighlighter,
+    y: mainHighlighter,
+    w: mainHighlighter,
+    h: mainHighlighter
+  };
+  const colorScheme = {
+    a: "#C8C8C8",
+    // alanine
+    r: "#145AFF",
+    // arginine
+    n: "#00DCDC",
+    // asparagine
+    d: "#E60A0A",
+    // aspartate
+    c: "#E6E600",
+    // cysteine
+    q: "#00DCDC",
+    // glutamine
+    e: "#E60A0A",
+    // glutamate
+    g: "#EBEBEB",
+    // glycine
+    h: "#8282D2",
+    // histidine
+    i: "#0F820F",
+    // isoleucine
+    l: "#0F820F",
+    // leucine
+    k: "#145AFF",
+    // lysine
+    m: "#E6E600",
+    // methionine
+    f: "#3232AA",
+    // phenylalanine
+    p: "#DC9682",
+    // proline
+    s: "#FA9600",
+    // serine
+    t: "#FA9600",
+    // threonine
+    w: "#B45AB4",
+    // tryptophan
+    y: "#3232AA",
+    // tyrosine
+    v: "#0F820F",
+    // valine
+    x: "#BEA06E"
+  };
+  function hexToRgba(hex) {
+    const alpha = 0.6;
+    if (hex === "transparent") return hex;
+    hex = hex.replace(/^#/, "");
+    const bigint = parseInt(hex, 16);
+    let r2, g2, b3;
+    if (hex.length === 6) {
+      r2 = bigint >> 16 & 255;
+      g2 = bigint >> 8 & 255;
+      b3 = bigint & 255;
+    } else {
+      r2 = (bigint >> 8 & 15) * 17;
+      g2 = (bigint >> 4 & 15) * 17;
+      b3 = (bigint & 15) * 17;
+    }
+    return `rgba(${r2}, ${g2}, ${b3}, ${alpha})`;
+  }
+  __name(hexToRgba, "hexToRgba");
+  function getAliphaticColor(char) {
+    return hexToRgba(aliphaticColors[char.toLowerCase()] || "transparent");
+  }
+  __name(getAliphaticColor, "getAliphaticColor");
+  function getAromaticColor(char) {
+    return hexToRgba(aromaticColors[char.toLowerCase()] || "transparent");
+  }
+  __name(getAromaticColor, "getAromaticColor");
+  function getNegativeColor(char) {
+    return hexToRgba(negativeColors[char.toLowerCase()] || "transparent");
+  }
+  __name(getNegativeColor, "getNegativeColor");
+  function getPositiveColor(char) {
+    return hexToRgba(positiveColors[char.toLowerCase()] || "transparent");
+  }
+  __name(getPositiveColor, "getPositiveColor");
+  function getChargedColor(char) {
+    return hexToRgba(chargedColors[char.toLowerCase()] || "transparent");
+  }
+  __name(getChargedColor, "getChargedColor");
+  function getPolarColor(char) {
+    return hexToRgba(polarColors[char.toLowerCase()] || "transparent");
+  }
+  __name(getPolarColor, "getPolarColor");
+  function getSerineThreonineColor(char) {
+    return hexToRgba(serineThreonineToColor[char.toLowerCase()] || "transparent");
+  }
+  __name(getSerineThreonineColor, "getSerineThreonineColor");
+  function getHydrophobicity(char) {
+    return hexToRgba(hydrophobicityColor[char.toLowerCase()] || "transparent");
+  }
+  __name(getHydrophobicity, "getHydrophobicity");
+  function getColorScheme(char) {
+    return hexToRgba(colorScheme[char.toLowerCase()] || "transparent");
+  }
+  __name(getColorScheme, "getColorScheme");
   const HoveredIdContext = React.createContext({
     hoveredId: ""
     // default value
   });
-  function withHoveredIdFromContext(Component) {
-    return /* @__PURE__ */ __name(function HoveredIdComponent(props) {
-      return /* @__PURE__ */ React.createElement(HoveredIdContext.Consumer, null, (contexts) => /* @__PURE__ */ React.createElement(Component, __spreadValues(__spreadValues({}, props), contexts)));
-    }, "HoveredIdComponent");
-  }
-  __name(withHoveredIdFromContext, "withHoveredIdFromContext");
   const hoveredAnnEasyStore = store$1({
     hoveredAnn: void 0,
-    selectedAnn: void 0
+    selectedAnn: void 0,
+    // Per-editor hovered annotation IDs
+    hoveredIds: {}
   });
-  const withHover = compose$1(
-    withHoveredIdFromContext,
-    branch(
-      ({ noRedux }) => !noRedux,
-      connect(function(state2, {
-        id: id2,
-        editorName = "StandaloneEditor",
-        className,
-        hoveredId: hoveredIdFromContext,
-        passHoveredId
-      }) {
-        if (!editorName) {
-          console.warn(
-            "please pass an editorName to the withHover() wrapped component"
-          );
+  function hoveredAnnotationUpdate(id2, { editorName = "StandaloneEditor" } = {}) {
+    hoveredAnnEasyStore.hoveredIds[editorName] = id2;
+  }
+  __name(hoveredAnnotationUpdate, "hoveredAnnotationUpdate");
+  function hoveredAnnotationClear(clear, { editorName = "StandaloneEditor" } = {}) {
+    hoveredAnnEasyStore.hoveredIds[editorName] = "";
+  }
+  __name(hoveredAnnotationClear, "hoveredAnnotationClear");
+  function withHover(WrappedComponent) {
+    var _a2;
+    const HoverComponent = view(
+      (_a2 = class extends React.Component {
+        constructor() {
+          super(...arguments);
+          __publicField(this, "handleMouseOver", /* @__PURE__ */ __name((e2) => {
+            const target = e2.target;
+            let alreadyHandled = false;
+            let currentElement = target;
+            while (currentElement) {
+              if (currentElement === e2.currentTarget) {
+                break;
+              }
+              if (currentElement.classList.contains("hoverHelper")) {
+                alreadyHandled = true;
+                break;
+              }
+              currentElement = currentElement.parentElement;
+            }
+            if (alreadyHandled) return;
+            const {
+              editorName = "StandaloneEditor",
+              id: id2,
+              annotation,
+              label
+            } = this.props;
+            const isIdHashmap = typeof id2 === "object";
+            const idToPass = isIdHashmap ? Object.keys(id2)[0] : id2;
+            const annot = annotation || (label == null ? void 0 : label.annotation);
+            if (modifiableTypes.includes(annot == null ? void 0 : annot.annotationTypePlural)) {
+              hoveredAnnEasyStore.hoveredAnn = annot;
+            }
+            if (window.__veDragging || window.__veScrolling) return;
+            hoveredAnnotationUpdate(idToPass, { editorName });
+          }, "handleMouseOver"));
+          __publicField(this, "handleMouseLeave", /* @__PURE__ */ __name((e2) => {
+            hoveredAnnEasyStore.hoveredAnn = void 0;
+            const { editorName = "StandaloneEditor" } = this.props;
+            e2.stopPropagation();
+            if (window.__veDragging || window.__veScrolling) return;
+            hoveredAnnotationClear(true, { editorName });
+          }, "handleMouseLeave"));
         }
-        const editorState = state2.VectorEditor[editorName] || {};
-        const hoveredId = editorState.hoveredAnnotation || hoveredIdFromContext;
-        const isIdHashmap = typeof id2 === "object";
-        const hovered = !!(isIdHashmap ? id2[hoveredId] : hoveredId === id2);
-        const newClassName = classNames$1(className, "hoverHelper", {
-          veAnnotationHovered: hovered
-        });
-        const toReturn = {
-          hovered,
-          className: newClassName
-        };
-        if (hovered && passHoveredId) {
-          toReturn.hoveredId = hoveredId;
-        }
-        return toReturn;
-      }, hoveredAnnotationActions)
-    ),
-    withHandlers({
-      onMouseOver: /* @__PURE__ */ __name((props) => function(e2) {
-        var _a2;
-        const target = e2.target;
-        let alreadyHandled = false;
-        let currentElement = target;
-        while (currentElement) {
-          if (currentElement === e2.currentTarget) {
-            break;
+        render() {
+          var _b2;
+          const _a3 = this.props, {
+            id: id2,
+            editorName = "StandaloneEditor",
+            className,
+            passHoveredId,
+            noRedux
+          } = _a3, restProps = __objRest(_a3, [
+            "id",
+            "editorName",
+            "className",
+            "passHoveredId",
+            "noRedux"
+          ]);
+          const hoveredIdFromContext = (_b2 = this.context) == null ? void 0 : _b2.hoveredId;
+          const hoveredId = hoveredAnnEasyStore.hoveredIds[editorName] || hoveredIdFromContext || "";
+          const isIdHashmap = typeof id2 === "object";
+          const hovered = !!(isIdHashmap ? id2[hoveredId] : hoveredId === id2);
+          const newClassName = classNames$1(className, "hoverHelper", {
+            veAnnotationHovered: hovered
+          });
+          const passedProps = __spreadProps(__spreadValues({}, restProps), {
+            id: id2,
+            editorName,
+            hovered,
+            className: newClassName,
+            onMouseOver: this.handleMouseOver,
+            onMouseLeave: this.handleMouseLeave
+          });
+          if (hovered && passHoveredId) {
+            passedProps.hoveredId = hoveredId;
           }
-          if (currentElement.classList.contains("hoverHelper")) {
-            alreadyHandled = true;
-            break;
-          }
-          currentElement = currentElement.parentElement;
+          return /* @__PURE__ */ React.createElement(WrappedComponent, __spreadValues({}, passedProps));
         }
-        if (alreadyHandled) return;
-        const { editorName, id: id2, hoveredAnnotationUpdate: hoveredAnnotationUpdate2 } = props;
-        const isIdHashmap = typeof id2 === "object";
-        const idToPass = isIdHashmap ? Object.keys(id2)[0] : id2;
-        const annot = (props == null ? void 0 : props.annotation) || ((_a2 = props == null ? void 0 : props.label) == null ? void 0 : _a2.annotation);
-        if (modifiableTypes.includes(annot == null ? void 0 : annot.annotationTypePlural)) {
-          hoveredAnnEasyStore.hoveredAnn = annot;
-        }
-        if (window.__veDragging || window.__veScrolling) return;
-        hoveredAnnotationUpdate2 && hoveredAnnotationUpdate2(idToPass, { editorName });
-      }, "onMouseOver"),
-      onMouseLeave: /* @__PURE__ */ __name((props) => (e2) => {
-        hoveredAnnEasyStore.hoveredAnn = void 0;
-        const { editorName, hoveredAnnotationClear: hoveredAnnotationClear2 } = props;
-        e2.stopPropagation();
-        if (window.__veDragging || window.__veScrolling) return;
-        hoveredAnnotationClear2 && hoveredAnnotationClear2(true, { editorName });
-      }, "onMouseLeave")
-    })
-  );
+      }, __publicField(_a2, "contextType", HoveredIdContext), _a2)
+    );
+    HoverComponent.displayName = `withHover(${WrappedComponent.displayName || WrappedComponent.name || "Component"})`;
+    return HoverComponent;
+  }
+  __name(withHover, "withHover");
   const partOverhangs = [
     "fivePrimeOverhang",
     "fivePrimeUnderhang",
@@ -145801,6 +137942,30 @@ ${seq.sequence}
     "threePrimeUnderhang"
   ];
   const getChunk = /* @__PURE__ */ __name((sequence2, chunkSize, chunkNumber) => sequence2.slice(chunkSize * chunkNumber, chunkSize * (chunkNumber + 1)), "getChunk");
+  function renderColoredLayer(props, fudge, width, toColor) {
+    return /* @__PURE__ */ React.createElement(
+      "svg",
+      {
+        style: {
+          left: props.startOffset * props.charWidth,
+          height: props.height,
+          width,
+          position: "absolute"
+        },
+        className: "rowViewTextContainer",
+        height: Math.max(0, Number(props.height))
+      },
+      /* @__PURE__ */ React.createElement(
+        ColoredSequence,
+        __spreadProps(__spreadValues({}, props), {
+          fudge,
+          totalWidth: width,
+          toColor
+        })
+      )
+    );
+  }
+  __name(renderColoredLayer, "renderColoredLayer");
   const _Sequence = class _Sequence extends React.Component {
     render() {
       const {
@@ -145817,6 +137982,15 @@ ${seq.sequence}
         chunkSize = 100,
         scrollData,
         showDnaColors,
+        showSerineThreonine,
+        showHydrophobicity,
+        showPolar,
+        showNegative,
+        showPositive,
+        showCharged,
+        showAliphatic,
+        showAromatic,
+        showColorScheme,
         fivePrimeThreePrimeHints,
         alignmentData,
         sequenceLength,
@@ -145859,6 +138033,17 @@ ${seq.sequence}
           ) : void 0;
         }
       });
+      const colorLayers = [
+        { show: showSerineThreonine, toColor: "serineThreonine" },
+        { show: showHydrophobicity, toColor: "hydrophobicity" },
+        { show: showPolar, toColor: "polar" },
+        { show: showNegative, toColor: "negative" },
+        { show: showPositive, toColor: "positive" },
+        { show: showCharged, toColor: "charged" },
+        { show: showAliphatic, toColor: "aliphatic" },
+        { show: showAromatic, toColor: "aromatic" },
+        { show: showColorScheme, toColor: "colorScheme" }
+      ];
       const style2 = __spreadValues({
         position: "relative",
         height,
@@ -145936,6 +138121,9 @@ ${seq.sequence}
           },
           "5'"
         ),
+        colorLayers.map(
+          ({ show: show2, toColor }) => show2 && renderColoredLayer(this.props, fudge, width, toColor)
+        ),
         !hideBps && /* @__PURE__ */ React.createElement(
           "svg",
           {
@@ -145952,7 +138140,8 @@ ${seq.sequence}
             ColoredSequence,
             __spreadValues({}, __spreadProps(__spreadValues({}, this.props), {
               fudge,
-              totalWidth: width
+              totalWidth: width,
+              toColor: "dnaColor"
             }))
           ),
           inner2
@@ -145976,19 +138165,44 @@ ${seq.sequence}
           alignmentData,
           getGaps,
           fudge,
-          totalWidth
+          totalWidth,
+          toColor
         } = this.props;
         if (alignmentData) {
           sequence2 = sequence2.replace(/^-+/g, "").replace(/-+$/g, "");
         }
-        const colorPaths = Object.values(dnaToColor).reduce((acc, color2) => {
+        const colorMap = {
+          dnaColor: dnaToColor,
+          serineThreonine: serineThreonineToColor,
+          hydrophobicity: hydrophobicityColor,
+          polar: polarColors,
+          negative: negativeColors,
+          positive: positiveColors,
+          charged: chargedColors,
+          aliphatic: aliphaticColors,
+          aromatic: aromaticColors,
+          colorScheme
+        };
+        const colorMethods = {
+          dnaColor: getDnaColor,
+          serineThreonine: getSerineThreonineColor,
+          hydrophobicity: getHydrophobicity,
+          polar: getPolarColor,
+          negative: getNegativeColor,
+          positive: getPositiveColor,
+          charged: getChargedColor,
+          aliphatic: getAliphaticColor,
+          aromatic: getAromaticColor,
+          colorScheme: getColorScheme
+        };
+        const colorPaths = Object.values(colorMap[toColor]).reduce((acc, color2) => {
           acc[color2] = "";
           return acc;
         }, {});
         const gapsBefore = getGaps ? getGaps({ start: 0, end: 0 }).gapsBefore : 0;
         sequence2.split("").forEach((char, i2) => {
           const width = Number(charWidth2);
-          const color2 = getDnaColor(char, isReverse);
+          const color2 = colorMethods[toColor](char, isReverse);
           const x2 = (i2 + gapsBefore) * charWidth2;
           const y2 = 0;
           colorPaths[color2] = (colorPaths[color2] || "") + `M${x2},${y2} L${x2 + width},${y2} L${x2 + width},${y2 + height} L${x2},${y2 + height}`;
@@ -146231,14 +138445,22 @@ ${seq.sequence}
       end2 = start2 - 1;
       start2 = oldEnd + 1;
     }
-    return `${startText ? startText : ""} ${typeToUse ? typeToUse + " -" : ""} ${name2 ? name2 : ""} - Start: ${isProtein2 ? (start2 + 3) / 3 : start2 + 1} End: ${isProtein2 ? (end2 + 1) / 3 : end2 + 1} ${overlapsSelf ? "(Overlaps Self) " : ""}${message ? "\n" + message : ""} ${readOnly2 ? "" : annotationTypePlural === "cutsites" ? `
+    const interactionInstructions = readOnly2 ? "" : annotationTypePlural === "cutsites" ? `
 
- click --> top cut position
- alt/option+click --> bottom cut position
- cmd/ctrl+click --> recognition range` : `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  INTERACTIONS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   click → top cut position
+   alt/option+click → bottom cut position
+   cmd/ctrl+click → recognition range
+   double click → show info` : `
 
-alt/option+click --> jump row view to start/end
-double click --> edit`}`;
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  INTERACTIONS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   alt/option+click → jump row view to start/end
+   double click → edit`;
+    return `${startText ? startText : ""} ${typeToUse ? typeToUse + " -" : ""} ${name2 ? name2 : ""} - Start: ${isProtein2 ? (start2 + 3) / 3 : start2 + 1} End: ${isProtein2 ? (end2 + 1) / 3 : end2 + 1} ${overlapsSelf ? "(Overlaps Self) " : ""}${message ? "\n" + message : ""}${interactionInstructions}`;
   }
   __name(getAnnotationNameAndStartStopString, "getAnnotationNameAndStartStopString");
   const orfFrameToColorMap = {
@@ -146333,6 +138555,21 @@ double click --> edit`}`;
     );
   }
   __name(Orf, "Orf");
+  var forEach_1;
+  var hasRequiredForEach;
+  function requireForEach() {
+    if (hasRequiredForEach) return forEach_1;
+    hasRequiredForEach = 1;
+    var arrayEach2 = require_arrayEach(), baseEach2 = require_baseEach(), castFunction2 = require_castFunction(), isArray2 = requireIsArray();
+    function forEach2(collection, iteratee) {
+      var func = isArray2(collection) ? arrayEach2 : baseEach2;
+      return func(collection, castFunction2(iteratee));
+    }
+    __name(forEach2, "forEach");
+    forEach_1 = forEach2;
+    return forEach_1;
+  }
+  __name(requireForEach, "requireForEach");
   var forEachExports = requireForEach();
   const forEach = /* @__PURE__ */ getDefaultExportFromCjs(forEachExports);
   var lib = {};
@@ -147002,9 +139239,49 @@ double click --> edit`}`;
   };
   __name(_AnnotationPositioner, "AnnotationPositioner");
   let AnnotationPositioner = _AnnotationPositioner;
+  let measureCanvas;
+  let cachedFontSize = null;
+  function getVeMonospaceFontSize() {
+    if (cachedFontSize !== null) {
+      return cachedFontSize;
+    }
+    const tempElement = document.createElement("div");
+    tempElement.className = "ve-monospace-font";
+    tempElement.style.position = "absolute";
+    tempElement.style.visibility = "hidden";
+    tempElement.style.pointerEvents = "none";
+    document.body.appendChild(tempElement);
+    try {
+      const computedStyle = window.getComputedStyle(tempElement);
+      const fontSize2 = parseFloat(computedStyle.fontSize);
+      cachedFontSize = fontSize2 || ANNOTATION_LABEL_FONT_WIDTH;
+      return cachedFontSize;
+    } catch (error) {
+      console.warn(
+        "Failed to compute ve-monospace-font size, using fallback",
+        error
+      );
+      cachedFontSize = ANNOTATION_LABEL_FONT_WIDTH;
+      return cachedFontSize;
+    } finally {
+      document.body.removeChild(tempElement);
+    }
+  }
+  __name(getVeMonospaceFontSize, "getVeMonospaceFontSize");
+  function getAnnotationTextWidth(text2, fontFamily2 = "monospace") {
+    if (!measureCanvas) {
+      measureCanvas = document.createElement("canvas");
+    }
+    const fontSize2 = getVeMonospaceFontSize();
+    const ctx = measureCanvas.getContext("2d");
+    ctx.font = `${fontSize2}px ${fontFamily2}`;
+    return ctx.measureText(text2).width;
+  }
+  __name(getAnnotationTextWidth, "getAnnotationTextWidth");
   const doesLabelFitInAnnotation = /* @__PURE__ */ __name((text2 = "", { range: range2, width }, charWidth2) => {
-    const textLength = text2.length * ANNOTATION_LABEL_FONT_WIDTH;
-    const widthMinusOne = (range2 ? getWidth(range2, charWidth2, 0) : width) - charWidth2;
+    const textLength = getAnnotationTextWidth(text2);
+    const fontSize2 = getVeMonospaceFontSize();
+    const widthMinusOne = range2 ? getWidth(range2, charWidth2, 0) - fontSize2 * 2 : width - fontSize2 * 2;
     return widthMinusOne > textLength;
   }, "doesLabelFitInAnnotation");
   function getAnnotationClassnames({ overlapsSelf }, { viewName, type: type2 }) {
@@ -147014,6 +139291,78 @@ double click --> edit`}`;
     });
   }
   __name(getAnnotationClassnames, "getAnnotationClassnames");
+  function getAnnotationTextOffset({
+    width,
+    nameToDisplay,
+    hasAPoint,
+    pointiness,
+    forward
+  }) {
+    return width / 2 - getAnnotationTextWidth(nameToDisplay) / 2 - (hasAPoint ? (pointiness / 2 + ANNOTATION_LABEL_FONT_WIDTH / 2) * (forward ? 1 : -1) : 0);
+  }
+  __name(getAnnotationTextOffset, "getAnnotationTextOffset");
+  function getAnnotationNameInfo({
+    name: name2,
+    width,
+    hasAPoint,
+    pointiness,
+    forward,
+    charWidth: charWidth2,
+    truncateLabelsThatDoNotFit,
+    onlyShowLabelsThatDoNotFit,
+    annotation
+  }) {
+    let nameToDisplay = name2;
+    let textOffset = getAnnotationTextOffset({
+      width,
+      nameToDisplay,
+      hasAPoint,
+      pointiness,
+      forward
+    });
+    const widthAvailableForText = width - ANNOTATION_LABEL_FONT_WIDTH * 2;
+    if (!doesLabelFitInAnnotation(name2, { width }, charWidth2) || !onlyShowLabelsThatDoNotFit && ["parts", "features"].includes(annotation.annotationTypePlural)) {
+      if (truncateLabelsThatDoNotFit) {
+        let left2 = 0;
+        let right2 = name2.length;
+        let bestFit = "";
+        while (left2 <= right2) {
+          const mid = Math.floor((left2 + right2) / 2);
+          const candidate = name2.slice(0, mid);
+          const candidateWidth = getAnnotationTextWidth(candidate);
+          if (candidateWidth <= widthAvailableForText) {
+            if (candidate.length > bestFit.length) {
+              bestFit = candidate;
+            }
+            left2 = mid + 1;
+          } else {
+            right2 = mid - 1;
+          }
+        }
+        if (bestFit.length < name2.length) {
+          bestFit = bestFit.slice(0, -2) + "..";
+        }
+        nameToDisplay = bestFit;
+        if (nameToDisplay.length <= 3) {
+          textOffset = 0;
+          nameToDisplay = "";
+        } else {
+          textOffset = getAnnotationTextOffset({
+            width,
+            nameToDisplay,
+            hasAPoint,
+            pointiness,
+            forward
+          });
+        }
+      } else {
+        textOffset = 0;
+        nameToDisplay = "";
+      }
+    }
+    return { textOffset, nameToDisplay };
+  }
+  __name(getAnnotationNameInfo, "getAnnotationNameInfo");
   function PointedAnnotation(props) {
     const {
       className,
@@ -147149,27 +139498,17 @@ double click --> edit`}`;
       Q ${pointiness},${height / 2} ${0},${0}
       z`;
     }
-    let nameToDisplay = name2;
-    let textOffset = width / 2 - name2.length * 5 / 2 - (hasAPoint ? pointiness / 2 * (forward ? 1 : -1) : 0);
-    if (!doesLabelFitInAnnotation(name2, { width }, charWidth2) || !onlyShowLabelsThatDoNotFit && ["parts", "features"].includes(annotation.annotationTypePlural)) {
-      if (truncateLabelsThatDoNotFit) {
-        const fractionToDisplay = width / (name2.length * ANNOTATION_LABEL_FONT_WIDTH);
-        const numLetters = Math.floor(fractionToDisplay * name2.length);
-        nameToDisplay = name2.slice(0, numLetters);
-        if (nameToDisplay.length > 3) {
-          if (nameToDisplay.length !== name2.length) {
-            nameToDisplay += "..";
-          }
-          textOffset = width / 2 - nameToDisplay.length * 5 / 2 - (hasAPoint ? pointiness / 2 * (forward ? 1 : -1) : 0);
-        } else {
-          textOffset = 0;
-          nameToDisplay = "";
-        }
-      } else {
-        textOffset = 0;
-        nameToDisplay = "";
-      }
-    }
+    const { textOffset, nameToDisplay } = getAnnotationNameInfo({
+      name: name2,
+      width,
+      hasAPoint,
+      pointiness,
+      forward,
+      charWidth: charWidth2,
+      truncateLabelsThatDoNotFit,
+      onlyShowLabelsThatDoNotFit,
+      annotation
+    });
     let _textColor = textColor;
     if (!textColor) {
       try {
@@ -148029,9 +140368,9 @@ double click --> edit`}`;
         "text",
         {
           fontSize: 25,
-          stroke: "black",
+          className: "aminoAcidNumber",
           strokeWidth: 2,
-          transform: `scale(${3 / width * 10},3) translate(${(forward ? 45 : 55) * width / 10},51)`,
+          transform: `scale(${3 / width * 10},${37.5 / height}) translate(${(forward ? 45 : 55) * width / 10},${4.4 * height - 4})`,
           x: "0",
           y: "4",
           style: { textAnchor: "middle" }
@@ -148064,6 +140403,7 @@ double click --> edit`}`;
         annotationRange,
         height,
         showAminoAcidNumbers,
+        showAminoAcidUnitAsCodon,
         charWidth: charWidth2,
         aminoAcidNumbersHeight,
         onClick,
@@ -148166,8 +140506,8 @@ double click --> edit`}`;
                 });
               }, "onContextMenu"),
               title: `${aminoAcid.name} -- Index: ${aminoAcidSliver.aminoAcidIndex + 1} -- Hydrophobicity: ${aminoAcid.hydrophobicity} -- Mass: ${aminoAcid.mass}
- 
-Part of ${annotation.translationType} Translation from BPs ${annotation.start + 1} to ${annotation.end + 1} (${aminoAcids.length / 3} AAs)`,
+
+Part of ${annotation.translationType} Translation from BPs ${annotation.start + 1} to ${annotation.end + 1} (${aminoAcids.length / 3} ${showAminoAcidUnitAsCodon ? "codons" : "AAs"})`,
               showAminoAcidNumbers,
               aminoAcidIndex: aminoAcidSliver.aminoAcidIndex,
               onDoubleClick: /* @__PURE__ */ __name(function(event) {
@@ -148194,6 +140534,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
   const Translation$1 = pure(Translation);
   function getExtraInnerCompProps(annotationRange, {
     showAminoAcidNumbers,
+    showAminoAcidUnitAsCodon,
     getGaps,
     isProtein: isProtein2,
     colorType,
@@ -148205,6 +140546,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     const anotationHeightNoSpace = annotationHeight - spaceBetweenAnnotations;
     return {
       showAminoAcidNumbers,
+      showAminoAcidUnitAsCodon,
       getGaps,
       height: anotationHeightNoSpace,
       aminoAcidNumbersHeight,
@@ -150376,12 +142718,12 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
       row,
       sequenceLength,
       topStrand,
-      hoveredAnnotation: hoveredAnnotation2
+      hoveredAnnotation
     } = props;
     const snips = [];
     const snipConnectors = [];
     Object.keys(annotationRanges).sort(
-      (a2) => annotationRanges[a2].annotation.id === hoveredAnnotation2 ? 1 : -1
+      (a2) => annotationRanges[a2].annotation.id === hoveredAnnotation ? 1 : -1
     ).forEach(function(key) {
       const annotationRange = annotationRanges[key];
       let { annotation } = annotationRange;
@@ -150400,7 +142742,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
       bottomSnipPosition = bottomSnipPosition && Number(bottomSnipPosition);
       upstreamTopSnip = upstreamTopSnip && Number(upstreamTopSnip);
       upstreamBottomSnip = upstreamBottomSnip && Number(upstreamBottomSnip);
-      const isHovered = annotation.id === hoveredAnnotation2;
+      const isHovered = annotation.id === hoveredAnnotation;
       snipStyle = __spreadProps(__spreadValues({}, snipStyle), {
         background: annotation.restrictionEnzyme.color
       });
@@ -150517,8 +142859,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
   }
   __name(Cutsites, "Cutsites");
   const Cutsites$1 = pure(
-    connectToEditor(({ hoveredAnnotation: hoveredAnnotation2 }) => ({
-      hoveredAnnotation: hoveredAnnotation2
+    connectToEditor(({ hoveredAnnotation }) => ({
+      hoveredAnnotation
     }))(Cutsites)
   );
   const useShowChromQualScores = /* @__PURE__ */ __name(() => {
@@ -150596,7 +142938,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
           noQualityScores: !showChromQualScores
         }),
         style: {
-          position: "relative"
+          position: "relative",
+          textAlign: "left"
         },
         onContextMenu: /* @__PURE__ */ __name((e2) => {
           showContextMenu([chromatogramMenu], void 0, e2);
@@ -150916,11 +143259,11 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
   const defaultContainerWidth = 400;
   const defaultMarginWidth$1 = 50;
   const CutsiteSelectionLayers = connectToEditor(
-    ({ hoveredAnnotation: hoveredAnnotation2 }) => ({
-      hoveredAnnotation: hoveredAnnotation2
+    ({ hoveredAnnotation }) => ({
+      hoveredAnnotation
     })
   )(/* @__PURE__ */ __name(function CutsiteSelectionLayersInner({
-    hoveredAnnotation: hoveredAnnotation2,
+    hoveredAnnotation,
     cutsites,
     annotationCommonProps,
     showReverseSequence,
@@ -150928,9 +143271,9 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     alignmentData,
     row
   }) {
-    return Object.keys(cutsites).sort((a2) => cutsites[a2].id === hoveredAnnotation2 ? 1 : -1).map(function(id2, index2) {
+    return Object.keys(cutsites).sort((a2) => cutsites[a2].id === hoveredAnnotation ? 1 : -1).map(function(id2, index2) {
       const cutsite = cutsites[id2];
-      const isHovered = hoveredAnnotation2 === cutsite.id;
+      const isHovered = hoveredAnnotation === cutsite.id;
       const layer = cutsite.annotation.recognitionSiteRange;
       return layer.start > -1 && /* @__PURE__ */ React.createElement(
         SelectionLayer$3,
@@ -150950,7 +143293,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
       );
     });
   }, "CutsiteSelectionLayersInner"));
-  function filterRanges(ranges, extraProps = {}) {
+  function filterRanges(ranges, isProteinAlignmentView, extraProps = {}) {
     if (!ranges) return ranges;
     if (extraProps.onlyForward) {
       ranges = filter(ranges, (a2) => a2.annotation.forward);
@@ -150958,12 +143301,30 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     if (extraProps.onlyReverse) {
       ranges = filter(ranges, (a2) => !a2.annotation.forward);
     }
+    if (isProteinAlignmentView) {
+      ranges = map$3(ranges, (range2) => {
+        const start2 = (range2.start + 3) / 3 - 1;
+        const end2 = (range2.end + 1) / 3 - 1;
+        return __spreadProps(__spreadValues({}, range2), {
+          start: start2,
+          end: end2,
+          annotation: __spreadProps(__spreadValues({}, range2.annotation), {
+            start: start2,
+            end: end2
+          })
+        });
+      });
+    }
     return ranges;
   }
   __name(filterRanges, "filterRanges");
-  function getPropsForType(props, type2, pluralType, extraProps) {
+  function getPropsForType(props, isProteinAlignmentView, type2, pluralType, extraProps) {
     const upperPluralType = startCase(pluralType);
-    const annotationRanges = filterRanges(props.row[pluralType], extraProps);
+    const annotationRanges = filterRanges(
+      props.row[pluralType],
+      isProteinAlignmentView,
+      extraProps
+    );
     const toRet = {
       annotationColor: props[pluralType + "Color"],
       annotationHeight: props[pluralType + "Height"] || rowHeights[pluralType].height,
@@ -150979,7 +143340,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     return toRet;
   }
   __name(getPropsForType, "getPropsForType");
-  function RowItem(props) {
+  function RowItem$1(props) {
     let {
       noRedux,
       charWidth: charWidth2 = defaultCharWidth,
@@ -151036,7 +143397,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
       isLinearView,
       scalePct,
       setScalePct,
-      extraAnnotationProps = {}
+      extraAnnotationProps = {},
+      showAminoAcidUnitAsCodon
     } = props;
     const {
       chromatogram: showChromatogram,
@@ -151048,6 +143410,15 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
       // yellowAxis: showYellowAxis,
       aminoAcidNumbers: showAminoAcidNumbers,
       dnaColors: showDnaColors,
+      serineThreonine: showSerineThreonine,
+      hydrophobicity: showHydrophobicity,
+      polar: showPolar,
+      negative: showNegative,
+      positive: showPositive,
+      charged: showCharged,
+      aliphatic: showAliphatic,
+      aromatic: showAromatic,
+      colorScheme: showColorScheme,
       fivePrimeThreePrimeHints,
       reverseSequence: showReverseSequence,
       sequence: showSequence,
@@ -151094,17 +143465,21 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
       height,
       width: width + "px"
     };
+    const isProteinAlignmentView = !!(props.isProtein && props.alignmentData);
     const annotationCommonProps = {
       noRedux,
       editorName,
       charWidth: charWidth2,
       bpsPerRow,
       getGaps,
-      isProtein: isProtein2,
+      isProtein: isProteinAlignmentView ? false : isProtein2,
       readOnly: readOnly2,
       sequenceLength,
       isRowView,
-      row: { start: row.start, end: row.end }
+      row: {
+        start: row.start,
+        end: isProteinAlignmentView ? sequenceLength - 1 : row.end
+      }
     };
     const drawLabels = /* @__PURE__ */ __name((type2, noDraw, _a2 = {}) => {
       var _b2 = _a2, { filterOpts } = _b2, extraProps = __objRest(_b2, ["filterOpts"]);
@@ -151121,6 +143496,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
             onDoubleClick: props[type2 + "DoubleClicked"]
           })
         ) : [],
+        isProteinAlignmentView,
         filterOpts
       );
       if (!ranges.length) return null;
@@ -151155,6 +143531,13 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
       if (shouldShow !== void 0 ? !shouldShow : !annotationVisibility2[pluralType] || Object.keys(row[pluralType] || {}).length <= 0) {
         return null;
       }
+      const propsForType = getPropsForType(
+        props,
+        isProteinAlignmentView,
+        type2,
+        pluralType,
+        extraProps
+      );
       const CompToUse = CompOverride || StackedAnnotations;
       return /* @__PURE__ */ React.createElement(
         CompToUse,
@@ -151165,7 +143548,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
           fullSequence,
           containerClassName: camelCase("veRowView-" + pluralType + "Container"),
           alignmentType: alignmentType2
-        }, annotationCommonProps), getPropsForType(props, type2, pluralType, extraProps)), otherExtraProps)
+        }, annotationCommonProps), propsForType), otherExtraProps)
       );
     }, "drawAnnotations");
     const deletionLayersToDisplay = flatMap(
@@ -151204,6 +143587,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     const translationCommonProps = {
       CompOverride: Translations,
       showAminoAcidNumbers,
+      showAminoAcidUnitAsCodon,
       sequenceLength,
       aminoAcidNumbersHeight
     };
@@ -151239,6 +143623,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
           customTitleStart: "Search match",
           regions: searchLayers
         }, annotationCommonProps), {
+          showAminoAcidUnitAsCodon,
           selectionLayerRightClicked: searchLayerRightClicked,
           row: alignmentData ? { start: 0, end: alignmentData.sequence.length - 1 } : row,
           onClick: searchLayerClicked
@@ -151253,7 +143638,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
           regions: getAllSelectionLayers({
             additionalSelectionLayers,
             selectionLayer: selectionLayer2
-          })
+          }),
+          showAminoAcidUnitAsCodon
         })
       ), drawAnnotations2("warning"), drawAnnotations2("assemblyPiece"), drawAnnotations2("lineageAnnotation"), drawLabels("part"), drawAnnotations2("part", partProps), drawAnnotations2("orf", {
         CompOverride: Orfs
@@ -151286,6 +143672,16 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
             sequenceLength,
             cutsites,
             showDnaColors,
+            showSerineThreonine,
+            showHydrophobicity,
+            showPolar,
+            showNegative,
+            showPositive,
+            showCharged,
+            showAliphatic,
+            showAromatic,
+            showColorScheme,
+            showPhysicalProperties: isProteinAlignmentView,
             fivePrimeThreePrimeHints,
             scrollData,
             hideBps: charWidth2 < 7,
@@ -151407,7 +143803,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
                 style: {
                   left: startOffset * charWidth2,
                   height: sequenceHeight,
-                  position: "absolute"
+                  position: "absolute",
+                  userSelect: "none"
                 },
                 onClick: /* @__PURE__ */ __name(function(event) {
                   replacementLayerClicked({
@@ -151453,7 +143850,9 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
       ), caretPosition2 > -1 && /* @__PURE__ */ React.createElement(
         Caret$2,
         __spreadProps(__spreadValues({
-          caretPosition: caretPosition2
+          caretPosition: caretPosition2,
+          isProtein: isProtein2,
+          showAminoAcidUnitAsCodon
         }, __spreadValues(__spreadValues({}, annotationCommonProps), { getGaps: void 0 })), {
           row: alignmentData ? { start: 0, end: alignmentData.sequence.length - 1 } : row
         })
@@ -151461,7 +143860,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
       rowBottomComp && rowBottomComp
     );
   }
-  __name(RowItem, "RowItem");
+  __name(RowItem$1, "RowItem$1");
   function getGapMap$1(sequence2) {
     const gapMap = [0];
     sequence2.split("").forEach((char) => {
@@ -152978,7 +145377,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     input.click();
   }
   __name(showFileDialog, "showFileDialog");
-  const version = "0.7.32";
+  const version = "0.8.42";
   const packageJson = {
     version
   };
@@ -153896,7 +146295,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     },
     exportSequenceAsTeselagenJson: {
       name: "Download Teselagen JSON File",
-      handler: /* @__PURE__ */ __name((props) => props.exportSequenceToFile("teselagenJson"), "handler")
+      handler: /* @__PURE__ */ __name((props) => props.exportSequenceToFile("teselagenJson", { getAcceptedInsertChars: props.getAcceptedInsertChars }), "handler")
     },
     viewProperties: {
       handler: /* @__PURE__ */ __name((props) => props.propertiesViewOpen(), "handler")
@@ -155089,7 +147488,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
         return;
       }
       const seqToInsert = isProtein2 ? {
-        proteinSequence: charsToInsert
+        proteinSequence: charsToInsert,
+        isProtein: true
       } : {
         sequence: charsToInsert
       };
@@ -155103,7 +147503,9 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
         isProtein: isProtein2,
         caretPosition: caretPosition2,
         sequenceData: sequenceData2,
-        maxInsertSize
+        maxInsertSize,
+        getAcceptedInsertChars,
+        showAminoAcidUnitAsCodon
       } = this.props;
       const { charsToInsert, hasTempError } = this.state;
       let message;
@@ -155113,9 +147515,9 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
           selectionLayer2,
           sequenceLength
         );
-        message = /* @__PURE__ */ React.createElement("span", null, "Press ", /* @__PURE__ */ React.createElement("span", { style: { fontWeight: "bolder" } }, "ENTER"), " to replace", " ", divideBy3(getRangeLength(selectionLayer2, sequenceLength), isProtein2), " ", isProtein2 ? "AAs" : "base pairs", " between", " ", isProtein2 ? convertDnaCaretPositionOrRangeToAA(betweenVals[0]) : betweenVals[0], " ", "and", " ", isProtein2 ? convertDnaCaretPositionOrRangeToAA(betweenVals[1] + 2) : betweenVals[1]);
+        message = /* @__PURE__ */ React.createElement("span", null, "Press ", /* @__PURE__ */ React.createElement("span", { style: { fontWeight: "bolder" } }, "ENTER"), " to replace", " ", divideBy3(getRangeLength(selectionLayer2, sequenceLength), isProtein2), " ", isProtein2 ? showAminoAcidUnitAsCodon ? "codons" : "AAs" : "base pairs", " ", "between", " ", isProtein2 ? convertDnaCaretPositionOrRangeToAA(betweenVals[0]) : betweenVals[0], " ", "and", " ", isProtein2 ? convertDnaCaretPositionOrRangeToAA(betweenVals[1] + 2) : betweenVals[1]);
       } else {
-        message = /* @__PURE__ */ React.createElement("span", null, "Press ", /* @__PURE__ */ React.createElement("span", { style: { fontWeight: "bolder" } }, "ENTER"), " to insert", " ", charsToInsert.length, " ", isProtein2 ? "AAs" : "base pairs", " after", " ", isProtein2 ? "AA" : "base", " ", isProtein2 ? convertDnaCaretPositionOrRangeToAA(caretPosition2) : caretPosition2);
+        message = /* @__PURE__ */ React.createElement("span", null, "Press ", /* @__PURE__ */ React.createElement("span", { style: { fontWeight: "bolder" } }, "ENTER"), " to insert", " ", charsToInsert.length, " ", isProtein2 ? `${showAminoAcidUnitAsCodon ? "codons" : "AAs"}` : "base pairs", " ", "after", " ", isProtein2 ? `${showAminoAcidUnitAsCodon ? "codon" : "AA"}` : "base", " ", isProtein2 ? convertDnaCaretPositionOrRangeToAA(caretPosition2) : caretPosition2);
       }
       return /* @__PURE__ */ React.createElement("div", { className: "sequenceInputBubble" }, /* @__PURE__ */ React.createElement(
         "input",
@@ -155138,7 +147540,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
             const [sanitizedVal, warnings] = filterSequenceString(
               e2.target.value,
               __spreadProps(__spreadValues({}, sequenceData2), {
-                name: void 0
+                name: void 0,
+                getAcceptedInsertChars
               })
             );
             if (warnings.length) {
@@ -155151,10 +147554,9 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
                 });
               }, 200);
             }
-            if (maxInsertSize && sanitizedVal.lenth > maxInsertSize) {
+            if (maxInsertSize && sanitizedVal.length > maxInsertSize) {
               return window.toastr.error(
-                "Sorry, your insert is greater than ",
-                maxInsertSize
+                `Sorry, your insert is greater than ${maxInsertSize}`
               );
             }
             e2.target.value = sanitizedVal;
@@ -155202,6 +147604,9 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     if (document.body.classList.contains("sequenceDragging")) {
       window.toastr.warning("Can't insert new sequence while dragging");
       return;
+    }
+    if (document.getElementById("sequenceInputBubble")) {
+      document.getElementById("sequenceInputBubble").outerHTML = "";
     }
     div = document.createElement("div");
     div.style.zIndex = "400000";
@@ -156014,7 +148419,9 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
             readOnly: readOnly2,
             onPaste,
             disableBpEditing,
-            sequenceData: sequenceData2
+            sequenceData: sequenceData2,
+            maxInsertSize,
+            getAcceptedInsertChars
           } = this.props;
           if (disableBpEditing) {
             return this.createDisableBpEditingMsg();
@@ -156038,14 +148445,23 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
               sequence: clipboardData.getData("text/plain") || e2.target.value
             };
           }
-          if (sequenceData2.isProtein && !seqDataToInsert.proteinSequence) {
-            seqDataToInsert.proteinSequence = seqDataToInsert.sequence;
+          if (sequenceData2.isProtein) {
+            seqDataToInsert.isProtein = true;
+            if (!seqDataToInsert.proteinSequence) {
+              seqDataToInsert.proteinSequence = seqDataToInsert.sequence;
+            }
+          }
+          if (maxInsertSize && (seqDataToInsert.proteinSequence || seqDataToInsert.sequence).length > maxInsertSize) {
+            return window.toastr.error(
+              `Sorry, the pasted sequence exceeds the maximum allowed length of ${maxInsertSize}`
+            );
           }
           seqDataToInsert = tidyUpSequenceData(seqDataToInsert, {
             topLevelSeqData: sequenceData2,
             provideNewIdsForAnnotations: true,
             annotationsAsObjects: true,
-            noCdsTranslations: true
+            noCdsTranslations: true,
+            getAcceptedInsertChars
           });
           if (!seqDataToInsert.sequence.length)
             return window.toastr.warning("Sorry no valid base pairs to paste");
@@ -156065,7 +148481,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
             selectionLayer: selectionLayer2,
             copyOptions: copyOptions2,
             disableBpEditing,
-            readOnly: readOnly2
+            readOnly: readOnly2,
+            getAcceptedInsertChars
           } = this.props;
           const onCut = this.props.onCut || this.props.onCopy || noop$8;
           const seqData = tidyUpSequenceData(
@@ -156089,7 +148506,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
             {
               doNotRemoveInvalidChars: true,
               annotationsAsObjects: true,
-              includeProteinSequence: true
+              includeProteinSequence: true,
+              getAcceptedInsertChars
             }
           );
           if (!(this.sequenceDataToCopy || {}).textToCopy && !seqData.sequence.length)
@@ -156107,7 +148525,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
               e2,
               tidyUpSequenceData(seqData, {
                 doNotRemoveInvalidChars: true,
-                annotationsAsObjects: true
+                annotationsAsObjects: true,
+                getAcceptedInsertChars
               }),
               this.props
             );
@@ -156155,10 +148574,10 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
             selectionLayer: selectionLayer2 = { start: -1, end: -1 },
             sequenceData: sequenceData2 = { sequence: "" },
             readOnly: readOnly2,
-            disableBpEditing
-            // updateSequenceData,
-            // wrappedInsertSequenceDataAtPositionOrRange
-            // handleInsert
+            disableBpEditing,
+            maxInsertSize,
+            getAcceptedInsertChars,
+            showAminoAcidUnitAsCodon
           } = this.props;
           const sequenceLength = sequenceData2.sequence.length;
           const isReplace = selectionLayer2.start > -1;
@@ -156176,6 +148595,9 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
               selectionLayer: selectionLayer2,
               sequenceLength,
               caretPosition: caretPosition2,
+              maxInsertSize,
+              getAcceptedInsertChars,
+              showAminoAcidUnitAsCodon,
               handleInsert: /* @__PURE__ */ __name((seqDataToInsert) => __async(this, null, function* () {
                 yield insertAndSelectHelper({
                   props: this.props,
@@ -156534,6 +148956,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
               [this.commandEnhancer],
               e2,
               () => {
+                document.body.removeEventListener("cut", this.handleCut);
+                document.body.removeEventListener("copy", this.handleCopy);
                 if (lastFocusedEl) {
                   lastFocusedEl.focus();
                 }
@@ -157096,8 +149520,14 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     ];
   }
   __name(getEditDeleteHandlers, "getEditDeleteHandlers");
-  function SequenceName({ sequenceName, sequenceLength, isProtein: isProtein2 }) {
-    return /* @__PURE__ */ React.createElement("div", { key: "sequenceNameText", className: "sequenceNameText" }, /* @__PURE__ */ React.createElement("span", null, sequenceName, " "), /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("span", null, isProtein2 ? `${Math.floor(sequenceLength / 3)} AAs` : `${sequenceLength} bps`));
+  function SequenceName({
+    sequenceName,
+    sequenceLength,
+    isProtein: isProtein2,
+    showAminoAcidUnitAsCodon
+  }) {
+    const proteinUnits = showAminoAcidUnitAsCodon ? "codons" : "AAs";
+    return /* @__PURE__ */ React.createElement("div", { key: "sequenceNameText", className: "sequenceNameText" }, /* @__PURE__ */ React.createElement("span", { title: sequenceName }, sequenceName, " "), /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("span", null, isProtein2 ? `${Math.floor(sequenceLength / 3)} ${proteinUnits}` : `${sequenceLength} bps`));
   }
   __name(SequenceName, "SequenceName");
   function massageTickSpacing(spacing) {
@@ -158372,7 +150802,15 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
         target
       }
     );
-    return /* @__PURE__ */ React.createElement("div", { ref: target, className: "tg-pinch-helper" }, children);
+    return /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        ref: target,
+        style: { overflowX: "hidden" },
+        className: "tg-pinch-helper"
+      },
+      children
+    );
   }
   __name(PinchHelper, "PinchHelper");
   function isElWithinAnotherEl(el, container) {
@@ -158635,6 +151073,78 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     ));
   }
   __name(ZoomLinearView, "ZoomLinearView");
+  function BarPlot({
+    data,
+    width = 300,
+    height = 30,
+    barColors,
+    className
+  }) {
+    if (!data || data.length === 0) return null;
+    const maxVal = Math.max(...data);
+    const barWidth = width / data.length;
+    return /* @__PURE__ */ React.createElement("svg", { width, height, className }, data.map((val2, i2) => {
+      const barHeight = val2 / maxVal * (height - 2);
+      return /* @__PURE__ */ React.createElement(
+        "rect",
+        {
+          "data-tip": `${val2 == null ? void 0 : val2.toFixed(1)}%`,
+          key: i2,
+          x: i2 * barWidth + 1,
+          y: height - barHeight,
+          width: barWidth - 2,
+          height: barHeight,
+          fill: barColors ? barColors[i2 % barColors.length] : "#3498db",
+          rx: 2
+        }
+      );
+    }), /* @__PURE__ */ React.createElement(
+      "line",
+      {
+        x1: 1,
+        y1: height - 0.5 * (height - 2),
+        x2: width,
+        y2: height - 0.5 * (height - 2),
+        stroke: "white",
+        strokeDasharray: "4,2",
+        strokeWidth: 1
+      }
+    ), /* @__PURE__ */ React.createElement(
+      "line",
+      {
+        x1: 0,
+        y1: height,
+        x2: width,
+        y2: height,
+        stroke: "#333",
+        strokeWidth: 1
+      }
+    ));
+  }
+  __name(BarPlot, "BarPlot");
+  function AminoAcidCirclePlot({ data, width, className }) {
+    const n2 = data.length;
+    if (n2 === 0) return null;
+    const padding = 5;
+    const availableWidth = width - 3 * padding;
+    const spacing = n2 > 1 ? availableWidth / (n2 - 1) : 0;
+    const maxRadius = spacing / 2 - 2 > 0 ? spacing / 2 - 2 : 8;
+    const radius = Math.max(8, Math.min(maxRadius, 20));
+    const svgHeight = radius * 2 + 10;
+    return /* @__PURE__ */ React.createElement("svg", { width, height: svgHeight, className }, data.map((d2, idx) => /* @__PURE__ */ React.createElement("g", { key: idx }, /* @__PURE__ */ React.createElement(
+      "circle",
+      {
+        "data-tip": d2.group,
+        cx: idx * spacing + radius,
+        cy: radius + 2,
+        r: radius,
+        fill: d2.color,
+        stroke: "#333",
+        strokeWidth: 1
+      }
+    ))));
+  }
+  __name(AminoAcidCirclePlot, "AminoAcidCirclePlot");
   const defaultMarginWidth = 10;
   const __LinearView = class __LinearView extends React.Component {
     constructor() {
@@ -158653,28 +151163,31 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
           maxAnnotationsToDisplay
         } = this.props;
         this.paredDownMessages = [];
-        const paredDownSeqData = ["parts", "features", "cutsites"].reduce(
-          (acc, type2) => {
-            const nameUpper = startCase(type2);
-            const maxToShow = (maxAnnotationsToDisplay ? maxAnnotationsToDisplay[type2] : limits[type2]) || 50;
-            const [annotations, paredDown] = pareDownAnnotations(
-              sequenceData2["filtered" + nameUpper] || sequenceData2[type2] || {},
-              maxToShow
+        const paredDownSeqData = [
+          "parts",
+          "features",
+          "cutsites",
+          "primers"
+        ].reduce((acc, type2) => {
+          const nameUpper = startCase(type2);
+          const maxToShow = (maxAnnotationsToDisplay ? maxAnnotationsToDisplay[type2] : limits[type2]) || 50;
+          const [annotations, paredDown] = pareDownAnnotations(
+            sequenceData2["filtered" + nameUpper] || sequenceData2[type2] || {},
+            maxToShow,
+            sequenceData2.sequence ? sequenceData2.sequence.length : sequenceData2.size || 0
+          );
+          if (paredDown) {
+            this.paredDownMessages.push(
+              getParedDownWarning({
+                nameUpper,
+                isAdjustable: !maxAnnotationsToDisplay,
+                maxToShow
+              })
             );
-            if (paredDown) {
-              this.paredDownMessages.push(
-                getParedDownWarning({
-                  nameUpper,
-                  isAdjustable: !maxAnnotationsToDisplay,
-                  maxToShow
-                })
-              );
-            }
-            acc[type2] = annotations;
-            return acc;
-          },
-          {}
-        );
+          }
+          acc[type2] = annotations;
+          return acc;
+        }, {});
         this.rowData = prepareRowData(
           __spreadValues(__spreadValues({}, sequenceData2), paredDownSeqData),
           sequenceData2.sequence ? sequenceData2.sequence.length : 0
@@ -158691,6 +151204,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
       }));
     }
     getNearestCursorPositionToMouseEvent(rowData, event, callback2) {
+      var _a2;
+      const isProtein2 = (_a2 = this.props.sequenceData) == null ? void 0 : _a2.isProtein;
       let nearestCaretPos = 0;
       let rowDomNode = this.linearView;
       rowDomNode = rowDomNode.querySelector(".veRowItem");
@@ -158704,11 +151219,11 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
           (clickXPositionRelativeToRowContainer + this.charWidth / 2) / this.charWidth
         );
         nearestCaretPos = numberOfBPsInFromRowStart + 0;
-        if (nearestCaretPos > maxEnd + 1) {
-          nearestCaretPos = maxEnd + 1;
+        if (nearestCaretPos > maxEnd) {
+          nearestCaretPos = isProtein2 ? maxEnd + 1 : maxEnd;
         }
       }
-      if (this.props.sequenceData && this.props.sequenceData.isProtein) {
+      if (isProtein2) {
         nearestCaretPos = Math.round(nearestCaretPos / 3) * 3;
       }
       if (maxEnd === 0) nearestCaretPos = 0;
@@ -158741,6 +151256,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
       callback2(callbackVals);
     }
     render() {
+      var _b2, _c2;
       const _a2 = this.props, {
         sequenceData: sequenceData2 = { sequence: "" },
         alignmentData,
@@ -158763,7 +151279,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
         linearViewCharWidth,
         annotationVisibilityOverrides,
         isProtein: isProtein2,
-        noWarnings
+        noWarnings,
+        showAminoAcidUnitAsCodon
       } = _a2, rest = __objRest(_a2, [
         //currently found in props
         "sequenceData",
@@ -158787,7 +151304,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
         "linearViewCharWidth",
         "annotationVisibilityOverrides",
         "isProtein",
-        "noWarnings"
+        "noWarnings",
+        "showAminoAcidUnitAsCodon"
       ]);
       const bpsPerRow = this.getMaxLength();
       let innerWidth = Math.max(width - marginWidth - 20, 0);
@@ -158899,15 +151417,31 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
             SequenceName,
             __spreadValues({}, {
               isProtein: isProtein2,
+              showAminoAcidUnitAsCodon,
               sequenceName,
               sequenceLength: sequenceData2.sequence ? sequenceData2.sequence.length : 0
             })
           ),
           !noWarnings && /* @__PURE__ */ React.createElement(VeTopRightContainer, null, this.paredDownMessages),
-          /* @__PURE__ */ React.createElement(PinchHelperToUse, __spreadValues({}, linearZoomEnabled && pinchHandler), /* @__PURE__ */ React.createElement(
-            RowItem,
+          /* @__PURE__ */ React.createElement(PinchHelperToUse, __spreadValues({}, linearZoomEnabled && pinchHandler), sequenceData2.isProtein && sequenceData2.name === "Consensus" && /* @__PURE__ */ React.createElement(React.Fragment, null, annotationVisibilityOverrides.conservation && /* @__PURE__ */ React.createElement(
+            BarPlot,
+            {
+              className: "ve-linear-view-conservation-plot",
+              data: (_b2 = sequenceData2 == null ? void 0 : sequenceData2.aminoAcidProperties) == null ? void 0 : _b2.frequencies,
+              width
+            }
+          ), annotationVisibilityOverrides.properties && /* @__PURE__ */ React.createElement(
+            AminoAcidCirclePlot,
+            {
+              className: "ve-linear-view-property-analysis-plot",
+              data: (_c2 = sequenceData2 == null ? void 0 : sequenceData2.aminoAcidProperties) == null ? void 0 : _c2.propertyAnalysis,
+              width
+            }
+          )), /* @__PURE__ */ React.createElement(
+            RowItem$1,
             __spreadProps(__spreadValues({}, __spreadValues(__spreadProps(__spreadValues({}, rest), {
               editorName,
+              showAminoAcidUnitAsCodon,
               onScroll: /* @__PURE__ */ __name(() => {
                 this.easyStore.viewportWidth = width;
                 const row = this.linearView.querySelector(".veRowItemWrapper");
@@ -158930,7 +151464,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
               fullSequence: sequenceData2.sequence,
               emptyText: getEmptyText({ sequenceData: sequenceData2, caretPosition: caretPosition2 }),
               tickSpacing: tickSpacingToUse,
-              annotationVisibility: __spreadValues(__spreadValues(__spreadValues({}, rest.annotationVisibility), (!isLinViewZoomed || this.charWidth < 5) && {
+              annotationVisibility: __spreadValues(__spreadValues(__spreadValues({}, rest.annotationVisibility), (!isLinViewZoomed || this.charWidth < 5) && bpsPerRow >= 50 && {
                 translations: false,
                 primaryProteinSequence: false,
                 reverseSequence: false,
@@ -159109,11 +151643,14 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
           alignmentTracks = [],
           dimensions: { width = 200 },
           laneHeight,
-          laneSpacing = 1
+          laneSpacing = 1,
+          isTrackSelected = [],
+          activeFilterType = "all"
         } = this.props;
         const charWidth2 = this.getCharWidth();
         const {
           matchHighlightRanges: _matchHighlightRanges,
+          gapRanges = [],
           alignmentData: { trimmedRange } = {}
         } = alignmentTracks[i2];
         const matchHighlightRanges = !trimmedRange ? _matchHighlightRanges : flatMap(_matchHighlightRanges, (r2) => {
@@ -159140,15 +151677,24 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
             charWidth2
           );
           const toAdd = `M${xStart},${y2} L${xStart + width2},${y2} L${xStart + width2},${y2 + height} L${xStart},${y2 + height}`;
-          if (!range2.isMatch) {
+          if (!range2.isMatch && (activeFilterType === "all" || range2.differenceType === activeFilterType)) {
             redPath += toAdd;
           }
         });
+        if (activeFilterType === "gap") {
+          gapRanges.forEach((range2) => {
+            const { xStart, width: width2 } = getXStartAndWidthFromNonCircularRange(
+              range2,
+              charWidth2
+            );
+            redPath += `M${xStart},${y2} L${xStart + width2},${y2} L${xStart + width2},${y2 + height} L${xStart},${y2 + height}`;
+          });
+        }
         return /* @__PURE__ */ React.createElement(
           "div",
           {
             key: i2 + "-lane",
-            className: "minimapLane",
+            className: `minimapLane ${isTrackSelected[i2] ? "isTrackSelected" : ""}`,
             "data-lane-index": i2,
             style: { height: laneHeight, maxHeight: laneHeight }
           },
@@ -159160,7 +151706,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
               shapeRendering: "geometricPrecision"
             },
             /* @__PURE__ */ React.createElement("path", { className: "miniBluePath", d: bluePath, fill: "#9abeff" }),
-            /* @__PURE__ */ React.createElement("path", { className: "miniRedPath", d: redPath, fill: "red" })
+            /* @__PURE__ */ React.createElement("path", { className: "miniRedPath", d: redPath, fill: "#FF4444" })
           )
         );
       }, "renderItem"));
@@ -159172,7 +151718,9 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
         "numBpsShownInLinearView",
         "scrollAlignmentView",
         "laneHeight",
-        "laneSpacing"
+        "laneSpacing",
+        "isTrackSelected",
+        "activeFilterType"
       ].some((key) => props[key] !== newProps[key]))
         return true;
       return false;
@@ -159450,6 +151998,899 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     return splitRangeIntoTwoPartsIfItIsCircular(inverted, seqLen);
   }
   __name(getTrimmedRangesToDisplay, "getTrimmedRangesToDisplay");
+  function groupConsecutiveDifferences(differences) {
+    const grouped = [];
+    for (const diff of differences) {
+      if (diff.type === "mismatch") {
+        grouped.push(__spreadProps(__spreadValues({}, diff), { start: diff.position, end: diff.position }));
+        continue;
+      }
+      const last2 = grouped[grouped.length - 1];
+      if (last2 && last2.type === diff.type && last2.end === diff.position - 1) {
+        grouped[grouped.length - 1] = __spreadProps(__spreadValues({}, last2), { end: diff.position });
+      } else {
+        grouped.push(__spreadProps(__spreadValues({}, diff), { start: diff.position, end: diff.position }));
+      }
+    }
+    return grouped;
+  }
+  __name(groupConsecutiveDifferences, "groupConsecutiveDifferences");
+  function findAlignmentDifferences(alignedSeqs) {
+    var _a2;
+    if (alignedSeqs.length < 2 || !((_a2 = alignedSeqs[0]) == null ? void 0 : _a2.length)) return [];
+    const template = alignedSeqs[0].toLowerCase();
+    const nonTemplates = alignedSeqs.slice(1).map((s2) => s2.toLowerCase());
+    const trackBounds = nonTemplates.map((seq) => {
+      const withoutLeading = seq.replace(/^-+/, "");
+      const withoutTrailing = seq.replace(/-+$/, "");
+      const start2 = seq.length - withoutLeading.length;
+      const end2 = seq.length - (seq.length - withoutTrailing.length);
+      return { start: start2, end: end2 };
+    });
+    const differences = [];
+    for (let i2 = 0; i2 < template.length; i2++) {
+      const templateBase = template[i2];
+      const allNonTemplateBases = nonTemplates.map((seq) => seq[i2]);
+      const bases = [templateBase, ...allNonTemplateBases];
+      const alignedIndices = trackBounds.reduce((acc, { start: start2, end: end2 }, idx) => {
+        if (i2 >= start2 && i2 < end2) acc.push(idx);
+        return acc;
+      }, []);
+      if (alignedIndices.length === 0) {
+        differences.push({ position: i2, type: "gap", bases });
+        continue;
+      }
+      const alignedBases = alignedIndices.map((idx) => allNonTemplateBases[idx]);
+      const templateIsGap = templateBase === "-";
+      const nonTemplateHasBase = alignedBases.some((b3) => b3 !== "-");
+      const nonTemplateHasGap = alignedBases.some((b3) => b3 === "-");
+      if (templateIsGap && nonTemplateHasBase) {
+        differences.push({ position: i2, type: "insertion", bases });
+      } else if (!templateIsGap && nonTemplateHasGap) {
+        differences.push({ position: i2, type: "deletion", bases });
+      } else if (!templateIsGap) {
+        const uniqueBases = /* @__PURE__ */ new Set([templateBase, ...alignedBases]);
+        if (uniqueBases.size > 1) {
+          differences.push({ position: i2, type: "mismatch", bases });
+        }
+      }
+    }
+    return differences;
+  }
+  __name(findAlignmentDifferences, "findAlignmentDifferences");
+  function scrollToAlignmentSelection() {
+    const el = document.querySelector(".veCaret");
+    if (el) {
+      el.scrollIntoView({ inline: "center", block: "nearest" });
+    }
+  }
+  __name(scrollToAlignmentSelection, "scrollToAlignmentSelection");
+  function updateCaretPosition({ start: start2, end: end2 }) {
+    if (window.updateAlignmentSelection) {
+      window.updateAlignmentSelection({ start: start2, end: end2 });
+    }
+  }
+  __name(updateCaretPosition, "updateCaretPosition");
+  const FILTER_OPTIONS = [
+    { value: "all", label: "All" },
+    { value: "mismatch", label: "Mismatches" },
+    { value: "insertion", label: "Insertions" },
+    { value: "deletion", label: "Deletions" },
+    { value: "gap", label: "Gaps" }
+  ];
+  function FindMismatches(props) {
+    var _a2;
+    const { alignmentJson, id: id2, onFilterChange } = props;
+    const alignedSeqs = reactExports.useMemo(
+      () => alignmentJson.map((t2) => {
+        var _a3;
+        return ((_a3 = t2.alignmentData) == null ? void 0 : _a3.sequence) || "";
+      }),
+      [alignmentJson]
+    );
+    const [activeFilter, setActiveFilter] = React.useState("all");
+    const allDifferences = reactExports.useMemo(
+      () => groupConsecutiveDifferences(findAlignmentDifferences(alignedSeqs)),
+      [alignedSeqs]
+    );
+    const countsByType = reactExports.useMemo(() => {
+      const counts = { all: 0, mismatch: 0, insertion: 0, deletion: 0, gap: 0 };
+      allDifferences.forEach((d2) => {
+        counts[d2.type] = (counts[d2.type] || 0) + 1;
+        counts.all++;
+      });
+      return counts;
+    }, [allDifferences]);
+    const differences = reactExports.useMemo(() => {
+      const filtered = activeFilter === "all" ? allDifferences : allDifferences.filter((d2) => d2.type === activeFilter);
+      return [{ position: -1, start: -1, end: -1, bases: [""] }, ...filtered];
+    }, [allDifferences, activeFilter]);
+    const currentCaretPosition = useSelector(
+      (state2) => {
+        var _a3;
+        return (_a3 = state2.VectorEditor.__allEditorsOptions.alignments[id2]) == null ? void 0 : _a3.caretPosition;
+      }
+    );
+    const [currentIdx, setCurrentIdx] = React.useState(0);
+    const currentDiff = differences[currentIdx];
+    const disablePrev = currentIdx <= 1;
+    const disableNext = currentIdx >= differences.length - 1;
+    reactExports.useEffect(() => {
+      setCurrentIdx(0);
+    }, [activeFilter]);
+    reactExports.useEffect(() => {
+      onFilterChange == null ? void 0 : onFilterChange({ activeFilter });
+    }, [activeFilter, onFilterChange]);
+    reactExports.useEffect(() => {
+      if (currentCaretPosition !== -1) {
+        const diffIdx = differences.findIndex(
+          (d2, i2) => i2 > 0 && currentCaretPosition >= d2.start && currentCaretPosition <= d2.end + 1
+        );
+        if (diffIdx !== -1 && diffIdx !== currentIdx) {
+          setCurrentIdx(diffIdx);
+        }
+      }
+    }, [currentCaretPosition, differences, currentIdx]);
+    const updateView = /* @__PURE__ */ __name((diff) => {
+      const idx = differences.indexOf(diff);
+      const { start: start2, end: end2 } = diff;
+      setCurrentIdx(idx);
+      updateCaretPosition({ start: start2, end: end2 });
+      setTimeout(() => {
+        scrollToAlignmentSelection();
+      }, 0);
+    }, "updateView");
+    const prevDifference = /* @__PURE__ */ __name(() => {
+      var _a3, _b2;
+      const pivot = currentCaretPosition >= 0 ? currentCaretPosition : (_b2 = (_a3 = differences[currentIdx]) == null ? void 0 : _a3.start) != null ? _b2 : 0;
+      const prev = [...differences].reverse().find((d2) => d2.start >= 0 && d2.start < pivot);
+      if (prev) updateView(prev);
+    }, "prevDifference");
+    const nextDifference = /* @__PURE__ */ __name(() => {
+      var _a3, _b2;
+      const pivot = currentCaretPosition >= 0 ? currentCaretPosition : (_b2 = (_a3 = differences[currentIdx]) == null ? void 0 : _a3.start) != null ? _b2 : -1;
+      const next = differences.find((d2) => d2.start > pivot && d2.start >= 0);
+      if (next) updateView(next);
+    }, "nextDifference");
+    const noDifferences = differences.length <= 1;
+    const activeOption = FILTER_OPTIONS.find((o2) => o2.value === activeFilter);
+    const activeLabel = (_a2 = activeOption == null ? void 0 : activeOption.label) != null ? _a2 : "Differences";
+    const filterMenu = /* @__PURE__ */ React.createElement(Menu, null, FILTER_OPTIONS.map(({ value, label }) => {
+      var _a3;
+      const count2 = (_a3 = countsByType[value]) != null ? _a3 : 0;
+      const isActive2 = activeFilter === value;
+      return /* @__PURE__ */ React.createElement(
+        MenuItem,
+        {
+          key: value,
+          active: isActive2,
+          onClick: /* @__PURE__ */ __name(() => setActiveFilter(value), "onClick"),
+          text: /* @__PURE__ */ React.createElement("span", { className: "veDiffMenuItem-inner" }, label, /* @__PURE__ */ React.createElement(Tag, { round: true, minimal: true, style: { marginLeft: 6 } }, count2))
+        }
+      );
+    }));
+    return /* @__PURE__ */ React.createElement("div", { className: "veDiffNavigator" }, /* @__PURE__ */ React.createElement(
+      Popover,
+      {
+        minimal: true,
+        position: Position.BOTTOM_LEFT,
+        content: filterMenu,
+        target: /* @__PURE__ */ React.createElement(
+          Button,
+          {
+            minimal: true,
+            "data-tip": "Filter Difference Type",
+            small: true,
+            rightIcon: "caret-down",
+            className: "veDiffFilter-trigger"
+          },
+          activeLabel
+        )
+      }
+    ), noDifferences ? /* @__PURE__ */ React.createElement("span", { className: "veDiffNav-empty" }, "no", " ", activeFilter === "all" ? "differences" : activeLabel.toLowerCase()) : /* @__PURE__ */ React.createElement("div", { className: "veDiffNav" }, /* @__PURE__ */ React.createElement(
+      Button,
+      {
+        minimal: true,
+        small: true,
+        "data-tip": "Previous Difference",
+        icon: "arrow-left",
+        intent: Intent.PRIMARY,
+        onClick: prevDifference,
+        disabled: disablePrev
+      }
+    ), /* @__PURE__ */ React.createElement("div", { className: "veDiffNav-center" }, /* @__PURE__ */ React.createElement("span", { className: "veDiffNav-fraction" }, currentIdx, /* @__PURE__ */ React.createElement("span", { className: "veDiffNav-sep" }, "/"), differences.length - 1), (currentDiff == null ? void 0 : currentDiff.start) > -1 && /* @__PURE__ */ React.createElement("span", { className: "veDiffNav-pos" }, ":", currentDiff.start + 1)), /* @__PURE__ */ React.createElement(
+      Button,
+      {
+        minimal: true,
+        small: true,
+        "data-tip": "Next Difference",
+        icon: "arrow-right",
+        intent: Intent.PRIMARY,
+        onClick: nextDifference,
+        disabled: disableNext
+      }
+    )));
+  }
+  __name(FindMismatches, "FindMismatches");
+  function getGapMap(sequence2) {
+    const gapMap = [0];
+    sequence2.split("").forEach((char) => {
+      if (char === "-") {
+        gapMap[Math.max(0, gapMap.length - 1)] = (gapMap[Math.max(0, gapMap.length - 1)] || 0) + 1;
+      } else {
+        gapMap.push(gapMap[gapMap.length - 1] || 0);
+      }
+    });
+    return gapMap;
+  }
+  __name(getGapMap, "getGapMap");
+  const MATCH_COLOR = "gold";
+  const CURRENT_MATCH_COLOR = "green";
+  const MISMATCH_COLOR = "red";
+  const ANNOTATION_TYPES = ["features", "parts", "primers"];
+  const initialSearchState = {
+    searchText: "",
+    matches: [],
+    currentMatchIndex: 0,
+    searched: false,
+    featureMatches: [],
+    dnaOrAA: "DNA",
+    ambiguousOrLiteral: "LITERAL",
+    mismatchesAllowed: 0
+  };
+  function searchReducer(state2, action2) {
+    switch (action2.type) {
+      case "SET_SEARCH_TEXT":
+        return __spreadProps(__spreadValues({}, state2), { searchText: action2.payload });
+      case "SET_MATCHES":
+        return __spreadProps(__spreadValues({}, state2), {
+          matches: action2.payload.matches,
+          currentMatchIndex: action2.payload.currentMatchIndex
+        });
+      case "SET_CURRENT_MATCH_INDEX":
+        return __spreadProps(__spreadValues({}, state2), { currentMatchIndex: action2.payload });
+      case "SET_SEARCHED":
+        return __spreadProps(__spreadValues({}, state2), { searched: action2.payload });
+      case "SEARCH_COMPLETE":
+        return __spreadProps(__spreadValues({}, state2), {
+          matches: action2.payload.matches,
+          currentMatchIndex: action2.payload.currentMatchIndex,
+          searched: action2.payload.searched
+        });
+      case "SET_FEATURE_MATCHES":
+        return __spreadProps(__spreadValues({}, state2), { featureMatches: action2.payload });
+      case "SET_DNA_OR_AA":
+        return __spreadProps(__spreadValues({}, state2), { dnaOrAA: action2.payload });
+      case "SET_AMBIGUOUS_OR_LITERAL":
+        return __spreadProps(__spreadValues({}, state2), { ambiguousOrLiteral: action2.payload });
+      case "SET_MISMATCHES_ALLOWED":
+        return __spreadProps(__spreadValues({}, state2), { mismatchesAllowed: Math.max(0, action2.payload) });
+      case "RESET":
+        return __spreadValues({}, initialSearchState);
+      default:
+        return state2;
+    }
+  }
+  __name(searchReducer, "searchReducer");
+  function AlignmentSearchBar(props) {
+    const { alignmentTracks = [], setSearchMatchLayers } = props;
+    const [searchState, dispatch] = reactExports.useReducer(searchReducer, initialSearchState);
+    const {
+      searchText,
+      matches,
+      currentMatchIndex,
+      searched,
+      featureMatches,
+      dnaOrAA,
+      ambiguousOrLiteral,
+      mismatchesAllowed
+    } = searchState;
+    const debouncedSearch = reactExports.useRef(
+      debounce((text2, search2, featureSearch) => {
+        search2(text2);
+        featureSearch(text2);
+      }, 50)
+    ).current;
+    reactExports.useEffect(() => {
+      return () => {
+        debouncedSearch.cancel();
+      };
+    }, [debouncedSearch]);
+    const [highlightAll, setHighlightAll] = reactExports.useState(false);
+    const [isExpanded, setIsExpanded] = reactExports.useState(false);
+    const [isOpen2, setIsOpen] = reactExports.useState(false);
+    const [isPopoverOpen, setIsPopoverOpen] = reactExports.useState(false);
+    const handleToggleExpanded = reactExports.useCallback(() => {
+      setIsExpanded((prev) => {
+        const next = !prev;
+        if (!next) setIsPopoverOpen(true);
+        return next;
+      });
+    }, [setIsPopoverOpen]);
+    reactExports.useEffect(() => {
+      dispatch({ type: "RESET" });
+      if (setSearchMatchLayers) setSearchMatchLayers([]);
+    }, [setSearchMatchLayers]);
+    const buildMatchLayers = reactExports.useCallback(
+      (allMatches, activeIndex) => {
+        if (!setSearchMatchLayers) return;
+        if (!allMatches.length) {
+          setSearchMatchLayers([]);
+          return;
+        }
+        const makeMismatchLayers = /* @__PURE__ */ __name((match) => (match.mismatchAlignmentPositions || []).map((pos) => ({
+          start: pos,
+          end: pos,
+          color: MISMATCH_COLOR,
+          className: "veSearchMismatch",
+          ignoreGaps: true,
+          hideCarets: true
+        })), "makeMismatchLayers");
+        const layers = highlightAll ? allMatches.flatMap((match, i2) => [
+          {
+            start: match.alignmentStart,
+            end: match.alignmentEnd,
+            color: i2 === activeIndex ? CURRENT_MATCH_COLOR : MATCH_COLOR,
+            className: i2 === activeIndex ? "veSearchLayerActive" : "veSearchLayer",
+            ignoreGaps: true
+          },
+          ...makeMismatchLayers(match)
+        ]) : [
+          {
+            start: allMatches[activeIndex].alignmentStart,
+            end: allMatches[activeIndex].alignmentEnd,
+            color: CURRENT_MATCH_COLOR,
+            className: "veSearchLayerActive",
+            ignoreGaps: true
+          },
+          ...makeMismatchLayers(allMatches[activeIndex])
+        ];
+        setSearchMatchLayers(layers);
+      },
+      [setSearchMatchLayers, highlightAll]
+    );
+    const navigateTo = reactExports.useCallback(
+      (allMatches, index2) => {
+        const match = allMatches[index2];
+        if (!match) return;
+        updateCaretPosition({
+          start: match.alignmentStart,
+          end: match.alignmentEnd
+        });
+        setTimeout(() => {
+          scrollToAlignmentSelection();
+        }, 0);
+        buildMatchLayers(allMatches, index2);
+      },
+      [buildMatchLayers]
+    );
+    const runSearch = reactExports.useCallback(
+      (text2) => {
+        const query = text2.trim();
+        if (!query) {
+          dispatch({
+            type: "SEARCH_COMPLETE",
+            payload: { matches: [], currentMatchIndex: 0, searched: false }
+          });
+          if (setSearchMatchLayers) setSearchMatchLayers([]);
+          return;
+        }
+        const allMatches = [];
+        alignmentTracks.slice(0, 1).forEach((track, trackIndex) => {
+          var _a2, _b2;
+          const rawSeq = ((_a2 = track.sequenceData) == null ? void 0 : _a2.sequence) || "";
+          const alignedSeq = ((_b2 = track.alignmentData) == null ? void 0 : _b2.sequence) || "";
+          const gapMap = getGapMap(alignedSeq);
+          const gapOffset = /* @__PURE__ */ __name((n2) => {
+            var _a3, _b3;
+            return (_b3 = (_a3 = gapMap[n2]) != null ? _a3 : gapMap[gapMap.length - 1]) != null ? _b3 : 0;
+          }, "gapOffset");
+          let seqMatches = [];
+          if (dnaOrAA === "DNA" && ambiguousOrLiteral === "LITERAL" && mismatchesAllowed > 0) {
+            const approxMatches = findApproxMatches(
+              query.toLowerCase(),
+              rawSeq.toLowerCase(),
+              mismatchesAllowed,
+              false
+            );
+            seqMatches = approxMatches.map((m2) => ({
+              start: m2.index,
+              end: m2.index + m2.match.length - 1,
+              mismatchPositions: m2.mismatchPositions
+            }));
+          } else {
+            seqMatches = findSequenceMatches(rawSeq, query, {
+              isCircular: false,
+              isAmbiguous: ambiguousOrLiteral === "AMBIGUOUS",
+              isProteinSearch: dnaOrAA !== "DNA",
+              searchReverseStrand: dnaOrAA === "DNA"
+            });
+          }
+          const hitsToProcess = query.length < 2 ? seqMatches.slice(0, 1) : seqMatches;
+          hitsToProcess.forEach(({ start: start2, end: end2, mismatchPositions }) => {
+            const alignmentStart = start2 + gapOffset(start2);
+            const alignmentEnd = end2 + gapOffset(end2);
+            const mismatchAlignmentPositions = (mismatchPositions || []).map(
+              (p2) => {
+                const absPos = start2 + p2;
+                return absPos + gapOffset(absPos);
+              }
+            );
+            allMatches.push({
+              trackIndex,
+              alignmentStart,
+              alignmentEnd,
+              mismatchAlignmentPositions
+            });
+          });
+        });
+        const results = query.length < 2 ? allMatches.slice(0, 1) : allMatches;
+        dispatch({
+          type: "SEARCH_COMPLETE",
+          payload: { matches: results, currentMatchIndex: 0, searched: true }
+        });
+        if (results.length) {
+          navigateTo(results, 0);
+        } else {
+          if (setSearchMatchLayers) setSearchMatchLayers([]);
+        }
+      },
+      [
+        alignmentTracks,
+        navigateTo,
+        dnaOrAA,
+        ambiguousOrLiteral,
+        mismatchesAllowed,
+        setSearchMatchLayers
+      ]
+    );
+    const runFeatureSearch = reactExports.useCallback(
+      (text2) => {
+        const query = text2.trim().toLowerCase();
+        if (!query) {
+          dispatch({ type: "SET_FEATURE_MATCHES", payload: [] });
+          return;
+        }
+        const allMatches = [];
+        alignmentTracks.slice(0, 1).forEach((track, trackIndex) => {
+          const { sequenceData: sequenceData2, alignmentData } = track;
+          const alignedSeq = (alignmentData == null ? void 0 : alignmentData.sequence) || "";
+          const gapMap = getGapMap(alignedSeq);
+          const gapOffset = /* @__PURE__ */ __name((n2) => {
+            var _a2, _b2;
+            return (_b2 = (_a2 = gapMap[n2]) != null ? _a2 : gapMap[gapMap.length - 1]) != null ? _b2 : 0;
+          }, "gapOffset");
+          const trackName = (alignmentData == null ? void 0 : alignmentData.name) || (sequenceData2 == null ? void 0 : sequenceData2.name) || (sequenceData2 == null ? void 0 : sequenceData2.id) || "";
+          ANNOTATION_TYPES.forEach((type2) => {
+            const anns = sequenceData2 == null ? void 0 : sequenceData2[type2];
+            if (!anns) return;
+            const annsArray = Array.isArray(anns) ? anns : Object.values(anns);
+            annsArray.forEach((ann) => {
+              if (!ann.name) return;
+              if (ann.name.toLowerCase().includes(query)) {
+                const alignmentStart = ann.start + gapOffset(ann.start);
+                const alignmentEnd = ann.end + gapOffset(ann.end);
+                allMatches.push({
+                  trackIndex,
+                  trackName,
+                  type: type2,
+                  annotation: ann,
+                  alignmentStart,
+                  alignmentEnd
+                });
+              }
+            });
+          });
+        });
+        dispatch({ type: "SET_FEATURE_MATCHES", payload: allMatches });
+      },
+      [alignmentTracks]
+    );
+    const goToPrev = reactExports.useCallback(() => {
+      if (!matches.length) return;
+      const newIndex = currentMatchIndex === 0 ? matches.length - 1 : currentMatchIndex - 1;
+      dispatch({ type: "SET_CURRENT_MATCH_INDEX", payload: newIndex });
+      navigateTo(matches, newIndex);
+    }, [matches, currentMatchIndex, navigateTo]);
+    const goToNext = reactExports.useCallback(() => {
+      if (!matches.length) return;
+      const newIndex = currentMatchIndex === matches.length - 1 ? 0 : currentMatchIndex + 1;
+      dispatch({ type: "SET_CURRENT_MATCH_INDEX", payload: newIndex });
+      navigateTo(matches, newIndex);
+    }, [matches, currentMatchIndex, navigateTo]);
+    const handleKeyDown = reactExports.useCallback(
+      (e2) => {
+        if (e2.key === "Escape") {
+          setIsOpen(false);
+        }
+        if (e2.key === "Enter") {
+          if (e2.shiftKey) {
+            goToPrev();
+          } else {
+            goToNext();
+          }
+          e2.preventDefault();
+          e2.stopPropagation();
+        }
+      },
+      [goToPrev, goToNext]
+    );
+    reactExports.useEffect(() => {
+      if (!searched || !searchText.trim()) return;
+      runSearch(searchText);
+      runFeatureSearch(searchText);
+    }, [
+      dnaOrAA,
+      ambiguousOrLiteral,
+      mismatchesAllowed,
+      runSearch,
+      runFeatureSearch,
+      searched,
+      searchText
+    ]);
+    reactExports.useEffect(() => {
+      if (searchText.trim().length < 1) setHighlightAll(false);
+    }, [searchText]);
+    const prevHighlightAll = reactExports.useRef(highlightAll);
+    reactExports.useEffect(() => {
+      if (prevHighlightAll.current !== highlightAll) {
+        prevHighlightAll.current = highlightAll;
+        if (matches.length) buildMatchLayers(matches, currentMatchIndex);
+      }
+    }, [highlightAll, matches, currentMatchIndex, buildMatchLayers]);
+    const hasMatches = matches.length > 0;
+    const handleChange = reactExports.useCallback(
+      (e2) => {
+        const value = e2.target.value;
+        dispatch({ type: "SET_SEARCH_TEXT", payload: value });
+        debouncedSearch(value, runSearch, runFeatureSearch);
+      },
+      [debouncedSearch, runSearch, runFeatureSearch]
+    );
+    const handleFeatureClick = reactExports.useCallback((featureMatch) => {
+      updateCaretPosition({
+        start: featureMatch.alignmentStart,
+        end: featureMatch.alignmentEnd
+      });
+      setTimeout(() => {
+        scrollToAlignmentSelection();
+      }, 0);
+    }, []);
+    const matchCounter = /* @__PURE__ */ React.createElement(
+      "span",
+      {
+        style: {
+          marginRight: 3,
+          color: "lightgrey",
+          fontSize: "0.9em",
+          whiteSpace: "nowrap"
+        }
+      },
+      hasMatches ? currentMatchIndex + 1 : 0,
+      "/",
+      matches.length
+    );
+    const inlineNavEl = /* @__PURE__ */ React.createElement("span", { style: { display: "flex", alignItems: "center" } }, !isExpanded && /* @__PURE__ */ React.createElement(
+      Popover,
+      {
+        autoFocus: false,
+        enforceFocus: false,
+        isOpen: isPopoverOpen,
+        onInteraction: setIsPopoverOpen,
+        position: Position.TOP,
+        content: /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            className: "ve-find-options-popover",
+            style: {
+              display: "flex",
+              flexDirection: "column",
+              paddingLeft: 20,
+              paddingBottom: 10,
+              paddingTop: 10,
+              paddingRight: 20,
+              gap: 6
+            }
+          },
+          /* @__PURE__ */ React.createElement(
+            FindOptionsPanel,
+            {
+              dnaOrAA,
+              ambiguousOrLiteral,
+              mismatchesAllowed,
+              searchText,
+              matches,
+              dispatch,
+              highlightAll,
+              setHighlightAll,
+              isExpanded,
+              onToggleExpanded: handleToggleExpanded
+            }
+          )
+        ),
+        target: /* @__PURE__ */ React.createElement(Button, { minimal: true, icon: "wrench", "data-tip": "Options" })
+      }
+    ), matchCounter, /* @__PURE__ */ React.createElement(
+      Button,
+      {
+        minimal: true,
+        small: true,
+        icon: "caret-left",
+        "data-tip": "Previous",
+        disabled: !hasMatches,
+        onClick: goToPrev
+      }
+    ), /* @__PURE__ */ React.createElement(
+      Button,
+      {
+        minimal: true,
+        small: true,
+        icon: "caret-right",
+        "data-tip": "Next",
+        disabled: !hasMatches,
+        onClick: goToNext
+      }
+    ), /* @__PURE__ */ React.createElement(
+      Button,
+      {
+        minimal: true,
+        small: true,
+        "data-tip": "Close (Esc)",
+        icon: "small-cross",
+        onClick: /* @__PURE__ */ __name(() => setIsOpen(false), "onClick")
+      }
+    ));
+    const expandedNavEl = /* @__PURE__ */ React.createElement("span", { style: { display: "flex", alignItems: "center" } }, matchCounter, /* @__PURE__ */ React.createElement(
+      Button,
+      {
+        minimal: true,
+        small: true,
+        icon: "caret-up",
+        disabled: !hasMatches,
+        onClick: goToPrev
+      }
+    ), /* @__PURE__ */ React.createElement(
+      Button,
+      {
+        minimal: true,
+        small: true,
+        icon: "caret-down",
+        disabled: !hasMatches,
+        onClick: goToNext
+      }
+    ));
+    if (!isOpen2) {
+      return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(
+        Button,
+        {
+          minimal: true,
+          small: true,
+          intent: "primary",
+          icon: "search",
+          rightIcon: "caret-right",
+          "data-tip": "Search",
+          onClick: /* @__PURE__ */ __name(() => setIsOpen(true), "onClick")
+        }
+      ));
+    }
+    const annotationPopoverOpen = searched && featureMatches.length > 0;
+    const inputEl = /* @__PURE__ */ React.createElement(
+      InputGroup,
+      {
+        className: "tg-find-tool-input alignment-search-bar",
+        leftIcon: "search",
+        placeholder: "Search...",
+        autoFocus: true,
+        value: searchText,
+        onChange: handleChange,
+        onKeyDown: handleKeyDown,
+        rightElement: inlineNavEl
+      }
+    );
+    return /* @__PURE__ */ React.createElement("div", { style: { position: "relative" } }, !isExpanded && /* @__PURE__ */ React.createElement(
+      Popover,
+      {
+        autoFocus: false,
+        enforceFocus: false,
+        modifiers: {
+          arrow: false
+        },
+        position: Position.BOTTOM,
+        isOpen: annotationPopoverOpen,
+        content: /* @__PURE__ */ React.createElement(
+          AnnotationResultsComp,
+          {
+            featureMatches,
+            onClickMatch: handleFeatureClick
+          }
+        ),
+        target: inputEl
+      }
+    ), isExpanded && /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          position: "absolute",
+          top: 0,
+          left: 0,
+          padding: 10,
+          paddingBottom: 25,
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 10,
+          zIndex: 5e4,
+          background: "white",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+          borderRadius: 3
+        }
+      },
+      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6 } }, /* @__PURE__ */ React.createElement(
+        TextArea,
+        {
+          autoFocus: true,
+          placeholder: "Search sequences and annotations...",
+          value: searchText,
+          onChange: handleChange,
+          onKeyDown: handleKeyDown,
+          style: { resize: "vertical", width: 350, height: 190 }
+        }
+      ), annotationPopoverOpen && /* @__PURE__ */ React.createElement(
+        AnnotationResultsComp,
+        {
+          featureMatches,
+          onClickMatch: handleFeatureClick
+        }
+      )),
+      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 5 } }, expandedNavEl, /* @__PURE__ */ React.createElement(
+        FindOptionsPanel,
+        {
+          dnaOrAA,
+          ambiguousOrLiteral,
+          mismatchesAllowed,
+          searchText,
+          matches,
+          dispatch,
+          highlightAll,
+          setHighlightAll,
+          isExpanded,
+          onToggleExpanded: handleToggleExpanded
+        }
+      )),
+      /* @__PURE__ */ React.createElement(
+        Button,
+        {
+          minimal: true,
+          style: { position: "absolute", bottom: 0, right: 0 },
+          onClick: /* @__PURE__ */ __name(() => setIsOpen(false), "onClick"),
+          icon: "cross"
+        }
+      )
+    ));
+  }
+  __name(AlignmentSearchBar, "AlignmentSearchBar");
+  function AnnotationResultsComp({ featureMatches, onClickMatch }) {
+    const byType = {};
+    ANNOTATION_TYPES.forEach((type2) => {
+      byType[type2] = [];
+    });
+    featureMatches.forEach((match) => {
+      if (byType[match.type]) {
+        byType[match.type].push(match);
+      }
+    });
+    const featureColorMap = getFeatureToColorMap({ includeHidden: true });
+    return /* @__PURE__ */ React.createElement("div", { className: "veAnnotationFindMatches" }, ANNOTATION_TYPES.map((type2) => {
+      const anns = byType[type2];
+      if (!anns.length) return null;
+      const showing = anns.slice(0, 10);
+      return /* @__PURE__ */ React.createElement("div", { key: type2 }, /* @__PURE__ */ React.createElement("div", { className: "veAnnotationFoundType" }, anns.length, " ", getSingular(type2), " match", anns.length > 1 ? "es" : null, anns.length > 10 ? ` (only showing 10)` : null, ":"), /* @__PURE__ */ React.createElement("div", null, showing.map((match, i2) => {
+        const { annotation } = match;
+        const annotationColor = type2 === "parts" ? "#ac68cc" : annotation.color || featureColorMap[annotation.type];
+        return /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            key: i2,
+            onClick: /* @__PURE__ */ __name(() => onClickMatch(match), "onClick"),
+            className: "veAnnotationFoundResult"
+          },
+          /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center" } }, /* @__PURE__ */ React.createElement(
+            "div",
+            {
+              style: {
+                background: annotationColor,
+                height: 15,
+                width: 15,
+                marginRight: 3
+              }
+            }
+          ), annotation.name),
+          /* @__PURE__ */ React.createElement("div", { className: "veAnnotationFoundResultRange" }, annotation.start + 1, "-", annotation.end + 1)
+        );
+      })));
+    }));
+  }
+  __name(AnnotationResultsComp, "AnnotationResultsComp");
+  function FindOptionsPanel({
+    dnaOrAA,
+    ambiguousOrLiteral,
+    mismatchesAllowed,
+    searchText,
+    matches,
+    dispatch,
+    highlightAll,
+    setHighlightAll,
+    isExpanded,
+    onToggleExpanded
+  }) {
+    return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(
+      TgHTMLSelect,
+      {
+        options: [
+          { label: "DNA", value: "DNA" },
+          { label: "Amino Acids", value: "AA" }
+        ],
+        value: dnaOrAA,
+        onChange: /* @__PURE__ */ __name((e2) => dispatch({ type: "SET_DNA_OR_AA", payload: e2.target.value }), "onChange")
+      }
+    ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex" } }, /* @__PURE__ */ React.createElement(
+      TgHTMLSelect,
+      {
+        options: [
+          { label: "Literal", value: "LITERAL" },
+          { label: "Ambiguous", value: "AMBIGUOUS" }
+        ],
+        value: ambiguousOrLiteral,
+        onChange: /* @__PURE__ */ __name((e2) => dispatch({
+          type: "SET_AMBIGUOUS_OR_LITERAL",
+          payload: e2.target.value
+        }), "onChange")
+      }
+    ), /* @__PURE__ */ React.createElement(InfoHelper, { style: { marginLeft: 10 } }, /* @__PURE__ */ React.createElement("div", null, "Ambiguous substitutions:", /* @__PURE__ */ React.createElement("div", { style: { display: "flex", fontSize: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { marginRight: 20 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, marginBottom: 4, marginTop: 5 } }, "DNA:"), /* @__PURE__ */ React.createElement("div", null, "M: AC"), /* @__PURE__ */ React.createElement("div", null, "R: AG"), /* @__PURE__ */ React.createElement("div", null, "W: AT"), /* @__PURE__ */ React.createElement("div", null, "S: CG"), /* @__PURE__ */ React.createElement("div", null, "Y: CT"), /* @__PURE__ */ React.createElement("div", null, "K: GT"), /* @__PURE__ */ React.createElement("div", null, "V: ACG"), /* @__PURE__ */ React.createElement("div", null, "H: ACT"), /* @__PURE__ */ React.createElement("div", null, "D: AGT"), /* @__PURE__ */ React.createElement("div", null, "B: CGT"), /* @__PURE__ */ React.createElement("div", null, "X: GATC"), /* @__PURE__ */ React.createElement("div", null, "N: GATC"), /* @__PURE__ */ React.createElement("div", null, "*: any")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, marginBottom: 4, marginTop: 5 } }, "AA:"), /* @__PURE__ */ React.createElement("div", null, "B: ND"), /* @__PURE__ */ React.createElement("div", null, "J: IL"), /* @__PURE__ */ React.createElement("div", null, "X: ACDEFGHIKLMNPQRSTVWY"), /* @__PURE__ */ React.createElement("div", null, "Z: QE"), /* @__PURE__ */ React.createElement("div", null, "*: any")))))), /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        style: {
+          marginTop: "8px",
+          display: "flex",
+          flexDirection: "row",
+          gap: "3px",
+          alignItems: "center"
+        }
+      },
+      /* @__PURE__ */ React.createElement("label", null, "Mismatches Allowed:"),
+      /* @__PURE__ */ React.createElement(
+        NumericInput,
+        {
+          min: 0,
+          max: 10,
+          className: "tg-mismatches-allowed-input",
+          style: { width: "60px" },
+          value: mismatchesAllowed,
+          disabled: dnaOrAA !== "DNA" || ambiguousOrLiteral !== "LITERAL",
+          onValueChange: /* @__PURE__ */ __name((value) => dispatch({
+            type: "SET_MISMATCHES_ALLOWED",
+            payload: Number.parseInt(value, 10) || 0
+          }), "onValueChange")
+        }
+      ),
+      /* @__PURE__ */ React.createElement(InfoHelper, { style: { marginLeft: 10 } }, /* @__PURE__ */ React.createElement("div", null, "Number of mismatches allowed when searching DNA sequences with literal matching.", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("br", null), "Higher values may slow down search performance."))
+    ), /* @__PURE__ */ React.createElement(
+      Switch,
+      {
+        checked: highlightAll,
+        onChange: /* @__PURE__ */ __name(() => setHighlightAll((v2) => !v2), "onChange"),
+        disabled: searchText.trim().length < 2 || matches.length > MAX_MATCHES_DISPLAYED
+      },
+      /* @__PURE__ */ React.createElement(
+        Tooltip,
+        {
+          disabled: matches.length <= MAX_MATCHES_DISPLAYED,
+          content: `Disabled because there are >${MAX_MATCHES_DISPLAYED} matches`
+        },
+        "Highlight All"
+      )
+    ), /* @__PURE__ */ React.createElement(Switch, { checked: isExpanded, onChange: onToggleExpanded }, "Expanded"));
+  }
+  __name(FindOptionsPanel, "FindOptionsPanel");
   const AlignmentVisibilityTool = pure(/* @__PURE__ */ __name(function AlignmentVisibilityTool2(props) {
     return /* @__PURE__ */ React.createElement(
       Popover,
@@ -159457,17 +152898,18 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
         minimal: true,
         position: "bottom",
         content: /* @__PURE__ */ React.createElement(VisibilityOptions$2, __spreadValues({}, props)),
-        target: /* @__PURE__ */ React.createElement(Tooltip, { content: "Visibility Options" }, /* @__PURE__ */ React.createElement(
+        target: /* @__PURE__ */ React.createElement(
           Button,
           {
             className: "tg-alignment-visibility-toggle",
             small: true,
+            "data-tip": "Visibility Options",
             rightIcon: "caret-down",
             intent: Intent.PRIMARY,
             minimal: true,
             icon: "eye-open"
           }
-        ))
+        )
       }
     );
   }, "AlignmentVisibilityTool"));
@@ -159486,6 +152928,17 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     } else {
       annotationCountToUse = annotationsWithCounts[0];
     }
+    const subMenuElements = ["physicalProperties", "plot"];
+    const physicalPropertyElements = [
+      "hydrophobicity",
+      "polar",
+      "negative",
+      "positive",
+      "charged",
+      "aliphatic",
+      "aromatic"
+    ];
+    const plotElements = ["conservation", "properties"];
     return /* @__PURE__ */ React.createElement(
       Menu,
       {
@@ -159493,36 +152946,107 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
         className: "alignmentAnnotationVisibilityToolInner"
       },
       map$3(togglableAlignmentAnnotationSettings, (visible, annotationName) => {
-        return /* @__PURE__ */ React.createElement(
-          MenuItem,
-          {
-            icon: visible ? "tick" : "",
-            onClick: /* @__PURE__ */ __name((e2) => {
-              e2.stopPropagation();
-              if (annotationName === "axis") {
-                return alignmentAnnotationVisibilityToggle({
-                  axisNumbers: !visible,
-                  axis: !visible
+        if (!physicalPropertyElements.includes(annotationName) && !plotElements.includes(annotationName)) {
+          return /* @__PURE__ */ React.createElement(
+            MenuItem,
+            {
+              icon: visible && !subMenuElements.includes(annotationName) ? "tick" : "",
+              onClick: /* @__PURE__ */ __name((e2) => {
+                e2.stopPropagation();
+                if (annotationName === "axis") {
+                  return alignmentAnnotationVisibilityToggle({
+                    axisNumbers: !visible,
+                    axis: !visible
+                  });
+                }
+                if (annotationName === "cdsFeatureTranslations" && !visible) {
+                  return alignmentAnnotationVisibilityToggle({
+                    cdsFeatureTranslations: !visible,
+                    translations: !visible
+                  });
+                }
+                alignmentAnnotationVisibilityToggle({
+                  [annotationName]: !visible
                 });
+              }, "onClick"),
+              text: /* @__PURE__ */ React.createElement(React.Fragment, null, startCase(annotationName).replace("Cds", "CDS").replace("Dna", "DNA"), annotationName in annotationCountToUse ? /* @__PURE__ */ React.createElement(Tag, { round: true, style: { marginLeft: 7 } }, annotationCountToUse[annotationName]) : ""),
+              key: annotationName
+            },
+            annotationName === "physicalProperties" ? map$3(
+              togglableAlignmentAnnotationSettings,
+              (_visible, _annotationName) => {
+                if (physicalPropertyElements.includes(_annotationName)) {
+                  return /* @__PURE__ */ React.createElement(
+                    MenuItem,
+                    {
+                      icon: _visible ? "tick" : "",
+                      onClick: /* @__PURE__ */ __name((e2) => {
+                        e2.stopPropagation();
+                        alignmentAnnotationVisibilityToggle({
+                          [_annotationName]: !_visible
+                        });
+                      }, "onClick"),
+                      text: /* @__PURE__ */ React.createElement(React.Fragment, null, startCase(_annotationName)),
+                      key: _annotationName
+                    }
+                  );
+                }
               }
-              if (annotationName === "cdsFeatureTranslations" && !visible) {
-                return alignmentAnnotationVisibilityToggle({
-                  cdsFeatureTranslations: !visible,
-                  translations: !visible
-                });
+            ).filter(Boolean) : annotationName === "plot" ? map$3(
+              togglableAlignmentAnnotationSettings,
+              (_visible, _annotationName) => {
+                if (plotElements.includes(_annotationName)) {
+                  return /* @__PURE__ */ React.createElement("div", { style: { position: "relative" } }, /* @__PURE__ */ React.createElement(
+                    MenuItem,
+                    {
+                      className: `plot-${_annotationName}`,
+                      icon: _visible ? "tick" : "",
+                      onClick: /* @__PURE__ */ __name((e2) => {
+                        e2.stopPropagation();
+                        alignmentAnnotationVisibilityToggle({
+                          [_annotationName]: !_visible
+                        });
+                      }, "onClick"),
+                      text: /* @__PURE__ */ React.createElement(React.Fragment, null, startCase(_annotationName)),
+                      key: _annotationName
+                    }
+                  ), _annotationName === "properties" ? /* @__PURE__ */ React.createElement(
+                    Button,
+                    {
+                      icon: "info-sign",
+                      style: {
+                        position: "absolute",
+                        top: 3,
+                        right: 0
+                      },
+                      onClick: /* @__PURE__ */ __name(() => {
+                        showDialog({
+                          ModalComponent: PropertyDialog
+                        });
+                      }, "onClick"),
+                      minimal: true,
+                      small: true
+                    }
+                  ) : null);
+                }
               }
-              alignmentAnnotationVisibilityToggle({
-                [annotationName]: !visible
-              });
-            }, "onClick"),
-            text: /* @__PURE__ */ React.createElement(React.Fragment, null, startCase(annotationName).replace("Cds", "CDS").replace("Dna", "DNA"), annotationName in annotationCountToUse ? /* @__PURE__ */ React.createElement(Tag, { round: true, style: { marginLeft: 7 } }, annotationCountToUse[annotationName]) : ""),
-            key: annotationName
-          }
-        );
+            ).filter(Boolean) : null
+          );
+        }
       })
     );
   }
   __name(VisibilityOptions$2, "VisibilityOptions$2");
+  const PropertyDialog = compose$1(
+    wrapDialog({
+      title: "Amino Acid Properties",
+      style: {
+        width: 600
+      }
+    })
+  )(function() {
+    return /* @__PURE__ */ React.createElement("div", { style: { width: "100%", padding: 10 } }, /* @__PURE__ */ React.createElement("img", { src: "/aaprops.svg", width: 580, alt: "Amino Acid Properties" }));
+  });
   const _SimpleGenericDialogForm = class _SimpleGenericDialogForm extends React.Component {
     render() {
       const {
@@ -159693,7 +153217,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     innerRadius,
     outerRadius,
     isProtein: isProtein2,
-    selectionMessage
+    selectionMessage,
+    showAminoAcidUnitAsCodon
   }) {
     const { startAngle, endAngle } = getRangeAngles(
       { start: caretPosition2, end: caretPosition2 },
@@ -159714,7 +153239,12 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
         transform: transform2,
         className: className + " veCaret " + draggableClassnames.caret
       },
-      /* @__PURE__ */ React.createElement("title", null, selectionMessage || getSelectionMessage({ caretPosition: caretPosition2, isProtein: isProtein2, sequenceLength })),
+      /* @__PURE__ */ React.createElement("title", null, selectionMessage || getSelectionMessage({
+        caretPosition: caretPosition2,
+        isProtein: isProtein2,
+        sequenceLength,
+        showAminoAcidUnitAsCodon
+      })),
       /* @__PURE__ */ React.createElement(
         "line",
         {
@@ -160011,7 +153541,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     onRightClicked,
     onClick,
     index: index2,
-    isProtein: isProtein2
+    isProtein: isProtein2,
+    showAminoAcidUnitAsCodon
   }) {
     const {
       color: color2,
@@ -160036,7 +153567,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     const selectionMessage = getSelectionMessage({
       sequenceLength,
       selectionLayer: selectionLayer2,
-      isProtein: isProtein2
+      isProtein: isProtein2,
+      showAminoAcidUnitAsCodon
     });
     const { transform: transform2 } = PositionAnnotationOnCircle({
       sAngle: startAngle,
@@ -160081,6 +153613,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
           onClick: onClick ? noop$4 : preventDefaultStopPropagation,
           selectionMessage,
           caretPosition: start2,
+          isProtein: isProtein2,
           sequenceLength,
           innerRadius,
           outerRadius: radius
@@ -160095,6 +153628,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
           onClick: onClick ? noop$4 : preventDefaultStopPropagation,
           selectionMessage,
           caretPosition: end2 + 1,
+          isProtein: isProtein2,
           sequenceLength,
           innerRadius,
           outerRadius: radius
@@ -160671,6 +154205,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
       readOnly: readOnly2,
       hideName = false,
       editorName,
+      showAminoAcidUnitAsCodon,
       smartCircViewLabelRender,
       showCicularViewInternalLabels,
       withRotateCircularView: _withRotateCircularView,
@@ -160736,7 +154271,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     }
     const innerRadius = radius - 10;
     const initialRadius = radius;
-    const showSeq = isZoomedIn && rangeToShowLength < 140;
+    const showSeq = rangeToShowLength < 140 && (isZoomedIn || sequenceLength < 50);
     const showSeqText = rangeToShowLength < 80;
     const layersToDraw = [
       { zIndex: 10, layerName: "sequenceChars" },
@@ -160989,7 +154524,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
           }
         );
         const maxToShow = !isZoomedIn && ((maxAnnotationsToDisplay ? maxAnnotationsToDisplay[layerName] : limits[layerName]) || 50);
-        const [trimmedAndParedAnns, paredDown] = maxToShow ? pareDownAnnotations(trimmedAnnotations, maxToShow) : [trimmedAnnotations];
+        const [trimmedAndParedAnns, paredDown] = maxToShow ? pareDownAnnotations(trimmedAnnotations, maxToShow, sequenceLength) : [trimmedAnnotations];
         if (paredDown) {
           paredDownMessages.push(
             getParedDownWarning({
@@ -161050,6 +154585,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
               key: "veCircularViewSelectionLayer" + index2
             }, {
               index: index2,
+              showAminoAcidUnitAsCodon,
               isDraggable: true,
               isProtein: isProtein2,
               selectionLayer: selectionLayer22,
@@ -161076,6 +154612,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
             key: "veCircularViewCaret"
           }, {
             caretPosition: caretPosition2,
+            showAminoAcidUnitAsCodon,
             sequenceLength,
             isProtein: isProtein2,
             innerRadius,
@@ -161088,7 +154625,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     if (radius < 150) radius = 150;
     const widthToUse = Math.max(Number(width) || 300);
     const heightToUse = Math.max(Number(height) || 300);
-    const bpTitle = isProtein2 ? `${Math.floor(sequenceLength / 3)} AAs` : `${sequenceLength} bps`;
+    const proteinUnits = showAminoAcidUnitAsCodon ? "codons" : "AAs";
+    const bpTitle = isProtein2 ? `${Math.floor(sequenceLength / 3)} ${proteinUnits}` : `${sequenceLength} bps`;
     const nameEl = /* @__PURE__ */ React.createElement(
       "div",
       {
@@ -161645,19 +155183,38 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
   };
   __name(_ComponentToPrint, "ComponentToPrint");
   let ComponentToPrint = _ComponentToPrint;
-  const sizeSchema = /* @__PURE__ */ __name((isProtein2) => ({
+  const sizeSchema = /* @__PURE__ */ __name(() => ({
     path: "size",
     type: "number",
-    render: /* @__PURE__ */ __name((val2, _record) => {
-      const record = isProtein2 ? convertDnaCaretPositionOrRangeToAA(_record) : _record;
+    render: /* @__PURE__ */ __name((val2, record) => {
       const base1Range = convertRangeTo1Based(record);
       const hasJoinedLocations = record.locations && record.locations.length > 1;
-      return /* @__PURE__ */ React.createElement("span", null, isProtein2 ? Math.floor(val2 / 3) : val2, " ", /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10 } }, hasJoinedLocations ? record.locations.map((loc, i2) => {
+      return /* @__PURE__ */ React.createElement("span", null, val2, " ", /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10 } }, hasJoinedLocations ? record.locations.map((loc, i2) => {
         const base1Range2 = convertRangeTo1Based(loc);
         return /* @__PURE__ */ React.createElement("span", { key: i2 }, "(", base1Range2.start, "-", base1Range2.end, ")");
       }) : /* @__PURE__ */ React.createElement("span", null, "(", base1Range.start, "-", base1Range.end, ")")));
     }, "render")
   }), "sizeSchema");
+  const getMemoOrfs = /* @__PURE__ */ (() => {
+    let lastDeps;
+    let lastResult;
+    return (editorState) => {
+      const { sequenceData: sequenceData2, minimumOrfSize: minimumOrfSize2, useAdditionalOrfStartCodons: useAdditionalOrfStartCodons2 } = editorState;
+      const { sequence: sequence2, circular: circular2 } = sequenceData2;
+      const deps = {
+        sequence: sequence2,
+        circular: circular2,
+        minimumOrfSize: minimumOrfSize2,
+        useAdditionalOrfStartCodons: useAdditionalOrfStartCodons2
+      };
+      if (lastResult && isEqual$3(deps, lastDeps)) {
+        return lastResult;
+      }
+      lastResult = selectors.orfsSelector(editorState);
+      lastDeps = deps;
+      return lastResult;
+    };
+  })();
   var lodash$1 = { exports: {} };
   /**
    * @license
@@ -167638,10 +161195,11 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
   __name(requireLodash, "requireLodash");
   var lodashExports = requireLodash();
   const useFormValue = /* @__PURE__ */ __name((formName, field) => {
-    return useSelector((state2) => {
+    const formValSelector = /* @__PURE__ */ __name((state2) => {
       var _a2, _b2;
       return lodashExports.get((_b2 = (_a2 = state2.form) == null ? void 0 : _a2[formName]) == null ? void 0 : _b2.values, field);
-    });
+    }, "formValSelector");
+    return useSelector(formValSelector);
   }, "useFormValue");
   const dialogFormName = "RemoveDuplicatesDialog";
   const dataTableFormName = "duplicatesToRemove";
@@ -167658,6 +161216,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     const ignoreName = useFormValue(dialogFormName, "ignoreName");
     const ignoreStartAndEnd = useFormValue(dialogFormName, "ignoreStartAndEnd");
     const ignoreStrand = useFormValue(dialogFormName, "ignoreStrand");
+    const isProteinSeq = isProtein2 || sequenceData2.isProtein;
     const recomputeDups = reactExports.useCallback(
       (values2) => {
         const ignoreName2 = values2 == null ? void 0 : values2.ignoreName;
@@ -167666,17 +161225,20 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
         const annotations = sequenceData2[type2];
         const newDups = [];
         const seqsHashByStartEndStrandName = {};
-        forEach$1(annotations, (a2) => {
-          const hash2 = `${ignoreStartAndEnd2 ? "" : a2.start}&${ignoreStartAndEnd2 ? "" : a2.end}&${ignoreStrand2 ? "" : a2.strand}&${ignoreName2 ? "" : a2.name}`;
+        forEach$1(annotations, (_annotation) => {
+          const annotation = isProteinSeq ? convertDnaCaretPositionOrRangeToAA(_annotation) : _annotation;
+          const hash2 = `${ignoreStartAndEnd2 ? "" : annotation.start}&${ignoreStartAndEnd2 ? "" : annotation.end}&${ignoreStrand2 ? "" : annotation.strand}&${ignoreName2 ? "" : annotation.name}`;
           if (seqsHashByStartEndStrandName[hash2]) {
-            newDups.push(__spreadProps(__spreadValues({}, a2), { size: getRangeLength(a2, sequenceLength) }));
+            newDups.push(__spreadProps(__spreadValues({}, annotation), {
+              size: getRangeLength(annotation, sequenceLength)
+            }));
           } else {
             seqsHashByStartEndStrandName[hash2] = true;
           }
         });
         return newDups;
       },
-      [sequenceData2, sequenceLength, type2]
+      [sequenceData2, sequenceLength, type2, isProteinSeq]
     );
     const [dups, setDups] = reactExports.useState(recomputeDups);
     const selectedIds = reactExports.useMemo(() => dups.map((d2) => d2.id), [dups]);
@@ -167698,11 +161260,11 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
         fields: [
           { path: "name", type: "string" },
           // ...(noType ? [] : [{ path: "type", type: "string" }]),
-          sizeSchema(isProtein2),
+          sizeSchema(),
           { path: "strand", type: "string" }
         ]
       }),
-      [isProtein2]
+      []
     );
     return /* @__PURE__ */ React.createElement("div", { className: classNames$1(DIALOG_BODY, "tg-min-width-dialog") }, /* @__PURE__ */ React.createElement(
       WrappedDT,
@@ -168061,7 +161623,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
         }
         if (rowData[index2]) {
           const rowItem = /* @__PURE__ */ React.createElement("div", { "data-row-number": index2, key: index2 }, /* @__PURE__ */ React.createElement("div", { className: "veRowItemSpacer" }), /* @__PURE__ */ React.createElement(
-            RowItem,
+            RowItem$1,
             __spreadProps(__spreadValues({}, __spreadValues(__spreadProps(__spreadValues({}, rest), {
               rowTopComp,
               truncateLabelsThatDoNotFit,
@@ -168706,7 +162268,8 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
           extraProps,
           isProtein: isProtein2,
           invalid,
-          handleSubmit: handleSubmit2
+          handleSubmit: handleSubmit2,
+          showAminoAcidUnitAsCodon
         } = this.props;
         const selectionLength = getRangeLength(
           {
@@ -168777,7 +162340,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
             {
               type: "submit",
               intent: Intent.PRIMARY,
-              text: `Select ${invalid ? 0 : selectionLength} ${isProtein2 ? "AA" : "BP"}${selectionLength === 1 ? "" : "s"}`,
+              text: `Select ${invalid ? 0 : selectionLength} ${isProtein2 ? `${showAminoAcidUnitAsCodon ? "codon" : "AA"}` : "BP"}${selectionLength === 1 ? "" : "s"}`,
               disabled: invalid
             }
           ))
@@ -168820,7 +162383,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
         }
       ),
       /* @__PURE__ */ React.createElement(
-        RowItem,
+        RowItem$1,
         __spreadValues({}, {
           charWidth: charWidth2,
           tickSpacing: 1,
@@ -171855,7 +165418,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
       /* , setMonovalentCationConc */
     ] = React.useState(0.05);
     const [tmType, setTmType] = useTmType();
-    let tm = (tmType === "neb_tm" ? calculateNebTm : calculateTm)(sequence2, {
+    let tm = (tmType === "neb_tm" ? calculateNebTm : tmType === "default" ? calculateSantaLuciaTm : calculateTm)(sequence2, {
       monovalentCationConc,
       primerConc
     });
@@ -171880,8 +165443,9 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
           {
             label: "Choose Tm Type:",
             options: [
-              { value: "default", label: "Default Tm (Breslauer)" },
-              { value: "neb_tm", label: "NEB Tm (SantaLucia)" }
+              { value: "default", label: "Santa Lucia (Default)" },
+              { value: "breslauer", label: "Breslauer" },
+              { value: "neb_tm", label: "NEB Tm" }
             ],
             onChange: /* @__PURE__ */ __name((e2) => setTmType(e2.target.value), "onChange"),
             selectedValue: tmType
@@ -171895,7 +165459,7 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
           }
         ), hasWarning, /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("br", null), "Try using the Default Tm"))
       },
-      /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(InnerWrapper, null, "Melting Temp: ", Number(tm) || 0, " "), hasWarning && /* @__PURE__ */ React.createElement(
+      /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(InnerWrapper, null, "Melting Temp: ", Number(tm) || 0, "°C"), hasWarning && /* @__PURE__ */ React.createElement(
         Icon,
         {
           style: { marginLeft: 5, marginRight: 5 },
@@ -172159,12 +165723,24 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
       )), /* @__PURE__ */ React.createElement(
         MeltingTemp,
         {
-          InnerWrapper: InnerWrapperMeltingTemp,
+          InnerWrapper: TextInnerWrapper,
           sequence: bases
         }
-      ))
+      ), /* @__PURE__ */ React.createElement(TextInnerWrapper, null, "GC content: ", bases && calculatePercentGC(bases).toFixed(1), "%"), /* @__PURE__ */ React.createElement(TextInnerWrapper, null, "3' Stability: ", bases && calculateEndStability(bases), " kcal/mol"))
     );
   }, "RenderBases");
+  const TextInnerWrapper = /* @__PURE__ */ __name((p2) => /* @__PURE__ */ React.createElement(
+    "div",
+    {
+      className: "bp3-text-muted bp3-text-small",
+      style: {
+        marginBottom: 15,
+        marginTop: -5,
+        fontStyle: "italic"
+      }
+    },
+    p2.children
+  ), "TextInnerWrapper");
   const AddOrEditPrimerDialog = AddOrEditAnnotationDialog$1({
     formName: "AddOrEditPrimerDialog",
     getProps: /* @__PURE__ */ __name((props) => ({
@@ -172173,14 +165749,6 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
       RenderBases
     }), "getProps")
   });
-  const InnerWrapperMeltingTemp = /* @__PURE__ */ __name((p2) => /* @__PURE__ */ React.createElement(
-    "div",
-    {
-      className: "bp3-text-muted bp3-text-small",
-      style: { marginBottom: 15, marginTop: -5, fontStyle: "italic" }
-    },
-    p2.children
-  ), "InnerWrapperMeltingTemp");
   const Dialogs = {
     RenameSequenceDialog,
     PrintDialog: PrintDialog$1,
@@ -172206,10 +165774,16 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
         hideDialog();
       };
     }, []);
+    reactExports.useEffect(() => {
+      dialogHolder.setUniqKeyToForceRerender = setUniqKeyToForceRerender;
+      if (editorName) {
+        const slot = dialogHolder[editorName] = dialogHolder[editorName] || {};
+        slot.setUniqKeyToForceRerender = setUniqKeyToForceRerender;
+      }
+    }, [editorName]);
     if (dialogHolder.editorName && editorName && dialogHolder.editorName !== editorName) {
       return null;
     }
-    dialogHolder.setUniqKeyToForceRerender = setUniqKeyToForceRerender;
     const Comp = dialogHolder.CustomModalComponent || dialogOverrides[dialogHolder.overrideName] || Dialogs[dialogHolder.dialogType];
     if (!Comp) return null;
     return /* @__PURE__ */ React.createElement(
@@ -172305,61 +165879,50 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     }
   }
   __name(getPairwiseOverviewLinearViewOptions, "getPairwiseOverviewLinearViewOptions");
-  const _PairwiseAlignmentView = class _PairwiseAlignmentView extends React.Component {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "state", {
-        currentPairwiseAlignmentIndex: void 0
-      });
+  function PairwiseAlignmentView(props) {
+    const [currentPairwiseAlignmentIndex, setCurrentPairwiseAlignmentIndex] = reactExports.useState(void 0);
+    const { pairwiseAlignments, pairwiseOverviewAlignmentTracks } = props;
+    if (currentPairwiseAlignmentIndex > -1) {
+      const alignmentTracks = pairwiseAlignments[currentPairwiseAlignmentIndex];
+      const templateLength = alignmentTracks[0].alignmentData.sequence.length;
+      return /* @__PURE__ */ React.createElement(
+        AlignmentView,
+        __spreadValues({}, __spreadProps(__spreadValues({}, props), {
+          sequenceData: {
+            //pass fake seq data in so editor interactions work
+            sequence: Array.from(templateLength).map(() => "a").join("")
+          },
+          allowTrackRearrange: false,
+          alignmentTracks,
+          hasTemplate: true,
+          isPairwise: true,
+          currentPairwiseAlignmentIndex,
+          handleBackButtonClicked: /* @__PURE__ */ __name(() => {
+            setCurrentPairwiseAlignmentIndex(void 0);
+          }, "handleBackButtonClicked")
+        }))
+      );
+    } else {
+      return /* @__PURE__ */ React.createElement(
+        AlignmentView,
+        __spreadValues({}, __spreadProps(__spreadValues({}, props), {
+          alignmentTracks: pairwiseOverviewAlignmentTracks,
+          allowTrackRearrange: false,
+          allowTrimming: false,
+          hasTemplate: true,
+          isPairwise: true,
+          isInPairwiseOverviewView: true,
+          isFullyZoomedOut: true,
+          noClickDragHandlers: true,
+          linearViewOptions: getPairwiseOverviewLinearViewOptions,
+          handleSelectTrack: /* @__PURE__ */ __name((trackIndex) => {
+            setCurrentPairwiseAlignmentIndex(trackIndex - 1);
+          }, "handleSelectTrack")
+        }))
+      );
     }
-    render() {
-      const { pairwiseAlignments, pairwiseOverviewAlignmentTracks } = this.props;
-      const { currentPairwiseAlignmentIndex } = this.state;
-      if (currentPairwiseAlignmentIndex > -1) {
-        const alignmentTracks = pairwiseAlignments[currentPairwiseAlignmentIndex];
-        const templateLength = alignmentTracks[0].alignmentData.sequence.length;
-        return /* @__PURE__ */ React.createElement(
-          AlignmentView,
-          __spreadValues({}, __spreadProps(__spreadValues({}, this.props), {
-            sequenceData: {
-              //pass fake seq data in so editor interactions work
-              sequence: Array.from(templateLength).map(() => "a").join("")
-            },
-            allowTrackRearrange: false,
-            alignmentTracks,
-            hasTemplate: true,
-            isPairwise: true,
-            currentPairwiseAlignmentIndex,
-            handleBackButtonClicked: /* @__PURE__ */ __name(() => {
-              this.setState({
-                currentPairwiseAlignmentIndex: void 0
-              });
-            }, "handleBackButtonClicked")
-          }))
-        );
-      } else {
-        return /* @__PURE__ */ React.createElement(
-          AlignmentView,
-          __spreadValues({}, __spreadProps(__spreadValues({}, this.props), {
-            alignmentTracks: pairwiseOverviewAlignmentTracks,
-            allowTrackRearrange: false,
-            allowTrimming: false,
-            hasTemplate: true,
-            isPairwise: true,
-            isInPairwiseOverviewView: true,
-            isFullyZoomedOut: true,
-            noClickDragHandlers: true,
-            linearViewOptions: getPairwiseOverviewLinearViewOptions,
-            handleSelectTrack: /* @__PURE__ */ __name((trackIndex) => {
-              this.setState({ currentPairwiseAlignmentIndex: trackIndex - 1 });
-            }, "handleSelectTrack")
-          }))
-        );
-      }
-    }
-  };
-  __name(_PairwiseAlignmentView, "PairwiseAlignmentView");
-  let PairwiseAlignmentView = _PairwiseAlignmentView;
+  }
+  __name(PairwiseAlignmentView, "PairwiseAlignmentView");
   function updateTrackHelper({
     currentPairwiseAlignmentIndex,
     pairwiseAlignments,
@@ -172437,6 +166000,610 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
   }
   __name(coerceInitialValue, "coerceInitialValue");
   const tabHeight = 34;
+  const LabileSitesLayer = /* @__PURE__ */ __name(({ leftMargin, charWidth: charWidth2, positionsToMark = [] }) => {
+    return /* @__PURE__ */ React.createElement("div", { className: "veLabileSites" }, positionsToMark == null ? void 0 : positionsToMark.map((pos, i2) => {
+      const x2 = leftMargin + (pos - 1.2) * charWidth2 + charWidth2 / 2;
+      return /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          className: "veAlignmentViewLabileSiteLine",
+          key: i2,
+          style: {
+            left: x2
+          }
+        }
+      );
+    }));
+  }, "LabileSitesLayer");
+  function calculateAminoAcidFrequency(sequence2, isProtein2) {
+    if (!sequence2 || typeof sequence2 !== "string") {
+      console.warn("Invalid or empty amino acid sequence provided.");
+    }
+    const standards = isProtein2 ? "ACDEFGHIKLMNPQRSTVWY-".split("") : "ATCG-".split("");
+    const frequencies = {};
+    standards.forEach((a2) => {
+      frequencies[a2] = { count: 0, percentage: 0 };
+    });
+    const nonStandard = {};
+    let totalCount = 0;
+    for (const char of sequence2.toUpperCase()) {
+      if (frequencies[char]) {
+        frequencies[char].count++;
+        totalCount++;
+      } else {
+        nonStandard[char] = (nonStandard[char] || 0) + 1;
+      }
+    }
+    if (totalCount > 0) {
+      for (const a2 of standards) {
+        frequencies[a2].percentage = frequencies[a2].count / totalCount * 100;
+      }
+    }
+    return {
+      totalStandards: totalCount,
+      // Total count of elements
+      totalLength: sequence2.length,
+      // Total length including non-standard
+      frequencies,
+      nonStandard
+    };
+  }
+  __name(calculateAminoAcidFrequency, "calculateAminoAcidFrequency");
+  const aminoAcidShortNames = {
+    A: "Ala",
+    C: "Cys",
+    D: "Asp",
+    E: "Glu",
+    F: "Phe",
+    G: "Gly",
+    H: "His",
+    I: "Ile",
+    K: "Lys",
+    L: "Leu",
+    M: "Met",
+    N: "Asn",
+    P: "Pro",
+    Q: "Gln",
+    R: "Arg",
+    S: "Ser",
+    T: "Thr",
+    V: "Val",
+    W: "Trp",
+    Y: "Tyr",
+    "-": "Gaps"
+  };
+  const PropertySidePanel = /* @__PURE__ */ __name(({ properties: properties2, setProperties, style: style2 }) => {
+    const sidebarRef = React.useRef(null);
+    const [mismatchesCount, setMismatchesCount] = React.useState(0);
+    const { track, isOpen: isOpen2, selection, isPairwise } = properties2;
+    const getSequenceInRegion = reactExports.useCallback(() => {
+      var _a2, _b2;
+      const seq = (_b2 = (_a2 = track == null ? void 0 : track.alignmentData) == null ? void 0 : _a2.sequence) != null ? _b2 : "";
+      if (!selection || selection.start === -1 || selection.end === -1) {
+        return seq;
+      }
+      const start2 = Math.max(0, selection.start);
+      const end2 = Math.min(seq.length - 1, selection.end);
+      if (start2 > end2) return "";
+      return seq.slice(start2, end2 + 1);
+    }, [track, selection]);
+    const mismatchKey = isPairwise ? "additionalSelectionLayers" : "mismatches";
+    const trackMismatches = reactExports.useMemo(() => {
+      const tr = track == null ? void 0 : track[mismatchKey];
+      if (!Array.isArray(tr)) return [];
+      return isPairwise ? tr.filter((m2) => (m2 == null ? void 0 : m2.color) === "red") : tr;
+    }, [track, mismatchKey, isPairwise]);
+    const mismatchSchema = reactExports.useMemo(
+      () => ({
+        fields: [
+          {
+            path: "start",
+            type: "number",
+            displayName: "Start",
+            render: /* @__PURE__ */ __name((val2) => val2 + 1, "render")
+          },
+          {
+            path: "end",
+            type: "number",
+            displayName: "End",
+            render: /* @__PURE__ */ __name((val2) => val2 + 1, "render")
+          }
+        ]
+      }),
+      []
+    );
+    const mismatchEntities = reactExports.useMemo(() => {
+      return (trackMismatches || []).map((m2, i2) => __spreadProps(__spreadValues({}, m2), {
+        id: i2.toString()
+      }));
+    }, [trackMismatches]);
+    reactExports.useEffect(() => {
+      if (!isOpen2 || sidebarRef.current === null || !track) {
+        return;
+      }
+      sidebarRef.current.focus();
+      let mismatchCount = 0;
+      trackMismatches == null ? void 0 : trackMismatches.forEach((tm) => {
+        if (tm === null || tm.start === null || tm.end === null) {
+          return;
+        }
+        const overlapStart = tm.start;
+        const overlapEnd = tm.end;
+        if (overlapEnd >= overlapStart) {
+          mismatchCount += overlapEnd - overlapStart + 1;
+        }
+      });
+      setMismatchesCount(mismatchCount);
+    }, [isOpen2, track, selection, trackMismatches]);
+    const aminoFreq = reactExports.useMemo(() => {
+      var _a2, _b2;
+      const seq = getSequenceInRegion();
+      return calculateAminoAcidFrequency(
+        seq,
+        (_b2 = (_a2 = track == null ? void 0 : track.sequenceData) == null ? void 0 : _a2.isProtein) != null ? _b2 : false
+      );
+    }, [getSequenceInRegion, track]);
+    if (!isOpen2) {
+      return null;
+    }
+    let trackInner;
+    if (track) {
+      const {
+        name: name2,
+        isProtein: isProtein2,
+        proteinSize,
+        size: size2,
+        molecularWeight,
+        isoPoint,
+        extinctionCoefficient
+      } = track.sequenceData;
+      const frequencyEntries = Object.entries(aminoFreq.frequencies);
+      trackInner = /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            display: "flex",
+            padding: 4,
+            paddingTop: 11,
+            paddingBottom: 11,
+            width: "100%"
+          }
+        }
+      ), /* @__PURE__ */ React.createElement(HeaderItem, { title: "Track Properties" }), /* @__PURE__ */ React.createElement("div", { className: "bp3-tab-panel" }, /* @__PURE__ */ React.createElement(RowItem, { item: name2, title: "Name" }), /* @__PURE__ */ React.createElement(RowItem, { item: isProtein2 ? proteinSize : size2, title: "Length" }), /* @__PURE__ */ React.createElement(
+        RowItem,
+        {
+          item: molecularWeight == null ? void 0 : molecularWeight.toFixed(2),
+          title: "Molecular Weight",
+          units: isProtein2 ? "Da" : "g/mol"
+        }
+      ), name2 !== "Consensus" && isProtein2 && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(RowItem, { item: isoPoint, title: "Isoelectric Point" }), /* @__PURE__ */ React.createElement(
+        RowItem,
+        {
+          item: extinctionCoefficient,
+          title: "Extinction Coefficient"
+        }
+      )), /* @__PURE__ */ React.createElement(
+        RowItem,
+        {
+          item: selection && selection.start > -1 ? /* @__PURE__ */ React.createElement("span", null, selection.start + 1, " - ", selection.end + 1) : /* @__PURE__ */ React.createElement("span", null, "1 - ", isProtein2 ? proteinSize : size2),
+          title: "Region"
+        }
+      ), /* @__PURE__ */ React.createElement(HeaderItem, { title: `Mismatches (${mismatchesCount})` }), trackMismatches && trackMismatches.length > 0 && /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            margin: "0px 10px"
+          }
+        },
+        /* @__PURE__ */ React.createElement(
+          WrappedDT,
+          {
+            formName: "mismatchesTable",
+            isSimple: true,
+            noHeader: true,
+            noFooter: true,
+            withSearch: false,
+            noPadding: true,
+            compact: true,
+            maxHeight: 150,
+            entities: mismatchEntities,
+            schema: mismatchSchema,
+            onRowClick: /* @__PURE__ */ __name((e2, row) => {
+              updateCaretPosition({ start: row.start, end: row.end });
+              setTimeout(() => {
+                scrollToAlignmentSelection();
+              }, 0);
+            }, "onRowClick")
+          }
+        )
+      )), /* @__PURE__ */ React.createElement(
+        HeaderItem,
+        {
+          title: `${isProtein2 ? "Amino Acid" : "Base Pair"} Frequencies`
+        }
+      ), /* @__PURE__ */ React.createElement("div", { className: "sidebar-table" }, /* @__PURE__ */ React.createElement("div", { className: "sidebar-row" }, /* @__PURE__ */ React.createElement("div", { className: "sidebar-cell" }, isProtein2 ? "Amino Acid" : "Base"), /* @__PURE__ */ React.createElement("div", { className: "sidebar-cell" }, "Count"), /* @__PURE__ */ React.createElement("div", { className: "sidebar-cell" }, "Percentage")), frequencyEntries.map(([aa, data], idx) => {
+        return /* @__PURE__ */ React.createElement("div", { className: `sidebar-row property-amino-acid-${idx}` }, /* @__PURE__ */ React.createElement("div", { className: "sidebar-cell" }, aa, " ", isProtein2 ? `(${aminoAcidShortNames[aa]})` : ""), /* @__PURE__ */ React.createElement("div", { className: "sidebar-cell" }, data.count), /* @__PURE__ */ React.createElement("div", { className: "sidebar-cell" }, data.percentage.toFixed(1), "%"));
+      })));
+    } else {
+      trackInner = /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          style: {
+            marginTop: 20,
+            fontStyle: "italic",
+            fontSize: 16
+          }
+        },
+        "Click on a track to view its properties"
+      );
+    }
+    return /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        ref: sidebarRef,
+        style: __spreadValues({
+          position: "relative",
+          width: isOpen2 ? 350 : 0,
+          minWidth: isOpen2 ? 350 : 0,
+          maxWidth: isOpen2 ? 350 : 0,
+          paddingLeft: 20,
+          paddingRight: 20
+        }, style2),
+        className: "ove-sidebar-container",
+        tabIndex: 0,
+        onKeyDown: /* @__PURE__ */ __name((e2) => {
+          if (e2.key === "Escape") {
+            setProperties({ isOpen: false });
+          }
+        }, "onKeyDown")
+      },
+      /* @__PURE__ */ React.createElement(
+        Button,
+        {
+          style: {
+            position: "absolute",
+            top: 0,
+            right: 10,
+            zIndex: 1,
+            cursor: "pointer"
+          },
+          minimal: true,
+          intent: "primary",
+          "data-tip": "Hide Track Properties",
+          icon: "cross",
+          onClick: /* @__PURE__ */ __name(() => setProperties({ isOpen: false }), "onClick")
+        }
+      ),
+      trackInner
+    );
+  }, "PropertySidePanel");
+  function RowItem({ item, title, units }) {
+    if (item == null) {
+      return null;
+    }
+    const propertyClass = title.split(" ").join("-").toLowerCase();
+    return /* @__PURE__ */ React.createElement("div", { className: `ve-flex-row property-${propertyClass}` }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: "bold" }, className: "ve-column-left" }, title), /* @__PURE__ */ React.createElement("div", { className: "ve-column-right" }, item, " ", units != null ? units : ""));
+  }
+  __name(RowItem, "RowItem");
+  const HeaderItem = /* @__PURE__ */ __name(({ title }) => {
+    return /* @__PURE__ */ React.createElement(
+      "h5",
+      {
+        style: {
+          margin: 0,
+          fontSize: 15,
+          fontWeight: "bold",
+          textAlign: "center",
+          padding: "5px 0",
+          borderBottom: "1px solid #f1f1f1"
+        }
+      },
+      title
+    );
+  }, "HeaderItem");
+  function calculatePairwiseIdentity(seq1, seq2, excludeGaps = true) {
+    if (seq1.length !== seq2.length) {
+      throw new Error("Sequences must be aligned (same length)");
+    }
+    let identicalPositions = 0;
+    let validPositions = 0;
+    for (let i2 = 0; i2 < seq1.length; i2++) {
+      const aa1 = seq1[i2].toUpperCase();
+      const aa2 = seq2[i2].toUpperCase();
+      if (excludeGaps && aa1 === "-" && aa2 === "-") {
+        continue;
+      }
+      validPositions++;
+      if (aa1 === aa2) {
+        identicalPositions++;
+      }
+    }
+    return { validPositions, identicalPositions };
+  }
+  __name(calculatePairwiseIdentity, "calculatePairwiseIdentity");
+  function calculateIdentityMatrix(alignedSequences) {
+    const n2 = Object.keys(alignedSequences).length;
+    const identityMatrix = Array(n2).fill(n2).map(() => Array(n2).fill(0));
+    const sequenceNames = Object.keys(alignedSequences);
+    const _identicalPositions = [];
+    for (let i2 = 0; i2 < n2; i2++) {
+      for (let j2 = i2; j2 < n2; j2++) {
+        if (i2 === j2) {
+          identityMatrix[i2][j2] = 100;
+        } else {
+          const seq1 = alignedSequences[sequenceNames[i2]];
+          const seq2 = alignedSequences[sequenceNames[j2]];
+          const { validPositions, identicalPositions } = calculatePairwiseIdentity(seq1, seq2, true);
+          const identityPercentage = validPositions > 0 ? identicalPositions / validPositions * 100 : 0;
+          _identicalPositions.push({
+            identicalPositions,
+            seqs: [sequenceNames[i2], sequenceNames[j2]]
+          });
+          identityMatrix[i2][j2] = identityPercentage;
+          identityMatrix[j2][i2] = identityPercentage;
+        }
+      }
+    }
+    return {
+      matrix: identityMatrix,
+      sequenceNames,
+      identicalPositions: _identicalPositions
+    };
+  }
+  __name(calculateIdentityMatrix, "calculateIdentityMatrix");
+  function getPropertyAnalysis(alignedSequences) {
+    const sequences = Object.values(alignedSequences).slice(1);
+    function getResidueProperties(residue, map2) {
+      return Object.keys(map2).filter((key) => map2[key].includes(residue));
+    }
+    __name(getResidueProperties, "getResidueProperties");
+    function intersectHelper(arrays) {
+      if (arrays.length === 0) return [];
+      return arrays.reduce((a2, b3) => a2.filter((x2) => b3.includes(x2)));
+    }
+    __name(intersectHelper, "intersectHelper");
+    const seqLength = sequences[0].length;
+    return Array.from({ length: seqLength }, (_2, pos) => {
+      const residues = sequences.map((seq) => seq[pos]).filter((r2) => r2 !== "-");
+      const sizeProps = residues.map(
+        (r2) => getResidueProperties(r2, residueSizeMap)
+      );
+      const polarityProps = residues.map(
+        (r2) => getResidueProperties(r2, polarityMap)
+      );
+      const specificGroupProps = residues.map(
+        (r2) => getResidueProperties(r2, specificGroupMap)
+      );
+      const shared = {
+        size: intersectHelper(sizeProps),
+        polarity: intersectHelper(polarityProps),
+        specificGroup: intersectHelper(specificGroupProps)
+      };
+      const group = shared.specificGroup.length > 0 ? shared.specificGroup[0] : `${shared.size.length ? shared.size[0] : ""} ${shared.polarity.length ? shared.polarity[0] : ""}`;
+      function mostFrequent(arr) {
+        const freq = {};
+        arr.forEach((val2) => {
+          if (val2 !== "none") freq[val2] = (freq[val2] || 0) + 1;
+        });
+        const max2 = Math.max(...Object.values(freq), 0);
+        const mostFrequentProps = Object.entries(freq).filter(([, count2]) => count2 === max2).map(([prop]) => prop);
+        return {
+          props: mostFrequentProps,
+          count: max2
+        };
+      }
+      __name(mostFrequent, "mostFrequent");
+      let mostFreqGroup;
+      if (group.trim() === "") {
+        const mostFreqResidueGroups = {
+          size: mostFrequent(sizeProps.flat()),
+          polarity: mostFrequent(polarityProps.flat()),
+          specificGroup: mostFrequent(specificGroupProps.flat())
+        };
+        const sortedGroups = Object.entries(mostFreqResidueGroups).sort(
+          (a2, b3) => b3[1].count - a2[1].count
+        );
+        const topCount = sortedGroups[0][1].count;
+        const topOrTiedGroups = sortedGroups.filter(
+          ([, val2]) => val2.count === topCount
+        );
+        const specificGroupEntry = topOrTiedGroups.find(
+          ([key]) => key === "specificGroup"
+        );
+        if (specificGroupEntry) {
+          mostFreqGroup = specificGroupEntry[1].props.join(" ");
+        } else {
+          const allProps = [
+            ...new Set(topOrTiedGroups.flatMap(([, val2]) => val2.props))
+          ];
+          mostFreqGroup = allProps.join(" ");
+        }
+      }
+      const aaGroup = group.trim() || mostFreqGroup.trim();
+      return {
+        position: pos,
+        residues,
+        group: aaGroup,
+        color: combineGroupColors(aaGroup.split(" "))
+      };
+    });
+  }
+  __name(getPropertyAnalysis, "getPropertyAnalysis");
+  function getIdentityAndFrequencies(alignedSequences) {
+    const sequences = Object.values(alignedSequences).slice(1);
+    const alignmentLength = sequences[0].length;
+    let totalScore = 0;
+    let totalPositions = 0;
+    const identityPercentages = [];
+    for (let pos = 0; pos < alignmentLength; pos++) {
+      const column = sequences.map((seq) => seq[pos]);
+      const nonGapResidues = column;
+      const propertyCounts = {};
+      if (nonGapResidues.length === 0) identityPercentages.push(0);
+      if (nonGapResidues.length < 2) continue;
+      let totalProperties = 0;
+      const residueCounts = {};
+      nonGapResidues.forEach((aa) => {
+        residueCounts[aa] = (residueCounts[aa] || 0) + 1;
+        const props = residuePropertyMap[aa] || [];
+        props.forEach((prop) => {
+          propertyCounts[prop] = (propertyCounts[prop] || 0) + 1;
+        });
+        totalProperties++;
+      });
+      const propertyPercentages = {};
+      Object.entries(propertyCounts).forEach(([prop, count2]) => {
+        propertyPercentages[prop] = count2 / totalProperties * 100;
+      });
+      const maxCount = Math.max(...Object.values(residueCounts));
+      const positionScore = maxCount / nonGapResidues.length;
+      identityPercentages.push(maxCount / nonGapResidues.length * 100);
+      totalScore += positionScore;
+      totalPositions++;
+    }
+    const overallIdentity = totalPositions > 0 ? totalScore / totalPositions * 100 : 0;
+    return {
+      overallIdentity,
+      frequencies: identityPercentages
+    };
+  }
+  __name(getIdentityAndFrequencies, "getIdentityAndFrequencies");
+  function getLabileSites(alignedSequences, threshold = 0.5) {
+    const sequences = Object.values(alignedSequences);
+    const alignmentLength = sequences[0].length;
+    const labileSites = [];
+    const conservationScores = [];
+    for (let pos = 0; pos < alignmentLength; pos++) {
+      const column = sequences.map((seq) => seq[pos]);
+      const nonGapResidues = column.filter((aa) => aa !== "-");
+      if (nonGapResidues.length < 2) {
+        conservationScores.push(null);
+        continue;
+      }
+      const counts = {};
+      nonGapResidues.forEach((aa) => {
+        counts[aa] = (counts[aa] || 0) + 1;
+      });
+      const maxCount = Math.max(...Object.values(counts));
+      const conservationScore = maxCount / nonGapResidues.length;
+      conservationScores.push(conservationScore);
+      if (conservationScore <= threshold) {
+        labileSites.push({
+          position: pos + 1,
+          // 1-based indexing
+          conservationScore,
+          residueVariation: Object.keys(counts),
+          frequencies: counts
+        });
+      }
+    }
+    return {
+      sites: labileSites,
+      conservationScores,
+      totalLabileSites: labileSites.length,
+      percentageLabile: labileSites.length / alignmentLength * 100
+    };
+  }
+  __name(getLabileSites, "getLabileSites");
+  function parseTracks(tracks) {
+    let sequences = {};
+    tracks.forEach((at) => {
+      sequences = __spreadProps(__spreadValues({}, sequences), {
+        [at.alignmentData.name]: at.alignmentData.sequence
+      });
+    });
+    return sequences;
+  }
+  __name(parseTracks, "parseTracks");
+  const getAlignedAminoAcidSequenceProps = /* @__PURE__ */ __name((tracks) => {
+    const sequences = parseTracks(tracks);
+    const identity2 = calculateIdentityMatrix(sequences);
+    const { overallIdentity, frequencies } = getIdentityAndFrequencies(sequences);
+    const labileSites = getLabileSites(sequences, 0.5);
+    const propertyAnalysis = getPropertyAnalysis(sequences);
+    return __spreadProps(__spreadValues({}, identity2), {
+      overallIdentity,
+      frequencies,
+      labileSites,
+      propertyAnalysis
+    });
+  }, "getAlignedAminoAcidSequenceProps");
+  const residueSizeMap = {
+    tiny: ["A", "C", "G", "S"],
+    small: ["A", "C", "D", "G", "N", "P", "S", "T", "V"],
+    large: ["E", "F", "H", "I", "K", "L", "M", "Q", "R", "W", "Y"]
+  };
+  const polarityMap = {
+    hydrophobic: ["A", "C", "F", "I", "L", "M", "V", "W", "Y", "H", "K", "R"],
+    polar: ["D", "E", "H", "K", "N", "Q", "R", "S", "T", "Y"],
+    charged: ["D", "E", "H", "K", "R"]
+  };
+  const specificGroupMap = {
+    aliphatic: ["I", "L", "V"],
+    aromatic: ["F", "W", "Y", "H"],
+    positive: ["H", "K", "R"],
+    negative: ["D", "E"],
+    amidic: ["N", "Q"],
+    "sulphur-containing": ["C", "M"],
+    hydroxylic: ["S", "T"]
+  };
+  const residuePropertyMap = {
+    A: ["Small", "Tiny", "Hydrophobic"],
+    C: ["Small", "Tiny", "Hydrophobic", "Sulphur-Containing"],
+    D: ["Small", "Polar", "Charged", "Negative"],
+    E: ["Large", "Polar", "Charged", "Negative"],
+    F: ["Hydrophobic", "Aromatic"],
+    G: ["Small", "Tiny"],
+    H: ["Hydrophobic", "Polar", "Charged", "Aromatic", "Positive"],
+    I: ["Hydrophobic", "Aliphatic"],
+    K: ["Hydrophobic", "Polar", "Charged", "Positive"],
+    L: ["Hydrophobic", "Aliphatic"],
+    M: ["Hydrophobic", "Sulphur-Containing"],
+    N: ["Polar", "Small", "Amidic"],
+    P: ["Small"],
+    Q: ["Polar", "Amidic"],
+    R: ["Polar", "Charged", "Positive"],
+    S: ["Polar", "Small", "Tiny", "Hydroxylic"],
+    T: ["Polar", "Small", "Hydroxylic"],
+    V: ["Hydrophobic", "Small", "Aliphatic"],
+    W: ["Hydrophobic", "Polar", "Aromatic"],
+    Y: ["Hydrophobic", "Polar", "Aromatic"]
+  };
+  const propertiesColorMap = {
+    aliphatic: "#AE83A3",
+    aromatic: "#EC8BA0",
+    amidic: "#83C6C2",
+    hydroxylic: "#65A3AC",
+    "sulphur-containing": "#F8CD7F",
+    positive: "#A1838F",
+    negative: "#DC855C",
+    large: "#C1B87E",
+    small: "#B1DEF0",
+    tiny: "#74BDA8",
+    hydrophobic: "#F4B3A2",
+    polar: "#C1DCAE",
+    charged: "#D7AD7A",
+    none: "#888"
+  };
+  function combineGroupColors(colorKeys, colorMap = propertiesColorMap) {
+    if (!colorKeys.length || colorKeys[0] === "none") return "#000";
+    const toRGB = /* @__PURE__ */ __name((hex) => {
+      if (!hex) return [0, 0, 0];
+      const h2 = hex.replace("#", "");
+      return [
+        parseInt(h2.substring(0, 2), 16),
+        parseInt(h2.substring(2, 4), 16),
+        parseInt(h2.substring(4, 6), 16)
+      ];
+    }, "toRGB");
+    const rgbs = colorKeys.map((key) => toRGB(colorMap[key])).filter((rgb2) => rgb2.every(Number.isFinite));
+    if (rgbs.length === 0) return "#888";
+    const avg = [0, 1, 2].map(
+      (i2) => Math.round(rgbs.reduce((sum2, rgb2) => sum2 + rgb2[i2], 0) / rgbs.length)
+    );
+    return "#" + avg.map((val2) => val2.toString(16).padStart(2, "0")).join("").toUpperCase();
+  }
+  __name(combineGroupColors, "combineGroupColors");
   let charWidthInLinearViewDefault = 12;
   try {
     const newVal2 = JSON.parse(
@@ -172529,6 +166696,11 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
     const [tempTrimBefore, setTempTrimBefore] = reactExports.useState({});
     const [tempTrimAfter, setTempTrimAfter] = reactExports.useState({});
     const [tempTrimmingCaret, setTempTrimmingCaret] = reactExports.useState({});
+    const [searchMatchLayers, setSearchMatchLayers] = React.useState([]);
+    const [activeFilterType, setActiveFilterType] = reactExports.useState("all");
+    const handleFilterChange = reactExports.useCallback(({ activeFilter }) => {
+      setActiveFilterType(activeFilter);
+    }, []);
     const bindOutsideChangeHelper = reactExports.useRef({});
     const alignmentHolder = reactExports.useRef(null);
     const alignmentHolderTop = reactExports.useRef(null);
@@ -172548,6 +166720,12 @@ Part of ${annotation.translationType} Translation from BPs ${annotation.start + 
         verticalVisibleRange: { start: 0, end: 0 }
       })
     );
+    const [propertySidePanel, setPropertySidePanel] = reactExports.useState({
+      isOpen: false,
+      selection: null,
+      track: null,
+      isPairwise: false
+    });
     const getAllAlignmentsFastaText = reactExports.useCallback(() => {
       const selectionLayer22 = store2.getState().VectorEditor.__allEditorsOptions.alignments[id2].selectionLayer || {};
       const seqDataOfAllTracksToCopy = [];
@@ -172566,7 +166744,11 @@ ${seqDataToCopy}\r
     }, [alignmentTracks, id2, store2]);
     reactExports.useEffect(() => {
       const handleAlignmentCopy = /* @__PURE__ */ __name((event) => {
+        var _a3, _b2, _c2;
         if (event.key === "c" && !event.shiftKey && (event.metaKey === true || event.ctrlKey === true)) {
+          if (!((_a3 = document.activeElement) == null ? void 0 : _a3.classList.contains("alignmentView"))) {
+            return;
+          }
           const input = document.createElement("textarea");
           document.body.appendChild(input);
           const seqDataToCopy = getAllAlignmentsFastaText();
@@ -172580,6 +166762,8 @@ ${seqDataToCopy}\r
           }
           document.body.removeChild(input);
           event.preventDefault();
+          (_b2 = document.activeElement) == null ? void 0 : _b2.blur();
+          (_c2 = document.querySelector(".alignmentView")) == null ? void 0 : _c2.focus();
         }
       }, "handleAlignmentCopy");
       document.addEventListener("keydown", handleAlignmentCopy);
@@ -172595,6 +166779,10 @@ ${seqDataToCopy}\r
         alignmentHolderTop.current.scrollLeft = scrollPercentageToUse * (alignmentHolderTop.current.scrollWidth - alignmentHolderTop.current.clientWidth);
       }
     }, "scrollAlignmentToPercent");
+    const aminoAcidAlignmentProperties = reactExports.useMemo(() => {
+      if (isPairwise || !alignmentTracks[0].sequenceData.isProtein) return;
+      return getAlignedAminoAcidSequenceProps(alignmentTracks);
+    }, [alignmentTracks, isPairwise]);
     reactExports.useEffect(() => {
       window.scrollAlignmentToPercent = scrollAlignmentToPercent;
       if (window.Cypress)
@@ -172604,6 +166792,59 @@ ${seqDataToCopy}\r
         if (window.Cypress) delete window.Cypress.scrollAlignmentToPercent;
       };
     }, []);
+    const {
+      alignmentAnnotationVisibility,
+      togglableAlignmentAnnotationSettings
+    } = alignmentVisibilityToolOptions;
+    reactExports.useEffect(() => {
+      const dnaAnnotations = [
+        "chromatogram",
+        "reverseSequence",
+        "cdsFeatureTranslations",
+        "dnaColors",
+        "translations",
+        "compactNames"
+      ];
+      const aminoAcidAnnotations = [
+        "physicalProperties",
+        "serineThreonine",
+        "labileSites",
+        "colorScheme",
+        "plot",
+        "conservation",
+        "properties",
+        "hydrophobicity",
+        "polar",
+        "negative",
+        "positive",
+        "charged",
+        "aliphatic",
+        "aromatic",
+        "compactNames"
+      ];
+      const noNeededAnnotationsForPairwise = ["plot", "labileSites"];
+      if (alignmentTracks[0].sequenceData.isProtein) {
+        dnaAnnotations.forEach((key) => {
+          delete alignmentAnnotationVisibility[key];
+          delete togglableAlignmentAnnotationSettings[key];
+        });
+        aminoAcidAnnotations.forEach((key) => {
+          alignmentAnnotationVisibility[key] = false;
+          togglableAlignmentAnnotationSettings[key] = false;
+        });
+        if (isPairwise) {
+          noNeededAnnotationsForPairwise.forEach((key) => {
+            delete alignmentAnnotationVisibility[key];
+            delete togglableAlignmentAnnotationSettings[key];
+          });
+        }
+      } else {
+        aminoAcidAnnotations.forEach((key) => {
+          delete alignmentAnnotationVisibility[key];
+          delete togglableAlignmentAnnotationSettings[key];
+        });
+      }
+    }, [alignmentTracks, isPairwise]);
     const maxLength = reactExports.useMemo(() => {
       const { sequenceData: sequenceData22 = { sequence: "" }, alignmentData } = alignmentTracks[0];
       const data = alignmentData || sequenceData22;
@@ -172732,6 +166973,11 @@ ${seqDataToCopy}\r
           )
         };
         callback2(callbackVals);
+        setPropertySidePanel((prev) => {
+          return __spreadProps(__spreadValues({}, prev), {
+            selection: easyStore2.current.selectionLayer
+          });
+        });
       },
       [
         caretPositionUpdate2,
@@ -172903,7 +167149,8 @@ ${seqDataToCopy}\r
         annotationLabelVisibility: alignmentVisibilityToolOptions.alignmentAnnotationLabelVisibility
       });
     }, "estimateRowHeight");
-    const renderItem = /* @__PURE__ */ __name((_i, key, isTemplate, cloneProps) => {
+    const renderItem = /* @__PURE__ */ __name((_i, _key, isTemplate, cloneProps) => {
+      var _a3, _b2, _c2, _d2, _e;
       const isDragDisabled = !allowTrackRearrange || isPairwise;
       let i2;
       if (isTemplate) {
@@ -172942,22 +167189,44 @@ ${seqDataToCopy}\r
         className: "tg-trimmed-region",
         color: "gray"
       }));
+      const trackIdentifier = (track == null ? void 0 : track.sequenceData.id) ? "id" : "hash";
+      const selectedTrack = propertySidePanel == null ? void 0 : propertySidePanel.track;
+      const isTrackSelected = (selectedTrack == null ? void 0 : selectedTrack.sequenceData[trackIdentifier]) === (track == null ? void 0 : track.sequenceData[trackIdentifier]);
+      let aaIdentity;
+      let aaIdenticalPosition;
+      if (sequenceData22.isProtein && !isPairwise) {
+        aaIdentity = (_c2 = (_b2 = (_a3 = aminoAcidAlignmentProperties == null ? void 0 : aminoAcidAlignmentProperties.matrix) == null ? void 0 : _a3[0]) == null ? void 0 : _b2[i2]) == null ? void 0 : _c2.toFixed(1);
+        aaIdenticalPosition = (_e = (_d2 = aminoAcidAlignmentProperties == null ? void 0 : aminoAcidAlignmentProperties.identicalPositions) == null ? void 0 : _d2[i2 - 1]) == null ? void 0 : _e.identicalPositions;
+        if (sequenceData22.name === "Consensus") {
+          sequenceData22.aminoAcidProperties = isPairwise || !sequenceData22.isProtein ? null : aminoAcidAlignmentProperties;
+        }
+      }
       const innerRenderItem = /* @__PURE__ */ __name((provided = {}, snapshot) => {
-        var _a3;
+        var _a4;
         return /* @__PURE__ */ React.createElement(
           "div",
           __spreadProps(__spreadValues({
             ref: provided == null ? void 0 : provided.innerRef
           }, provided == null ? void 0 : provided.draggableProps), {
             className: classNames$1("alignmentViewTrackContainer", {
-              isDragDisabled
+              isDragDisabled,
+              isTrackSelected
             }),
             "data-alignment-track-index": i2,
             style: __spreadValues(__spreadValues({
               boxShadow: isTemplate ? "red 0px -1px 0px 0px inset, red 0px 1px 0px 0px inset" : "0px -1px 0px 0px inset",
               display: "flex"
-            }, (_a3 = provided == null ? void 0 : provided.draggableProps) == null ? void 0 : _a3.style), (snapshot == null ? void 0 : snapshot.isDragging) && { left: unset }),
-            key: i2
+            }, (_a4 = provided == null ? void 0 : provided.draggableProps) == null ? void 0 : _a4.style), (snapshot == null ? void 0 : snapshot.isDragging) && { left: unset }),
+            key: i2,
+            onClick: /* @__PURE__ */ __name(() => {
+              setPropertySidePanel((prev) => {
+                return __spreadProps(__spreadValues({}, prev), {
+                  selection: easyStore2.current.selectionLayer,
+                  track,
+                  isPairwise
+                });
+              });
+            }, "onClick")
           }),
           /* @__PURE__ */ React.createElement(
             "div",
@@ -173078,7 +167347,7 @@ ${seqDataToCopy}\r
                   "data-tip": "This sequence was trimmed and resubmitted for alignment"
                 },
                 "TRIMMED"
-              ), sequenceData22.sequence.length, " bps")
+              ), sequenceData22.isProtein ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("span", null, sequenceData22.proteinSequence.length, " AAs"), !compactNames && i2 > 0 && !isPairwise && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("span", null, "Identical Positions: ", aaIdenticalPosition), /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("span", null, "Identity: ", aaIdentity, "%"))) : /* @__PURE__ */ React.createElement("span", null, sequenceData22.sequence.length, " bps"))
             ),
             /* @__PURE__ */ React.createElement(
               HorizontalPanelDragHandle,
@@ -173156,7 +167425,12 @@ ${seqDataToCopy}\r
               alignmentData,
               chromatogramData
             }) : linearViewOptions)), {
-              additionalSelectionLayers,
+              additionalSelectionLayers: [
+                ...i2 !== 0 ? (additionalSelectionLayers || []).filter(
+                  (layer) => activeFilterType === "all" ? layer.differenceType !== "gap" : layer.differenceType === activeFilterType
+                ) : additionalSelectionLayers || [],
+                ...searchMatchLayers || []
+              ],
               dimensions: {
                 width: linearViewWidth
               },
@@ -173363,7 +167637,8 @@ ${seqDataToCopy}\r
       console.error("corrupted data!", props);
       return "corrupted data!";
     }
-    const getTrackVis = /* @__PURE__ */ __name((alignmentTracks2, isTemplate, allTracks) => {
+    const getTrackVis = /* @__PURE__ */ __name((alignmentTracks2, isTemplate, allTracks, aminoAcidAlignmentProperties2, labileSites2) => {
+      const labilePositions = (aminoAcidAlignmentProperties2 == null ? void 0 : aminoAcidAlignmentProperties2.labileSites.sites.map((ls) => ls.position)) || [];
       const rowData2 = {};
       const innerTrackVis = /* @__PURE__ */ __name((drop_provided, drop_snapshot) => {
         return /* @__PURE__ */ React.createElement(
@@ -173551,6 +167826,14 @@ ${seqDataToCopy}\r
                     easyStore: easyStore2.current
                   }
                 ),
+                labileSites2 && labilePositions.length > 0 && /* @__PURE__ */ React.createElement(
+                  LabileSitesLayer,
+                  {
+                    leftMargin: nameDivWidth,
+                    charWidth: charWidth2,
+                    positionsToMark: labilePositions
+                  }
+                ),
                 isTemplate ? renderItem(0, 0, isTemplate) : /* @__PURE__ */ React.createElement(
                   ReactList,
                   {
@@ -173623,257 +167906,335 @@ ${seqDataToCopy}\r
         updateLabelsForInViewFeatures();
       }, "onPinch")
     };
-    return /* @__PURE__ */ React.createElement(PinchHelper, __spreadValues({}, pinchHandler), /* @__PURE__ */ React.createElement(ResizeSensor, { onResize: handleResize }, /* @__PURE__ */ React.createElement(
+    const { labileSites } = alignmentVisibilityToolOptions.alignmentAnnotationVisibility;
+    return /* @__PURE__ */ React.createElement(PinchHelper, __spreadValues({}, pinchHandler), /* @__PURE__ */ React.createElement(
       "div",
       {
-        style: __spreadValues({
-          height: height || (isPairwise ? "auto" : viewportHeight * 0.88),
+        style: {
           display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          position: "relative",
-          overflowY: "auto"
-        }, style2),
-        className: "alignmentView"
+          flexDirection: "row"
+        }
       },
-      /* @__PURE__ */ React.createElement(
-        DragDropContext,
+      /* @__PURE__ */ React.createElement(ResizeSensor, { onResize: handleResize }, /* @__PURE__ */ React.createElement(
+        "div",
         {
-          onDragStart: onTrackDragStart,
-          onDragEnd: onTrackDragEnd
+          style: __spreadValues({
+            height: height || (isPairwise ? "auto" : viewportHeight * 0.88),
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            position: "relative",
+            overflowY: "auto"
+          }, style2),
+          tabIndex: 0,
+          className: "alignmentView"
         },
         /* @__PURE__ */ React.createElement(
-          "div",
+          DragDropContext,
           {
-            style: {
-              display: "flex",
-              flexDirection: "column",
-              position: "relative",
-              overflowY: "auto"
-            },
-            className: "alignmentView-top-container"
+            onDragStart: onTrackDragStart,
+            onDragEnd: onTrackDragEnd
           },
           /* @__PURE__ */ React.createElement(
             "div",
             {
               style: {
-                paddingTop: "3px",
-                paddingBottom: "5px",
-                borderBottom: "1px solid",
                 display: "flex",
-                minHeight: "32px",
+                flexDirection: "column",
+                position: "relative",
                 width: "100%",
-                flexWrap: "nowrap",
-                flexDirection: "row",
-                flex: "0 0 auto"
+                overflowY: "auto"
               },
-              className: "ve-alignment-top-bar"
+              className: "alignmentView-top-container"
             },
-            additionalTopLeftEl,
-            handleBackButtonClicked && /* @__PURE__ */ React.createElement(Tooltip, { content: "Back to Pairwise Alignment Overview" }, /* @__PURE__ */ React.createElement(
-              Button,
-              {
-                icon: "arrow-left",
-                onClick: /* @__PURE__ */ __name(() => {
-                  handleBackButtonClicked();
-                  caretPositionUpdate2(-1);
-                }, "onClick"),
-                small: true,
-                intent: Intent.PRIMARY,
-                minimal: true,
-                style: { marginRight: 10 },
-                className: "alignmentViewBackButton"
-              }
-            )),
-            /* @__PURE__ */ React.createElement("div", { style: { display: "flex" } }, /* @__PURE__ */ React.createElement(
-              EditableText,
-              {
-                disabled: !handleAlignmentRename,
-                onChange: /* @__PURE__ */ __name((v2) => {
-                  setAlignmentName(v2);
-                }, "onChange"),
-                maxLength: 399,
-                value: alignmentName,
-                onConfirm: /* @__PURE__ */ __name((v2) => __async(this, null, function* () {
-                  if (!v2) {
-                    setAlignmentName(_alignmentName);
-                    return;
-                  }
-                  if (v2 === _alignmentName) {
-                    return;
-                  }
-                  setSaveMessage("Alignment Renaming..");
-                  setSaveMessageLoading(true);
-                  yield handleAlignmentRename(v2, props);
-                  setSaveMessage("Rename Successful");
-                  setSaveMessageLoading(false);
-                  setTimeout(() => {
-                    setSaveMessage(void 0);
-                    setSaveMessageLoading(false);
-                  }, 5e3);
-                }), "onConfirm"),
-                selectAllOnFocus: true,
-                className: "veAlignmentName"
-              }
-            ), "   ", /* @__PURE__ */ React.createElement(
+            /* @__PURE__ */ React.createElement(
               "div",
               {
-                className: "veAlignmentType",
                 style: {
                   paddingTop: "3px",
-                  fontSize: "14px",
-                  color: "grey",
-                  maxWidth: "300px",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap"
-                },
-                "data-title": alignmentType || "Unknown Alignment Type"
-              },
-              alignmentType || "Unknown Alignment Type"
-            )),
-            unmappedSeqs && /* @__PURE__ */ React.createElement(
-              InfoHelper,
-              {
-                size: 20,
-                content: /* @__PURE__ */ React.createElement("div", null, "This alignment had sequences that did not map to the template sequence:", unmappedSeqs.map(({ sequenceData: sequenceData22 }, i2) => /* @__PURE__ */ React.createElement("div", { key: i2 }, sequenceData22.name))),
-                intent: "warning",
-                icon: "warning-sign"
-              }
-            ),
-            !isInPairwiseOverviewView && /* @__PURE__ */ React.createElement(
-              UncontrolledSliderWithPlusMinusBtns,
-              {
-                noWraparound: true,
-                bindOutsideChangeHelper: bindOutsideChangeHelper.current,
-                onClick: /* @__PURE__ */ __name(() => {
-                  setTimeout(scrollToCaret2, 0);
-                }, "onClick"),
-                minCharWidth: getMinCharWidth(),
-                onChange: /* @__PURE__ */ __name((zoomLvl) => __async(this, null, function* () {
-                  isZooming.current = true;
-                  setTimeout(() => {
-                    isZooming.current = false;
-                  }, 10);
-                  const minCharWidth = getMinCharWidth();
-                  const scaleFactor = Math.pow(12 / minCharWidth, 1 / 10);
-                  const newCharWidth = minCharWidth * Math.pow(scaleFactor, zoomLvl);
-                  yield setCharWidthInLinearView({
-                    charWidthInLinearView: newCharWidth
-                  });
-                  yield scrollToCaret2();
-                  yield updateLabelsForInViewFeatures({
-                    rectElement: ".alignmentHolder"
-                  });
-                }), "onChange"),
-                coerceInitialValue,
-                title: "Adjust Zoom Level",
-                style: { paddingTop: "4px", width: 100 },
-                className: "veZoomAlignmentSlider ove-slider",
-                labelRenderer: false,
-                initialValue: charWidth2,
-                stepSize: 0.05,
-                max: 10,
-                min: 0,
-                clickStepSize: 0.5
-              }
-            ),
-            !noVisibilityOptions && !isInPairwiseOverviewView && /* @__PURE__ */ React.createElement(
-              AlignmentVisibilityTool,
-              __spreadValues({
-                currentPairwiseAlignmentIndex
-              }, alignmentVisibilityToolOptions)
-            ),
-            additionalTopEl,
-            saveMessage && /* @__PURE__ */ React.createElement(
-              "div",
-              {
-                className: "ove-menu-toast",
-                style: {
+                  paddingBottom: "5px",
+                  borderBottom: "1px solid",
                   display: "flex",
-                  alignItems: "center",
-                  marginLeft: "auto",
-                  marginRight: 10
-                }
-              },
-              saveMessageLoading ? /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(Spinner, { size: 15 })) : /* @__PURE__ */ React.createElement(Icon, { icon: "tick-circle", intent: "success" }),
-              " ",
-              " ",
-              saveMessage
-            )
-          ),
-          hasTemplate ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "alignmentTrackFixedToTop" }, getTrackVis([firstTrack], true, alignmentTracks)), getTrackVis(otherTracks, false, alignmentTracks)) : getTrackVis(alignmentTracks, false, alignmentTracks)
-        )
-      ),
-      !isInPairwiseOverviewView && /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          className: "alignmentViewBottomBar",
-          style: {
-            // flexGrow: 1,
-            // minHeight: "-webkit-min-content", //https://stackoverflow.com/questions/28029736/how-to-prevent-a-flex-item-from-shrinking-smaller-than-its-content
-            maxHeight: 210,
-            marginTop: 4,
-            paddingTop: 4,
-            borderTop: "1px solid lightgrey",
-            display: "flex"
-          }
-        },
-        /* @__PURE__ */ React.createElement(
-          Minimap,
-          {
-            selectionLayerComp: /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(
-              PerformantSelectionLayer,
-              {
-                is: true,
-                hideCarets: true,
-                className: "veAlignmentSelectionLayer veMinimapSelectionLayer",
-                easyStore: easyStore2.current,
-                sequenceLength: maxLength,
-                charWidth: getMinCharWidth(true),
-                row: { start: 0, end: maxLength - 1 }
-              }
-            ), /* @__PURE__ */ React.createElement(
-              PerformantCaret,
-              {
-                style: {
-                  opacity: 0.2
+                  minHeight: "32px",
+                  width: "100%",
+                  flexWrap: "wrap",
+                  flexDirection: "row",
+                  flex: "0 0 auto"
                 },
-                className: "veAlignmentSelectionLayer veMinimapSelectionLayer",
-                sequenceLength: maxLength,
-                charWidth: getMinCharWidth(true),
-                row: { start: 0, end: maxLength - 1 },
-                easyStore: easyStore2.current
-              }
-            )),
-            alignmentTracks,
-            dimensions: {
-              width: Math.max(width, 10) || 10
-            },
-            nameDivOffsetPercent: 0,
-            scrollYToTrack,
-            onSizeAdjust: onMinimapSizeAdjust,
-            minSliderSize,
-            laneHeight: minimapLaneHeight || (alignmentTracks.length > 5 ? 10 : 17),
-            laneSpacing: minimapLaneSpacing || (alignmentTracks.length > 5 ? 2 : 1),
-            easyStore: easyStore2.current,
-            numBpsShownInLinearView: getNumBpsShownInLinearView(),
-            scrollAlignmentView: false,
-            onMinimapScrollX: scrollAlignmentToPercent
-          }
+                className: "ve-alignment-top-bar"
+              },
+              additionalTopLeftEl,
+              handleBackButtonClicked && /* @__PURE__ */ React.createElement(Tooltip, { content: "Back to Pairwise Alignment Overview" }, /* @__PURE__ */ React.createElement(
+                Button,
+                {
+                  icon: "arrow-left",
+                  onClick: /* @__PURE__ */ __name(() => {
+                    handleBackButtonClicked();
+                    caretPositionUpdate2(-1);
+                  }, "onClick"),
+                  small: true,
+                  intent: Intent.PRIMARY,
+                  minimal: true,
+                  style: { marginRight: 10 },
+                  className: "alignmentViewBackButton"
+                }
+              )),
+              /* @__PURE__ */ React.createElement("div", { style: { display: "flex" } }, /* @__PURE__ */ React.createElement(
+                EditableText,
+                {
+                  disabled: !handleAlignmentRename,
+                  onChange: /* @__PURE__ */ __name((v2) => {
+                    setAlignmentName(v2);
+                  }, "onChange"),
+                  maxLength: 399,
+                  value: alignmentName,
+                  onConfirm: /* @__PURE__ */ __name((v2) => __async(this, null, function* () {
+                    if (!v2) {
+                      setAlignmentName(_alignmentName);
+                      return;
+                    }
+                    if (v2 === _alignmentName) {
+                      return;
+                    }
+                    setSaveMessage("Alignment Renaming..");
+                    setSaveMessageLoading(true);
+                    yield handleAlignmentRename(v2, props);
+                    setSaveMessage("Rename Successful");
+                    setSaveMessageLoading(false);
+                    setTimeout(() => {
+                      setSaveMessage(void 0);
+                      setSaveMessageLoading(false);
+                    }, 5e3);
+                  }), "onConfirm"),
+                  selectAllOnFocus: true,
+                  className: "veAlignmentName"
+                }
+              ), "   ", /* @__PURE__ */ React.createElement(
+                "div",
+                {
+                  className: "veAlignmentType",
+                  style: {
+                    paddingTop: "3px",
+                    fontSize: "14px",
+                    color: "grey",
+                    maxWidth: "300px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap"
+                  },
+                  "data-title": alignmentType || "Unknown Alignment Type"
+                },
+                alignmentType || "Unknown Alignment Type"
+              )),
+              unmappedSeqs && /* @__PURE__ */ React.createElement(
+                InfoHelper,
+                {
+                  size: 20,
+                  content: /* @__PURE__ */ React.createElement("div", null, "This alignment had sequences that did not map to the template sequence:", unmappedSeqs.map(({ sequenceData: sequenceData22 }, i2) => /* @__PURE__ */ React.createElement("div", { key: i2 }, sequenceData22.name))),
+                  intent: "warning",
+                  icon: "warning-sign"
+                }
+              ),
+              !isInPairwiseOverviewView && /* @__PURE__ */ React.createElement(
+                UncontrolledSliderWithPlusMinusBtns,
+                {
+                  noWraparound: true,
+                  bindOutsideChangeHelper: bindOutsideChangeHelper.current,
+                  onClick: /* @__PURE__ */ __name(() => {
+                    setTimeout(scrollToCaret2, 0);
+                  }, "onClick"),
+                  minCharWidth: getMinCharWidth(),
+                  onChange: /* @__PURE__ */ __name((zoomLvl) => __async(this, null, function* () {
+                    isZooming.current = true;
+                    setTimeout(() => {
+                      isZooming.current = false;
+                    }, 10);
+                    const minCharWidth = getMinCharWidth();
+                    const scaleFactor = Math.pow(12 / minCharWidth, 1 / 10);
+                    const newCharWidth = minCharWidth * Math.pow(scaleFactor, zoomLvl);
+                    yield setCharWidthInLinearView({
+                      charWidthInLinearView: newCharWidth
+                    });
+                    yield scrollToCaret2();
+                    yield updateLabelsForInViewFeatures({
+                      rectElement: ".alignmentHolder"
+                    });
+                  }), "onChange"),
+                  coerceInitialValue,
+                  title: "Adjust Zoom Level",
+                  style: { paddingTop: "4px", width: 100 },
+                  className: "veZoomAlignmentSlider ove-slider",
+                  labelRenderer: false,
+                  initialValue: charWidth2,
+                  stepSize: 0.05,
+                  max: 10,
+                  min: 0,
+                  clickStepSize: 0.5
+                }
+              ),
+              !noVisibilityOptions && !isInPairwiseOverviewView && /* @__PURE__ */ React.createElement(
+                AlignmentVisibilityTool,
+                __spreadValues({
+                  currentPairwiseAlignmentIndex
+                }, alignmentVisibilityToolOptions)
+              ),
+              /* @__PURE__ */ React.createElement(
+                AlignmentSearchBar,
+                {
+                  alignmentTracks,
+                  id: id2,
+                  setSearchMatchLayers
+                }
+              ),
+              /* @__PURE__ */ React.createElement(
+                FindMismatches,
+                {
+                  alignmentJson: alignmentTracks,
+                  id: id2,
+                  onFilterChange: handleFilterChange
+                }
+              ),
+              additionalTopEl,
+              saveMessage && /* @__PURE__ */ React.createElement(
+                "div",
+                {
+                  className: "ove-menu-toast",
+                  style: {
+                    display: "flex",
+                    alignItems: "center",
+                    marginLeft: "auto",
+                    marginRight: 10
+                  }
+                },
+                saveMessageLoading ? /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(Spinner, { size: 15 })) : /* @__PURE__ */ React.createElement(Icon, { icon: "tick-circle", intent: "success" }),
+                " ",
+                " ",
+                saveMessage
+              ),
+              !propertySidePanel.isOpen && /* @__PURE__ */ React.createElement(
+                Button,
+                {
+                  small: true,
+                  minimal: true,
+                  className: "showTrackPropertiesBtn",
+                  icon: "menu-closed",
+                  intent: "primary",
+                  style: { marginLeft: "auto" },
+                  onClick: /* @__PURE__ */ __name(() => {
+                    setPropertySidePanel((prev) => {
+                      return __spreadProps(__spreadValues({}, prev), {
+                        isOpen: true
+                      });
+                    });
+                  }, "onClick"),
+                  "data-tip": "Show Track Properties"
+                }
+              )
+            ),
+            hasTemplate ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "alignmentTrackFixedToTop" }, getTrackVis(
+              [firstTrack],
+              true,
+              alignmentTracks,
+              aminoAcidAlignmentProperties,
+              labileSites
+            )), getTrackVis(
+              otherTracks,
+              false,
+              alignmentTracks,
+              aminoAcidAlignmentProperties,
+              labileSites
+            )) : getTrackVis(
+              alignmentTracks,
+              false,
+              alignmentTracks,
+              aminoAcidAlignmentProperties,
+              labileSites
+            )
+          )
+        ),
+        !isInPairwiseOverviewView && /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            className: "alignmentViewBottomBar",
+            style: {
+              // flexGrow: 1,
+              // minHeight: "-webkit-min-content", //https://stackoverflow.com/questions/28029736/how-to-prevent-a-flex-item-from-shrinking-smaller-than-its-content
+              maxHeight: 210,
+              marginTop: 4,
+              paddingTop: 4,
+              borderTop: "1px solid lightgrey",
+              display: "flex"
+            }
+          },
+          /* @__PURE__ */ React.createElement(
+            Minimap,
+            {
+              selectionLayerComp: /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(
+                PerformantSelectionLayer,
+                {
+                  is: true,
+                  hideCarets: true,
+                  className: "veAlignmentSelectionLayer veMinimapSelectionLayer",
+                  easyStore: easyStore2.current,
+                  sequenceLength: maxLength,
+                  charWidth: getMinCharWidth(true),
+                  row: { start: 0, end: maxLength - 1 }
+                }
+              ), /* @__PURE__ */ React.createElement(
+                PerformantCaret,
+                {
+                  style: {
+                    opacity: 0.2
+                  },
+                  className: "veAlignmentSelectionLayer veMinimapSelectionLayer",
+                  sequenceLength: maxLength,
+                  charWidth: getMinCharWidth(true),
+                  row: { start: 0, end: maxLength - 1 },
+                  easyStore: easyStore2.current
+                }
+              )),
+              alignmentTracks,
+              activeFilterType,
+              dimensions: {
+                width: Math.max(width, 10) || 10
+              },
+              nameDivOffsetPercent: 0,
+              scrollYToTrack,
+              onSizeAdjust: onMinimapSizeAdjust,
+              minSliderSize,
+              laneHeight: minimapLaneHeight || (alignmentTracks.length > 5 ? 10 : 17),
+              laneSpacing: minimapLaneSpacing || (alignmentTracks.length > 5 ? 2 : 1),
+              easyStore: easyStore2.current,
+              numBpsShownInLinearView: getNumBpsShownInLinearView(),
+              scrollAlignmentView: false,
+              onMinimapScrollX: scrollAlignmentToPercent
+            }
+          )
+        ),
+        /* @__PURE__ */ React.createElement(
+          GlobalDialog,
+          null
         )
-      ),
-      /* @__PURE__ */ React.createElement(
-        GlobalDialog,
-        null
+      )),
+      propertySidePanel.isOpen && /* @__PURE__ */ React.createElement(
+        PropertySidePanel,
+        {
+          properties: propertySidePanel,
+          setProperties: setPropertySidePanel,
+          style: {
+            height: viewportHeight * 0.88
+          }
+        }
       )
-    )));
+    ));
   }, "AlignmentView");
   const AlignmentView$1 = compose(
     withStore,
     withEditorProps,
     connect(
       (state2, ownProps) => {
+        var _a2, _b2;
         const {
           VectorEditor: {
             __allEditorsOptions: { alignments: alignments2 }
@@ -173916,6 +168277,20 @@ ${seqDataToCopy}\r
           "cdsFeatureTranslations",
           "chromatogram",
           "dnaColors",
+          "physicalProperties",
+          "serineThreonine",
+          "labileSites",
+          "colorScheme",
+          "plot",
+          "conservation",
+          "properties",
+          "hydrophobicity",
+          "polar",
+          "negative",
+          "positive",
+          "charged",
+          "aliphatic",
+          "aromatic",
           "compactNames"
         ];
         const togglableAlignmentAnnotationSettings = {};
@@ -173926,6 +168301,8 @@ ${seqDataToCopy}\r
         });
         const annotationsWithCounts = [];
         if (alignmentTracks) {
+          const tracks = parseTracks(alignmentTracks);
+          const labileSites = getLabileSites(tracks, 0.5);
           let totalNumOfFeatures = 0;
           let totalNumOfParts = 0;
           alignmentTracks.forEach((seq) => {
@@ -173938,7 +168315,8 @@ ${seqDataToCopy}\r
           });
           annotationsWithCounts.push({
             features: totalNumOfFeatures,
-            parts: totalNumOfParts
+            parts: totalNumOfParts,
+            labileSites: (_b2 = (_a2 = labileSites.sites) == null ? void 0 : _a2.length) != null ? _b2 : 0
           });
         } else if (pairwiseAlignments) {
           pairwiseAlignments.forEach((pairwise) => {
@@ -175604,7 +169982,7 @@ ${seqDataToCopy}\r
           _this$props.innerRef;
           _this$props.onResize;
           var props = _objectWithoutPropertiesLoose$5(_this$props, ["innerRef", "onResize"]);
-          return reactExports.createElement(WrappedComponent, _extends$j({}, props, {
+          return reactExports.createElement(WrappedComponent, _extends$k({}, props, {
             measureRef: this._handleRef,
             measure: this.measure,
             contentRect: this.state.contentRect
@@ -176209,6 +170587,8 @@ ${seqDataToCopy}\r
     "allowPrimerBasesToBeEdited",
     "truncateLabelsThatDoNotFit",
     "smartCircViewLabelRender",
+    "on_setPanelAsActive",
+    "on_propertiesViewTabUpdate",
     "onConfigureFeatureTypesClick",
     "allPartTags",
     "bpLimit",
@@ -176247,6 +170627,8 @@ ${seqDataToCopy}\r
     "enzymeManageOverride",
     "enzymeGroupsOverride",
     "additionalEnzymes",
+    "getAcceptedInsertChars",
+    "maxInsertSize",
     "onDelete",
     "onCopy",
     "autoAnnotateFeatures",
@@ -176255,7 +170637,8 @@ ${seqDataToCopy}\r
     "onCreateNewFromSubsequence",
     "onPreviewModeFullscreenClose",
     "onPaste",
-    "menuFilter"
+    "menuFilter",
+    "showAminoAcidUnitAsCodon"
   ];
   const cutsiteTool = connectToEditor(
     ({ readOnly: readOnly2, annotationVisibility: annotationVisibility2 = {}, toolBar: toolBar2 = {} }) => {
@@ -176649,20 +171032,13 @@ ${seqDataToCopy}\r
             display: "flex",
             minWidth: 300
           } : {
-            position: "fixed",
-            top: 0,
-            right: 25,
+            position: "relative",
+            top: 100,
             padding: 10,
             display: "flex",
-            alignItems: "center",
+            alignItems: "start",
             paddingBottom: 5,
-            background: "white",
-            zIndex: "20000",
-            borderBottom: "1px solid lightgrey",
-            borderLeft: "1px solid lightgrey",
-            borderRight: "1px solid lightgrey",
-            borderBottomLeftRadius: "5px",
-            borderBottomRightRadius: "5px"
+            zIndex: 2e4
           },
           className: "veFindBar"
         },
@@ -176677,7 +171053,10 @@ ${seqDataToCopy}\r
                 autoFocus: true,
                 style: __spreadValues({
                   resize: "vertical"
-                }, !isInline && { width: 350, minHeight: 70 }),
+                }, !isInline && {
+                  width: 350,
+                  height: 190
+                }),
                 className: "tg-find-tool-input",
                 inputRef: /* @__PURE__ */ __name((n2) => {
                   if (n2) this.inputEl = n2;
@@ -176723,12 +171102,10 @@ ${seqDataToCopy}\r
           "div",
           {
             style: {
+              marginLeft: 10,
               display: "flex",
-              maxWidth: "400px",
-              flexWrap: "wrap",
-              justifyContent: "space-around",
-              alignItems: "stretch",
-              height: "76px"
+              flexDirection: "column",
+              gap: 5
             }
           },
           rightEl,
@@ -176738,7 +171115,7 @@ ${seqDataToCopy}\r
           Button,
           {
             minimal: true,
-            style: { position: "absolute", bottom: 0, right: -10 },
+            style: { position: "absolute", bottom: 0, right: 0 },
             onClick: toggleFindTool2,
             icon: "cross"
           }
@@ -176796,11 +171173,23 @@ ${seqDataToCopy}\r
     return {
       isOpen: findTool2.isOpen
     };
-  })(({ toolbarItemProps, editorName, toggleFindTool: toggleFindTool2, isOpen: isOpen2 }) => {
+  })(({
+    toolbarItemProps,
+    editorName,
+    toggleFindTool: toggleFindTool2,
+    isOpen: isOpen2,
+    additionalEnzymes
+  }) => {
     return /* @__PURE__ */ React.createElement(
       ToolbarItem$1,
       __spreadValues({}, __spreadValues({
-        Icon: !isOpen2 ? /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(Icon, { "data-test": "ve-find-tool-toggle", icon: "search" }), /* @__PURE__ */ React.createElement(Icon, { icon: "caret-right" })) : /* @__PURE__ */ React.createElement(FindBar$1, { editorName }),
+        Icon: !isOpen2 ? /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(Icon, { "data-test": "ve-find-tool-toggle", icon: "search" }), /* @__PURE__ */ React.createElement(Icon, { icon: "caret-right" })) : /* @__PURE__ */ React.createElement(
+          FindBar$1,
+          {
+            editorName,
+            additionalEnzymes
+          }
+        ),
         renderIconAbove: isOpen2,
         onIconClick: toggleFindTool2,
         tooltip: isOpen2 ? /* @__PURE__ */ React.createElement("span", null, "Hide Find Tool ", /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10 } }, "(Cmd/Ctrl+F)")) : /* @__PURE__ */ React.createElement("span", null, "Show Find Tool ", /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10 } }, "(Cmd/Ctrl+F)"))
@@ -177121,6 +171510,7 @@ ${seqDataToCopy}\r
     caretPosition: caretPosition2 = -1,
     sequenceLength = 0,
     isProtein: isProtein2,
+    showAminoAcidUnitAsCodon,
     sequenceData: sequenceData2 = { sequence: "" },
     showGCContent: showGCContent2,
     GCDecimalDigits,
@@ -177137,6 +171527,7 @@ ${seqDataToCopy}\r
       sequenceLength,
       sequenceData: sequenceData2,
       showGCContent: showGCContent2,
+      showAminoAcidUnitAsCodon,
       GCDecimalDigits,
       isProtein: isProtein2
     }), /* @__PURE__ */ React.createElement(
@@ -177161,10 +171552,10 @@ ${seqDataToCopy}\r
     ({ sequenceData: sequenceData2 = { sequence: "" } }) => ({
       sequenceLength: sequenceData2.sequence.length
     })
-  )(({ isProtein: isProtein2, sequenceLength = 0 }) => /* @__PURE__ */ React.createElement(StatusBarItem, { dataTest: "veStatusBar-length" }, `Length: ${divideBy3(
+  )(({ isProtein: isProtein2, sequenceLength = 0, showAminoAcidUnitAsCodon }) => /* @__PURE__ */ React.createElement(StatusBarItem, { dataTest: "veStatusBar-length" }, `Length: ${divideBy3(
     sequenceLength,
     isProtein2
-  )} ${isProtein2 ? "AAs" : "bps"}`));
+  )} ${isProtein2 ? `${showAminoAcidUnitAsCodon ? "codons" : "AAs"}` : "bps"}`));
   const ShowTypeItem = connectToEditor(({ sequenceData: sequenceData2 }) => ({
     isProtein: sequenceData2.isProtein,
     isOligo: sequenceData2.isOligo,
@@ -177244,6 +171635,7 @@ ${seqDataToCopy}\r
     onSelectionOrCaretChanged,
     GCDecimalDigits = 1,
     isProtein: isProtein2,
+    showAminoAcidUnitAsCodon,
     beforeReadOnlyChange
   }) {
     return /* @__PURE__ */ React.createElement("div", { className: "veStatusBar" }, showMoleculeType && /* @__PURE__ */ React.createElement(ShowTypeItem, { editorName }), /* @__PURE__ */ React.createElement(
@@ -177271,13 +171663,21 @@ ${seqDataToCopy}\r
     ), /* @__PURE__ */ React.createElement(
       ShowSelectionItem,
       {
+        showAminoAcidUnitAsCodon,
         editorName,
         isProtein: isProtein2,
         showGCContentByDefault,
         onSelectionOrCaretChanged,
         GCDecimalDigits
       }
-    ), /* @__PURE__ */ React.createElement(ShowLengthItem, { isProtein: isProtein2, editorName }));
+    ), /* @__PURE__ */ React.createElement(
+      ShowLengthItem,
+      {
+        isProtein: isProtein2,
+        editorName,
+        showAminoAcidUnitAsCodon
+      }
+    ));
   }
   __name(StatusBar, "StatusBar");
   function StatusBarItem({ children, dataTest }) {
@@ -177369,12 +171769,29 @@ ${seqDataToCopy}\r
     additionalFooterEls
   }) => {
     const annotationTypeUpper = upperFirst(annotationType);
-    const _AnnotationProperties = class _AnnotationProperties extends React.Component {
-      constructor(props) {
-        super(props);
-        __publicField(this, "onRowSelect", /* @__PURE__ */ __name(([record]) => {
+    const AnnotationProperties = /* @__PURE__ */ __name((props) => {
+      var _a2, _b2, _c2;
+      const {
+        readOnly: readOnly2,
+        annotations = {},
+        annotationVisibility: annotationVisibility2,
+        sequenceLength,
+        selectionLayer: selectionLayer2,
+        sequence: sequence2,
+        isProtein: isProtein2,
+        allPartTags,
+        annotationPropertiesSelectedEntities: _annotationPropertiesSelectedEntities,
+        selectedAnnotationId,
+        PropertiesProps,
+        dispatch,
+        editorName
+      } = props;
+      const instanceRef = React.useRef({ props });
+      instanceRef.current.props = props;
+      const cmds = React.useMemo(() => getCommands(instanceRef.current), []);
+      const onRowSelect = React.useCallback(
+        ([record]) => {
           if (!record) return;
-          const { dispatch, editorName } = this.props;
           dispatch({
             type: "SELECTION_LAYER_UPDATE",
             payload: record,
@@ -177382,40 +171799,34 @@ ${seqDataToCopy}\r
               editorName
             }
           });
-        }, "onRowSelect"));
-        this.commands = getCommands(this);
-      }
-      render() {
-        var _a2;
-        const {
-          readOnly: readOnly2,
-          annotations = {},
-          annotationVisibility: annotationVisibility2,
-          sequenceLength,
-          selectionLayer: selectionLayer2,
-          sequence: sequence2,
-          isProtein: isProtein2,
-          allPartTags,
-          annotationPropertiesSelectedEntities: _annotationPropertiesSelectedEntities,
-          selectedAnnotationId
-        } = this.props;
-        const annotationPropertiesSelectedEntities = _annotationPropertiesSelectedEntities.filter((a2) => annotations[a2.id]);
-        const deleteAnnotation = this.props[`delete${annotationTypeUpper}`];
-        const annotationsToUse = map$3(annotations, (annotation) => {
+        },
+        [dispatch, editorName]
+      );
+      const annotationPropertiesSelectedEntities = _annotationPropertiesSelectedEntities.filter((a2) => annotations[a2.id]);
+      const deleteAnnotation = props[`delete${annotationTypeUpper}`];
+      const annotationsToUse = React.useMemo(
+        () => map$3(annotations, (_annotation) => {
+          const annotation = isProtein2 ? convertDnaCaretPositionOrRangeToAA(_annotation) : _annotation;
           return __spreadProps(__spreadValues(__spreadValues({}, annotation), annotation.strand === void 0 && {
             strand: annotation.forward ? 1 : -1
           }), {
             size: getRangeLength(annotation, sequenceLength)
           });
-        });
-        const keyedPartTags = (_a2 = getKeyedTagsAndTagOptions(allPartTags)) != null ? _a2 : {};
-        this.schema = {
+        }),
+        [annotations, sequenceLength, isProtein2]
+      );
+      const keyedPartTags = (_a2 = getKeyedTagsAndTagOptions(allPartTags)) != null ? _a2 : {};
+      const additionalColumns = ((_c2 = (_b2 = PropertiesProps == null ? void 0 : PropertiesProps.propertiesList) == null ? void 0 : _b2.find(
+        (p2) => (p2.name || p2) === (pluralize(annotationType) || "")
+      )) == null ? void 0 : _c2.additionalColumns) || [];
+      const schema2 = useMemoDeepEqual(
+        () => ({
           fields: [
             {
               path: "name",
               type: "string",
               render: /* @__PURE__ */ __name((name2, ann) => {
-                const checked = !this.props.annotationVisibility[`${annotationType}IndividualToHide`][ann.id];
+                const checked = !annotationVisibility2[`${annotationType}IndividualToHide`][ann.id];
                 return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(
                   Icon,
                   {
@@ -177424,9 +171835,9 @@ ${seqDataToCopy}\r
                       e2.stopPropagation();
                       const upperType = startCase(annotationType);
                       if (checked) {
-                        this.props[`hide${upperType}Individual`]([ann.id]);
+                        props[`hide${upperType}Individual`]([ann.id]);
                       } else {
-                        this.props[`show${upperType}Individual`]([ann.id]);
+                        props[`show${upperType}Individual`]([ann.id]);
                       }
                     }, "onClick"),
                     style: {
@@ -177447,7 +171858,7 @@ ${seqDataToCopy}\r
                 render: /* @__PURE__ */ __name((bases, primer) => {
                   let bps = bases;
                   if (!bases) {
-                    bps = getSequenceWithinRange(primer, this.props.sequence);
+                    bps = getSequenceWithinRange(primer, sequence2);
                     if (!primer.forward) {
                       bps = getReverseComplementSequenceString(bps);
                     }
@@ -177472,8 +171883,8 @@ ${seqDataToCopy}\r
                 }, "render")
               }
             ],
-            sizeSchema(this.props.isProtein),
-            ...withTags && this.props.allPartTags ? [
+            sizeSchema(),
+            ...withTags && allPartTags ? [
               {
                 path: "tags",
                 type: "string",
@@ -177494,139 +171905,147 @@ ${seqDataToCopy}\r
                 }, "render")
               }
             ] : [],
-            { path: "strand", type: "number" }
+            { path: "strand", type: "number" },
+            ...additionalColumns
           ]
-        };
-        return /* @__PURE__ */ React.createElement(
-          WrappedDT,
-          {
-            topLeftItems: getVisFilter(
-              createCommandMenu(
-                isFunction$1(visSubmenu) ? visSubmenu(this.props) : visSubmenu,
-                this.commands,
-                {
-                  useTicks: true
-                }
-              )
-            ),
-            annotationPropertiesSelectedEntities,
-            leftOfSearchBarItems: /* @__PURE__ */ React.createElement(React.Fragment, null, !readOnly2 && /* @__PURE__ */ React.createElement(ButtonGroup, { style: { marginTop: 3, marginRight: 4 } }, /* @__PURE__ */ React.createElement(
-              Tooltip,
+        }),
+        [
+          additionalColumns,
+          allPartTags,
+          annotationVisibility2,
+          isProtein2,
+          keyedPartTags,
+          sequence2
+        ]
+      );
+      return /* @__PURE__ */ React.createElement(
+        WrappedDT,
+        {
+          topLeftItems: getVisFilter(
+            createCommandMenu(
+              isFunction$1(visSubmenu) ? visSubmenu(props) : visSubmenu,
+              cmds,
               {
-                position: "top",
-                modifiers: popoverOverflowModifiers,
-                content: "New"
-              },
-              /* @__PURE__ */ React.createElement(
-                AnchorButton,
-                {
-                  disabled: !sequenceLength,
-                  icon: "plus",
-                  className: "tgNewAnnBtn",
-                  onClick: /* @__PURE__ */ __name(() => {
-                    showAddOrEditAnnotationDialog({
-                      type: annotationType,
-                      annotation: pick$1(
-                        selectionLayer2,
-                        "start",
-                        "end",
-                        "forward"
-                      )
-                    });
-                  }, "onClick")
-                }
-              )
-            ), /* @__PURE__ */ React.createElement(
-              Tooltip,
-              {
-                position: "top",
-                modifiers: popoverOverflowModifiers,
-                content: "Edit"
-              },
-              /* @__PURE__ */ React.createElement(
-                AnchorButton,
-                {
-                  onClick: /* @__PURE__ */ __name(() => {
-                    showAddOrEditAnnotationDialog({
-                      type: annotationType,
-                      annotation: annotationPropertiesSelectedEntities[0]
-                    });
-                  }, "onClick"),
-                  disabled: annotationPropertiesSelectedEntities.length !== 1,
-                  icon: "edit"
-                }
-              )
-            ), ["feature"].includes(annotationType) && /* @__PURE__ */ React.createElement(
-              CmdButton,
-              {
-                text: "",
-                icon: "cog",
-                "data-tip": "Configure Feature Types",
-                cmd: this.commands.onConfigureFeatureTypesClick
+                useTicks: true
               }
-            ), ["part", "primer", "feature"].includes(annotationType) && /* @__PURE__ */ React.createElement(
-              CmdButton,
+            )
+          ),
+          annotationPropertiesSelectedEntities,
+          leftOfSearchBarItems: /* @__PURE__ */ React.createElement(React.Fragment, null, !readOnly2 && /* @__PURE__ */ React.createElement(ButtonGroup, { style: { marginTop: 3, marginRight: 4 } }, /* @__PURE__ */ React.createElement(
+            Tooltip,
+            {
+              position: "top",
+              modifiers: popoverOverflowModifiers,
+              content: "New"
+            },
+            /* @__PURE__ */ React.createElement(
+              AnchorButton,
               {
-                text: "",
-                icon: removeDuplicatesIcon,
-                "data-tip": "Remove Duplicates",
-                cmd: this.commands[`showRemoveDuplicatesDialog${annotationTypeUpper + "s"}`]
+                disabled: !sequenceLength,
+                icon: "plus",
+                className: "tgNewAnnBtn",
+                onClick: /* @__PURE__ */ __name(() => {
+                  showAddOrEditAnnotationDialog({
+                    type: annotationType,
+                    annotation: pick$1(
+                      selectionLayer2,
+                      "start",
+                      "end",
+                      "forward"
+                    )
+                  });
+                }, "onClick")
               }
-            ), additionalFooterEls && additionalFooterEls(this.props), /* @__PURE__ */ React.createElement(
-              Tooltip,
+            )
+          ), /* @__PURE__ */ React.createElement(
+            Tooltip,
+            {
+              position: "top",
+              modifiers: popoverOverflowModifiers,
+              content: "Edit"
+            },
+            /* @__PURE__ */ React.createElement(
+              AnchorButton,
               {
-                position: "top",
-                modifiers: popoverOverflowModifiers,
-                content: "Delete"
-              },
-              /* @__PURE__ */ React.createElement(
-                AnchorButton,
-                {
-                  onClick: /* @__PURE__ */ __name(() => {
-                    deleteAnnotation(annotationPropertiesSelectedEntities);
-                  }, "onClick"),
-                  className: "tgDeleteAnnsBtn",
-                  intent: "danger",
-                  disabled: !annotationPropertiesSelectedEntities.length,
-                  icon: "trash"
-                }
-              )
-            ))),
-            onDoubleClick: /* @__PURE__ */ __name((annotation) => {
-              showAddOrEditAnnotationDialog({
-                type: annotationType,
-                annotation
-              });
-            }, "onDoubleClick"),
-            withCheckboxes: true,
-            showFeatureIndividual: this.props.showFeatureIndividual,
-            hideFeatureIndividual: this.props.hideFeatureIndividual,
-            showPartIndividual: this.props.showPartIndividual,
-            hidePartIndividual: this.props.hidePartIndividual,
-            showPrimerIndividual: this.props.showPrimerIndividual,
-            hidePrimerIndividual: this.props.hidePrimerIndividual,
-            annotationVisibility: annotationVisibility2,
-            featureLengthsToHide: this.props.featureLengthsToHide,
-            primerLengthsToHide: this.props.primerLengthsToHide,
-            partLengthsToHide: this.props.partLengthsToHide,
-            sequence: sequence2,
-            noPadding: true,
-            noFullscreenButton: true,
-            onRowSelect: this.onRowSelect,
-            selectedIds: selectedAnnotationId,
-            formName: "annotationProperties",
-            noRouter: true,
-            isProtein: isProtein2,
-            compact: true,
-            isInfinite: true,
-            schema: this.schema,
-            entities: annotationsToUse
-          }
-        );
-      }
-    };
-    __name(_AnnotationProperties, "AnnotationProperties");
-    let AnnotationProperties = _AnnotationProperties;
+                onClick: /* @__PURE__ */ __name(() => {
+                  showAddOrEditAnnotationDialog({
+                    type: annotationType,
+                    annotation: annotationPropertiesSelectedEntities[0]
+                  });
+                }, "onClick"),
+                disabled: annotationPropertiesSelectedEntities.length !== 1,
+                icon: "edit"
+              }
+            )
+          ), ["feature"].includes(annotationType) && /* @__PURE__ */ React.createElement(
+            CmdButton,
+            {
+              text: "",
+              icon: "cog",
+              "data-tip": "Configure Feature Types",
+              cmd: cmds.onConfigureFeatureTypesClick
+            }
+          ), ["part", "primer", "feature"].includes(annotationType) && /* @__PURE__ */ React.createElement(
+            CmdButton,
+            {
+              text: "",
+              icon: removeDuplicatesIcon,
+              "data-tip": "Remove Duplicates",
+              cmd: cmds[`showRemoveDuplicatesDialog${annotationTypeUpper + "s"}`]
+            }
+          ), additionalFooterEls && additionalFooterEls(props), /* @__PURE__ */ React.createElement(
+            Tooltip,
+            {
+              position: "top",
+              modifiers: popoverOverflowModifiers,
+              content: "Delete"
+            },
+            /* @__PURE__ */ React.createElement(
+              AnchorButton,
+              {
+                onClick: /* @__PURE__ */ __name(() => {
+                  deleteAnnotation(annotationPropertiesSelectedEntities);
+                }, "onClick"),
+                className: "tgDeleteAnnsBtn",
+                intent: "danger",
+                disabled: !annotationPropertiesSelectedEntities.length,
+                icon: "trash"
+              }
+            )
+          ))),
+          onDoubleClick: /* @__PURE__ */ __name((annotation) => {
+            showAddOrEditAnnotationDialog({
+              type: annotationType,
+              annotation
+            });
+          }, "onDoubleClick"),
+          withCheckboxes: true,
+          showFeatureIndividual: props.showFeatureIndividual,
+          hideFeatureIndividual: props.hideFeatureIndividual,
+          showPartIndividual: props.showPartIndividual,
+          hidePartIndividual: props.hidePartIndividual,
+          showPrimerIndividual: props.showPrimerIndividual,
+          hidePrimerIndividual: props.hidePrimerIndividual,
+          annotationVisibility: annotationVisibility2,
+          featureLengthsToHide: props.featureLengthsToHide,
+          primerLengthsToHide: props.primerLengthsToHide,
+          partLengthsToHide: props.partLengthsToHide,
+          sequence: sequence2,
+          noPadding: true,
+          noFullscreenButton: true,
+          onRowSelect,
+          selectedIds: selectedAnnotationId,
+          formName: "annotationProperties",
+          noRouter: true,
+          isProtein: isProtein2,
+          compact: true,
+          isInfinite: true,
+          withDisplayOptions: true,
+          schema: schema2,
+          entities: annotationsToUse
+        }
+      );
+    }, "AnnotationProperties");
     return compose(
       connectToEditor(
         ({
@@ -177636,8 +172055,9 @@ ${seqDataToCopy}\r
           selectionLayer: selectionLayer2,
           featureLengthsToHide: featureLengthsToHide2,
           primerLengthsToHide: primerLengthsToHide2,
-          partLengthsToHide: partLengthsToHide2
-        }) => {
+          partLengthsToHide: partLengthsToHide2,
+          PropertiesProps
+        }, ownProps) => {
           return {
             annotationVisibility: annotationVisibility2,
             selectionLayer: selectionLayer2,
@@ -177649,7 +172069,8 @@ ${seqDataToCopy}\r
             sequence: sequenceData2.sequence,
             annotations: sequenceData2[annotationType + "s"],
             [annotationType + "s"]: sequenceData2[annotationType + "s"],
-            sequenceLength: sequenceData2.sequence.length
+            sequenceLength: sequenceData2.sequence.length,
+            PropertiesProps: ownProps.PropertiesProps || PropertiesProps
           };
         }
       ),
@@ -177956,7 +172377,7 @@ ${seqDataToCopy}\r
                 displayName: "Size (aa)",
                 type: "number"
               },
-              sizeSchema(this.props.isProtein),
+              sizeSchema(),
               { path: "frame", type: "number" },
               { path: "strand", type: "number" }
             ]
@@ -177982,7 +172403,7 @@ ${seqDataToCopy}\r
         readOnly: readOnly2,
         annotationVisibility: annotationVisibility2,
         useAdditionalOrfStartCodons: useAdditionalOrfStartCodons2,
-        orfs: selectors.orfsSelector(editorState),
+        orfs: getMemoOrfs(editorState),
         sequenceLength: sequence2.length,
         sequenceData: sequenceData2,
         minimumOrfSize: minimumOrfSize2
@@ -178172,7 +172593,7 @@ ${seqDataToCopy}\r
       return {
         readOnly: readOnly2,
         translations: selectors.translationsSelector(editorState),
-        orfs: selectors.orfsSelector(editorState),
+        orfs: getMemoOrfs(editorState),
         annotationVisibility: annotationVisibility2,
         sequenceLength: (sequenceData2.sequence || "").length,
         sequenceData: sequenceData2
@@ -178196,8 +172617,8 @@ ${seqDataToCopy}\r
     noType: true
   });
   const PropertiesContainer = /* @__PURE__ */ __name((Comp) => (props) => {
-    const _a2 = props, { additionalFooterEls, additionalHeaderEls } = _a2, rest = __objRest(_a2, ["additionalFooterEls", "additionalHeaderEls"]);
-    return /* @__PURE__ */ React.createElement(React.Fragment, null, additionalHeaderEls, /* @__PURE__ */ React.createElement(Comp, __spreadValues({}, rest)), additionalFooterEls);
+    const _a2 = props, { additionalFooterEls, additionalHeaderEls, overrideEl } = _a2, rest = __objRest(_a2, ["additionalFooterEls", "additionalHeaderEls", "overrideEl"]);
+    return /* @__PURE__ */ React.createElement(React.Fragment, null, additionalHeaderEls, overrideEl || /* @__PURE__ */ React.createElement(Comp, __spreadValues({}, rest)), additionalFooterEls);
   }, "PropertiesContainer");
   const allTabs = {
     general: PropertiesContainer(GeneralProperties$1),
@@ -178239,6 +172660,19 @@ ${seqDataToCopy}\r
     if (propertiesList.map((nameOrOverride) => nameOrOverride.name || nameOrOverride).indexOf(tabId) === -1) {
       tabId = propertiesList[0].name || propertiesList[0];
     }
+    const getAnnotationCount = /* @__PURE__ */ __name((name2) => {
+      const annotations = props[name2] || props.sequenceData[name2];
+      let count2;
+      if (Array.isArray(annotations)) {
+        count2 = annotations.length;
+      } else if (annotations && typeof annotations === "object") {
+        count2 = Object.keys(annotations).length;
+      }
+      if (isNumber$2(count2)) {
+        return /* @__PURE__ */ React.createElement(Tag, { className: "tg-smallTag", round: true, style: { marginLeft: 1 } }, count2);
+      }
+      return null;
+    }, "getAnnotationCount");
     const propertiesTabs = flatMap(propertiesList, (nameOrOverride) => {
       if (annotationsToSupport2[nameOrOverride] === false) {
         return [];
@@ -178250,12 +172684,16 @@ ${seqDataToCopy}\r
           return null;
         }
       }
-      const title = (() => {
+      const count2 = getAnnotationCount(name2);
+      let title = (() => {
         if (nameOrOverride.Comp) return name2;
         if (name2 === "orfs") return "ORFs";
         if (name2 === "cutsites") return "Cut Sites";
         return startCase(name2);
       })();
+      if (count2) {
+        title = /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center" } }, title, count2);
+      }
       return /* @__PURE__ */ React.createElement(
         Tab,
         {
@@ -178271,7 +172709,8 @@ ${seqDataToCopy}\r
               showReadOnly,
               showAvailability,
               disableSetReadOnly,
-              selectedAnnotationId
+              selectedAnnotationId,
+              PropertiesProps: props.PropertiesProps
             }), nameOrOverride.name && nameOrOverride))
           )
         }
@@ -178314,11 +172753,7 @@ ${seqDataToCopy}\r
       )
     );
   }, "PropertiesDialog");
-  const Properties = compose$1(
-    connectToEditor(({ propertiesTool: propertiesTool2, annotationsToSupport: annotationsToSupport2 }) => {
-      return { propertiesTool: propertiesTool2, annotationsToSupport: annotationsToSupport2 };
-    })
-  )(PropertiesDialog);
+  const PropertiesDialog$1 = withEditorProps(PropertiesDialog);
   const useLadders = /* @__PURE__ */ __name(() => {
     return useLocalStorageState("tg-additional-ladder", { defaultValue: [] });
   }, "useLadders");
@@ -178950,108 +173385,6 @@ ${seqDataToCopy}\r
     ]
   };
   const DigestTool$1 = withEditorInteractions(DigestTool);
-  const _Mismatches = class _Mismatches extends React.Component {
-    constructor() {
-      super(...arguments);
-      __publicField(this, "getGapMap", /* @__PURE__ */ __name((sequence2) => {
-        const gapMap = [0];
-        sequence2.split("").forEach((char) => {
-          if (char === "-") {
-            gapMap[Math.max(0, gapMap.length - 1)] = (gapMap[Math.max(0, gapMap.length - 1)] || 0) + 1;
-          } else {
-            gapMap.push(gapMap[gapMap.length - 1] || 0);
-          }
-        });
-        return gapMap;
-      }, "getGapMap"));
-      __publicField(this, "getMismatchList", /* @__PURE__ */ __name((alignmentData, mismatches) => {
-        const mismatchList = [];
-        let getGaps = /* @__PURE__ */ __name(() => ({
-          gapsBefore: 0,
-          gapsInside: 0
-        }), "getGaps");
-        const gapMap = this.getGapMap(alignmentData.sequence);
-        getGaps = /* @__PURE__ */ __name((rangeOrCaretPosition) => {
-          if (typeof rangeOrCaretPosition !== "object") {
-            return {
-              gapsBefore: gapMap[Math.min(rangeOrCaretPosition, gapMap.length - 1)]
-            };
-          }
-          const { start: start2, end: end2 } = rangeOrCaretPosition;
-          const toReturn = {
-            gapsBefore: gapMap[start2],
-            gapsInside: gapMap[Math.min(end2, gapMap.length - 1)] - gapMap[Math.min(start2, gapMap.length - 1)]
-          };
-          return toReturn;
-        }, "getGaps");
-        const gapsBeforeSequence = getGaps(0).gapsBefore;
-        for (let mismatchI = 0; mismatchI < mismatches.length; mismatchI++) {
-          const mismatchEnd = mismatches[mismatchI].end;
-          const mismatchStart = mismatches[mismatchI].start;
-          const mismatchDifference = mismatchEnd - mismatchStart;
-          if (mismatchDifference === 0) {
-            mismatchList.push({
-              mismatches: mismatchStart + 1 - gapsBeforeSequence,
-              start: mismatchStart - gapsBeforeSequence,
-              end: mismatchStart - gapsBeforeSequence
-            });
-          } else {
-            for (let innerI = 0; innerI <= mismatchDifference; innerI++) {
-              mismatchList.push({
-                mismatches: mismatchStart + innerI + 1 - gapsBeforeSequence,
-                start: mismatchStart + innerI - gapsBeforeSequence,
-                end: mismatchStart + innerI - gapsBeforeSequence
-              });
-            }
-          }
-        }
-        return mismatchList;
-      }, "getMismatchList"));
-    }
-    UNSAFE_componentWillMount() {
-      const { alignmentData, mismatches } = this.props;
-      const mismatchList = this.getMismatchList(alignmentData, mismatches);
-      const schema2 = {
-        fields: [{ path: "mismatches", type: "number" }]
-      };
-      this.setState({ mismatchList, schema: schema2 });
-    }
-    render() {
-      const { mismatchList, schema: schema2 } = this.state;
-      let tableOfMismatches;
-      if (mismatchList.length === 0) {
-        tableOfMismatches = null;
-      } else {
-        tableOfMismatches = /* @__PURE__ */ React.createElement(
-          WrappedDT,
-          {
-            maxHeight: 168,
-            formName: "mismatchesTable",
-            isSimple: true,
-            compact: true,
-            noRouter: true,
-            schema: schema2,
-            entities: mismatchList
-          }
-        );
-      }
-      return /* @__PURE__ */ React.createElement("div", { style: { maxHeight: 180.8, overflowY: "scroll" } }, /* @__PURE__ */ React.createElement(
-        "div",
-        {
-          style: {
-            // margin: 10,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center"
-          }
-        },
-        /* @__PURE__ */ React.createElement("div", { style: { width: 100, margin: 4 } }, tableOfMismatches)
-      ));
-    }
-  };
-  __name(_Mismatches, "Mismatches");
-  let Mismatches = _Mismatches;
-  const Mismatches$1 = withSelectedEntities("mismatchesTable")(Mismatches);
   function PCRTool(props) {
     const {
       sequenceData: sequenceData2,
@@ -179220,10 +173553,10 @@ ${seqDataToCopy}\r
     digestTool: DigestTool$1,
     pcrTool: PCRTool$1,
     properties: {
-      comp: Properties,
-      panelSpecificPropsToSpread: ["PropertiesProps"]
+      comp: PropertiesDialog$1,
+      panelSpecificProps: ["PropertiesProps"]
     },
-    mismatches: Mismatches$1
+    mismatches: FindMismatches
   };
   const reorder = /* @__PURE__ */ __name((list2, startIndex, endIndex) => {
     const result = Array.from(list2);
@@ -179442,6 +173775,9 @@ ${seqDataToCopy}\r
         hideStatusBar,
         hoveredId,
         isFullscreen,
+        maxInsertSize,
+        getAcceptedInsertChars,
+        showAminoAcidUnitAsCodon,
         maxAnnotationsToDisplay,
         minHeight = 400,
         onlyShowLabelsThatDoNotFit = true,
@@ -179629,6 +173965,9 @@ ${seqDataToCopy}\r
             doubleClickOverrides: this.props.doubleClickOverrides
           }), panelPropsToSpread), {
             editorName,
+            maxInsertSize,
+            getAcceptedInsertChars,
+            showAminoAcidUnitAsCodon,
             isProtein: sequenceData2.isProtein,
             onlyShowLabelsThatDoNotFit,
             tabHeight,
@@ -179982,7 +174321,8 @@ ${seqDataToCopy}\r
           __spreadValues(__spreadProps(__spreadValues({}, pickedUserDefinedHandlersAndOpts), {
             isProtein: sequenceData2.isProtein,
             showCircularity: !!(showCircularity && !sequenceData2.isProtein && !sequenceData2.isOligo && !sequenceData2.isRna),
-            editorName
+            editorName,
+            showAminoAcidUnitAsCodon
           }), StatusBarProps)
         )
       ), /* @__PURE__ */ React.createElement(
@@ -182016,18 +176356,6 @@ ${seqDataToCopy}\r
   window.createVectorEditor = createVectorEditor;
   window.createAlignmentView = createAlignmentView;
   window.createVersionHistoryView = createVersionHistoryView;
-  function getGapMap(sequence2) {
-    const gapMap = [0];
-    sequence2.split("").forEach((char) => {
-      if (char === "-") {
-        gapMap[Math.max(0, gapMap.length - 1)] = (gapMap[Math.max(0, gapMap.length - 1)] || 0) + 1;
-      } else {
-        gapMap.push(gapMap[gapMap.length - 1] || 0);
-      }
-    });
-    return gapMap;
-  }
-  __name(getGapMap, "getGapMap");
   exports2.getGaps = () => ({
     gapsBefore: 0,
     gapsInside: 0
@@ -189919,12 +184247,11 @@ ${seqDataToCopy}\r
   exports2.LinearView = LinearView$1;
   exports2.LinearViewUnconnected = LinearView;
   exports2.PositionAnnotationOnCircle = PositionAnnotationOnCircle;
-  exports2.RowItem = RowItem;
+  exports2.RowItem = RowItem$1;
   exports2.RowView = RowView$1;
   exports2.RowViewUnconnected = RowView;
   exports2.SimpleCircularOrLinearView = SimpleCircularOrLinearView;
   exports2.StatusBar = StatusBar;
-  exports2.StatusBarUnconnected = StatusBar;
   exports2.ToolBar = ToolBar;
   exports2.actions = actions;
   exports2.addAlignment = addAlignment;

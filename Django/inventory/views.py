@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.utils.text import get_valid_filename
 from django.shortcuts import redirect
 
 from .models import Plasmid
@@ -9,8 +10,47 @@ from .models import RestrictionEnzyme
 from .models import Primer
 from .models import Box
 from .models import Location
+from .models import SangerRead
+from .models import SangerReadFile
+from .models import SangerVariant
+from .models import SangerVerificationRun
 from .custom.general import CHECK_STATES
 from .custom.general import LIGATION_STATES
+from .custom.pcr import suggest_pcr_primers
+from .custom.pcr import matching_primer_annotations
+from .custom.pcr import matching_amplicon_annotations
+from .custom.pcr import primer_pair_amplicons
+from .custom.pcr import primer_pair_complementarity
+from .custom.pcr import select_non_overlapping_amplicons
+from .custom.pcr import display_primer_name
+from .custom.pcr import display_primer_id
+from .custom.restriction_digest import DigestConstraints
+from .custom.restriction_digest import DEFAULT_MAX_ENZYMES
+from .custom.restriction_digest import DEFAULT_MAX_FRAGMENTS
+from .custom.restriction_digest import DEFAULT_MIN_BAND_DIFFERENCE_BP
+from .custom.restriction_digest import DEFAULT_MIN_BUFFER_ACTIVITY_PERCENT
+from .custom.restriction_digest import DEFAULT_MIN_FRAGMENT_SIZE_BP
+from .custom.restriction_digest import DEFAULT_MIN_FRAGMENTS
+from .custom.restriction_digest import DEFAULT_RESULT_LIMIT
+from .custom.restriction_digest import enzymes_with_effective_cuts
+from .custom.restriction_digest import normalize_regions
+from .custom.restriction_digest import serialize_digest_response
+from .custom.primer_access import visible_primers_for_user
+from .custom.primer_import import PrimerImportError
+from .custom.primer_import import import_primers_from_fasta
+from .custom.sanger import alignment_tracks_for_ove
+from .custom.sanger import align_read
+from .custom.sanger import classify_run
+from .custom.sanger import clustal_content
+from .custom.sanger import combined_metrics
+from .custom.sanger import display_trim_range
+from .custom.sanger import process_sanger_files
+from .custom.sanger import parse_ab1
+from .custom.sanger import read_is_usable
+from .custom.sanger import read_metrics_tsv
+from .custom.sanger import SangerProcessingParameters
+from .custom.sanger import trim_by_quality
+from .custom.sanger import variants_csv
 from .models import Stats
 from .models import PlasmidType
 from .models import TableFilter
@@ -32,6 +72,7 @@ from organization.views import member_can_write_or_admin_plasmid
 from organization.views import member_can_write_or_admin_gs
 from organization.views import get_show_from_all_projects
 from organization.views import member_can_write_or_admin_primer
+from organization.views import on_project_member_can_any
 
 from .forms import PlasmidValidationForm
 from .forms import PlasmidCreateForm
@@ -51,6 +92,7 @@ from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 from django.urls import reverse
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 
 from Bio import SeqIO
 from Bio import Align
@@ -66,7 +108,10 @@ from pyblast.utils import make_linear, make_circular
 
 from .forms import DigestForm
 from .forms import PCRForm
+from .forms import PrimerBatchUploadForm
+from .forms import ServicesPCRForm
 import json
+from io import StringIO
 from .forms import SangerAlignForm
 from .forms import FastaAlignForm
 from .forms import L0SequenceInput
@@ -79,6 +124,7 @@ from .forms import PlasmidNameInput
 import os
 import tempfile
 import re
+import builtins
 import Bio
 from Bio import AlignIO
 import django
@@ -88,6 +134,8 @@ from os import fdopen, remove
 from django.core.files.base import ContentFile
 from datetime import datetime
 from datetime import date
+from django.utils import timezone
+from contextlib import contextmanager
 from django.http import JsonResponse
 from io import StringIO
 import requests
@@ -95,6 +143,27 @@ from bs4 import BeautifulSoup
 
 import plotly.express as px
 import pandas as pd
+
+
+@contextmanager
+def pyblast_open_compat():
+    original_open = builtins.open
+
+    def open_compat(file, mode='r', *args, **kwargs):
+        if mode == 'rU':
+            mode = 'r'
+        return original_open(file, mode, *args, **kwargs)
+
+    builtins.open = open_compat
+    try:
+        yield
+    finally:
+        builtins.open = original_open
+
+
+def run_pyblast_compat(callback):
+    with pyblast_open_compat():
+        return callback()
 
 
 def get_table_filters(level_from_table_filters, level_to_table_filters):
@@ -1141,10 +1210,20 @@ def plasmid_view_edit(request, plasmid_id):
     else:
         warnings.append('Current user can\'t make modifications')
 
+    sequence = grab_seq(plasmid_to_detail)
+    digest_picker_enzymes = []
+    if sequence[0]:
+        digest_picker_enzymes = enzymes_with_effective_cuts(
+            str(sequence[1]),
+            RestrictionEnzyme.objects.all().order_by('name'),
+            is_circular=True,
+        )
+
     context = {
         'plasmid': plasmid_to_detail,
         'sequence_file_contents': plasmid_sequence_file_contents(plasmid_to_detail),
         'warnings': warnings,
+        'RESTRICTION_ENZYMES': digest_picker_enzymes,
         'user_can_edit_plasmid': member_can_write_or_admin_plasmid(plasmid_to_detail, request.user)
     }
     return render(request, 'inventory/plasmid_view_edit.html', context)
@@ -1155,6 +1234,173 @@ def plasmid_sequence_file_contents(plasmid):
         sequence_file_contents = html.unescape(file.read())
 
     return re.sub(r'[\'"]', '', sequence_file_contents)
+
+
+def plasmid_seqrecord(plasmid):
+    if not plasmid.sequence:
+        return None
+    try:
+        with open(plasmid.sequence.path, "r") as handle:
+            records = list(SeqIO.parse(handle, "genbank"))
+    except Exception:
+        return None
+    return records[0] if records else None
+
+
+@require_member_can_read_project_of_plasmid
+def api_plasmid_primer_matches(request, plasmid_id):
+    try:
+        plasmid_to_match = Plasmid.objects.get(id=plasmid_id)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    sequence = grab_seq(plasmid_to_match)
+    if not sequence[0]:
+        return JsonResponse({
+            'error': sequence[1],
+            'primers': [],
+            'count': 0
+        }, status=400)
+
+    primers = visible_primers_for_user(request.user)
+    annotations = matching_primer_annotations(str(sequence[1]), primers)
+    return JsonResponse({
+        'primers': annotations,
+        'count': len(annotations)
+    })
+
+
+@require_member_can_read_project_of_plasmid
+def api_plasmid_amplicon_matches(request, plasmid_id):
+    try:
+        plasmid_to_match = Plasmid.objects.get(id=plasmid_id)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    sequence = grab_seq(plasmid_to_match)
+    if not sequence[0]:
+        return JsonResponse({
+            'error': sequence[1],
+            'amplicons': [],
+            'count': 0
+        }, status=400)
+
+    try:
+        min_product_size = int(request.GET.get('min_size', 100))
+        max_product_size = int(request.GET.get('max_size', len(str(sequence[1]))))
+        max_tm_difference = float(request.GET.get('max_tm_diff', 5))
+    except ValueError:
+        return JsonResponse({
+            'error': 'Bad amplicon filter limits',
+            'amplicons': [],
+            'count': 0
+        }, status=400)
+
+    primers = visible_primers_for_user(request.user)
+    candidate_annotations = matching_amplicon_annotations(
+        str(sequence[1]),
+        primers,
+        min_product_size=min_product_size,
+        max_product_size=max_product_size,
+        max_tm_difference=max_tm_difference,
+    )
+    non_overlapping = request.GET.get('non_overlapping', 'true').lower() not in ('0', 'false', 'no')
+    annotations = select_non_overlapping_amplicons(
+        candidate_annotations,
+        len(str(sequence[1]))
+    ) if non_overlapping else candidate_annotations
+    return JsonResponse({
+        'amplicons': annotations,
+        'candidates': candidate_annotations,
+        'count': len(annotations),
+        'candidate_count': len(candidate_annotations),
+        'non_overlapping': non_overlapping,
+    })
+
+
+@require_member_can_read_project_of_plasmid
+def api_plasmid_restriction_digests(request, plasmid_id):
+    try:
+        plasmid_to_digest = Plasmid.objects.get(id=plasmid_id)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    sequence = grab_seq(plasmid_to_digest)
+    if not sequence[0]:
+        return JsonResponse({
+            'error': sequence[1],
+            'results': [],
+            'count': 0
+        }, status=400)
+
+    sequence_text = str(sequence[1])
+    try:
+        raw_required_enzymes = []
+        for value in request.GET.getlist('required_enzymes'):
+            raw_required_enzymes.extend(value.split(','))
+        required_enzymes = tuple(dict.fromkeys(
+            enzyme.strip()
+            for enzyme in raw_required_enzymes
+            if enzyme.strip()
+        ))
+        raw_regions = json.loads(request.GET.get('regions', '[]'))
+        zero_based_regions = [
+            {
+                'start': int(region['start']) - 1,
+                'end': int(region['end']) - 1,
+            }
+            for region in raw_regions
+            if str(region.get('start', '')).strip() and str(region.get('end', '')).strip()
+        ]
+        constraints = DigestConstraints(
+            min_fragments=max(1, int(request.GET.get('min_fragments', DEFAULT_MIN_FRAGMENTS))),
+            max_fragments=max(1, int(request.GET.get('max_fragments', DEFAULT_MAX_FRAGMENTS))),
+            min_band_difference_bp=max(0, int(request.GET.get('min_band_difference_bp', DEFAULT_MIN_BAND_DIFFERENCE_BP))),
+            min_fragment_size_bp=max(0, int(request.GET.get('min_fragment_size_bp', DEFAULT_MIN_FRAGMENT_SIZE_BP))),
+            min_buffer_activity_percent=DEFAULT_MIN_BUFFER_ACTIVITY_PERCENT,
+            max_enzymes=max(1, min(2, int(request.GET.get('max_enzymes', DEFAULT_MAX_ENZYMES)))),
+            limit=max(1, min(50, int(request.GET.get('limit', DEFAULT_RESULT_LIMIT)))),
+            required_regions=normalize_regions(zero_based_regions, len(sequence_text)),
+            required_enzymes=required_enzymes,
+        )
+    except (TypeError, ValueError, KeyError, json.JSONDecodeError) as error:
+        return JsonResponse({
+            'error': 'Bad restriction digest parameters: ' + str(error),
+            'results': [],
+            'count': 0
+        }, status=400)
+
+    enzymes = list(RestrictionEnzyme.objects.all())
+    available_enzyme_names = {
+        enzyme.name.lower(): enzyme.name
+        for enzyme in enzymes
+    }
+    unknown_required_enzymes = [
+        enzyme
+        for enzyme in constraints.required_enzymes
+        if enzyme.lower() not in available_enzyme_names
+    ]
+    if unknown_required_enzymes:
+        return JsonResponse({
+            'error': 'Bad restriction digest parameters: required enzyme not available: ' + ', '.join(unknown_required_enzymes),
+            'results': [],
+            'count': 0
+        }, status=400)
+
+    if constraints.max_fragments < constraints.min_fragments:
+        return JsonResponse({
+            'error': 'Bad restriction digest parameters: maximum fragments must be greater than or equal to minimum fragments',
+            'results': [],
+            'count': 0
+        }, status=400)
+
+    response = serialize_digest_response(
+        sequence_text,
+        enzymes,
+        constraints=constraints,
+        is_circular=True,
+    )
+    return JsonResponse(response)
 
 
 @require_member_can_read_project_of_plasmid
@@ -1269,9 +1515,43 @@ def plasmid_pcr(request, plasmid_id):
     sequence = grab_seq(plasmid_to_pcr)
 
     if sequence[0]:
+        if request.method == 'GET' and 'start' in request.GET and 'end' in request.GET:
+            try:
+                selection_start = int(request.GET.get('start'))
+                selection_end = int(request.GET.get('end'))
+                margin = int(request.GET.get('margin', 300))
+                max_tm_difference = float(request.GET.get('max_tm_diff', 5))
+                if margin < 0:
+                    margin = 0
+            except ValueError:
+                context['error'] = "Bad PCR design coordinates"
+                return render(request, 'inventory/plasmid_pcr.html', context)
+
+            primers = visible_primers_for_user(request.user)
+            context['pcr_design'] = {
+                'start': selection_start,
+                'end': selection_end,
+                'start_display': selection_start + 1,
+                'end_display': selection_end + 1,
+                'margin': margin,
+                'max_tm_difference': max_tm_difference,
+                'suggestions': suggest_pcr_primers(
+                    str(sequence[1]),
+                    primers,
+                    selection_start,
+                    selection_end,
+                    margin=margin,
+                    max_tm_difference=max_tm_difference,
+                )
+            }
+            context['pcr_form'] = PCRForm(user=request.user)
+
         if request.method == 'POST':
+            visible_primers = visible_primers_for_user(request.user)
             if request.POST['primer_f'] != "":
-                primer_f = Primer.objects.get(id=request.POST['primer_f'])
+                primer_f = visible_primers.filter(id=request.POST['primer_f']).first()
+                if primer_f is None:
+                    context['error'] = "Forward primer is not available"
             else:
                 if request.POST['primer_f_seq'] != "":
                     primer_f = Primer(
@@ -1285,7 +1565,9 @@ def plasmid_pcr(request, plasmid_id):
                 else:
                     context['error'] = "No forward primer set"
             if request.POST['primer_r'] != "":
-                primer_r = Primer.objects.get(id=request.POST['primer_r'])
+                primer_r = visible_primers.filter(id=request.POST['primer_r']).first()
+                if primer_r is None:
+                    context['error'] = "Reverse primer is not available"
             else:
                 if request.POST['primer_r_seq'] != "":
                     primer_r = Primer(
@@ -1322,8 +1604,8 @@ def plasmid_pcr(request, plasmid_id):
                 else:
                     context['error'] = "FWD primer does not hit template"
             context['show_new_PCR'] = True
-        else:
-            context['pcr_form'] = PCRForm()
+        elif 'pcr_form' not in context:
+            context['pcr_form'] = PCRForm(user=request.user)
 
     else:
         context['error'] = sequence[1]
@@ -1333,13 +1615,11 @@ def plasmid_pcr(request, plasmid_id):
 
 def plasmid_save_clustal(plasmid, records):
     try:
-        file_name = "uploads/sequencing_clustal/" + plasmid.name + ".clustal"
-        with open(file_name, "w") as output_handle:
-            align = Bio.Align.MultipleSeqAlignment(records)
-            AlignIO.write(align, output_handle, "clustal")
-
-        plasmid.sequencing_clustal_file = file_name
-        plasmid.save()
+        file_name = os.path.join("uploads", "sequencing_clustal", plasmid.name + ".clustal")
+        output_handle = StringIO()
+        align = Bio.Align.MultipleSeqAlignment(records)
+        AlignIO.write(align, output_handle, "clustal")
+        plasmid.sequencing_clustal_file.save(file_name, ContentFile(output_handle.getvalue()), save=True)
         return True, 'Save clustal file done'
     except Exception as e:
         return False, e.__str__()
@@ -1362,6 +1642,574 @@ def get_optimal_alignment(ref_seq, query_seq, is_reversed=False):
     except Exception as e:
         return False, e.__str__()
 
+
+def is_fasta_alignment_file(filename):
+    return filename.lower().endswith((".fa", ".fas", ".fasta"))
+
+
+def fasta_records_from_text(text):
+    sequence_text = str(text or '').strip()
+    if not sequence_text:
+        return []
+    fasta_text = sequence_text if ">" in sequence_text else f">Query\n{sequence_text}\n"
+    fasta_text = "\n".join(
+        line for line in fasta_text.splitlines()
+        if line.strip() and not line.lstrip().startswith((";", "#", "!"))
+    )
+    fasta_io = StringIO(fasta_text)
+    try:
+        return list(SeqIO.parse(fasta_io, "fasta"))
+    except ValueError:
+        return []
+    finally:
+        fasta_io.close()
+
+
+def render_uploaded_fasta_alignment(request, plasmid_to_align, upload_files, form, context):
+    records = []
+    for uploaded_file in upload_files:
+        try:
+            fasta_text = uploaded_file.read().decode("utf-8-sig")
+        except UnicodeDecodeError:
+            context['error'] = "{} is not valid UTF-8 text".format(uploaded_file.name)
+            return render(request, 'inventory/plasmid_align_sanger.html', context)
+        records.extend(fasta_records_from_text(fasta_text))
+    if not records:
+        context['error'] = "Input sequence not in FASTA format"
+        return render(request, 'inventory/plasmid_align_sanger.html', context)
+    plasmid_seq = grab_seq(plasmid_to_align)[1]
+    fasta_result = fasta_alignment_result(str(plasmid_seq), records)
+    if not any(read.get("is_usable") for read in fasta_result["reads"]):
+        context['error'] = "No FASTA sequences aligned"
+        return render(request, 'inventory/plasmid_align_sanger.html', context)
+
+    fasta_result["reference_record"] = plasmid_seqrecord(plasmid_to_align)
+    context['sanger_result'] = fasta_result
+    context['sanger_browser_data'] = json.dumps(sanger_browser_data(str(plasmid_seq), fasta_result, plasmid_to_align.name))
+    context['align_data'] = alignment_tracks_for_ove(plasmid_to_align.name, str(plasmid_seq), fasta_result["reads"])
+    context['plasmid_sequence_file_contents'] = plasmid_sequence_file_contents(plasmid_to_align)
+    context['alignment_source_type'] = "FASTA"
+    context['fasta_view_mode'] = form.cleaned_data.get("alignment_view_mode", "combined")
+    context['fasta_clustal_content'] = clustal_content(plasmid_to_align.name, str(plasmid_seq), fasta_result["reads"])
+    context['fasta_clustal_filename'] = get_valid_filename("{}-fasta-alignment.clustal".format(plasmid_to_align.name))
+    context['show_results'] = True
+    return render(request, 'inventory/plasmid_align_sanger.html', context)
+
+
+def fasta_alignment_result(reference_sequence, records):
+    params = SangerProcessingParameters()
+    if isinstance(records, SeqRecord):
+        records = [records]
+    reads = []
+    for index, record in enumerate(records or [], start=1):
+        read_sequence = str(record.seq).upper()
+        qualities = [40] * len(read_sequence)
+        alignment = align_read(
+            reference_sequence,
+            read_sequence,
+            qualities,
+            0,
+            params,
+            len(read_sequence),
+        )
+        record_name = record.id or record.name or "FASTA {}".format(index)
+        reads.append({
+            "name": record_name,
+            "files": [],
+            "formats": ["FASTA"],
+            "parsed_sources": [],
+            "selected_source": "fasta",
+            "raw_sequence": read_sequence,
+            "trimmed_sequence": read_sequence,
+            "trim_start": 0,
+            "trim_end": len(read_sequence),
+            "quality_metrics": {
+                "raw_length": len(read_sequence),
+                "trimmed_length": len(read_sequence),
+                "quality_available": False,
+                "mean_quality": None,
+                "alignment_blocks": [],
+                "low_confidence_regions": [],
+                "intermediate_confidence_regions": [],
+            },
+            "alignment": alignment,
+            "warnings": [],
+            "errors": [],
+            "is_usable": bool(alignment),
+            "unusable_reason": "" if alignment else "FASTA sequence did not align",
+            "chromatogram": {},
+        })
+    combined = combined_metrics(reference_sequence, reads, params)
+    classification = classify_run(combined, reads, params)
+    if classification.get("reasons") == ["The high-quality Sanger-aligned region is consistent with the expected plasmid sequence"]:
+        classification["reasons"] = ["The aligned FASTA sequence(s) are consistent with the expected plasmid sequence"]
+    return {
+        "parameters": params.as_dict(),
+        "uploaded_files": [],
+        "reads": reads,
+        "combined": combined,
+        "classification": classification,
+    }
+
+
+SANGER_FEATURE_TYPE_COLORS = {
+    "cds": "#2fb344",
+    "promoter": "#f0b429",
+    "terminator": "#d94841",
+    "restriction_site": "#8f63d9",
+    "cut_site": "#8f63d9",
+    "recombination_site": "#e66fb2",
+    "primer_bind": "#2f9ed8",
+    "rep_origin": "#20a39e",
+    "origin_of_replication": "#20a39e",
+}
+
+
+def sanger_feature_role(feature_type, label):
+    normalized_type = (feature_type or "").strip().lower()
+    normalized_label = (label or "").strip().lower()
+    enzyme_label = re.sub(r"[-_ ]?hf$", "", (label or "").strip(), flags=re.IGNORECASE)
+    if normalized_type == "cds":
+        return "cds"
+    if "promoter" in normalized_type or "promoter" in normalized_label or normalized_label.startswith(("p_", "p-")):
+        return "promoter"
+    if "terminator" in normalized_type or "terminator" in normalized_label or normalized_label.startswith(("t_", "t-")):
+        return "terminator"
+    if (
+        normalized_type in ("restriction_site", "cut_site")
+        or "restriction" in normalized_type
+        or "cut site" in normalized_label
+        or enzyme_label in rest_dict
+    ):
+        return "restriction_site"
+    if (
+        normalized_type in ("recombination_site", "misc_recomb")
+        or "recombination" in normalized_type
+        or "recombination" in normalized_label
+        or re.search(r"\bhr\d*[-_ ]?chr\d+\b", normalized_label)
+        or normalized_label.startswith(("attb", "attp", "attl", "attr"))
+        or normalized_label in ("loxp", "frt")
+    ):
+        return "recombination_site"
+    if normalized_type in ("primer_bind", "primer") or "primer" in normalized_label:
+        return "primer_bind"
+    if normalized_type in ("rep_origin", "origin_of_replication", "ori") or normalized_label in ("ori", "origin") or "origin of replication" in normalized_label:
+        return "rep_origin"
+    return normalized_type
+
+
+def sanger_feature_color(feature_type, label, qualifiers):
+    role = sanger_feature_role(feature_type, label)
+    if role in SANGER_FEATURE_TYPE_COLORS:
+        return SANGER_FEATURE_TYPE_COLORS[role]
+    explicit_color = (
+        qualifiers.get("ApEinfo_fwdcolor", [""])[0]
+        or qualifiers.get("ApEinfo_revcolor", [""])[0]
+        or qualifiers.get("color", [""])[0]
+    )
+    return explicit_color or "#7fb3ff"
+
+
+def sanger_browser_data(reference_sequence, service_result, reference_name="Reference"):
+    def feature_rows():
+        features = []
+        record = service_result.get("reference_record")
+        if not record:
+            return features
+        for index, feature in enumerate(getattr(record, "features", []) or []):
+            if feature.type == "source":
+                continue
+            parts = list(feature.location.parts) if isinstance(feature.location, CompoundLocation) else [feature.location]
+            label = (
+                feature.qualifiers.get("label", [""])[0]
+                or feature.qualifiers.get("gene", [""])[0]
+                or feature.qualifiers.get("product", [""])[0]
+                or feature.type
+            )
+            role = sanger_feature_role(feature.type, label)
+            color = sanger_feature_color(feature.type, label, feature.qualifiers)
+            strand = feature.location.strand or 0
+            for part in parts:
+                start = int(part.start) % len(reference_sequence) if reference_sequence else 0
+                end = (int(part.end) - 1) % len(reference_sequence) if reference_sequence else 0
+                features.append({
+                    "id": "{}-{}-{}".format(index, start, end),
+                    "name": label,
+                    "type": feature.type,
+                    "role": role,
+                    "start": start,
+                    "end": end,
+                    "strand": strand,
+                    "color": color,
+                    "crosses_origin": int(part.end) > len(reference_sequence) or start > end,
+                })
+        return features
+
+    def trace_reference_points(chromatogram, projection_base_indices):
+        base_positions = chromatogram.get("basePos") or []
+        qualities = chromatogram.get("qualNums") or []
+        points = []
+        for coord, base_index in enumerate(projection_base_indices or []):
+            if base_index is None:
+                continue
+            if 0 <= int(base_index) < len(base_positions):
+                quality = qualities[int(base_index)] if int(base_index) < len(qualities) else None
+                points.append({
+                    "coordinate": coord,
+                    "baseIndex": int(base_index),
+                    "tracePos": base_positions[int(base_index)],
+                    "quality": quality,
+                })
+        return points
+
+    def trace_max_signal(chromatogram):
+        values = []
+        for key in ("aTrace", "cTrace", "gTrace", "tTrace"):
+            values.extend(chromatogram.get(key) or [])
+        return max(values) if values else 0
+
+    def fallback_projection_base_indices(read, alignment):
+        projection = alignment.get("reference_projection", "")
+        if not projection or not reference_sequence:
+            return []
+        existing = alignment.get("reference_projection_base_indices")
+        if existing and len(existing) == len(reference_sequence):
+            return existing
+
+        quality = read.get("quality_metrics") or {}
+        trim_start = int(quality.get("trim_start") or 0)
+        trim_end = int(quality.get("trim_end") or (trim_start + len(read.get("trimmed_sequence", ""))))
+        chromatogram = read.get("chromatogram") or {}
+        qualities = chromatogram.get("qualNums") or []
+        if read.get("trimmed_sequence") and qualities:
+            recalculated = align_read(
+                reference_sequence,
+                read.get("trimmed_sequence", ""),
+                qualities,
+                trim_start,
+                SangerProcessingParameters(),
+                trim_end,
+            )
+            if recalculated and recalculated.get("reference_projection_base_indices"):
+                alignment.update({
+                    "reference_projection": recalculated.get("reference_projection", projection),
+                    "reference_projection_base_indices": recalculated.get("reference_projection_base_indices", []),
+                    "query_start": recalculated.get("query_start"),
+                    "query_end": recalculated.get("query_end"),
+                    "best_orientation": recalculated.get("best_orientation"),
+                })
+                return recalculated["reference_projection_base_indices"]
+        start = int(alignment.get("start") or 0)
+        end = int(alignment.get("end") or 0)
+        orientation = alignment.get("best_orientation") or alignment.get("orientation") or "forward"
+        indices = [None] * len(reference_sequence)
+        coords = []
+        coord = start
+        while True:
+            coords.append(coord)
+            if coord == end:
+                break
+            coord = (coord + 1) % len(reference_sequence)
+            if len(coords) > len(reference_sequence):
+                break
+        query_index = 0
+        for coord in coords:
+            if coord >= len(projection) or projection[coord] == "-":
+                continue
+            indices[coord] = trim_end - 1 - query_index if orientation == "reverse" else trim_start + query_index
+            query_index += 1
+        return indices
+
+    reads = []
+    for read in service_result.get("reads", []):
+        alignment = read.get("alignment") or {}
+        display_alignment = read.get("display_alignment") or alignment
+        if not read.get("is_usable") or not display_alignment:
+            continue
+        projection_base_indices = fallback_projection_base_indices(read, display_alignment)
+        reads.append({
+            "name": read["name"],
+            "orientation": display_alignment.get("orientation", "unmapped"),
+            "start": display_alignment.get("start", 0),
+            "end": display_alignment.get("end", 0),
+            "segments": display_alignment.get("segments", []),
+            "crosses_origin": display_alignment.get("crosses_origin", False),
+            "identity": alignment.get("identity", display_alignment.get("identity", 0)),
+            "projection": display_alignment.get("reference_projection", ""),
+            "projectionBaseIndices": projection_base_indices,
+            "chromatogram": read.get("chromatogram") or {},
+            "confidenceRegions": (read.get("quality_metrics") or {}).get("low_confidence_regions", []),
+            "intermediateConfidenceRegions": (read.get("quality_metrics") or {}).get("intermediate_confidence_regions", []),
+            "acceptedBlocks": (read.get("quality_metrics") or {}).get("alignment_blocks", []),
+            "traceReferencePoints": trace_reference_points(read.get("chromatogram") or {}, projection_base_indices),
+            "traceMaxSignal": trace_max_signal(read.get("chromatogram") or {}),
+            "variants": [
+                {
+                    "coordinate": variant.get("coordinate", 0),
+                    "type": variant.get("type", ""),
+                    "expected": variant.get("expected", ""),
+                    "observed": variant.get("observed", ""),
+                    "quality": variant.get("quality"),
+                    "low_quality": variant.get("low_quality", False),
+                    "base_index": variant.get("base_index"),
+                }
+                for variant in display_alignment.get("variants", [])
+            ],
+        })
+    return {
+        "referenceName": reference_name,
+        "referenceSequence": reference_sequence,
+        "referenceLength": len(reference_sequence),
+        "displayOrigin": reads[0]["start"] if reads else 0,
+        "features": feature_rows(),
+        "depth": service_result.get("combined", {}).get("depth", []),
+        "reads": reads,
+        "uncoveredRegions": service_result.get("combined", {}).get("uncovered_regions", []),
+    }
+
+
+def chromatogram_for_saved_read(read):
+    stored = read.parsing_result.get("chromatogram", {})
+    if read.selected_source != "ab1":
+        return stored
+    ab1_file = next((file_obj for file_obj in read.files.all() if file_obj.format == "ab1" and file_obj.file), None)
+    if not ab1_file:
+        return stored
+    try:
+        with ab1_file.file.open("rb") as handle:
+            parsed = parse_ab1(handle.read())
+    except Exception:
+        return stored
+    return parsed.chromatogram or stored
+
+
+def recalculated_saved_sanger_read(read, reference_sequence, params=None):
+    params = params or SangerProcessingParameters()
+    chromatogram = chromatogram_for_saved_read(read)
+    raw_sequence = read.raw_sequence or "".join(chromatogram.get("baseCalls") or [])
+    qualities = chromatogram.get("qualNums") or []
+    if not raw_sequence or not qualities:
+        return None
+    try:
+        trimmed, trim_start, trim_end, quality_metrics = trim_by_quality(raw_sequence, qualities, params, chromatogram)
+        usable, unusable_reason = read_is_usable(trimmed, quality_metrics, read.parsing_result.get("errors", []), params)
+        alignment = align_read(
+            reference_sequence,
+            trimmed,
+            qualities,
+            trim_start,
+            params,
+            trim_end,
+            trusted_blocks=quality_metrics.get("alignment_blocks"),
+            forced_orientation=read.detected_orientation if read.detected_orientation in ("forward", "reverse") else None,
+        ) if usable else None
+    except Exception:
+        return None
+    display_alignment = None
+    if alignment:
+        display_start, display_end = display_trim_range(len(raw_sequence), quality_metrics)
+        display_sequence = raw_sequence[display_start:display_end]
+        if display_sequence:
+            display_alignment = align_read(
+                reference_sequence,
+                display_sequence,
+                qualities,
+                display_start,
+                params,
+                display_end,
+                forced_orientation=alignment.get("best_orientation") or alignment.get("orientation"),
+            )
+    warnings = list(read.warnings or [])
+    if unusable_reason and unusable_reason not in warnings:
+        warnings.append(unusable_reason)
+    return {
+        "id": str(read.id),
+        "name": read.name,
+        "formats": read.parsing_result.get("formats", []),
+        "selected_source": read.selected_source,
+        "raw_sequence": raw_sequence,
+        "trimmed_sequence": trimmed,
+        "quality_metrics": quality_metrics,
+        "alignment": alignment or {},
+        "display_alignment": display_alignment,
+        "warnings": warnings,
+        "errors": read.parsing_result.get("errors", []),
+        "is_usable": usable and bool(alignment),
+        "chromatogram": chromatogram,
+    }
+
+
+def sanger_result_from_run(run):
+    reference_sequence = str(grab_seq(run.plasmid)[1])
+    params = SangerProcessingParameters()
+
+    variants = []
+    variants_by_read = {}
+    for variant in run.variants.select_related("read"):
+        row = {
+            "read": variant.read.name if variant.read else "",
+            "coordinate": variant.coordinate,
+            "type": variant.variant_type,
+            "expected": variant.expected_base,
+            "observed": variant.observed_base,
+            "quality": variant.quality,
+            "low_quality": "low_quality" in variant.flags,
+            "base_index": (variant.evidence or {}).get("base_index"),
+        }
+        variants.append(row)
+        if variant.read_id:
+            variants_by_read.setdefault(variant.read_id, []).append(row)
+
+    reads = []
+    for read in run.reads.prefetch_related("files").all():
+        chromatogram = chromatogram_for_saved_read(read)
+        recalculated_read = recalculated_saved_sanger_read(read, reference_sequence, params)
+        if recalculated_read:
+            reads.append(recalculated_read)
+            continue
+        alignment = read.alignment_metrics.copy() if read.alignment_metrics else {}
+        saved_variants = variants_by_read.get(read.id, [])
+        alignment_variant_base_indices = {}
+        for variant in alignment.get("variants", []):
+            key = (
+                variant.get("coordinate"),
+                variant.get("type"),
+                variant.get("observed", ""),
+                variant.get("expected", ""),
+            )
+            if variant.get("base_index") is not None:
+                alignment_variant_base_indices[key] = variant.get("base_index")
+        for variant in saved_variants:
+            if variant.get("base_index") is not None:
+                continue
+            key = (
+                variant.get("coordinate"),
+                variant.get("type"),
+                variant.get("observed", ""),
+                variant.get("expected", ""),
+            )
+            if key in alignment_variant_base_indices:
+                variant["base_index"] = alignment_variant_base_indices[key]
+        alignment["variants"] = saved_variants
+        reads.append({
+            "id": str(read.id),
+            "name": read.name,
+            "formats": read.parsing_result.get("formats", []),
+            "selected_source": read.selected_source,
+            "raw_sequence": read.raw_sequence,
+            "trimmed_sequence": read.trimmed_sequence,
+            "quality_metrics": read.quality_metrics,
+            "alignment": alignment,
+            "warnings": read.warnings,
+            "errors": read.parsing_result.get("errors", []),
+            "is_usable": read.is_usable,
+            "chromatogram": chromatogram,
+        })
+
+    if any(read.get("alignment") for read in reads):
+        combined = combined_metrics(reference_sequence, reads, params)
+        variants = combined.get("variants", variants)
+    else:
+        combined = run.combined_metrics.copy() if run.combined_metrics else {}
+        combined["variants"] = variants
+    labels = {
+        "PASS": "Verifica",
+        "REVIEW": "Requiere revisión",
+        "FAIL": "No verifica",
+        "NO_DATA": "Sin datos utilizables",
+    }
+    return {
+        "parameters": run.parameters,
+        "reads": reads,
+        "combined": combined,
+        "classification": {
+            "state": run.automated_state,
+            "label": labels.get(run.automated_state, run.automated_state),
+            "reasons": run.automated_reasons,
+        },
+    }
+
+
+def persist_sanger_verification(plasmid, user, service_result, label="", notes="", save_clustal=False):
+    run = SangerVerificationRun.objects.create(
+        plasmid=plasmid,
+        created_by=user,
+        label=label or "",
+        notes=notes or "",
+        parameters=service_result["parameters"],
+        automated_state=service_result["classification"]["state"],
+        automated_reasons=service_result["classification"]["reasons"],
+        combined_metrics={key: value for key, value in service_result["combined"].items() if key != "variants"},
+    )
+    saved_reads = {}
+    for read_data in service_result["reads"]:
+        alignment = read_data.get("alignment") or {}
+        read = SangerRead.objects.create(
+            run=run,
+            name=read_data["name"],
+            detected_orientation=alignment.get("orientation", "unmapped"),
+            raw_sequence=read_data.get("raw_sequence", ""),
+            trimmed_sequence=read_data.get("trimmed_sequence", ""),
+            selected_source=read_data.get("selected_source", ""),
+            parsing_result={
+                "formats": read_data.get("formats", []),
+                "errors": read_data.get("errors", []),
+                "unusable_reason": read_data.get("unusable_reason", ""),
+                "chromatogram": read_data.get("chromatogram", {}),
+            },
+            quality_metrics=read_data.get("quality_metrics", {}),
+            alignment_metrics={key: value for key, value in alignment.items() if key not in ("covered_positions", "variants", "ref_alignment", "read_alignment", "oriented_sequence")},
+            warnings=read_data.get("warnings", []),
+            is_usable=read_data.get("is_usable", False),
+        )
+        saved_reads[read_data["name"]] = read
+        for uploaded in read_data.get("files", []):
+            read_file = SangerReadFile.objects.create(
+                read=read,
+                format=uploaded.format,
+                original_name=uploaded.original_name,
+                sha256=uploaded.sha256,
+                size=uploaded.size,
+                metadata={},
+            )
+            read_file.file.save(uploaded.original_name, ContentFile(uploaded.data), save=True)
+
+    for variant in service_result["combined"].get("variants", []):
+        read = saved_reads.get(variant.get("read"))
+        SangerVariant.objects.create(
+            run=run,
+            read=read,
+            coordinate=variant.get("coordinate", 0),
+            variant_type=variant.get("type", ""),
+            expected_base=variant.get("expected", ""),
+            observed_base=variant.get("observed", ""),
+            quality=variant.get("quality"),
+            evidence={"read": variant.get("read", ""), "base_index": variant.get("base_index")},
+            flags=["low_quality"] if variant.get("low_quality") else [],
+        )
+
+    if save_clustal:
+        file_text = clustal_content(plasmid.name, grab_seq(plasmid)[1], service_result["reads"])
+        file_name = "{}-{}-sanger.clustal".format(plasmid.name, run.id)
+        run.clustal_file.save(file_name, ContentFile(file_text), save=True)
+        plasmid.sequencing_clustal_file = run.clustal_file.name
+        plasmid.save()
+    return run
+
+
+def delete_sanger_run_files(run):
+    plasmid = run.plasmid
+    clustal_name = run.clustal_file.name if run.clustal_file else ""
+    if clustal_name:
+        run.clustal_file.storage.delete(clustal_name)
+        if plasmid.sequencing_clustal_file and plasmid.sequencing_clustal_file.name == clustal_name:
+            plasmid.sequencing_clustal_file = None
+            plasmid.save()
+    for read_file in SangerReadFile.objects.filter(read__run=run):
+        if read_file.file:
+            read_file.file.storage.delete(read_file.file.name)
+
+
 @require_member_can_read_project_of_plasmid
 def plasmid_align_fasta(request, plasmid_id):
     try:
@@ -1371,63 +2219,57 @@ def plasmid_align_fasta(request, plasmid_id):
 
     context = {
         'plasmid': plasmid_to_align,
-        'user_can_edit_plasmid': member_can_write_or_admin_plasmid(plasmid_to_align, request.user)
+        'user_can_edit_plasmid': member_can_write_or_admin_plasmid(plasmid_to_align, request.user),
+        'alignment_source_type': "FASTA",
     }
 
     if request.method == 'POST':
         form = FastaAlignForm(request.POST, request.FILES)
         if form.is_valid():
+            context['fasta_view_mode'] = form.cleaned_data.get("alignment_view_mode", "combined")
+            records = []
+            saw_input = False
             if request.POST.get('fasta_sequence'):
-                fasta_io = StringIO(request.POST.get('fasta_sequence'))
-                try:
-                    record = list(SeqIO.parse(fasta_io, "fasta"))[0]
-                except IndexError:
-                    record = None
-                    context['error'] = 'Input sequence not in FASTA format'
-                fasta_io.close()
-            else:
-                if request.FILES["fasta_file"]:
-                    fasta_file = request.FILES["fasta_file"]
-                    f = tempfile.NamedTemporaryFile(delete=False)
-                    for chunk in fasta_file.chunks():
-                        f.write(chunk)
-                    f.close()
-                    record = SeqIO.read(f.name, "fasta")
-                else:
-                    context['error'] = 'No input sequence'
+                saw_input = True
+                records.extend(fasta_records_from_text(request.POST.get('fasta_sequence')))
 
-            if record:
+            if request.FILES.getlist("fasta_file"):
+                saw_input = True
+                for fasta_file in request.FILES.getlist("fasta_file"):
+                    try:
+                        fasta_text = b"".join(fasta_file.chunks()).decode("utf-8-sig")
+                    except UnicodeDecodeError:
+                        context['error'] = '{} is not valid UTF-8 text'.format(fasta_file.name)
+                        break
+                    records.extend(fasta_records_from_text(fasta_text))
+
+            if not records and not context.get('error'):
+                context['error'] = 'Input sequence not in FASTA format' if saw_input else 'No input sequence'
+
+            if records:
                 plasmid_seq = grab_seq(plasmid_to_align)[1]
+                fasta_result = fasta_alignment_result(str(plasmid_seq), records)
 
-                alignment_result, optimal_alignment = get_optimal_alignment(plasmid_seq, record.seq, is_reversed=request.POST.get('is_reversed'))
-
-                if alignment_result:
-                    context['align_data'] = json.dumps([
-                        [plasmid_to_align.name, record.id],
-                        [str(plasmid_seq), str(record.seq)],
-                        [optimal_alignment[0], optimal_alignment[1]]
-                    ])
-
-                    if request.POST.get('save_clustal_file'):
-                        result, output_text = plasmid_save_clustal(plasmid_to_align, [
-                            SeqRecord(optimal_alignment[0], id=plasmid_to_align.name),
-                            SeqRecord(optimal_alignment[1], id=record.id)
-                        ])
-                        if result:
-                            context['save_clustal_done'] = output_text
-                        else:
-                            context['output_text'] = output_text
+                if any(read.get("is_usable") for read in fasta_result["reads"]):
+                    fasta_result["reference_record"] = plasmid_seqrecord(plasmid_to_align)
+                    context['sanger_result'] = fasta_result
+                    context['sanger_browser_data'] = json.dumps(sanger_browser_data(str(plasmid_seq), fasta_result, plasmid_to_align.name))
+                    context['align_data'] = alignment_tracks_for_ove(plasmid_to_align.name, str(plasmid_seq), fasta_result["reads"])
+                    context['alignment_source_type'] = "FASTA"
+                    context['fasta_clustal_content'] = clustal_content(plasmid_to_align.name, str(plasmid_seq), fasta_result["reads"])
+                    context['fasta_clustal_filename'] = get_valid_filename("{}-fasta-alignment.clustal".format(plasmid_to_align.name))
+                    context['show_results'] = True
 
                     context['plasmid_sequence_file_contents'] = plasmid_sequence_file_contents(plasmid_to_align)
                 else:
-                    context['error'] = optimal_alignment
+                    context['error'] = "No FASTA sequences aligned"
             else:
-                if not context['error']:
+                if not context.get('error'):
                     context['error'] = 'Error while parsing input sequence'
     else:
         context['upload_form'] = FastaAlignForm()
         context['show_upload_form'] = True
-    return render(request, 'inventory/plasmid_align_fasta.html', context)
+    return render(request, 'inventory/plasmid_align_sanger.html', context)
 
 
 @require_member_can_read_project_of_plasmid
@@ -1439,60 +2281,247 @@ def plasmid_align_sanger(request, plasmid_id):
 
     context = {
         'plasmid': plasmid_to_align,
-        'user_can_edit_plasmid': member_can_write_or_admin_plasmid(plasmid_to_align, request.user)
+        'user_can_edit_plasmid': member_can_write_or_admin_plasmid(plasmid_to_align, request.user),
+        'recent_runs': plasmid_to_align.sanger_verification_runs.all()[:10],
     }
 
     if request.method == 'POST':
         form = SangerAlignForm(request.POST, request.FILES)
         if form.is_valid():
-            ab1_chromatos = []
-            ab1_chromatos.append({})  # no chromato data for template
-
-            ab1_file = request.FILES["ab1"]
-            f = tempfile.NamedTemporaryFile(delete=False)
-            for chunk in ab1_file.chunks():
-                f.write(chunk)
-            f.close()
-            record = SeqIO.read(f.name, "abi")
-
-            plasmid_seq = grab_seq(plasmid_to_align)[1]
-            ab1_chromatos.append({
-                'aTrace': record.annotations['abif_raw']['DATA9'],
-                'tTrace': record.annotations['abif_raw']['DATA10'],
-                'gTrace': record.annotations['abif_raw']['DATA11'],
-                'cTrace': record.annotations['abif_raw']['DATA12'],
-                'basePos': record.annotations['abif_raw']['PLOC2'],
-                'baseCalls': list(record.annotations['abif_raw']['PBAS2'].decode()),
-                'qualNums': []
-            })
-
-            alignment_result, optimal_alignment = get_optimal_alignment(plasmid_seq, record.seq, is_reversed=request.POST.get('is_reversed'))
-
-            if alignment_result:
-                context['align_data'] = json.dumps([
-                    [plasmid_to_align.name, ab1_file.name],
-                    [str(plasmid_seq), str(record.seq)],
-                    [optimal_alignment[0], optimal_alignment[1]],
-                    ab1_chromatos
-                ])
-
-                if request.POST.get('save_clustal_file'):
-                    result, output_text = plasmid_save_clustal(plasmid_to_align, [
-                        SeqRecord(optimal_alignment[0], id=plasmid_to_align.name),
-                        SeqRecord(optimal_alignment[1], id=record.id)
-                    ])
-                    if result:
-                        context['save_clustal_done'] = output_text
-                    else:
-                        context['output_text'] = output_text
-
+            upload_files = request.FILES.getlist("sanger_files")
+            legacy_ab1 = request.FILES.get("ab1")
+            if legacy_ab1 and legacy_ab1 not in upload_files:
+                upload_files.append(legacy_ab1)
+            fasta_files = [uploaded for uploaded in upload_files if is_fasta_alignment_file(uploaded.name)]
+            if fasta_files:
+                if len(fasta_files) != len(upload_files):
+                    context['error'] = "Do not mix FASTA files with Sanger trace files in the same alignment batch."
+                    context['upload_form'] = form
+                    context['show_upload_form'] = True
+                    return render(request, 'inventory/plasmid_align_sanger.html', context)
+                return render_uploaded_fasta_alignment(request, plasmid_to_align, upload_files, form, context)
+            try:
+                plasmid_seq = str(grab_seq(plasmid_to_align)[1])
+                sanger_result = process_sanger_files(upload_files, plasmid_seq)
+                sanger_result["reference_record"] = plasmid_seqrecord(plasmid_to_align)
+                run = persist_sanger_verification(
+                    plasmid_to_align,
+                    request.user,
+                    sanger_result,
+                    label=form.cleaned_data.get("label", ""),
+                    notes=form.cleaned_data.get("notes", ""),
+                    save_clustal=form.cleaned_data.get("save_clustal_file", False),
+                )
+                context['run'] = run
+                context['sanger_result'] = sanger_result
+                context['align_data'] = alignment_tracks_for_ove(plasmid_to_align.name, plasmid_seq, sanger_result["reads"])
+                context['sanger_browser_data'] = json.dumps(sanger_browser_data(plasmid_seq, sanger_result, plasmid_to_align.name))
                 context['plasmid_sequence_file_contents'] = plasmid_sequence_file_contents(plasmid_to_align)
-            else:
-                context['error'] = optimal_alignment
+                context['show_results'] = True
+                context['recent_runs'] = plasmid_to_align.sanger_verification_runs.exclude(id=run.id)[:10]
+                if form.cleaned_data.get("save_clustal_file"):
+                    context['save_clustal_done'] = "Saved Sanger Clustal file for this verification run"
+            except Exception as exc:
+                context['error'] = "Sanger verification failed: {}".format(exc)
+        else:
+            context['upload_form'] = form
+            context['show_upload_form'] = True
     else:
         context['upload_form'] = SangerAlignForm()
         context['show_upload_form'] = True
     return render(request, 'inventory/plasmid_align_sanger.html', context)
+
+
+def redirect_to_sanger_verification(request, plasmid_to_align):
+    if not on_project_member_can_any(plasmid_to_align.project, request.user):
+        return render(request, 'common/no_permission_to_edit.html')
+
+    runs = plasmid_to_align.sanger_verification_runs.all()
+    run = runs.filter(manual_decision="VERIFIED").first() or runs.first()
+    if run:
+        return redirect("sanger_run_detail", plasmid_id=plasmid_to_align.id, run_id=run.id)
+    return redirect("plasmid_align_sanger", plasmid_id=plasmid_to_align.id)
+
+
+def plasmid_seq_verification_entry(request, weaver_id):
+    try:
+        plasmid_to_align = Plasmid.objects.get(idx=weaver_id)
+    except ObjectDoesNotExist:
+        raise Http404
+    return redirect_to_sanger_verification(request, plasmid_to_align)
+
+
+def plasmid_seq_verification_entry_by_uuid(request, plasmid_id):
+    try:
+        plasmid_to_align = Plasmid.objects.get(id=plasmid_id)
+    except ObjectDoesNotExist:
+        raise Http404
+    return redirect_to_sanger_verification(request, plasmid_to_align)
+
+
+@require_member_can_read_project_of_plasmid
+def sanger_run_detail(request, plasmid_id, run_id):
+    try:
+        plasmid_to_align = Plasmid.objects.get(id=plasmid_id)
+        run = SangerVerificationRun.objects.get(id=run_id, plasmid=plasmid_to_align)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    plasmid_seq = str(grab_seq(plasmid_to_align)[1])
+    sanger_result = sanger_result_from_run(run)
+    sanger_result["reference_record"] = plasmid_seqrecord(plasmid_to_align)
+    context = {
+        'plasmid': plasmid_to_align,
+        'user_can_edit_plasmid': member_can_write_or_admin_plasmid(plasmid_to_align, request.user),
+        'recent_runs': plasmid_to_align.sanger_verification_runs.exclude(id=run.id)[:10],
+        'run': run,
+        'sanger_result': sanger_result,
+        'sanger_browser_data': json.dumps(sanger_browser_data(plasmid_seq, sanger_result, plasmid_to_align.name)),
+        'align_data': alignment_tracks_for_ove(plasmid_to_align.name, plasmid_seq, sanger_result["reads"]),
+        'plasmid_sequence_file_contents': plasmid_sequence_file_contents(plasmid_to_align),
+        'show_results': True,
+        'is_saved_run_view': True,
+    }
+    return render(request, 'inventory/plasmid_align_sanger.html', context)
+
+
+@require_member_can_read_project_of_plasmid
+def sanger_read_chromatogram(request, plasmid_id, run_id, read_id):
+    try:
+        plasmid_to_align = Plasmid.objects.get(id=plasmid_id)
+        run = SangerVerificationRun.objects.get(id=run_id, plasmid=plasmid_to_align)
+        read = SangerRead.objects.get(id=read_id, run=run)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    plasmid_seq = str(grab_seq(plasmid_to_align)[1])
+    read_data = recalculated_saved_sanger_read(read, plasmid_seq) or {
+        "id": str(read.id),
+        "name": read.name,
+        "selected_source": read.selected_source,
+        "quality_metrics": read.quality_metrics,
+        "alignment": read.alignment_metrics,
+        "warnings": read.warnings,
+        "errors": read.parsing_result.get("errors", []),
+        "is_usable": read.is_usable,
+        "chromatogram": chromatogram_for_saved_read(read),
+    }
+    chromatogram = read_data.get("chromatogram") or {}
+    if not chromatogram.get("aTrace"):
+        raise Http404
+    source_file = read.files.filter(format=read.selected_source).first() or read.files.first()
+    context = {
+        "plasmid": plasmid_to_align,
+        "run": run,
+        "read": read,
+        "read_data": read_data,
+        "source_file_name": source_file.original_name if source_file else read.name,
+        "chromatogram_data": json.dumps({
+            "readName": read.name,
+            "sourceFileName": source_file.original_name if source_file else read.name,
+            "orientation": (read_data.get("alignment") or {}).get("orientation", read.detected_orientation),
+            "chromatogram": chromatogram,
+            "qualityMetrics": read_data.get("quality_metrics") or {},
+        }),
+    }
+    return render(request, "inventory/sanger_chromatogram.html", context)
+
+
+@require_member_can_read_project_of_plasmid
+def sanger_run_download(request, plasmid_id, run_id, kind):
+    try:
+        run = SangerVerificationRun.objects.get(id=run_id, plasmid_id=plasmid_id)
+    except ObjectDoesNotExist:
+        raise Http404
+    if kind == "variants":
+        rows = []
+        for variant in run.variants.select_related("read"):
+            rows.append({
+                "read": variant.read.name if variant.read else "",
+                "coordinate": variant.coordinate,
+                "type": variant.variant_type,
+                "expected": variant.expected_base,
+                "observed": variant.observed_base,
+                "quality": variant.quality,
+                "low_quality": "low_quality" in variant.flags,
+            })
+        response = HttpResponse(variants_csv(rows), content_type="text/csv")
+        response['Content-Disposition'] = 'attachment; filename="{}-sanger-variants.csv"'.format(run.id)
+        return response
+    if kind == "reads":
+        reads = []
+        for read in run.reads.all():
+            reads.append({
+                "name": read.name,
+                "formats": read.parsing_result.get("formats", []),
+                "selected_source": read.selected_source,
+                "is_usable": read.is_usable,
+                "alignment": read.alignment_metrics,
+                "quality_metrics": read.quality_metrics,
+                "warnings": read.warnings,
+                "errors": read.parsing_result.get("errors", []),
+            })
+        response = HttpResponse(read_metrics_tsv(reads), content_type="text/tab-separated-values")
+        response['Content-Disposition'] = 'attachment; filename="{}-sanger-read-metrics.tsv"'.format(run.id)
+        return response
+    if kind == "clustal" and run.clustal_file:
+        file_path = os.path.join(settings.MEDIA_ROOT, run.clustal_file.name)
+        with open(file_path, "rb") as handle:
+            response = HttpResponse(handle.read(), content_type="text/plain")
+        response['Content-Disposition'] = 'attachment; filename="{}-sanger.clustal"'.format(run.id)
+        return response
+    raise Http404
+
+
+@require_member_can_write_or_admin_project_of_plasmid
+def sanger_run_decision(request, plasmid_id, run_id):
+    if request.method != "POST":
+        raise Http404
+    try:
+        run = SangerVerificationRun.objects.select_related("plasmid").get(id=run_id, plasmid_id=plasmid_id)
+    except ObjectDoesNotExist:
+        raise Http404
+    decision = request.POST.get("manual_decision", "")
+    if decision not in ("VERIFIED", "REJECTED", "INCONCLUSIVE", "PENDING", ""):
+        raise Http404
+    effective_date_raw = request.POST.get("manual_decision_effective_date", "")
+    if effective_date_raw:
+        try:
+            effective_date = datetime.strptime(effective_date_raw, "%Y-%m-%d").date()
+        except ValueError:
+            raise Http404
+    else:
+        effective_date = timezone.localdate()
+    comment = (request.POST.get("manual_decision_comment", "") or "").strip()[:5000]
+    with transaction.atomic():
+        plasmid = Plasmid.objects.select_for_update().get(id=plasmid_id)
+        locked_run = SangerVerificationRun.objects.select_for_update().get(id=run_id, plasmid=plasmid)
+        locked_run.manual_decision = decision
+        locked_run.manual_decision_by = request.user if decision else None
+        locked_run.manual_decision_at = timezone.now() if decision else None
+        locked_run.manual_decision_effective_date = effective_date if decision and decision != "PENDING" else None
+        locked_run.manual_decision_comment = comment
+        locked_run.save()
+        if decision == "VERIFIED":
+            plasmid.sequencing_state = 2
+            plasmid.sequencing_date = effective_date
+            if comment:
+                plasmid.sequencing_observations = comment[:1000]
+            plasmid.save(update_fields=["sequencing_state", "sequencing_date", "sequencing_observations"])
+    return redirect("sanger_run_detail", plasmid_id=plasmid_id, run_id=run_id)
+
+
+@require_member_can_write_or_admin_project_of_plasmid
+def sanger_run_delete(request, plasmid_id, run_id):
+    if request.method != "POST":
+        raise Http404
+    try:
+        run = SangerVerificationRun.objects.get(id=run_id, plasmid_id=plasmid_id)
+    except ObjectDoesNotExist:
+        raise Http404
+    delete_sanger_run_files(run)
+    run.delete()
+    return redirect("plasmid_align", plasmid_id=plasmid_id)
 
 
 class PlasmidDelete(DeleteView):
@@ -1921,12 +2950,22 @@ def re_find_cut_positions(sequence, the_re, is_circular, sort):
     return found_hits
 
 
+def primer_numeric_id(primer):
+    return display_primer_id(primer)
+
+
+def primer_display_name(primer):
+    return display_primer_name(primer)
+
+
 @require_member_can_read_project_of_primer
 def primer(request, primer_id):
     try:
         primer_to_detail = Primer.objects.get(id=primer_id)
     except ObjectDoesNotExist:
         raise Http404
+    primer_to_detail.display_idx = primer_numeric_id(primer_to_detail)
+    primer_to_detail.display_name = primer_display_name(primer_to_detail)
     context = {
         'primer': primer_to_detail,
         'user_can_edit_primer': member_can_write_or_admin_primer(primer_to_detail, request.user)
@@ -1937,10 +2976,17 @@ def primer(request, primer_id):
 def primers(request):
     show_from_all_projects = get_show_from_all_projects(request)
     if show_from_all_projects:
-        primers = Primer.objects.filter(project_id__in=get_projects_where_member_can_any(request.user))
+        primers = visible_primers_for_user(request.user)
     else:
-        primers = Primer.objects.filter(project_id=get_current_project_id(request))
+        primers = visible_primers_for_user(request.user)
+
+    primers = sorted(primers, key=lambda primer: (
+        primer_numeric_id(primer) if primer_numeric_id(primer) is not None else 10**9,
+        primer.name or ""
+    ))
     for primer in primers:
+        primer.display_idx = primer_numeric_id(primer)
+        primer.display_name = primer_display_name(primer)
         primer.can_edit = member_can_write_or_admin_primer(primer, request.user)
     context = {
         'primers': primers,
@@ -1948,6 +2994,36 @@ def primers(request):
         'on_current_project_member_can_write_or_admin': on_current_project_member_can_write_or_admin(request)
     }
     return render(request, 'inventory/primers.html', context)
+
+
+@require_current_project_set
+@require_member_can_write_or_admin_current_project
+def primer_import(request):
+    result = None
+    form = PrimerBatchUploadForm(request.POST or None, request.FILES or None)
+    current_project = get_current_project(request)
+
+    if request.method == "POST" and form.is_valid():
+        try:
+            fasta_text = request.FILES["fasta_file"].read().decode("utf-8-sig")
+            result = import_primers_from_fasta(
+                StringIO(fasta_text),
+                current_project,
+                update_existing=form.cleaned_data["update_existing"],
+                name_source=form.cleaned_data["name_source"],
+                default_direction=form.cleaned_data["default_direction"],
+            )
+        except UnicodeDecodeError:
+            form.add_error("fasta_file", "Could not read this file as UTF-8 text.")
+        except PrimerImportError as error:
+            form.add_error("fasta_file", str(error))
+
+    context = {
+        "form": form,
+        "result": result,
+        "current_project": current_project,
+    }
+    return render(request, "inventory/primer_import.html", context)
 
 
 class PrimerCreate(CreateView):
@@ -2113,23 +3189,135 @@ def ServicesL0d(request):
     return render(request, 'inventory/services/l0d/l0d.html', context)
 
 
+def ServicesPcr(request):
+    form = ServicesPCRForm(request.POST or None, user=request.user)
+    results = []
+    skipped = []
+    primer_f = None
+    primer_r = None
+    primer_complementarity = None
+
+    if request.method == "POST" and form.is_valid():
+        primer_f = form.cleaned_data["primer_f"]
+        primer_r = form.cleaned_data["primer_r"]
+        primer_complementarity = primer_pair_complementarity(primer_f, primer_r)
+        min_product_size = form.cleaned_data["min_product_size"]
+        max_product_size = form.cleaned_data["max_product_size"]
+        plasmids = Plasmid.objects.filter(
+            project__in=get_projects_where_member_can_any(request.user)
+        ).order_by("name")
+
+        for plasmid_to_scan in plasmids:
+            sequence = grab_seq(plasmid_to_scan)
+            if not sequence[0]:
+                skipped.append({
+                    "plasmid": plasmid_to_scan,
+                    "reason": sequence[1],
+                })
+                continue
+
+            for amplicon in primer_pair_amplicons(
+                    str(sequence[1]),
+                    primer_f,
+                    primer_r,
+                    min_product_size=min_product_size,
+                    max_product_size=max_product_size,
+            ):
+                results.append({
+                    "plasmid": plasmid_to_scan,
+                    "project": plasmid_to_scan.project,
+                    "amplicon": amplicon,
+                })
+
+        results.sort(key=lambda result: (
+            result["amplicon"]["product_size"],
+            result["plasmid"].name or "",
+        ))
+
+    context = {
+        "form": form,
+        "results": results,
+        "skipped": skipped,
+        "searched": request.method == "POST" and form.is_valid(),
+        "primer_f": primer_f,
+        "primer_r": primer_r,
+        "primer_complementarity": primer_complementarity,
+    }
+    return render(request, 'inventory/services/pcr/pcr.html', context)
+
+
+def run_local_blast(request, context, record, project_id='a', short_blast=False):
+    visible_projects = get_projects_where_member_can_any(request.user)
+    if project_id == 'a':
+        plasmids = Plasmid.objects.filter(project__in=visible_projects)
+    else:
+        plasmids = Plasmid.objects.filter(project__in=visible_projects, project=project_id)
+
+    subjects = []
+    context['not_considered_subjects'] = []
+    for plasmid in plasmids:
+        try:
+            seqio_get_result = seqio_get(plasmid)
+            if seqio_get_result[0]:
+                seqio_get_result[1].id = plasmid.id
+                seqio_get_result[1].name = plasmid.name
+                subjects.append(make_circular([seqio_get_result[1]])[0])
+            else:
+                context['not_considered_subjects'].append((plasmid, 'No sequence file'))
+        except Exception as e:
+            context['not_considered_subjects'].append((plasmid, e))
+
+    if record and subjects:
+        context['query'] = record
+        context['short_blast'] = "Yes" if short_blast else "No"
+        queries = make_linear([record])
+        blast = BioBlast(subjects, queries)
+        context['results'] = run_pyblast_compat(
+            lambda: blast.blastn_short() if short_blast else blast.blastn()
+        )
+        for result in context['results']:
+            result['alignment'] = Bio.Align.MultipleSeqAlignment([
+                SeqRecord(Seq(result['meta']['query seq']), id=result['query']['name']),
+                SeqRecord(Seq(result['meta']['subject seq']), id=result['subject']['name']),
+            ]).__format__('clustal')
+    elif not context.get('error'):
+        context['error'] = 'Error while parsing input sequence'
+
+
+def fasta_record_from_text(text, name='Query'):
+    sequence_text = str(text or '').strip()
+    if not sequence_text:
+        return None
+    if ">" not in sequence_text:
+        sequence_text = f">{name}\n{sequence_text}\n"
+    records = fasta_records_from_text(sequence_text)
+    return records[0] if records else None
+
+
 def ServicesBlast(request):
     context = {}
     project_choices = [('a', 'All')]
     for project in get_projects_where_member_can_any(request.user):
         project_choices.append((project.id, project.name),)
 
-    if request.method == 'POST':
+    if request.method == 'GET' and request.GET.get('sequence'):
+        record = fasta_record_from_text(request.GET.get('sequence'), request.GET.get('name') or 'Amplicon')
+        if record is None:
+            context['error'] = 'Input sequence not in FASTA format'
+        run_local_blast(
+            request,
+            context,
+            record,
+            project_id=request.GET.get('project', 'a'),
+            short_blast=request.GET.get('short_blast', '').lower() in ('1', 'true', 'yes'),
+        )
+    elif request.method == 'POST':
         form = BlastSequenceInput(project_choices, request.POST, request.FILES)
         if form.is_valid():
             if request.POST.get('fasta_sequence'):
-                fasta_io = StringIO(request.POST.get('fasta_sequence'))
-                try:
-                    record = list(SeqIO.parse(fasta_io, "fasta"))[0]
-                except IndexError:
-                    record = None
+                record = fasta_record_from_text(request.POST.get('fasta_sequence'))
+                if record is None:
                     context['error'] = 'Input sequence not in FASTA format'
-                fasta_io.close()
             else:
                 if request.FILES["fasta_file"]:
                     fasta_file = request.FILES["fasta_file"]
@@ -2139,46 +3327,16 @@ def ServicesBlast(request):
                     f.close()
                     record = SeqIO.read(f.name, "fasta")
                 else:
+                    record = None
                     context['error'] = 'No input sequence'
 
-            if request.POST.get('project') == 'a':
-                plasmids = Plasmid.objects.filter(project__in=get_projects_where_member_can_any(request.user))
-            else:
-                plasmids = Plasmid.objects.filter(project=request.POST.get('project'))
-
-            subjects = []
-            context['not_considered_subjects'] = []
-            for plasmid in plasmids:
-                try:
-                    seqio_get_result = seqio_get(plasmid)
-                    if seqio_get_result[0]:
-                        seqio_get_result[1].id = plasmid.id
-                        seqio_get_result[1].name = plasmid.name
-                        subjects.append(make_circular([seqio_get_result[1]])[0])
-                    else:
-                        context['not_considered_subjects'].append((plasmid, 'No sequence file'))
-                except Exception as e:
-                    context['not_considered_subjects'].append((plasmid, e))
-
-            if record and subjects:
-                context['query'] = record
-                context['short_blast'] = "No"
-                if request.POST.get('short_blast'):
-                    context['short_blast'] = "Yes"
-                queries = make_linear([record])
-                blast = BioBlast(subjects, queries)
-                if request.POST.get('short_blast'):
-                    context['results'] = blast.blastn_short()
-                else:
-                    context['results'] = blast.blastn()
-                for result in context['results']:
-                    result['alignment'] = Bio.Align.MultipleSeqAlignment([
-                        SeqRecord(Seq(result['meta']['query seq']), id=result['query']['name']),
-                        SeqRecord(Seq(result['meta']['subject seq']), id=result['subject']['name']),
-                    ]).__format__('clustal')
-            else:
-                if not context['error']:
-                    context['error'] = 'Error while parsing input sequence'
+            run_local_blast(
+                request,
+                context,
+                record,
+                project_id=request.POST.get('project'),
+                short_blast=bool(request.POST.get('short_blast')),
+            )
     else:
         context['form'] = BlastSequenceInput(project_choices)
 
@@ -2329,6 +3487,130 @@ def experiments(request):
         'projects': projects_with_experiments
     }
     return render(request, 'inventory/experiments.html', context)
+
+
+def _experiment_plasmid_status(plasmid):
+    if plasmid.reference_sequence:
+        return 'RS'
+    if plasmid.is_validated():
+        return 'V'
+    if plasmid.ligation_state != 1:
+        return 'UC'
+    return 'NV'
+
+
+def _experiment_plasmid_node(plasmid, request):
+    plasmid_url = reverse('plasmid', kwargs={'plasmid_id': plasmid.id})
+    return {
+        'uuid': str(plasmid.id),
+        'weaver_id': plasmid.idx,
+        'name': plasmid.name,
+        'plasmid_type': str(plasmid.type) if plasmid.type else '',
+        'type_id': plasmid.type.id if plasmid.type else None,
+        'level': plasmid.level,
+        'parts': [],
+        'parent': [],
+        'status': _experiment_plasmid_status(plasmid),
+        'colony': plasmid.working_colony,
+        'url': request.build_absolute_uri(plasmid_url),
+        'ligation_raw': plasmid.ligation_raw(),
+        'ready_to_build': False,
+    }
+
+
+def _collect_experiment_plasmid(plasmid, request, nodes, visiting=None):
+    if visiting is None:
+        visiting = set()
+    if plasmid.idx is None or plasmid.idx in visiting:
+        return
+
+    visiting.add(plasmid.idx)
+    if plasmid.idx not in nodes:
+        nodes[plasmid.idx] = _experiment_plasmid_node(plasmid, request)
+
+    child_ids = []
+    children = []
+    if plasmid.backbone:
+        children.append(plasmid.backbone)
+    children.extend(list(plasmid.inserts.all()))
+
+    for child in children:
+        if child.idx is None:
+            continue
+        child_ids.append(child.idx)
+        _collect_experiment_plasmid(child, request, nodes, visiting.copy())
+        if child.idx in nodes and plasmid.idx not in nodes[child.idx]['parent']:
+            nodes[child.idx]['parent'].append(plasmid.idx)
+
+    for child_id in child_ids:
+        if child_id not in nodes[plasmid.idx]['parts']:
+            nodes[plasmid.idx]['parts'].append(child_id)
+
+
+def _experiment_map_stats(nodes):
+    total = len(nodes)
+    validated = len([node for node in nodes.values() if node['status'] == 'V'])
+    reference = len([node for node in nodes.values() if node['status'] == 'RS'])
+    pending_nodes = [
+        node for node in nodes.values()
+        if node['status'] not in ('V', 'RS') and node['level'] is not None
+    ]
+    ready_to_build = 0
+    blocked = 0
+
+    for node in pending_nodes:
+        dependencies_ready = all(
+            nodes[part_id]['status'] in ('V', 'RS')
+            for part_id in node['parts']
+            if part_id in nodes
+        )
+        node['ready_to_build'] = dependencies_ready
+        if dependencies_ready:
+            ready_to_build += 1
+        else:
+            blocked += 1
+
+    return {
+        'total': total,
+        'validated': validated,
+        'reference': reference,
+        'pending': len(pending_nodes),
+        'ready_to_build': ready_to_build,
+        'blocked': blocked,
+        'progress': round((validated / total) * 100) if total else 0,
+    }
+
+
+def api_experiments_map(request):
+    projects = []
+    for project in get_projects_where_member_can_any(request.user):
+        experiments_output = []
+        for experiment in project.experiment_set.all():
+            nodes = {}
+            root_ids = []
+            for plasmid in experiment.plasmids.all():
+                if plasmid.idx is None:
+                    continue
+                root_ids.append(plasmid.idx)
+                _collect_experiment_plasmid(plasmid, request, nodes)
+
+            experiments_output.append({
+                'id': experiment.id,
+                'name': experiment.name,
+                'description': experiment.description,
+                'root_ids': root_ids,
+                'stats': _experiment_map_stats(nodes),
+                'plasmids': list(nodes.values()),
+            })
+
+        if experiments_output:
+            projects.append({
+                'id': project.id,
+                'name': str(project),
+                'experiments': experiments_output,
+            })
+
+    return JsonResponse({'projects': projects})
 
 
 def createEnzymeFromName(enzyme_name):
