@@ -50,6 +50,7 @@ function onReady(){
     /* select2 */
     var select2_ids = '#id_backbone, #id_inserts, #id_parent, #id_plasmid, #id_primer_f, #id_primer_r';
     $(select2_ids).select2();
+    /* plasmid table massive actions */
     /* tooltips bootstrap */
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -124,11 +125,11 @@ function saveOVE(sequenceDataToSave) {
 }
 
 function expandName(){
-    var elements = $('#plasmids-table td a:first-child span.plasmid_list-name');
+    var elements = $('#plasmids-table td a:first-child button.plasmid_list-name');
     if($('#table_search-expand').is(":checked")){
         elements.each(function(){
             $(this).attr('data-short', $(this).html())
-            $(this).html($(this).parent().parent().attr('data-name'))
+            $(this).html($(this).parent().attr('data-name'))
         })
     } else {
         elements.each(function(){

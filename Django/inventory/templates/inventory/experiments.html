@@ -1,0 +1,48 @@
+{% extends "inventory/parts/base.html" %}
+
+{% block header_object_name %}Experiments{% endblock %}
+
+{% block content %}
+{% if projects %}
+    <div class="accordion" id="accordionProjects">
+    {% for project in projects %}
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-p{{project.id}}" aria-expanded="true" aria-controls="collapse-p{{project.id}}">
+                    Project <strong class="ms-1">{{project}}</strong>
+                </button>
+            </h2>
+            <div id="collapse-p{{project.id}}" class="accordion-collapse collapse show" data-bs-parent="#accordionProjects">
+                <div class="accordion-body">
+                    <div class="accordion" id="accordionExperiments">
+                        {% for experiment in project.experiment_set.all %}
+                        <div class="experiment accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-e{{experiment.id}}" aria-expanded="true" aria-controls="collapse-e{{experiment.id}}">
+                                   Experiment <strong class="ms-1">{{experiment}}</strong>
+                                </button>
+                            </h2>
+                            <div id="collapse-e{{experiment.id}}" class="accordion-collapse collapse" data-bs-parent="#accordionExperiments">
+                                <div class="accordion-body">
+                                    <div class="alert alert-light">
+                                        {{experiment.description}}
+                                    </div>
+                                    <div class="experiment-wrapper p-4">
+                                        {% for plasmid in experiment.plasmids.all %}
+                                            {% include "inventory/parts/experiments-iterator.html" %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+{% else %}
+<div class="alert alert-warning">No experiments found.</div>
+{% endif %}
+{% endblock %}

@@ -424,7 +424,7 @@ def glycerolstock_boxes(request):
 
 
 @require_current_project_set
-def plasmids(request):
+def plasmids(request, render_html=None):
     show_from_all_projects = get_show_from_all_projects(request)
     if show_from_all_projects:
         plasmids = Plasmid.objects.filter(project_id__in=get_projects_where_member_can_any(request.user))
@@ -577,7 +577,7 @@ def plasmid_record_from_inserts(plasmid_to_build, insert_seq, the_re_name=None):
 
     the_re = None
     for enzyme in AllEnzymes:
-        if enzyme.__name__ == the_re_name:
+        if enzyme.__name__.lower() == the_re_name.lower():
             the_re = enzyme
 
     if not the_re:
@@ -668,7 +668,7 @@ def plasmid_record_from_inserts(plasmid_to_build, insert_seq, the_re_name=None):
                         hits = [hits[1], hits[0]]
 
                     part = {
-                        "name": insert_record.name,
+                        "name": str(insert),
                         "oh5": insert_record.seq[hits[0]-1:hits[0]-1+cut_length],
                         "oh3": insert_record.seq[hits[1]-1:hits[1]-1+cut_length],
                         "part": extract_circular_region(insert_record, hits[0], end=hits[1])
@@ -682,7 +682,7 @@ def plasmid_record_from_inserts(plasmid_to_build, insert_seq, the_re_name=None):
             if not plasmid_to_build.backbone:
                 # first one is a insert
                 final_record = parts[0]["part"]
-                joined.append("/".join([parts[0]["name"], str(parts[0]["oh5"]), str(parts[0]["oh5"])]))
+                joined.append(parts[0]["name"] + " (" + str(parts[0]["oh5"]) + "-" + str(parts[0]["oh5"]) + ")")
                 parts_to_iterate.pop(0)
             final_oh = parts[0]["oh5"]
             next_oh = parts[0]["oh3"]
@@ -697,16 +697,16 @@ def plasmid_record_from_inserts(plasmid_to_build, insert_seq, the_re_name=None):
                             final_record = part["part"]
                         next_oh = part["oh3"]
                         changed = True
-                        joined.append("/".join([part["name"], str(part["oh5"]), str(part["oh5"])]))
+                        joined.append(part["name"] + " (" + str(part["oh5"]) + "-" + str(part["oh5"]) + ")")
                         parts_to_iterate.pop(idx)
                         break
                 if not changed:
-                    return False, "Unable to join parts. Joined = " + " + ".join(joined) + "."
+                    return False, "Unable to join parts. Joined = " + " & ".join(joined) + "."
 
             if plasmid_to_build.backbone:
                 # add backbone at last
                 final_record += parts[0]["part"]
-                joined.append("/".join([parts[0]["name"], str(parts[0]["oh5"]), str(parts[0]["oh5"])]))
+                joined.append(parts[0]["name"] + " (" + str(parts[0]["oh5"]) + "-" + str(parts[0]["oh5"]) + ")")
                 parts_to_iterate.pop(0)
 
             if len(parts_to_iterate):
@@ -889,7 +889,7 @@ class PlasmidCreate(CreateView):
 class PlasmidCreateWizard(CreateView):
     model = Plasmid
     fields = '__all__'
-    template_name_suffix = '_create_form_wizard'
+    template_name_suffix = '_create_wizard'
 
     @method_decorator(require_member_can_write_or_admin_current_project)
     def dispatch(self, *args, **kwargs):
@@ -1519,6 +1519,84 @@ def plasmid_deleted(request):
     return render(request, 'inventory/plasmid_deleted.html')
 
 
+def plasmid_validation_initial_from_payload(validation_payload):
+    pattern = re.compile(
+        r'^(?P<weaver_id>\d+)_(?P<colony_number>\d+)_'
+        r'(?P<date>\d{4}-\d{2}-\d{2})_(?P<method>pcr|digest)$',
+        re.IGNORECASE
+    )
+    match = pattern.match(validation_payload)
+    if not match:
+        return None, "Invalid validation link format"
+
+    try:
+        parsed_date = datetime.strptime(match.group('date'), "%Y-%m-%d").date()
+    except ValueError:
+        return None, "Invalid date in validation link"
+
+    method = match.group('method').lower()
+    initial = {
+        'weaver_id': int(match.group('weaver_id')),
+        'working_colony': int(match.group('colony_number')),
+        'ligation_state': 1,
+    }
+
+    if method == 'pcr':
+        initial.update({
+            'method': 'pcr',
+            'colonypcr_state': 2,
+            'colonypcr_date': parsed_date,
+        })
+    elif method == 'digest':
+        initial.update({
+            'method': 'digest',
+            'digestion_state': 2,
+            'digestion_date': parsed_date,
+        })
+
+    return initial, None
+
+
+@require_current_project_set
+def PlasmidValidationFromLink(request, validation_payload):
+    initial, error = plasmid_validation_initial_from_payload(validation_payload)
+    if error:
+        return render(request, 'inventory/general_error.html', {'error': error})
+
+    try:
+        plasmid_to_validate = Plasmid.objects.get(idx=initial['weaver_id'])
+    except ObjectDoesNotExist:
+        raise Http404
+
+    if not member_can_write_or_admin_plasmid(plasmid_to_validate, request.user):
+        raise PermissionDenied
+
+    if request.method == 'POST':
+        post_data = request.POST.copy()
+        post_data['ligation_state'] = str(initial['ligation_state'])
+        post_data['working_colony'] = str(initial['working_colony'])
+        if initial['method'] == 'pcr':
+            post_data['colonypcr_state'] = str(initial['colonypcr_state'])
+            post_data['colonypcr_date'] = initial['colonypcr_date'].isoformat()
+        elif initial['method'] == 'digest':
+            post_data['digestion_state'] = str(initial['digestion_state'])
+            post_data['digestion_date'] = initial['digestion_date'].isoformat()
+
+        form = PlasmidValidationForm(post_data or None, request.FILES, instance=plasmid_to_validate)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('plasmid', args=(
+                plasmid_to_validate.id,)) + '?form_result_plasmidvalidation_edit_success=true')
+    else:
+        form = PlasmidValidationForm(instance=plasmid_to_validate, initial=initial)
+
+    return render(request, 'inventory/plasmidvalidation_update_form.html',
+                  {'form': form, 'plasmid': plasmid_to_validate,
+                   'validation_link_payload': validation_payload,
+                   'validation_link_method': initial['method'],
+                   'user_can_edit_plasmid': member_can_write_or_admin_plasmid(plasmid_to_validate, request.user)})
+
+
 @require_current_project_set
 @require_member_can_write_or_admin_project_of_plasmid
 def PlasmidValidationEdit(request, plasmid_id):
@@ -1553,26 +1631,35 @@ def PlasmidValidations(request):
                         plasmid = Plasmid.objects.get(idx=int(key.split("-")[1]))
                         if member_can_write_or_admin_plasmid(plasmid, request.user):
                             action = request.POST.get('massive_action_form_action')
-                            if action.startswith("ligation_state-"):
-                                action_id = int(action.split("-")[1])
+                            action_id = int(action.split("-")[1])
+                            if action.startswith("ligation_state"):
                                 plasmid.ligation_state = action_id
                                 plasmid_massive_action_results.append(
                                     [plasmid, "Set to " + str(LIGATION_STATES[action_id][1])])
-                            if action == "colony_pcr_correct":
+                            if action.startswith("colony_pcr"):
                                 # set correct & now
-                                plasmid.colonypcr_state = 2
-                                plasmid.colonypcr_date = datetime.now()
-                                plasmid_massive_action_results.append([plasmid, "Set to Colony PCR - Correct"])
-                            elif action == "digestion_correct":
+                                plasmid.colonypcr_state = action_id
+                                if action_id == 2: # correct
+                                    plasmid.colonypcr_date = datetime.now()
+                                else:
+                                    plasmid.colonypcr_date = None
+                                plasmid_massive_action_results.append([plasmid, "Set to Colony PCR - " + str(CHECK_STATES[action_id][1])])
+                            elif action.startswith("digestion"):
                                 # set correct & now
-                                plasmid.digestion_state = 2
-                                plasmid.digestion_date = datetime.now()
-                                plasmid_massive_action_results.append([plasmid, "Set to Digestion - Correct"])
-                            elif action == "sequencing_correct":
+                                plasmid.digestion_state = action_id
+                                if action_id == 2: # correct
+                                    plasmid.digestion_date = datetime.now()
+                                else:
+                                    plasmid.digestion_date = None
+                                plasmid_massive_action_results.append([plasmid, "Set to Digestion - " + str(CHECK_STATES[action_id][1])])
+                            elif action.startswith("sequencing"):
                                 # set correct & now
-                                plasmid.sequencing_state = 2
-                                plasmid.sequencing_date = datetime.now()
-                                plasmid_massive_action_results.append([plasmid, "Set to Sequencing - Correct"])
+                                plasmid.sequencing_state = action_id
+                                if action_id == 2: # correct
+                                    plasmid.sequencing_date = datetime.now()
+                                else:
+                                    plasmid.sequencing_date = None
+                                plasmid_massive_action_results.append([plasmid, "Set to Sequencing - " + str(CHECK_STATES[action_id][1])])
                             plasmid.save()
     except Exception:
         pass
@@ -2229,6 +2316,19 @@ def api_glycerolstocks(request):
         'glycerolstocks': output,
     }
     return JsonResponse(context, safe=False)
+
+
+def experiments(request):
+    projects_with_experiments = []
+
+    for project in get_projects_where_member_can_any(request.user):
+        if project.experiment_set.all():
+            projects_with_experiments.append(project)
+
+    context = {
+        'projects': projects_with_experiments
+    }
+    return render(request, 'inventory/experiments.html', context)
 
 
 def createEnzymeFromName(enzyme_name):

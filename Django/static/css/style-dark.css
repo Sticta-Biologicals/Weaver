@@ -12,10 +12,12 @@ html[data-bs-theme="dark"]{
     h5,
     h5.bp3-heading,
     h6,
-    h6.bp3-heading {
+    h6.bp3-heading,
+    .tab-pane {
         color: #fff !important;
     }
-    .plasmid-opts i {
+    .plasmid-opts i,
+    .select2-selection__choice__display{
         color: #484848 !important;
     }
     #ove-viewer{
@@ -34,5 +36,11 @@ html[data-bs-theme="dark"]{
     }
     div#header-container {
         background: #444;
+    }
+    .diagonal-box:before{
+        background: linear-gradient(to right bottom, rgb(33, 37, 41) 49%, transparent 50%);
+    }
+    .diagonal-box:after{
+        background: linear-gradient(to right bottom, transparent 49%, rgb(33, 37, 41) 50%);
     }
 }

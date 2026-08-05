@@ -182,13 +182,19 @@
                 <label for="massive_action_form_action" class="form-label">Change {% if k == 'to_colonypcr' %}Colony PCR{% endif %}{% if k == 'to_digest' %}Digestion{% endif %}{% if k == 'to_sequence' %}Sequencing{% endif %}{% if k == 'waiting' or k == 'to_ligate' %}Ligation{% endif %} state for selected plasmids</label>
                 <select id="massive_action_form_action" name="massive_action_form_action">
                     {% if k == 'to_colonypcr' %}
-                    <option value="colony_pcr_correct">Colony PCR - Correct</option>
+                    <option value="colony_pcr-0">Colony PCR - Not required</option>
+                    <option value="colony_pcr-1">Colony PCR - Pending</option>
+                    <option value="colony_pcr-2">Colony PCR - Correct</option>
                     {% endif %}
                     {% if k == 'to_digest' %}
-                    <option value="digestion_correct">Digestion - Correct</option>
+                    <option value="digestion-0">Digestion - Not required</option>
+                    <option value="digestion-1">Digestion - Pending</option>
+                    <option value="digestion-2">Digestion - Correct</option>
                     {% endif %}
                     {% if k == 'to_sequence' %}
-                    <option value="sequencing_correct">Sequencing - Correct</option>
+                    <option value="sequencing-0">Sequencing - Not required</option>
+                    <option value="sequencing-1">Sequencing - Pending</option>
+                    <option value="sequencing-2">Sequencing - Correct</option>
                     {% endif %}
                     {% if k == 'to_ligate' %}
                     <option value="ligation_state-1">{{LIGATION_STATES|get_element_by_key:1}}</option>

@@ -263,13 +263,19 @@ class Plasmid(models.Model):
     def get_backbone_of(self):
         return Plasmid.objects.filter(backbone=self)
 
-    def ligation_concentration(self):
+    def ligation_concentration(self, units=True):
         if self.computed_size:
             if self.type:
                 if str(self.type) == "Insert":
-                    return str(round(self.computed_size / 100, 1)) + " ng / ul"
+                    result = str(round(self.computed_size / 100, 1))
+                    if units:
+                        result += " ng / ul"
+                    return result
                 elif str(self.type) == "Receiver":
-                    return str(round(self.computed_size / 300, 1)) + " ng / ul"
+                    result = str(round(self.computed_size / 300, 1))
+                    if units:
+                        result += " ng / ul"
+                    return result
                 else:
                     return "Plasmid type no formula"
             else:
@@ -277,9 +283,16 @@ class Plasmid(models.Model):
         else:
             return "No plasmid computed size"
 
-    def recommended_enzyme_for_create(self):
+    def ligation_concentration_no_units(self):
+        return self.ligation_concentration(units=False)
+
+    def recommended_enzyme_for_create(self, return_name=False):
         try:
-            return assembly_standards[self.project.assembly_standard]['enzymes'][self.level]
+            if return_name:
+                re = RestrictionEnzyme.objects.get(name__iexact=assembly_standards[self.project.assembly_standard]['enzymes'][self.level])
+                return re.name
+            else:
+                return assembly_standards[self.project.assembly_standard]['enzymes'][self.level]
         except:
             return "No level set"
 
@@ -298,7 +311,9 @@ class Plasmid(models.Model):
         tab = "	"
         ligation_raw = self.__str__() + tab
         if self.backbone:
-            ligation_raw += self.backbone.__str__() + " [" + self.backbone.working_colony_text_short() + "]" + tab
+            ligation_raw += self.backbone.__str__() + " [" + self.backbone.working_colony_text_short() + "]"
+
+        ligation_raw += tab
 
         inserts = []
         for plasmid in self.inserts.all():
@@ -306,7 +321,7 @@ class Plasmid(models.Model):
 
         if self.level:
             ligation_raw = ligation_raw + " + ".join(inserts) + tab + tab +\
-                           self.recommended_enzyme_for_create() + tab +\
+                           self.recommended_enzyme_for_create(return_name=True) + tab +\
                            self.getPlasmidResistanceForLigation().upper()
         else:
             if self.level == 0:
@@ -443,3 +458,14 @@ class Stats(models.Model):
     plasmids_by_level = models.JSONField(null=True)
     gs_box_fill = models.JSONField(null=True)
     last_update = models.DateField(auto_now_add=False, default=datetime.date.today)
+
+
+class Experiment(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=128, help_text="Experiment name")
+    description = models.CharField(max_length=500, help_text="Experiment description", null=True, blank=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    plasmids = models.ManyToManyField(Plasmid, blank=True, related_name='+')
+
+    def __str__(self):
+        return self.name

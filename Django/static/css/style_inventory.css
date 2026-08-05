@@ -1,41 +1,44 @@
-div#label-info p#label-name {
+div.label-info p#label-name,
+div.label-info p#label-strain,
+div.label-info p.label-id-colony {
     font-size: 2rem;
     line-height: 1em;
 }
 
-div#label-qrcode img {
+div.label-info p#label-strain{
+    font-size: 1.5rem;
+}
+
+div.label-qrcode img {
     width: 10rem;
     margin-left: 1rem;
 }
 
-p#label-qrcode img {
+p.label-qrcode img {
     max-width: 5rem;
 }
 
-div#label {
+div.label {
     border: solid 1px;
     border-radius: 1rem;
     padding: 2rem;
     background: #eee;
 }
 
-div#label-info p:not(#label-name) {
+div.label-info p:not(.label-id-colony) {
     margin: 0;
     padding: .15rem 0;
 }
 
-div#label-main {
+div.label-main {
     display: flex;
 }
 
-div#label span.label-name {
+div.label span.label-id-colony {
     font-weight: 600;
 }
 
-div#label span.label-name:after {
-    content: ": ";
-}
-div#label-instructions {
+div.label-instructions {
     margin-top: 1rem;
 }
 

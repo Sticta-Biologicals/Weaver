@@ -3,7 +3,11 @@
 {%if glycerolstock %}
 {% block header_object_type %}Stock{% endblock %}
 {% block header_object_name %}{{glycerolstock.strain}}{% if glycerolstock.plasmid.name %} / {{glycerolstock.plasmid.name}}{% endif %}{% endblock %}
-{% block header_object_id %}{{glycerolstock.plasmid.idx}}{% endblock %}
+{% block header_object_id %}
+        <span class="badge text-bg-light border fw-normal p-1 fs-3 fw-light m-0 align-middle" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Part ID">
+                {{glycerolstock.plasmid.idx}}
+        </span>
+{% endblock %}
 {% block header_object_links %}
         {% if user_can_edit_gs %}
         <a href="{% url 'glycerolstock_edit' pk=glycerolstock.id %}" class="btn btn-outline-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="bi bi-pencil"></i></a>

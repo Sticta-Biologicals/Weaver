@@ -17,6 +17,7 @@ from .views import PrimerDelete
 
 from .views import PlasmidValidations
 from .views import PlasmidValidationEdit
+from .views import PlasmidValidationFromLink
 
 from .views import ServicesBlast
 from .views import ServicesGtr
@@ -33,8 +34,9 @@ from django.urls import path
 urlpatterns = [
     path('plasmids/', login_required(views.plasmids, redirect_field_name='next'), name='plasmids'),
     path('plasmids/validations/', login_required(PlasmidValidations, redirect_field_name='next'), name='plasmid_validations'),
+    path('validation/<str:validation_payload>/', login_required(PlasmidValidationFromLink, redirect_field_name='next'), name='plasmid_validation_from_link'),
     path('plasmid/<uuid:plasmid_id>/', login_required(views.plasmid, redirect_field_name='next'), name='plasmid'),
-    path('qr/i/<str:plasmid_id>/', login_required(views.plasmid_from_qr, redirect_field_name='next'), name='plasmid_from_qr'), # for QR
+    path('qr/i/<str:plasmid_id>/', login_required(views.plasmid_from_qr, redirect_field_name='next'), name='plasmid_from_qr'), # forfor QR
     path('plasmid/create/', login_required(PlasmidCreate.as_view(), redirect_field_name='next'), name='plasmid_create'),
     path('plasmid/create/l0d', login_required(PlasmidCreateL0d, redirect_field_name='next'), name='plasmid_create_l0d'),
     path('plasmid/create/wizard', login_required(PlasmidCreateWizard.as_view(), redirect_field_name='next'), name='plasmid_create_wizard'),
@@ -82,8 +84,10 @@ urlpatterns = [
     path('services/l0d/', login_required(ServicesL0d, redirect_field_name='next'), name='services-l0d'),
     path('services/stats/', login_required(ServicesStats, redirect_field_name='next'), name='services-stats'),
 
-    path('api/plasmid/get_fasta/by_name/<str:name>/', api_plasmid_get_fasta_by_name, name='api-plasmid-get_fasta_by_name'),
-    path('api/plasmid/get_fasta/by_idx/<int:idx>/', api_plasmid_get_fasta_by_idx, name='api-plasmid-get_fasta_by_idx'),
+    path('experiments', login_required(views.experiments, redirect_field_name='next'), name='experiments'),
+
+    #path('api/plasmid/get_fasta/by_name/<str:name>/', api_plasmid_get_fasta_by_name, name='api-plasmid-get_fasta_by_name'),
+    #path('api/plasmid/get_fasta/by_idx/<int:idx>/', api_plasmid_get_fasta_by_idx, name='api-plasmid-get_fasta_by_idx'),
     path('api/fidelity_calc/<str:enzyme>/<str:ohs>', login_required(views.api_fidelity_calc, redirect_field_name='next'), name='api-fidelity_calc'),
     path('api/plasmids/', login_required(views.api_plasmids, redirect_field_name='next'), name='api-plasmids'),
     # path('api/plasmids/', views.api_plasmids, name='api-plasmids'),

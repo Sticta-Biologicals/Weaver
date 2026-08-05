@@ -190,9 +190,22 @@
     <tr>
         <th scope="row">Insert of</th>
         <td>
-            {% for pr in plasmid.insert_of %}
-                {% include "inventory/parts/plasmid-button.html" %}
-            {% endfor %}
+            <div class="accordion" id="accordionInsertOf">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInsertOf" aria-expanded="true" aria-controls="collapseInsertOf">
+                        Insert of
+                        </button>
+                    </h2>
+                    <div id="collapseInsertOf" class="accordion-collapse collapse" data-bs-parent="#accordionInsertOf">
+                        <div class="accordion-body">
+                            {% for pr in plasmid.insert_of %}
+                                {% include "inventory/parts/plasmid-button.html" %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </td>
     </tr>
     {% endif %}
@@ -200,25 +213,89 @@
     <tr>
         <th scope="row">Backbone of</th>
         <td>
-            {% for pr in plasmid.backbone_of %}
-                {% include "inventory/parts/plasmid-button.html" %}
-            {% endfor %}
+            <div class="accordion" id="accordionBackboneOf">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBackboneOf" aria-expanded="true" aria-controls="collapseBackboneOf">
+                        Backbone of
+                        </button>
+                    </h2>
+                    <div id="collapseBackboneOf" class="accordion-collapse collapse" data-bs-parent="#accordionBackboneOf">
+                        <div class="accordion-body">
+                            {% for pr in plasmid.backbone_of %}
+                                {% include "inventory/parts/plasmid-button.html" %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </td>
     </tr>
     {% endif %}
     <tr>
-        <th scope="row">Ligation</th>
+        <th scope="row">Assembly</th>
         <td>
             <table class="table table-hover">
                 <tbody>
                 <tr>
-                    <th>Text</th>
+                    <th>Working stock concentration</th>
+                    <td>
+                        {{plasmid.ligation_concentration}}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Text for spreadsheet</th>
                     <td><i class="bi bi-clipboard copy_clipboard" data-cc="{{ plasmid.ligation_raw }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Copy ligation data"></i></td>
                 </tr>
                 <tr>
-                    <th>Working concentration</th>
+                    <th scope="row">Parts table</th>
                     <td>
-                        {{plasmid.ligation_concentration}}
+                        <div class="accordion" id="accordionPartsTable">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePartsTable" aria-expanded="true" aria-controls="collapsePartsTable">
+                                    Parts table
+                                    </button>
+                                </h2>
+                                <div id="collapsePartsTable" class="accordion-collapse collapse" data-bs-parent="#accordionPartsTable">
+                                    <div class="accordion-body">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Role</th>
+                                                    <th>Plasmid ID</th>
+                                                    <th>Plasmid name</th>
+                                                    <th>Colony</th>
+                                                    <th>WS conc (ng/ul)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% if plasmid.backbone %}
+                                                {% with pr=plasmid.backbone %}
+                                                    <tr>
+                                                        <td>Backbone</td>
+                                                        <td><span>{{plasmid.idx}}</span></td>
+                                                        <td><span class="pe-2">{{plasmid.name}}</span><a href="{% url 'plasmid' plasmid_id=plasmid.backbone.id %}"><i class="bi bi-box-arrow-up-right"></i></a></td>
+                                                        <td>{{pr.working_colony_text}}</td>
+                                                        <td>{{pr.ligation_concentration_no_units}}</td>
+                                                    </tr>
+                                                {% endwith %}
+                                            {% endif %}
+                                            {% for pr in plasmid.inserts.all %}
+                                                <tr>
+                                                    <td>Insert</td>
+                                                    <td><span class="pe-2">{{pr.idx}}</span></td>
+                                                    <td><span class="pe-2">{{pr.name}}</span><a href="{% url 'plasmid' plasmid_id=pr.id %}"><i class="bi bi-box-arrow-up-right"></i></a></td>
+                                                    <td>{{pr.working_colony_text}}</td>
+                                                    <td>{{pr.ligation_concentration_no_units}}</td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </td>
                 </tr>
                 </tbody>
