@@ -6,6 +6,8 @@ export default defineConfig({
   plugins: [react()],
   base: '/static/experiments-reactflow/',
   build: {
+    outDir: '../../Django/static/experiments-reactflow',
+    emptyOutDir: true,
     manifest: false,
     rollupOptions: {
       output: {
