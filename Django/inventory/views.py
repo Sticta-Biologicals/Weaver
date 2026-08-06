@@ -93,6 +93,7 @@ from django.views.generic.edit import DeleteView
 from django.urls import reverse
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
+from django.db.models import Q
 
 from Bio import SeqIO
 from Bio import Align
@@ -110,6 +111,7 @@ from .forms import DigestForm
 from .forms import PCRForm
 from .forms import PrimerBatchUploadForm
 from .forms import ServicesPCRForm
+from .forms import BatchPrintsForm
 import json
 from io import StringIO
 from .forms import SangerAlignForm
@@ -124,6 +126,7 @@ from .forms import PlasmidNameInput
 import os
 import tempfile
 import re
+import uuid
 import builtins
 import Bio
 from Bio import AlignIO
@@ -3187,6 +3190,164 @@ def ServicesL0d(request):
         'csrf_token': django.middleware.csrf.get_token(request),
     }
     return render(request, 'inventory/services/l0d/l0d.html', context)
+
+
+def batch_print_tokens(raw_identifiers):
+    return [token.strip() for token in re.split(r"[\n,;]+", raw_identifiers or "") if token.strip()]
+
+
+def looks_like_uuid(value):
+    try:
+        uuid.UUID(str(value))
+        return True
+    except ValueError:
+        return False
+
+
+def find_batch_plasmids(tokens, user):
+    queryset = Plasmid.objects.filter(project__in=get_projects_where_member_can_any(user))
+    objects = []
+    missing = []
+    for token in tokens:
+        query = Q(name=token) | Q(qr_id=token)
+        if token.isdigit():
+            query |= Q(idx=int(token))
+        if looks_like_uuid(token):
+            query |= Q(id=token)
+        match = queryset.filter(query).first()
+        if match:
+            objects.append(match)
+        else:
+            missing.append(token)
+    return objects, missing
+
+
+def find_batch_glycerolstocks(tokens, user):
+    queryset = GlycerolStock.objects.filter(project__in=get_projects_where_member_can_any(user)).select_related(
+        "plasmid", "strain", "box", "box__location"
+    )
+    objects = []
+    missing = []
+    for token in tokens:
+        query = Q(qr_id=token)
+        if looks_like_uuid(token):
+            query |= Q(id=token)
+        if token.isdigit():
+            query |= Q(plasmid__idx=int(token))
+        match = queryset.filter(query).first()
+        if match:
+            if match.plasmid:
+                match.resistantes_human = resistantes_human(match.plasmid.selectable_markers, True)
+            else:
+                match.resistantes_human = "None"
+            match.resistantes_strain_human = resistantes_human(match.strain.selectable_markers, True)
+            objects.append(match)
+        else:
+            missing.append(token)
+    return objects, missing
+
+
+def find_batch_label(label_type, token, user):
+    if label_type == "plasmids":
+        matches, missing = find_batch_plasmids([token], user)
+    elif label_type == "glycerolstocks":
+        matches, missing = find_batch_glycerolstocks([token], user)
+    else:
+        return None, "Unknown label type"
+    if matches:
+        return matches[0], ""
+    return None, missing[0] if missing else token
+
+
+def parse_batch_print_date(raw_value):
+    try:
+        return date.fromisoformat(raw_value)
+    except (TypeError, ValueError):
+        return date.today()
+
+
+def parse_batch_print_concentration(raw_value):
+    try:
+        value = float(raw_value)
+    except (TypeError, ValueError):
+        return ""
+    if value <= 0:
+        return ""
+    return value
+
+
+def parse_batch_print_colony(raw_value):
+    colony = (raw_value or "").strip()
+    if colony.lower().startswith("c"):
+        colony = colony[1:].strip()
+    return colony
+
+
+def batch_print_rows_from_post(post_data):
+    label_types = post_data.getlist("label_type")
+    identifiers = post_data.getlist("identifier")
+    colonies = post_data.getlist("colony")
+    dates = post_data.getlist("date")
+    concentrations = post_data.getlist("concentration")
+    rows = []
+    total = max(len(label_types), len(identifiers), len(colonies), len(dates), len(concentrations))
+    for index in range(total):
+        row = {
+            "label_type": label_types[index] if index < len(label_types) else "plasmids",
+            "identifier": identifiers[index].strip() if index < len(identifiers) else "",
+            "colony": parse_batch_print_colony(colonies[index]) if index < len(colonies) else "",
+            "date": dates[index] if index < len(dates) else date.today().isoformat(),
+            "concentration": concentrations[index] if index < len(concentrations) else "",
+        }
+        if row["identifier"]:
+            rows.append(row)
+    return rows
+
+
+def ServicesBatchPrints(request):
+    labels = []
+    missing = []
+    searched = False
+    rows = [{
+        "label_type": "plasmids",
+        "identifier": "",
+        "colony": "",
+        "date": date.today().isoformat(),
+        "concentration": "",
+    }]
+    if request.method == "POST":
+        searched = True
+        rows = batch_print_rows_from_post(request.POST)
+        for row in rows:
+            obj, missing_token = find_batch_label(row["label_type"], row["identifier"], request.user)
+            if obj:
+                labels.append({
+                    "kind": row["label_type"],
+                    "object": obj,
+                    "colony": row["colony"],
+                    "date": parse_batch_print_date(row["date"]),
+                    "concentration": parse_batch_print_concentration(row["concentration"]),
+                })
+            else:
+                missing.append("{} ({})".format(row["identifier"], missing_token))
+        if not rows:
+            rows = [{
+                "label_type": "plasmids",
+                "identifier": "",
+                "colony": "",
+                "date": date.today().isoformat(),
+                "concentration": "",
+            }]
+
+    context = {
+        "rows": rows,
+        "label_types": BatchPrintsForm.LABEL_TYPES,
+        "labels": labels,
+        "missing": missing,
+        "searched": searched,
+        "today": date.today().isoformat(),
+    }
+    return render(request, "inventory/services/batch_prints/batch_prints.html", context)
 
 
 def ServicesPcr(request):

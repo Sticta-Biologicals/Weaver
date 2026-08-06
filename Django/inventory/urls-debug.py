@@ -22,6 +22,7 @@ from .views import ServicesBlast
 from .views import ServicesGtr
 from .views import ServicesL0d
 from .views import ServicesStats
+from .views import ServicesBatchPrints
 from .views import api_plasmid_get_fasta_by_name
 from .views import api_plasmid_get_fasta_by_idx
 from .views import api_fidelity_calc
@@ -85,6 +86,7 @@ urlpatterns = [
     path('services/blast/', login_required(ServicesBlast, redirect_field_name='next'), name='services-blast'),
     path('services/gtr/', login_required(ServicesGtr, redirect_field_name='next'), name='services-gtr'),
     path('services/l0d/', login_required(ServicesL0d, redirect_field_name='next'), name='services-l0d'),
+    path('services/batch-prints/', login_required(ServicesBatchPrints, redirect_field_name='next'), name='services-batch-prints'),
     path('services/stats/', login_required(ServicesStats, redirect_field_name='next'), name='services-stats'),
 
     path('api/plasmid/get_fasta/by_name/<str:name>/', api_plasmid_get_fasta_by_name, name='api-plasmid-get_fasta_by_name'),

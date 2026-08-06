@@ -238,6 +238,29 @@ class ServicesPCRForm(forms.Form):
         return cleaned_data
 
 
+class BatchPrintsForm(forms.Form):
+    LABEL_TYPES = (
+        ("plasmids", "Plasmids"),
+        ("glycerolstocks", "Glycerol stocks"),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(BatchPrintsForm, self).__init__(*args, **kwargs)
+        self.fields["label_type"].widget.attrs.update({"class": "form-select"})
+        self.fields["identifiers"].widget.attrs.update({
+            "class": "form-control",
+            "rows": 8,
+            "placeholder": "One ID, code, QR, or name per line",
+        })
+        self.fields["date"].widget.attrs.update({"class": "form-control"})
+        self.fields["concentration"].widget.attrs.update({"class": "form-control"})
+
+    label_type = forms.ChoiceField(label="Label type", choices=LABEL_TYPES)
+    identifiers = forms.CharField(label="Items", widget=forms.Textarea)
+    date = forms.DateField(widget=DateInput(), initial=datetime.date.today)
+    concentration = forms.FloatField(label="Concentration (ng/ul)", min_value=0.01, initial=1)
+
+
 class MsaUploadAb1FilesForm(forms.Form):
     ab1_file_1 = forms.FileField(label="AB1 File 1")
     ab1_file_2 = forms.FileField(label="AB1 File 2", required=False)

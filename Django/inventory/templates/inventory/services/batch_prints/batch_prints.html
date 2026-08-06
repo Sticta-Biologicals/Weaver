@@ -1,0 +1,284 @@
+{% extends "inventory/parts/base.html" %}
+{% load humanize %}
+
+{% block header_object_type %}Services{% endblock %}
+{% block header_object_name %}Batch Prints{% endblock %}
+
+{% block content %}
+<style>
+    .batch-print-table td {
+        vertical-align: middle;
+    }
+    .batch-print-table .batch-type {
+        min-width: 10rem;
+    }
+    .batch-print-table .batch-identifier {
+        min-width: 16rem;
+    }
+    .batch-print-table .batch-colony {
+        min-width: 7rem;
+    }
+    .batch-print-table .batch-date {
+        min-width: 10rem;
+    }
+    .batch-print-table .batch-concentration {
+        min-width: 9rem;
+    }
+    .batch-print-sheet {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+    }
+    .batch-print-sheet div.label {
+        position: static;
+        left: auto;
+        top: auto;
+        max-width: none;
+        border: 1px solid rgba(128, 128, 128, .35);
+        border-radius: .5rem;
+        padding: .85rem;
+        background: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        min-height: 8.5rem;
+        box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .08);
+    }
+    .batch-print-sheet div.label-info {
+        margin: 0;
+        padding: 0;
+    }
+    .batch-print-sheet .batch-label-title,
+    .batch-print-sheet .batch-label-subtitle,
+    .batch-print-sheet div.label-info p.label-id-colony {
+        font-size: .95rem;
+        line-height: 1.1em;
+        margin: 0 0 .35rem 0;
+    }
+    .batch-print-sheet .batch-label-subtitle {
+        font-size: .85rem;
+        line-height: 1.05em;
+    }
+    .batch-print-sheet div.label-info p:not(.label-id-colony) {
+        font-size: .75rem;
+        line-height: 1.15em;
+        padding: 0;
+        margin-bottom: .2rem;
+    }
+    @media print {
+        .batch-print-sheet {
+            display: block;
+        }
+        .batch-print-sheet div.label {
+            position: static !important;
+            left: auto !important;
+            top: auto !important;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            background: none;
+            box-shadow: none;
+            break-inside: avoid;
+            page-break-inside: avoid;
+            break-after: page;
+            page-break-after: always;
+        }
+        .batch-print-sheet div.label:last-child {
+            break-after: auto;
+            page-break-after: auto;
+        }
+        .batch-print-sheet .batch-label-title,
+        .batch-print-sheet .batch-label-subtitle,
+        .batch-print-sheet div.label-info p.label-id-colony {
+            font-size: .8rem;
+            line-height: 1em;
+            margin: 0 0 .5rem 0;
+        }
+        .batch-print-sheet .batch-label-subtitle {
+            font-size: .6rem;
+            line-height: .8em;
+        }
+        .batch-print-sheet div.label-info p:not(.label-id-colony) {
+            font-size: .4rem;
+            line-height: 1em;
+            padding: 0;
+        }
+    }
+</style>
+
+<form method="post" id="label-inputs" class="alert alert-light border">
+    {% csrf_token %}
+    <table class="table table-sm batch-print-table">
+        <thead>
+            <tr>
+                <th scope="col">Print type</th>
+                <th scope="col">ID / code / QR / name</th>
+                <th scope="col">Colony</th>
+                <th scope="col">Concentration</th>
+                <th scope="col">Date</th>
+                <th scope="col" data-defaultsort="disabled"></th>
+            </tr>
+        </thead>
+        <tbody id="batch-print-rows">
+            {% for row in rows %}
+            <tr class="batch-print-row">
+                <td>
+                    <select name="label_type" class="form-select form-select-sm batch-type">
+                        {% for value, label in label_types %}
+                        <option value="{{ value }}"{% if value == row.label_type %} selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <input name="identifier" type="text" class="form-control form-control-sm batch-identifier" value="{{ row.identifier }}" required>
+                </td>
+                <td>
+                    <input name="colony" type="text" class="form-control form-control-sm batch-colony" value="{{ row.colony }}" placeholder="#">
+                </td>
+                <td>
+                    <input name="concentration" type="text" inputmode="decimal" class="form-control form-control-sm batch-concentration" value="{{ row.concentration }}">
+                </td>
+                <td>
+                    <input name="date" type="date" class="form-control form-control-sm batch-date" value="{{ row.date|default:today }}">
+                </td>
+                <td class="text-end">
+                    <button type="button" class="btn btn-sm btn-outline-danger batch-remove-row" title="Remove row"><i class="bi bi-trash"></i></button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="button" class="btn btn-outline-secondary" id="batch-add-row"><i class="bi bi-plus"></i> Add entry</button>
+    <button type="submit" class="btn btn-primary ms-2"><i class="bi bi-search"></i> Preview batch</button>
+    {% if labels %}
+    <button id="label-print-button" type="button" class="btn btn-info ms-2" onclick="window.print();return false;"><i class="bi bi-printer"></i> Print batch</button>
+    {% endif %}
+</form>
+
+{% if missing %}
+<div class="alert alert-warning">
+    Not found or not visible: {{ missing|join:", " }}
+</div>
+{% endif %}
+
+{% if searched and not labels %}
+<div class="alert alert-secondary">No labels to print.</div>
+{% endif %}
+
+{% if labels %}
+<div class="batch-print-sheet">
+    {% for label in labels %}
+        {% if label.kind == "plasmids" %}
+            {% with plasmid=label.object %}
+            <div class="plasmid label mb-4">
+                <div class="label-main">
+                    <div class="label-info">
+                        <p class="label-id-colony">
+                            <span class="label-value">
+                                ID {{ plasmid.idx }} ~ {% if label.colony %}c{{ label.colony }}{% else %}{{ plasmid.working_colony_text_short }}{% endif %}
+                                {% if plasmid.is_validated %}
+                                <i class="bi bi-check-circle"></i>
+                                {% else %}
+                                <i class="bi bi-circle"></i>
+                                {% endif %}
+                            </span>
+                        </p>
+                        <p class="batch-label-title">{{ plasmid.name }}</p>
+                        <p><span class="label-name">Date</span> <span class="label-value">{{ label.date }}</span></p>
+                        {% if label.concentration %}
+                        <p><span class="label-name">Conc</span> <span class="label-value">{{ label.concentration }} [ng/ul]</span></p>
+                        {% endif %}
+                        <p><span class="label-name">Size</span> <span class="label-value">{{ plasmid.computed_size|intcomma }} bp</span></p>
+                    </div>
+                </div>
+            </div>
+            {% endwith %}
+        {% elif label.kind == "glycerolstocks" %}
+            {% with glycerolstock=label.object %}
+            <div class="glycerolstock label mb-4">
+                <div class="label-main">
+                    <div class="label-info">
+                        {% if glycerolstock.plasmid %}
+                        <p class="label-id-colony">
+                            <span class="label-name">ID</span>
+                            <span class="label-value">{{ glycerolstock.plasmid.idx }}</span>
+                            ~ <span class="label-value">{{ glycerolstock.plasmid.working_colony_text_short }}</span>
+                        </p>
+                        {% endif %}
+                        <p class="batch-label-title">{% if glycerolstock.plasmid %}{{ glycerolstock.plasmid.name }}{% endif %}</p>
+                        <p class="batch-label-subtitle">{{ glycerolstock.strain }}</p>
+                        <p>
+                            {% if glycerolstock.resistantes_strain_human %}
+                            <span class="label-name">Strain Marker</span>
+                            <span class="label-value">{{ glycerolstock.resistantes_strain_human }}</span><br/>
+                            {% endif %}
+                            {% if glycerolstock.resistantes_human %}
+                            <span class="label-name">Plasmid Marker</span>
+                            <span class="label-value">{{ glycerolstock.resistantes_human }}</span><br/>
+                            {% endif %}
+                        </p>
+                        <p><span class="label-value">{% if glycerolstock.box_column and glycerolstock.box_row %}{{ glycerolstock.box_row }}{{ glycerolstock.box_column }} @ {% endif %}{{ glycerolstock.box.name }}</span></p>
+                        <p><span class="label-value">{{ glycerolstock.box.location }}</span></p>
+                        <p><span class="label-value">{{ label.date }}</span></p>
+                    </div>
+                </div>
+            </div>
+            {% endwith %}
+        {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+
+<script>
+    $(document).ready(function(){
+        var today = "{{ today }}";
+
+        function refreshConcentrationState(row) {
+            var type = row.find(".batch-type").val();
+            var concentration = row.find(".batch-concentration");
+            if (type === "glycerolstocks") {
+                concentration.val("");
+                concentration.prop("readonly", true);
+                concentration.attr("placeholder", "N/A");
+            } else {
+                concentration.prop("readonly", false);
+                concentration.attr("placeholder", "ng/ul");
+            }
+        }
+
+        function bindRow(row) {
+            refreshConcentrationState(row);
+            row.find(".batch-type").off("change").on("change", function(){
+                refreshConcentrationState(row);
+            });
+            row.find(".batch-remove-row").off("click").on("click", function(){
+                if ($("#batch-print-rows .batch-print-row").length > 1) {
+                    row.remove();
+                } else {
+                    row.find(".batch-identifier").val("");
+                    row.find(".batch-colony").val("");
+                    row.find(".batch-date").val(today);
+                    row.find(".batch-concentration").val("");
+                    row.find(".batch-type").val("plasmids");
+                    refreshConcentrationState(row);
+                }
+            });
+        }
+
+        $("#batch-print-rows .batch-print-row").each(function(){
+            bindRow($(this));
+        });
+
+        $("#batch-add-row").on("click", function(){
+            var template = $("#batch-print-rows .batch-print-row:first").clone();
+            template.find(".batch-type").val("plasmids");
+            template.find(".batch-identifier").val("");
+            template.find(".batch-colony").val("");
+            template.find(".batch-date").val(today);
+            template.find(".batch-concentration").val("");
+            $("#batch-print-rows").append(template);
+            bindRow(template);
+            template.find(".batch-identifier").focus();
+        });
+
+    });
+</script>
+{% endblock %}
