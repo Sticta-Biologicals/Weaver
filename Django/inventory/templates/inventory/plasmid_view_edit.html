@@ -41,6 +41,38 @@
                             <i class="bi bi-x-lg"></i>
                         </button>
                     </div>
+                    <button id="amplicon-parameters-toggle" type="button" class="weaver-digest-parameters-toggle" aria-expanded="true">
+                        <span>Filters</span>
+                        <i class="bi bi-chevron-up"></i>
+                    </button>
+                    <div id="amplicon-parameters-body" class="weaver-digest-parameters-body">
+                        <div class="weaver-digest-controls weaver-amplicon-filter-controls">
+                            <label class="form-label" for="amplicon-min-size">Product size</label>
+                            <div class="weaver-digest-fragment-range weaver-amplicon-filter-range">
+                                <input id="amplicon-min-size" class="form-control form-control-sm" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Min" aria-label="Minimum product size">
+                                <input id="amplicon-max-size" class="form-control form-control-sm" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Max" aria-label="Maximum product size">
+                            </div>
+
+                            <label class="form-label" for="amplicon-primer-id-1">Primer IDs</label>
+                            <div class="weaver-digest-fragment-range weaver-amplicon-filter-range">
+                                <input id="amplicon-primer-id-1" class="form-control form-control-sm" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="ID 1" aria-label="First primer ID">
+                                <input id="amplicon-primer-id-2" class="form-control form-control-sm" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="ID 2" aria-label="Second primer ID">
+                            </div>
+                        </div>
+                        <div class="weaver-digest-region-header">
+                            <span>Required amplicon regions</span>
+                            <button id="amplicon-add-region" type="button" class="btn btn-sm btn-outline-secondary" title="Add region">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        </div>
+                        <div id="amplicon-regions" class="weaver-digest-regions"></div>
+                    </div>
+                    <div class="weaver-amplicon-panel-actions">
+                        <button id="amplicon-run-search" type="button" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-play-fill"></i>
+                            Search
+                        </button>
+                    </div>
                     <div id="ove-amplicon-panel-list" class="weaver-amplicon-panel-list"></div>
                 </div>
             </aside>

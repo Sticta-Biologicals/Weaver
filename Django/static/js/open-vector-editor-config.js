@@ -477,6 +477,31 @@ function extensionSecondsForAmplicon(amplicon) {
 		return remainder ? "Ext " + minutes + " min " + remainder + " s" : "Ext " + minutes + " min";
 	}
 
+	function partialPrimerBindingLabel(amplicon) {
+		return valueFromNotes(amplicon, "partial_primer_binding") === "true" ? "3' partial" : "";
+	}
+
+	function partialPrimerBindingTooltip(amplicon) {
+		const details = [];
+		if (valueFromNotes(amplicon, "fwd_partial_binding") === "true") {
+			details.push(
+				"FWD: " +
+				valueFromNotes(amplicon, "fwd_binding_length") +
+				" bp aligned; 5' unaligned " +
+				valueFromNotes(amplicon, "fwd_unmatched_5")
+			);
+		}
+		if (valueFromNotes(amplicon, "rev_partial_binding") === "true") {
+			details.push(
+				"REV: " +
+				valueFromNotes(amplicon, "rev_binding_length") +
+				" bp aligned; 5' unaligned " +
+				valueFromNotes(amplicon, "rev_unmatched_5")
+			);
+		}
+		return details.length ? details.join("\n") : "Primer binding uses the 3' end only.";
+	}
+
 	function fallbackCopyText(text) {
 		const textarea = document.createElement("textarea");
 		textarea.value = text;
@@ -793,7 +818,11 @@ function clearWeaverTemporarySelection() {
 }
 
 function digestRegionRows() {
-	return Array.from(document.querySelectorAll(".weaver-digest-region-row"));
+	return Array.from(document.querySelectorAll("#digest-regions .weaver-digest-region-row"));
+}
+
+function ampliconRegionRows() {
+	return Array.from(document.querySelectorAll("#amplicon-regions .weaver-amplicon-region-row"));
 }
 
 function digestRequiredEnzymeButtons() {
@@ -889,8 +918,29 @@ function currentOveSelectionForDigest() {
 	};
 }
 
+function currentOveSelectionForAmplicon() {
+	const selection = weaverLatestSelection || (editorState && editorState.selectionLayer ? editorState.selectionLayer : null);
+	if (!selection || Array.isArray(selection) || selection.start < 0 || selection.end < 0) {
+		return null;
+	}
+	const originalSelection = originalDigestSelection(selection);
+	return {
+		start: Number(originalSelection.start) + 1,
+		end: Number(originalSelection.end) + 1
+	};
+}
+
 function digestRegionExists(startValue, endValue) {
 	return digestRegionRows().some((row) => {
+		const inputs = row.querySelectorAll("input");
+		const rowStart = inputs[0] ? String(inputs[0].value || "").trim() : "";
+		const rowEnd = inputs[1] ? String(inputs[1].value || "").trim() : "";
+		return rowStart === String(startValue) && rowEnd === String(endValue);
+	});
+}
+
+function ampliconRegionExists(startValue, endValue) {
+	return ampliconRegionRows().some((row) => {
 		const inputs = row.querySelectorAll("input");
 		const rowStart = inputs[0] ? String(inputs[0].value || "").trim() : "";
 		const rowEnd = inputs[1] ? String(inputs[1].value || "").trim() : "";
@@ -907,14 +957,16 @@ function addDigestRegion(startValue, endValue) {
 	row.className = "weaver-digest-region-row";
 	const startInput = document.createElement("input");
 	startInput.className = "form-control form-control-sm";
-	startInput.type = "number";
-	startInput.min = "1";
+	startInput.type = "text";
+	startInput.inputMode = "numeric";
+	startInput.pattern = "[0-9]*";
 	startInput.placeholder = "Start";
 	startInput.value = startValue || "";
 	const endInput = document.createElement("input");
 	endInput.className = "form-control form-control-sm";
-	endInput.type = "number";
-	endInput.min = "1";
+	endInput.type = "text";
+	endInput.inputMode = "numeric";
+	endInput.pattern = "[0-9]*";
 	endInput.placeholder = "End";
 	endInput.value = endValue || "";
 	const useSelectionButton = document.createElement("button");
@@ -927,6 +979,56 @@ function addDigestRegion(startValue, endValue) {
 		const selection = currentOveSelectionForDigest();
 		if (!selection) {
 			setDigestStatus("No active map selection is available.", true);
+			return;
+		}
+		startInput.value = selection.start;
+		endInput.value = selection.end;
+	};
+	const removeButton = document.createElement("button");
+	removeButton.type = "button";
+	removeButton.className = "btn btn-sm btn-outline-secondary";
+	removeButton.title = "Remove region";
+	removeButton.setAttribute("aria-label", "Remove region");
+	removeButton.innerHTML = '<i class="bi bi-trash"></i>';
+	removeButton.onclick = () => row.remove();
+	row.appendChild(startInput);
+	row.appendChild(endInput);
+	row.appendChild(useSelectionButton);
+	row.appendChild(removeButton);
+	container.appendChild(row);
+}
+
+function addAmpliconRegion(startValue, endValue) {
+	const container = document.getElementById("amplicon-regions");
+	if (!container) {
+		return;
+	}
+	const row = document.createElement("div");
+	row.className = "weaver-digest-region-row weaver-amplicon-region-row";
+	const startInput = document.createElement("input");
+	startInput.className = "form-control form-control-sm";
+	startInput.type = "text";
+	startInput.inputMode = "numeric";
+	startInput.pattern = "[0-9]*";
+	startInput.placeholder = "Start";
+	startInput.value = startValue || "";
+	const endInput = document.createElement("input");
+	endInput.className = "form-control form-control-sm";
+	endInput.type = "text";
+	endInput.inputMode = "numeric";
+	endInput.pattern = "[0-9]*";
+	endInput.placeholder = "End";
+	endInput.value = endValue || "";
+	const useSelectionButton = document.createElement("button");
+	useSelectionButton.type = "button";
+	useSelectionButton.className = "btn btn-sm btn-outline-primary";
+	useSelectionButton.title = "Use active map selection";
+	useSelectionButton.setAttribute("aria-label", "Use active map selection");
+	useSelectionButton.innerHTML = '<i class="bi bi-bounding-box"></i>';
+	useSelectionButton.onclick = () => {
+		const selection = currentOveSelectionForAmplicon();
+		if (!selection) {
+			setPrimerMatchStatus("No active map selection is available.", true);
 			return;
 		}
 		startInput.value = selection.start;
@@ -960,6 +1062,39 @@ function digestRequestParams() {
 		params.set("required_enzymes", requiredEnzymes.join(","));
 	}
 	const regions = digestRegionRows().map((row) => {
+		const inputs = row.querySelectorAll("input");
+		return {
+			start: inputs[0] ? inputs[0].value : "",
+			end: inputs[1] ? inputs[1].value : ""
+		};
+	}).filter((region) => String(region.start).trim() && String(region.end).trim());
+	params.set("regions", JSON.stringify(regions));
+	return params;
+}
+
+function ampliconRequestParams() {
+	const params = new URLSearchParams({
+		max_tm_diff: "5",
+		non_overlapping: true
+	});
+	const minSize = document.getElementById("amplicon-min-size");
+	const maxSize = document.getElementById("amplicon-max-size");
+	const minSizeValue = minSize ? String(minSize.value || "").trim() : "";
+	const maxSizeValue = maxSize ? String(maxSize.value || "").trim() : "";
+	if (minSizeValue) {
+		params.set("min_size", minSizeValue);
+	}
+	if (maxSizeValue) {
+		params.set("max_size", maxSizeValue);
+	}
+	const primerIds = [
+		document.getElementById("amplicon-primer-id-1"),
+		document.getElementById("amplicon-primer-id-2")
+	].map((input) => input ? String(input.value || "").trim() : "").filter(Boolean);
+	if (primerIds.length) {
+		params.set("primer_ids", primerIds.join(","));
+	}
+	const regions = ampliconRegionRows().map((row) => {
 		const inputs = row.querySelectorAll("input");
 		return {
 			start: inputs[0] ? inputs[0].value : "",
@@ -1319,6 +1454,7 @@ function renderAmpliconPanel(candidates) {
 				{text: annealingTemperatureLabel(amplicon), title: annealingTemperatureTooltip(amplicon), className: "weaver-amplicon-ta-chip"},
 				{text: primerComplementarityLabel(amplicon), className: "weaver-amplicon-dimer-chip", title: "Show primer complementarity", onClick: () => togglePrimerComplementarityDetails(amplicon)},
 				{text: "ΔTm " + valueFromNotes(amplicon, "tm_difference") + " °C"},
+				{text: partialPrimerBindingLabel(amplicon), title: partialPrimerBindingTooltip(amplicon), className: "weaver-amplicon-partial-chip"},
 				{text: extensionTimeLabel(amplicon)}
 			].forEach((itemMeta) => {
 				if (!itemMeta.text.trim()) {
@@ -1453,6 +1589,32 @@ function mountWeaverPrimerToolbar() {
 	const panelClearMap = document.getElementById("ove-amplicon-panel-clear-map");
 	if (panelClearMap) {
 		panelClearMap.onclick = clearAmpliconsFromMap;
+	}
+	const ampliconParametersToggle = document.getElementById("amplicon-parameters-toggle");
+	const ampliconParametersBody = document.getElementById("amplicon-parameters-body");
+	const ampliconPanel = document.getElementById("ove-amplicon-panel");
+	if (ampliconParametersToggle && ampliconParametersBody && ampliconPanel) {
+		ampliconParametersToggle.onclick = () => {
+			const isCollapsed = !ampliconParametersBody.classList.contains("is-collapsed");
+			ampliconParametersBody.classList.toggle("is-collapsed", isCollapsed);
+			ampliconPanel.classList.toggle("has-collapsed-parameters", isCollapsed);
+			ampliconParametersToggle.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
+		};
+	}
+	const ampliconAddRegion = document.getElementById("amplicon-add-region");
+	if (ampliconAddRegion) {
+		ampliconAddRegion.onclick = () => {
+			const selection = currentOveSelectionForAmplicon();
+			if (!selection || ampliconRegionExists(selection.start, selection.end)) {
+				addAmpliconRegion();
+				return;
+			}
+			addAmpliconRegion(selection.start, selection.end);
+		};
+	}
+	const ampliconRunSearch = document.getElementById("amplicon-run-search");
+	if (ampliconRunSearch) {
+		ampliconRunSearch.onclick = loadPlasmidAmplicons;
 	}
 	const digestPanelTab = document.getElementById("ove-digest-panel-tab");
 	if (digestPanelTab) {
@@ -1652,12 +1814,7 @@ async function loadPlasmidAmplicons() {
 	setPrimerMatchStatus("Loading amplicons...");
 	try {
 		restoreWeaverVisualOriginalSequenceData();
-		const params = new URLSearchParams({
-			min_size: 100,
-			max_size: 5000,
-			max_tm_diff: 5,
-			non_overlapping: true
-		});
+		const params = ampliconRequestParams();
 		const response = await fetch(plasmid_amplicon_matches_path + "?" + params.toString(), {
 			headers: {
 				"Accept": "application/json"

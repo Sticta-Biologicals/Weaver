@@ -22,6 +22,7 @@ from .custom.pcr import matching_amplicon_annotations
 from .custom.pcr import primer_pair_amplicons
 from .custom.pcr import primer_pair_complementarity
 from .custom.pcr import select_non_overlapping_amplicons
+from .custom.pcr import amplicon_segments
 from .custom.pcr import display_primer_name
 from .custom.pcr import display_primer_id
 from .custom.restriction_digest import DigestConstraints
@@ -106,6 +107,8 @@ from Bio.Restriction import AllEnzymes
 from Bio.Restriction.Restriction_Dictionary import rest_dict
 from pyblast import BioBlast
 from pyblast.utils import make_linear, make_circular
+
+DEFAULT_AMPLICON_REGION_FLANK_BP = 30
 
 from .forms import DigestForm
 from .forms import PCRForm
@@ -1250,6 +1253,63 @@ def plasmid_seqrecord(plasmid):
     return records[0] if records else None
 
 
+def parse_required_regions(raw_regions, sequence_length):
+    zero_based_regions = [
+        {
+            'start': int(region['start']) - 1,
+            'end': int(region['end']) - 1,
+        }
+        for region in raw_regions
+        if str(region.get('start', '')).strip() and str(region.get('end', '')).strip()
+    ]
+    return normalize_regions(zero_based_regions, sequence_length)
+
+
+def optional_int_query_param(request, name, default=None):
+    raw_value = str(request.GET.get(name, '')).strip()
+    return int(raw_value) if raw_value else default
+
+
+def interval_contains(container_start, container_end, contained_start, contained_end, flank_bp=0):
+    return container_start - flank_bp <= contained_start and container_end + flank_bp >= contained_end
+
+
+def amplicon_contains_region(amplicon, region, sequence_length, flank_bp=0):
+    amplicon_ranges = amplicon_segments(amplicon, sequence_length)
+    region_ranges = (
+        [(region.start, region.end)]
+        if region.start <= region.end
+        else [(region.start, sequence_length - 1), (0, region.end)]
+    )
+    for region_start, region_end in region_ranges:
+        if not any(
+                interval_contains(amplicon_start, amplicon_end, region_start, region_end, flank_bp)
+                for amplicon_start, amplicon_end in amplicon_ranges):
+            return False
+    return True
+
+
+def amplicon_matches_required_regions(amplicon, regions, sequence_length, flank_bp=0):
+    return all(amplicon_contains_region(amplicon, region, sequence_length, flank_bp) for region in regions)
+
+
+def amplicon_matches_primer_id(amplicon, primer_id):
+    if not primer_id:
+        return True
+    notes = amplicon.get("notes") or {}
+    return primer_id in (
+        (notes.get("fwd_primer_id") or [""])[0],
+        (notes.get("rev_primer_id") or [""])[0],
+    )
+
+
+def amplicon_matches_any_primer_id(amplicon, primer_ids):
+    primer_ids = [str(primer_id).strip() for primer_id in primer_ids if str(primer_id).strip()]
+    if not primer_ids:
+        return True
+    return any(amplicon_matches_primer_id(amplicon, primer_id) for primer_id in primer_ids)
+
+
 @require_member_can_read_project_of_plasmid
 def api_plasmid_primer_matches(request, plasmid_id):
     try:
@@ -1289,12 +1349,30 @@ def api_plasmid_amplicon_matches(request, plasmid_id):
         }, status=400)
 
     try:
-        min_product_size = int(request.GET.get('min_size', 100))
-        max_product_size = int(request.GET.get('max_size', len(str(sequence[1]))))
+        min_product_size = optional_int_query_param(request, 'min_size', 100)
+        max_product_size = optional_int_query_param(request, 'max_size')
+        region_flank_bp = optional_int_query_param(
+            request,
+            'region_flank_bp',
+            DEFAULT_AMPLICON_REGION_FLANK_BP,
+        )
         max_tm_difference = float(request.GET.get('max_tm_diff', 5))
-    except ValueError:
+        raw_regions = json.loads(request.GET.get('regions', '[]'))
+        required_regions = parse_required_regions(raw_regions, len(str(sequence[1])))
+        raw_primer_ids = []
+        for value in request.GET.getlist('primer_ids'):
+            raw_primer_ids.extend(value.split(','))
+        legacy_primer_id = str(request.GET.get('primer_id', '')).strip()
+        if legacy_primer_id:
+            raw_primer_ids.append(legacy_primer_id)
+        primer_ids = tuple(dict.fromkeys(
+            primer_id.strip()
+            for primer_id in raw_primer_ids
+            if primer_id.strip()
+        ))
+    except (TypeError, ValueError, KeyError, json.JSONDecodeError) as error:
         return JsonResponse({
-            'error': 'Bad amplicon filter limits',
+            'error': 'Bad amplicon filter parameters: ' + str(error),
             'amplicons': [],
             'count': 0
         }, status=400)
@@ -1307,6 +1385,21 @@ def api_plasmid_amplicon_matches(request, plasmid_id):
         max_product_size=max_product_size,
         max_tm_difference=max_tm_difference,
     )
+    if required_regions:
+        candidate_annotations = [
+            amplicon for amplicon in candidate_annotations
+            if amplicon_matches_required_regions(
+                amplicon,
+                required_regions,
+                len(str(sequence[1])),
+                region_flank_bp,
+            )
+        ]
+    if primer_ids:
+        candidate_annotations = [
+            amplicon for amplicon in candidate_annotations
+            if amplicon_matches_any_primer_id(amplicon, primer_ids)
+        ]
     non_overlapping = request.GET.get('non_overlapping', 'true').lower() not in ('0', 'false', 'no')
     annotations = select_non_overlapping_amplicons(
         candidate_annotations,
@@ -1318,6 +1411,13 @@ def api_plasmid_amplicon_matches(request, plasmid_id):
         'count': len(annotations),
         'candidate_count': len(candidate_annotations),
         'non_overlapping': non_overlapping,
+        'filters': {
+            'min_size': min_product_size,
+            'max_size': max_product_size,
+            'primer_ids': list(primer_ids),
+            'region_count': len(required_regions),
+            'region_flank_bp': region_flank_bp,
+        },
     })
 
 
@@ -1347,14 +1447,6 @@ def api_plasmid_restriction_digests(request, plasmid_id):
             if enzyme.strip()
         ))
         raw_regions = json.loads(request.GET.get('regions', '[]'))
-        zero_based_regions = [
-            {
-                'start': int(region['start']) - 1,
-                'end': int(region['end']) - 1,
-            }
-            for region in raw_regions
-            if str(region.get('start', '')).strip() and str(region.get('end', '')).strip()
-        ]
         constraints = DigestConstraints(
             min_fragments=max(1, int(request.GET.get('min_fragments', DEFAULT_MIN_FRAGMENTS))),
             max_fragments=max(1, int(request.GET.get('max_fragments', DEFAULT_MAX_FRAGMENTS))),
@@ -1363,7 +1455,7 @@ def api_plasmid_restriction_digests(request, plasmid_id):
             min_buffer_activity_percent=DEFAULT_MIN_BUFFER_ACTIVITY_PERCENT,
             max_enzymes=max(1, min(2, int(request.GET.get('max_enzymes', DEFAULT_MAX_ENZYMES)))),
             limit=max(1, min(50, int(request.GET.get('limit', DEFAULT_RESULT_LIMIT)))),
-            required_regions=normalize_regions(zero_based_regions, len(sequence_text)),
+            required_regions=parse_required_regions(raw_regions, len(sequence_text)),
             required_enzymes=required_enzymes,
         )
     except (TypeError, ValueError, KeyError, json.JSONDecodeError) as error:

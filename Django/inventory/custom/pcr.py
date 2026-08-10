@@ -2,10 +2,33 @@ import re
 
 from Bio.Seq import Seq
 
+from inventory.custom.standards import assembly_standards
 from inventory.custom.primer_dimers import PrimerDimerConditions
 from inventory.custom.primer_dimers import PrimerDimerThresholds
 from inventory.custom.primer_dimers import PrimerInput
 from inventory.custom.primer_dimers import analyze_pair
+
+
+TYPE_IIS_CLONING_SITES = ("CGTCTC", "GAGACG", "GGTCTC", "GAGACC", "GCTCTTC", "GAAGAGC")
+MAX_CLONING_SITE_PREFIX = 8
+TYPE_IIS_SPACER_LENGTHS = range(1, 9)
+TYPE_IIS_OVERHANG_LENGTHS = (4, 3)
+PREFERRED_TYPE_IIS_SPACER_LENGTH = 5
+MIN_INFERRED_HYBRIDIZING_LENGTH = 15
+MIN_PRIMER_3PRIME_BINDING_LENGTH = 15
+YTK_OVERHANGS = {
+    "8-1": {"name": "YTK Type 8 / Type 1", "overhang": "CCCT"},
+    "1-2": {"name": "YTK Type 1 / Type 2", "overhang": "AACG"},
+    "2-3": {"name": "YTK Type 2 / Type 3", "overhang": "TATG"},
+    "3a-3b": {"name": "YTK Type 3a / Type 3b", "overhang": "TTCT"},
+    "3-4": {"name": "YTK Type 3 / Type 4", "overhang": "ATCC"},
+    "4a-4b": {"name": "YTK Type 4a / Type 4b", "overhang": "TGGC"},
+    "4-5": {"name": "YTK Type 4 / Type 5", "overhang": "GCTG"},
+    "5-6": {"name": "YTK Type 5 / Type 6", "overhang": "TACA"},
+    "6-7": {"name": "YTK Type 6 / Type 7", "overhang": "GAGT"},
+    "7-8": {"name": "YTK Type 7 / Type 8", "overhang": "CCGA"},
+    "8a-8b": {"name": "YTK Type 8a / Type 8b", "overhang": "CAAT"},
+}
 
 
 def clean_dna(sequence):
@@ -36,20 +59,146 @@ def recommended_annealing_tm(primer_tm, product_tm):
     return 0.3 * primer_tm + 0.7 * product_tm - 14.9
 
 
+def known_cloning_overhangs():
+    overhangs = set()
+    for standard in assembly_standards.values():
+        for level in standard.get("ohs", {}).values():
+            for overhang in level.values():
+                sequence = clean_dna(overhang.get("oh", ""))
+                if sequence:
+                    overhangs.add(sequence)
+                    overhangs.add(str(Seq(sequence).reverse_complement()))
+    return overhangs
+
+
+KNOWN_CLONING_OVERHANGS = known_cloning_overhangs()
+
+
+def ytk_overhang_lookup():
+    lookup = {}
+    for key, value in YTK_OVERHANGS.items():
+        overhang = clean_dna(value["overhang"])
+        reverse_complement = str(Seq(overhang).reverse_complement())
+        lookup[overhang] = {
+            "key": key,
+            "name": value["name"],
+            "canonical_overhang": overhang,
+            "orientation": "forward",
+        }
+        lookup[reverse_complement] = {
+            "key": key,
+            "name": value["name"],
+            "canonical_overhang": overhang,
+            "orientation": "reverse_complement",
+        }
+    return lookup
+
+
+YTK_OVERHANG_LOOKUP = ytk_overhang_lookup()
+
+
+def classify_ytk_overhang(overhang):
+    return YTK_OVERHANG_LOOKUP.get(clean_dna(overhang), {
+        "key": "",
+        "name": "",
+        "canonical_overhang": "",
+        "orientation": "",
+    })
+
+
+def infer_type_iis_overhang(sequence, min_hybridizing_length=MIN_INFERRED_HYBRIDIZING_LENGTH):
+    sequence = clean_dna(sequence)
+    if not sequence:
+        return None
+
+    candidates = []
+    for site in TYPE_IIS_CLONING_SITES:
+        site_index = sequence.find(site)
+        if site_index < 0 or site_index > MAX_CLONING_SITE_PREFIX:
+            continue
+
+        for spacer_length in TYPE_IIS_SPACER_LENGTHS:
+            for overhang_length in TYPE_IIS_OVERHANG_LENGTHS:
+                split_index = site_index + len(site) + spacer_length + overhang_length
+                if len(sequence) - split_index < min_hybridizing_length:
+                    continue
+
+                cloning_overhang = sequence[split_index - overhang_length:split_index]
+                if cloning_overhang not in KNOWN_CLONING_OVERHANGS:
+                    continue
+
+                candidates.append({
+                    "sequence_5": sequence[:split_index],
+                    "sequence_3": sequence[split_index:],
+                    "site": site,
+                    "cloning_overhang": cloning_overhang,
+                    "ytk": classify_ytk_overhang(cloning_overhang),
+                    "spacer_length": spacer_length,
+                    "overhang_length": overhang_length,
+                })
+
+    if not candidates:
+        return None
+
+    return sorted(candidates, key=lambda candidate: (
+        abs(candidate["spacer_length"] - PREFERRED_TYPE_IIS_SPACER_LENGTH),
+        -candidate["overhang_length"],
+        -len(candidate["sequence_5"]),
+        candidate["spacer_length"],
+    ))[0]
+
+
+def inferred_primer_parts(primer):
+    sequence_5 = clean_dna(primer.sequence_5)
+    sequence_3 = clean_dna(primer.sequence_3)
+    if sequence_5 or not sequence_3:
+        return {
+            "sequence_5": sequence_5,
+            "sequence_3": sequence_3,
+            "inferred": False,
+            "cloning_overhang": "",
+            "site": "",
+            "ytk": classify_ytk_overhang(""),
+        }
+
+    inferred = infer_type_iis_overhang(sequence_3)
+    if not inferred:
+        return {
+            "sequence_5": sequence_5,
+            "sequence_3": sequence_3,
+            "inferred": False,
+            "cloning_overhang": "",
+            "site": "",
+            "ytk": classify_ytk_overhang(""),
+        }
+
+    return {
+        "sequence_5": inferred["sequence_5"],
+        "sequence_3": inferred["sequence_3"],
+        "inferred": True,
+        "cloning_overhang": inferred["cloning_overhang"],
+        "site": inferred["site"],
+        "ytk": inferred["ytk"],
+    }
+
+
 def primer_full_sequence(primer):
-    return clean_dna(f"{primer.sequence_5}{primer.sequence_3}")
+    parts = inferred_primer_parts(primer)
+    return clean_dna(f"{parts['sequence_5']}{parts['sequence_3']}")
 
 
 def primer_dimer_analysis(primer_f, primer_r, annealing_temp_c=60.0):
+    fwd_parts = inferred_primer_parts(primer_f)
+    rev_parts = inferred_primer_parts(primer_r)
     primer_a = PrimerInput(
         name=display_primer_name(primer_f) or str(primer_f.name or "Forward primer"),
         sequence=primer_full_sequence(primer_f),
-        hybridizing_sequence=clean_dna(primer_f.sequence_3),
+        hybridizing_sequence=fwd_parts["sequence_3"],
     )
     primer_b = PrimerInput(
         name=display_primer_name(primer_r) or str(primer_r.name or "Reverse primer"),
         sequence=primer_full_sequence(primer_r),
-        hybridizing_sequence=clean_dna(primer_r.sequence_3),
+        hybridizing_sequence=rev_parts["sequence_3"],
     )
     return analyze_pair(
         primer_a,
@@ -90,6 +239,41 @@ def find_literal_hits(sequence, query):
         })
         start = index + 1
     return hits
+
+
+def find_primer_binding_hits(sequence, primer_sequence, is_reverse=False, min_binding_length=MIN_PRIMER_3PRIME_BINDING_LENGTH):
+    primer_sequence = clean_dna(primer_sequence)
+    if not primer_sequence:
+        return []
+
+    minimum_length = min(int(min_binding_length), len(primer_sequence))
+    for binding_length in range(len(primer_sequence), minimum_length - 1, -1):
+        binding_sequence = primer_sequence[-binding_length:]
+        query = str(Seq(binding_sequence).reverse_complement()) if is_reverse else binding_sequence
+        hits = find_literal_hits(sequence, query)
+        if not hits:
+            continue
+
+        unmatched_5 = primer_sequence[:-binding_length]
+        for hit in hits:
+            hit["binding_length"] = binding_length
+            hit["binding_sequence"] = binding_sequence
+            hit["query"] = query
+            hit["unmatched_5"] = unmatched_5
+        return hits
+
+    return []
+
+
+def primer_hit_partial_binding(hit):
+    return bool(hit.get("unmatched_5"))
+
+
+def partial_binding_warning(label, hit):
+    unmatched = hit.get("unmatched_5", "")
+    if not unmatched:
+        return ""
+    return f"{label} partial 3' binding: {hit.get('binding_length', 0)} bp aligned, {len(unmatched)} bp 5' unaligned"
 
 
 def bases_are_complementary(base_a, base_b):
@@ -264,6 +448,9 @@ def unwrap_hits(hits, sequence_length, window_start, window_end):
                     "original_start": hit["start"],
                     "original_end": hit["end"],
                     "length": hit["length"],
+                    "binding_length": hit.get("binding_length", hit["length"]),
+                    "binding_sequence": hit.get("binding_sequence", ""),
+                    "unmatched_5": hit.get("unmatched_5", ""),
                 })
     return unwrapped
 
@@ -320,15 +507,19 @@ def classify_product(product_start, product_end, selection_start, selection_end,
 
 
 def primer_info(primer, hits):
+    parts = inferred_primer_parts(primer)
     return {
         "primer": primer,
         "name": display_primer_name(primer),
         "display_id": display_primer_id(primer),
-        "sequence_3": clean_dna(primer.sequence_3),
-        "sequence_5": clean_dna(primer.sequence_5),
+        "sequence_3": parts["sequence_3"],
+        "sequence_5": parts["sequence_5"],
+        "sequence_5_inferred": parts["inferred"],
+        "cloning_overhang": parts["cloning_overhang"],
+        "cloning_site": parts["site"],
         "hit_count": len(hits),
-        "tm_3": tm_value(primer.sequence_3),
-        "gc_3": gc_content(primer.sequence_3),
+        "tm_3": tm_value(parts["sequence_3"]),
+        "gc_3": gc_content(parts["sequence_3"]),
     }
 
 
@@ -359,13 +550,12 @@ def suggest_pcr_primers(
     rev_candidates = []
 
     for primer in primers:
-        sequence_3 = clean_dna(primer.sequence_3)
+        sequence_3 = inferred_primer_parts(primer)["sequence_3"]
         if not sequence_3:
             continue
 
         if primer.fwd_or_rev == "r":
-            query = str(Seq(sequence_3).reverse_complement())
-            hits = find_literal_hits(doubled_sequence, query)
+            hits = find_primer_binding_hits(doubled_sequence, sequence_3, is_reverse=True)
             hits = [hit for hit in hits if hit["start"] < sequence_length]
             unwrapped_hits = unwrap_hits(hits, sequence_length, window_start, window_end)
             if unwrapped_hits:
@@ -376,7 +566,7 @@ def suggest_pcr_primers(
                     "info": primer_info(primer, hits),
                 })
         else:
-            hits = find_literal_hits(doubled_sequence, sequence_3)
+            hits = find_primer_binding_hits(doubled_sequence, sequence_3)
             hits = [hit for hit in hits if hit["start"] < sequence_length]
             unwrapped_hits = unwrap_hits(hits, sequence_length, window_start, window_end)
             if unwrapped_hits:
@@ -426,6 +616,12 @@ def suggest_pcr_primers(
                         warnings.append(f"FWD has {fwd['info']['hit_count']} hits")
                     if rev["info"]["hit_count"] > 1:
                         warnings.append(f"REV has {rev['info']['hit_count']} hits")
+                    for warning in (
+                        partial_binding_warning("FWD", f_hit),
+                        partial_binding_warning("REV", r_hit),
+                    ):
+                        if warning:
+                            warnings.append(warning)
                     template_product_sequence = circular_sequence_slice(sequence, product_start, product_end)
                     less_stable_primer_tm = min(fwd["info"]["tm_3"], rev["info"]["tm_3"])
                     product_tm = tm_value(template_product_sequence)
@@ -440,7 +636,9 @@ def suggest_pcr_primers(
                     extra_right = max(0, product_end - selection_end)
                     total_product_length = (
                         len(fwd["info"]["sequence_5"]) +
+                        len(f_hit.get("unmatched_5", "")) +
                         template_product_length +
+                        len(r_hit.get("unmatched_5", "")) +
                         len(rev["info"]["sequence_5"])
                     )
                     if total_product_length < min_product_size:
@@ -465,6 +663,12 @@ def suggest_pcr_primers(
                         "extra_left": extra_left,
                         "extra_right": extra_right,
                         "tm_difference": tm_difference,
+                        "fwd_partial_binding": primer_hit_partial_binding(f_hit),
+                        "rev_partial_binding": primer_hit_partial_binding(r_hit),
+                        "fwd_binding_length": f_hit.get("binding_length", f_hit["length"]),
+                        "rev_binding_length": r_hit.get("binding_length", r_hit["length"]),
+                        "fwd_unmatched_5": f_hit.get("unmatched_5", ""),
+                        "rev_unmatched_5": r_hit.get("unmatched_5", ""),
                         "primer_complementarity": complementarity,
                         "primer3_dimer": primer3_dimer,
                         "warnings": warnings,
@@ -490,13 +694,12 @@ def matching_primer_annotations(sequence, primers):
     doubled_sequence = sequence + sequence
     annotations = []
     for primer in primers:
-        sequence_3 = clean_dna(primer.sequence_3)
+        sequence_3 = inferred_primer_parts(primer)["sequence_3"]
         if not sequence_3:
             continue
 
         is_reverse = primer.fwd_or_rev == "r"
-        query = str(Seq(sequence_3).reverse_complement()) if is_reverse else sequence_3
-        hits = find_literal_hits(doubled_sequence, query)
+        hits = find_primer_binding_hits(doubled_sequence, sequence_3, is_reverse=is_reverse)
         hits = [hit for hit in hits if hit["start"] < sequence_length]
 
         for hit in hits:
@@ -524,6 +727,7 @@ def matching_primer_annotations(sequence, primers):
                     "direction": [direction_label],
                 },
                 "bases": sequence_3,
+                "bindingBases": hit.get("binding_sequence", sequence_3),
                 "overlapsSelf": overlaps_self,
             })
 
@@ -549,19 +753,22 @@ def matching_amplicon_annotations(
     rev_hits = []
 
     for primer in primers:
-        sequence_3 = clean_dna(primer.sequence_3)
+        parts = inferred_primer_parts(primer)
+        sequence_3 = parts["sequence_3"]
         if not sequence_3:
             continue
 
         is_reverse = primer.fwd_or_rev == "r"
-        query = str(Seq(sequence_3).reverse_complement()) if is_reverse else sequence_3
-        hits = find_literal_hits(doubled_sequence, query)
+        hits = find_primer_binding_hits(doubled_sequence, sequence_3, is_reverse=is_reverse)
         hits = [hit for hit in hits if hit["start"] < sequence_length]
         primer_data = {
             "primer": primer,
             "name": display_primer_name(primer),
             "display_id": display_primer_id(primer),
-            "sequence_5": clean_dna(primer.sequence_5),
+            "sequence_5": parts["sequence_5"],
+            "sequence_5_inferred": parts["inferred"],
+            "cloning_overhang": parts["cloning_overhang"],
+            "cloning_site": parts["site"],
             "tm_3": tm_value(sequence_3),
             "hit_count": len(hits),
         }
@@ -571,6 +778,9 @@ def matching_amplicon_annotations(
                 "primer": primer_data,
                 "start": hit["start"],
                 "end": hit["end"],
+                "binding_sequence": hit.get("binding_sequence", sequence_3),
+                "binding_length": hit.get("binding_length", len(sequence_3)),
+                "unmatched_5": hit.get("unmatched_5", ""),
             }
             if is_reverse:
                 rev_hits.append(hit_data)
@@ -590,7 +800,9 @@ def matching_amplicon_annotations(
             template_size = r_end - f_hit["start"] + 1
             product_size = (
                 len(f_hit["primer"]["sequence_5"]) +
+                len(f_hit.get("unmatched_5", "")) +
                 template_size +
+                len(r_hit.get("unmatched_5", "")) +
                 len(r_hit["primer"]["sequence_5"])
             )
             if product_size < min_product_size or product_size > max_product_size:
@@ -602,7 +814,9 @@ def matching_amplicon_annotations(
             template_product_sequence = doubled_sequence[f_hit["start"]:r_end + 1]
             amplicon_sequence = (
                 f_hit["primer"]["sequence_5"] +
+                f_hit.get("unmatched_5", "") +
                 template_product_sequence +
+                str(Seq(r_hit.get("unmatched_5", "")).reverse_complement()) +
                 str(Seq(r_hit["primer"]["sequence_5"]).reverse_complement())
             )
             product_tm = tm_value(template_product_sequence)
@@ -633,6 +847,12 @@ def matching_amplicon_annotations(
                 warnings.append(f"FWD has {f_hit['primer']['hit_count']} hits")
             if r_hit["primer"]["hit_count"] > 1:
                 warnings.append(f"REV has {r_hit['primer']['hit_count']} hits")
+            for warning in (
+                partial_binding_warning("FWD", f_hit),
+                partial_binding_warning("REV", r_hit),
+            ):
+                if warning:
+                    warnings.append(warning)
             complementarity = primer_pair_complementarity(f_hit["primer"]["primer"], r_hit["primer"]["primer"])
             warnings.extend(complementarity["warnings"])
             if primer3_dimer["risk"] in ("MODERATE", "HIGH", "CALCULATION_ERROR"):
@@ -668,6 +888,15 @@ def matching_amplicon_annotations(
                     "product_tm": [f"{product_tm:.1f}"],
                     "tm_difference": [f"{tm_difference:.1f}"],
                     "recommended_annealing_tm": [f"{annealing_tm:.1f}"],
+                    "partial_primer_binding": [
+                        "true" if primer_hit_partial_binding(f_hit) or primer_hit_partial_binding(r_hit) else "false"
+                    ],
+                    "fwd_partial_binding": ["true" if primer_hit_partial_binding(f_hit) else "false"],
+                    "rev_partial_binding": ["true" if primer_hit_partial_binding(r_hit) else "false"],
+                    "fwd_binding_length": [str(f_hit.get("binding_length", 0))],
+                    "rev_binding_length": [str(r_hit.get("binding_length", 0))],
+                    "fwd_unmatched_5": [f_hit.get("unmatched_5", "")],
+                    "rev_unmatched_5": [r_hit.get("unmatched_5", "")],
                     "primer_complementarity_severity": [complementarity["severity"]],
                     "primer_complementarity_max": [str(complementarity["max_contiguous"])],
                     "primer_complementarity_3prime": [str(complementarity["max_3prime_contiguous"])],
@@ -710,20 +939,21 @@ def primer_pair_amplicons(sequence, primer_f, primer_r, min_product_size=1, max_
     if not sequence:
         return []
 
-    fwd_sequence = clean_dna(primer_f.sequence_3)
-    rev_sequence = clean_dna(primer_r.sequence_3)
+    fwd_parts = inferred_primer_parts(primer_f)
+    rev_parts = inferred_primer_parts(primer_r)
+    fwd_sequence = fwd_parts["sequence_3"]
+    rev_sequence = rev_parts["sequence_3"]
     if not fwd_sequence or not rev_sequence:
         return []
 
     max_product_size = max_product_size or sequence_length
     doubled_sequence = sequence + sequence
-    rev_query = str(Seq(rev_sequence).reverse_complement())
     fwd_hits = [
-        hit for hit in find_literal_hits(doubled_sequence, fwd_sequence)
+        hit for hit in find_primer_binding_hits(doubled_sequence, fwd_sequence)
         if hit["start"] < sequence_length
     ]
     rev_hits = [
-        hit for hit in find_literal_hits(doubled_sequence, rev_query)
+        hit for hit in find_primer_binding_hits(doubled_sequence, rev_sequence, is_reverse=True)
         if hit["start"] < sequence_length
     ]
 
@@ -738,7 +968,13 @@ def primer_pair_amplicons(sequence, primer_f, primer_r, min_product_size=1, max_
                 r_end += sequence_length
 
             template_size = r_end - f_hit["start"] + 1
-            product_size = len(clean_dna(primer_f.sequence_5)) + template_size + len(clean_dna(primer_r.sequence_5))
+            product_size = (
+                len(fwd_parts["sequence_5"]) +
+                len(f_hit.get("unmatched_5", "")) +
+                template_size +
+                len(r_hit.get("unmatched_5", "")) +
+                len(rev_parts["sequence_5"])
+            )
             if product_size < min_product_size or product_size > max_product_size:
                 continue
 
@@ -766,6 +1002,13 @@ def primer_pair_amplicons(sequence, primer_f, primer_r, min_product_size=1, max_
                 "fwd_tm": tm_value(fwd_sequence),
                 "rev_tm": tm_value(rev_sequence),
                 "recommended_annealing_tm": annealing_tm,
+                "partial_primer_binding": primer_hit_partial_binding(f_hit) or primer_hit_partial_binding(r_hit),
+                "fwd_partial_binding": primer_hit_partial_binding(f_hit),
+                "rev_partial_binding": primer_hit_partial_binding(r_hit),
+                "fwd_binding_length": f_hit.get("binding_length", f_hit["length"]),
+                "rev_binding_length": r_hit.get("binding_length", r_hit["length"]),
+                "fwd_unmatched_5": f_hit.get("unmatched_5", ""),
+                "rev_unmatched_5": r_hit.get("unmatched_5", ""),
                 "primer3_dimer": primer3_dimer,
             })
 

@@ -364,6 +364,12 @@ div#ove-viewer {
     content: " ▾";
 }
 
+.weaver-amplicon-partial-chip {
+    border-color: #0d6efd !important;
+    color: #0b5ed7;
+    cursor: help;
+}
+
 .weaver-amplicon-dimer-detail {
     border-left: solid 2px #f0ad4e;
     margin-top: 0.35rem;
@@ -455,6 +461,10 @@ div#ove-viewer {
     display: grid;
     gap: 0.25rem;
     grid-template-columns: 1fr 1fr;
+}
+
+.weaver-amplicon-filter-controls {
+    grid-template-columns: 1fr;
 }
 
 .weaver-digest-required-enzyme-picker {
@@ -588,6 +598,15 @@ div#ove-viewer {
     display: grid;
     gap: 0.25rem;
     grid-template-columns: 1fr 1fr 32px 32px;
+}
+
+.weaver-amplicon-filter-range {
+    gap: 0.4rem;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.weaver-amplicon-region-row {
+    grid-template-columns: minmax(104px, 1fr) minmax(104px, 1fr) 36px 36px;
 }
 
 .weaver-digest-panel-list {

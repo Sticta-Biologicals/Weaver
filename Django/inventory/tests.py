@@ -5,6 +5,7 @@ from uuid import uuid4
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth.models import User
+from django.test import RequestFactory
 from django.test import SimpleTestCase
 from django.test import TestCase
 from django.urls import reverse
@@ -22,6 +23,10 @@ from inventory.custom.primer_dimers import read_primers
 from inventory.custom.primer_dimers import validate_primers
 from inventory.custom.primer_import import import_primers_from_fasta
 from inventory.custom.primer_import import primer_entries_from_fasta
+from inventory.custom.pcr import classify_ytk_overhang
+from inventory.custom.pcr import find_primer_binding_hits
+from inventory.custom.pcr import infer_type_iis_overhang
+from inventory.custom.pcr import inferred_primer_parts
 from inventory.custom.pcr import matching_amplicon_annotations
 from inventory.custom.pcr import primer_pair_amplicons
 from inventory.custom.pcr import primer_pair_complementarity
@@ -52,6 +57,10 @@ from inventory.models import SangerVerificationRun
 from inventory.views import fasta_alignment_result
 from inventory.views import fasta_record_from_text
 from inventory.views import fasta_records_from_text
+from inventory.views import amplicon_contains_region
+from inventory.views import amplicon_matches_any_primer_id
+from inventory.views import amplicon_matches_primer_id
+from inventory.views import optional_int_query_param
 from inventory.views import sanger_feature_color
 from organization.models import Membership
 from organization.models import Project
@@ -436,6 +445,171 @@ class SangerFeatureColorTests(SimpleTestCase):
 
 
 class PcrSuggestionTests(SimpleTestCase):
+    def test_infers_type_iis_overhang_from_full_primer_sequence(self):
+        inferred = infer_type_iis_overhang("aaCGTCTCtctccTATGcgtaaaggcgaagag")
+
+        self.assertEqual(inferred["sequence_5"], "AACGTCTCTCTCCTATG")
+        self.assertEqual(inferred["sequence_3"], "CGTAAAGGCGAAGAG")
+        self.assertEqual(inferred["cloning_overhang"], "TATG")
+        self.assertEqual(inferred["ytk"]["key"], "2-3")
+        self.assertEqual(inferred["ytk"]["orientation"], "forward")
+
+    def test_infers_reverse_primer_type_iis_overhang_from_full_sequence(self):
+        inferred = infer_type_iis_overhang("aaCGTCTCtctcgGGATtttgtacagttcatccataccatg")
+
+        self.assertEqual(inferred["sequence_5"], "AACGTCTCTCTCGGGAT")
+        self.assertEqual(inferred["sequence_3"], "TTTGTACAGTTCATCCATACCATG")
+        self.assertEqual(inferred["cloning_overhang"], "GGAT")
+        self.assertEqual(inferred["ytk"]["key"], "3-4")
+        self.assertEqual(inferred["ytk"]["canonical_overhang"], "ATCC")
+        self.assertEqual(inferred["ytk"]["orientation"], "reverse_complement")
+
+    def test_classifies_non_ytk_overhang_as_empty(self):
+        self.assertEqual(classify_ytk_overhang("AAAA")["key"], "")
+
+    def test_amplicon_finder_uses_inferred_hybridizing_sequence(self):
+        sequence = (
+            "CGTAAAGGCGAAGAG" +
+            "AAAAC" +
+            str(Seq("TTTGTACAGTTCATCCATACCATG").reverse_complement())
+        )
+        primers = [
+            primer("693-L0-P3-sfGFP-F", "aaCGTCTCtctccTATGcgtaaaggcgaagag", "f"),
+            primer("694-L0-P3-sfGFP-R", "aaCGTCTCtctcgGGATtttgtacagttcatccataccatg", "r"),
+        ]
+
+        amplicons = matching_amplicon_annotations(
+            sequence,
+            primers,
+            min_product_size=1,
+            max_product_size=999,
+            max_tm_difference=99,
+        )
+
+        self.assertEqual(len(amplicons), 1)
+        self.assertEqual(amplicons[0]["notes"]["fwd_primer"], ["L0-P3-sfGFP-F"])
+        self.assertEqual(amplicons[0]["notes"]["rev_primer"], ["L0-P3-sfGFP-R"])
+        self.assertEqual(
+            amplicons[0]["notes"]["amplicon_sequence"],
+            ["AACGTCTCTCTCCTATG" + sequence + str(Seq("AACGTCTCTCTCGGGAT").reverse_complement())],
+        )
+
+    def test_existing_declared_overhang_is_not_reinferred(self):
+        parts = inferred_primer_parts(
+            primer_with_overhang("declared-F", "aaCGTCTCtctccTATGcgtaaaggcgaagag", "TT", "f")
+        )
+
+        self.assertFalse(parts["inferred"])
+        self.assertEqual(parts["sequence_5"], "TT")
+        self.assertEqual(parts["sequence_3"], "AACGTCTCTCTCCTATGCGTAAAGGCGAAGAG")
+
+    def test_primer_binding_hits_can_match_from_3prime_end(self):
+        hits = find_primer_binding_hits(
+            "AAAACCCCGGGGTTTT",
+            "GGGGGAAAACCCCGGGGTTTT",
+            min_binding_length=15,
+        )
+
+        self.assertEqual(len(hits), 1)
+        self.assertEqual(hits[0]["start"], 0)
+        self.assertEqual(hits[0]["binding_sequence"], "AAAACCCCGGGGTTTT")
+        self.assertEqual(hits[0]["unmatched_5"], "GGGGG")
+
+    def test_amplicon_finder_allows_3prime_binding_without_full_primer_containment(self):
+        fwd_binding = "AAAACCCCGGGGTTTT"
+        rev_binding = "TTTTGGGGCCCCAAAA"
+        sequence = fwd_binding + "GG" + str(Seq(rev_binding).reverse_complement())
+        primers = [
+            primer_with_overhang("partial-F", "GGGGG" + fwd_binding, "AA", "f"),
+            primer_with_overhang("partial-R", "CCCCC" + rev_binding, "TT", "r"),
+        ]
+
+        amplicons = matching_amplicon_annotations(
+            sequence,
+            primers,
+            min_product_size=1,
+            max_product_size=999,
+            max_tm_difference=99,
+        )
+
+        self.assertEqual(len(amplicons), 1)
+        self.assertEqual(amplicons[0]["notes"]["partial_primer_binding"], ["true"])
+        self.assertEqual(amplicons[0]["notes"]["fwd_partial_binding"], ["true"])
+        self.assertEqual(amplicons[0]["notes"]["rev_partial_binding"], ["true"])
+        self.assertEqual(amplicons[0]["notes"]["fwd_binding_length"], ["16"])
+        self.assertEqual(amplicons[0]["notes"]["rev_binding_length"], ["16"])
+        self.assertEqual(amplicons[0]["notes"]["fwd_unmatched_5"], ["GGGGG"])
+        self.assertEqual(amplicons[0]["notes"]["rev_unmatched_5"], ["CCCCC"])
+        self.assertIn("FWD partial 3' binding: 16 bp aligned, 5 bp 5' unaligned", amplicons[0]["notes"]["warnings"])
+        self.assertIn("REV partial 3' binding: 16 bp aligned, 5 bp 5' unaligned", amplicons[0]["notes"]["warnings"])
+        self.assertEqual(
+            amplicons[0]["notes"]["amplicon_sequence"],
+            ["AA" + "GGGGG" + sequence + str(Seq("CCCCC").reverse_complement()) + "AA"],
+        )
+
+    def test_primer_pair_amplicons_flags_partial_binding(self):
+        fwd_binding = "AAAACCCCGGGGTTTT"
+        rev_binding = "TTTTGGGGCCCCAAAA"
+        sequence = fwd_binding + "GG" + str(Seq(rev_binding).reverse_complement())
+        primer_f = primer("partial-F", "GGGGG" + fwd_binding, "f")
+        primer_r = primer("partial-R", "CCCCC" + rev_binding, "r")
+
+        amplicons = primer_pair_amplicons(
+            sequence,
+            primer_f,
+            primer_r,
+            max_product_size=999,
+        )
+
+        self.assertEqual(len(amplicons), 1)
+        self.assertTrue(amplicons[0]["partial_primer_binding"])
+        self.assertTrue(amplicons[0]["fwd_partial_binding"])
+        self.assertTrue(amplicons[0]["rev_partial_binding"])
+
+    def test_amplicon_region_filter_requires_region_inside_amplicon(self):
+        amplicon = {"start": 10, "end": 30}
+        inside = SimpleNamespace(start=12, end=20)
+        outside = SimpleNamespace(start=5, end=12)
+
+        self.assertTrue(amplicon_contains_region(amplicon, inside, 100))
+        self.assertFalse(amplicon_contains_region(amplicon, outside, 100))
+
+    def test_amplicon_region_filter_allows_configured_flank(self):
+        amplicon = {"start": 6374, "end": 6844}
+        region = SimpleNamespace(start=6369, end=6743)
+
+        self.assertFalse(amplicon_contains_region(amplicon, region, 9171))
+        self.assertTrue(amplicon_contains_region(amplicon, region, 9171, flank_bp=30))
+
+    def test_amplicon_region_filter_supports_circular_amplicons(self):
+        amplicon = {"start": 90, "end": 10, "overlapsSelf": True}
+        inside = SimpleNamespace(start=95, end=5)
+        outside = SimpleNamespace(start=20, end=30)
+
+        self.assertTrue(amplicon_contains_region(amplicon, inside, 100))
+        self.assertFalse(amplicon_contains_region(amplicon, outside, 100))
+
+    def test_amplicon_primer_id_filter_matches_either_primer(self):
+        amplicon = {"notes": {"fwd_primer_id": ["693"], "rev_primer_id": ["694"]}}
+
+        self.assertTrue(amplicon_matches_primer_id(amplicon, "693"))
+        self.assertTrue(amplicon_matches_primer_id(amplicon, "694"))
+        self.assertFalse(amplicon_matches_primer_id(amplicon, "695"))
+        self.assertTrue(amplicon_matches_any_primer_id(amplicon, ("695", "694")))
+        self.assertFalse(amplicon_matches_any_primer_id(amplicon, ("695", "696")))
+
+    def test_amplicon_size_filter_limits_are_optional(self):
+        factory = RequestFactory()
+
+        empty_request = factory.get("/amplicons", {"min_size": "", "max_size": ""})
+        min_request = factory.get("/amplicons", {"min_size": "200", "max_size": ""})
+        max_request = factory.get("/amplicons", {"min_size": "", "max_size": "1200"})
+
+        self.assertEqual(optional_int_query_param(empty_request, "min_size", 100), 100)
+        self.assertIsNone(optional_int_query_param(empty_request, "max_size"))
+        self.assertEqual(optional_int_query_param(min_request, "min_size", 100), 200)
+        self.assertEqual(optional_int_query_param(max_request, "max_size"), 1200)
+
     def test_suggests_pair_covering_selection(self):
         sequence = "AAAACCCCGGGGTTTT"
         primers = [

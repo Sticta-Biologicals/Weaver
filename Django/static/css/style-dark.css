@@ -74,6 +74,8 @@ html[data-bs-theme="dark"]{
 
 #ove-viewer.bp3-dark ~ .weaver-amplicon-panel .weaver-amplicon-dimer-chip,
 .bp3-dark.weaver-amplicon-panel .weaver-amplicon-dimer-chip,
+#ove-viewer.bp3-dark ~ .weaver-amplicon-panel .weaver-amplicon-partial-chip,
+.bp3-dark.weaver-amplicon-panel .weaver-amplicon-partial-chip,
 #ove-viewer.bp3-dark ~ .weaver-amplicon-panel .weaver-amplicon-item-warnings,
 .bp3-dark.weaver-amplicon-panel .weaver-amplicon-item-warnings,
 #ove-viewer.bp3-dark ~ .weaver-amplicon-panel .weaver-amplicon-dimer-label,
