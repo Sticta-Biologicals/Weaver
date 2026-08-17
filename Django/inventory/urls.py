@@ -14,6 +14,8 @@ from .views import GstockDelete
 from .views import PrimerCreate
 from .views import PrimerEdit
 from .views import PrimerDelete
+from .views import RestrictionEnzymeCreate
+from .views import RestrictionEnzymeDelete
 
 from .views import PlasmidValidations
 from .views import PlasmidValidationEdit
@@ -40,6 +42,7 @@ urlpatterns = [
     path('plasmid/<uuid:plasmid_id>/', login_required(views.plasmid, redirect_field_name='next'), name='plasmid'),
     path('qr/i/<str:plasmid_id>/', login_required(views.plasmid_from_qr, redirect_field_name='next'), name='plasmid_from_qr'), # forfor QR
     path('plasmid/create/', login_required(PlasmidCreate.as_view(), redirect_field_name='next'), name='plasmid_create'),
+    path('plasmid/import/', login_required(views.plasmid_import, redirect_field_name='next'), name='plasmid_import'),
     path('plasmid/create/l0d', login_required(PlasmidCreateL0d, redirect_field_name='next'), name='plasmid_create_l0d'),
     path('plasmid/create/wizard', login_required(PlasmidCreateWizard.as_view(), redirect_field_name='next'), name='plasmid_create_wizard'),
     path('plasmid/create/wizard/end', login_required(plasmid_create_wizard_end, redirect_field_name='next'), name='plasmid_create_wizard_end'),
@@ -83,6 +86,8 @@ urlpatterns = [
     path('glycerolstock/box/<uuid:box_id>', login_required(views.glycerolstock_box, redirect_field_name='next'), name='glycerolstock_box'),
 
     path('restrictionenzymes/', login_required(views.restrictionenzymes, redirect_field_name='next'), name='restrictionenzymes'),
+    path('restrictionenzyme/create/', login_required(RestrictionEnzymeCreate.as_view(), redirect_field_name='next'), name='restrictionenzyme_create'),
+    path('restrictionenzyme/delete/<uuid:pk>/', login_required(RestrictionEnzymeDelete.as_view(), redirect_field_name='next'), name='restrictionenzyme_delete'),
     path('restrictionenzyme/<uuid:restrictionenzyme_id>/', login_required(views.restrictionenzyme, redirect_field_name='next'), name='restrictionenzyme'),
 
     path('primers/', login_required(views.primers, redirect_field_name='next'), name='primers'),

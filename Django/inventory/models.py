@@ -3,6 +3,8 @@ import uuid
 from django.db import models
 import datetime
 from django.conf import settings
+from django.core.validators import MaxValueValidator
+from django.core.validators import MinValueValidator
 from shortuuidfield import ShortUUIDField
 import shortuuid
 from .custom.box import BOX_ROWS
@@ -23,6 +25,14 @@ RE_Choices = []
 for key in rest_dict:
     if not key.startswith("_"):
         RE_Choices.append((key, key))
+
+LEGACY_RESTRICTION_BUFFERS = (
+    ("activity_buffer_1_1", "NEB 1.1"),
+    ("activity_buffer_2_1", "NEB 2.1"),
+    ("activity_buffer_3_1", "NEB 3.1"),
+    ("activity_buffer_CS", "NEB CutSmart"),
+    ("activity_buffer_aari", "Thermo AarI"),
+)
 
 
 def generate_shortuuid():
@@ -56,10 +66,27 @@ class PlasmidType(models.Model):
         return self.name
 
 
+class RestrictionBuffer(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+
+
 class RestrictionEnzyme(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # List https://github.com/biopython/biopython/blob/master/Bio/Restriction/Restriction_Dictionary.py
     name = models.CharField(choices=RE_Choices, max_length=20)
+    buffers = models.ManyToManyField(
+        RestrictionBuffer,
+        through='RestrictionEnzymeBuffer',
+        blank=True,
+        related_name='restriction_enzymes',
+    )
     activity_buffer_1_1 = models.IntegerField(blank=True, null=True)
     activity_buffer_2_1 = models.IntegerField(blank=True, null=True)
     activity_buffer_3_1 = models.IntegerField(blank=True, null=True)
@@ -114,6 +141,41 @@ class RestrictionEnzyme(models.Model):
             return suppliers_list
         return None
 
+    @property
+    def buffer_activities(self):
+        prefetched = getattr(self, '_prefetched_objects_cache', {})
+        if 'buffer_links' in prefetched:
+            links = prefetched['buffer_links']
+        else:
+            links = list(self.buffer_links.select_related('buffer').all())
+        return sorted(links, key=lambda link: link.buffer.name.lower())
+
+    @property
+    def buffer_activity_entries(self):
+        if self.buffer_activities:
+            return [
+                {
+                    'name': link.buffer.name,
+                    'activity_percent': link.activity_percent,
+                }
+                for link in self.buffer_activities
+            ]
+        legacy_entries = []
+        for legacy_field, buffer_name in LEGACY_RESTRICTION_BUFFERS:
+            activity = getattr(self, legacy_field, None)
+            if activity is not None:
+                legacy_entries.append({
+                    'name': buffer_name,
+                    'activity_percent': activity,
+                })
+        return legacy_entries
+
+    def buffer_activity_map(self):
+        return {
+            entry['name']: entry['activity_percent']
+            for entry in self.buffer_activity_entries
+        }
+
     def __str__(self):
         if self.hf_version:
             return self.name + "-HF"
@@ -122,6 +184,35 @@ class RestrictionEnzyme(models.Model):
 
     class Meta:
         ordering = ['name']
+
+
+class RestrictionEnzymeBuffer(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    restriction_enzyme = models.ForeignKey(
+        RestrictionEnzyme,
+        on_delete=models.CASCADE,
+        related_name='buffer_links',
+    )
+    buffer = models.ForeignKey(
+        RestrictionBuffer,
+        on_delete=models.CASCADE,
+        related_name='enzyme_links',
+    )
+    activity_percent = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+    )
+
+    def __str__(self):
+        return f"{self.restriction_enzyme} / {self.buffer} / {self.activity_percent}%"
+
+    class Meta:
+        ordering = ['buffer__name']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['restriction_enzyme', 'buffer'],
+                name='unique_restriction_enzyme_buffer',
+            ),
+        ]
 
 
 class Location(models.Model):
@@ -170,6 +261,7 @@ class Plasmid(models.Model):
     description = models.CharField(max_length=1000, blank=True, help_text="Allows markdown")
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     created_on = models.DateField(auto_now_add=False, default=datetime.date.today)
+    assembly_metadata = models.JSONField(default=dict, blank=True)
 
     reference_sequence = models.BooleanField(blank=True, default=0)
     public_visibility = models.BooleanField(blank=True, default=0)
@@ -267,6 +359,21 @@ class Plasmid(models.Model):
 
     def get_backbone_of(self):
         return Plasmid.objects.filter(backbone=self)
+
+    @property
+    def detected_assembly(self):
+        return (self.assembly_metadata or {}).get("detected", {})
+
+    @property
+    def confirmed_assembly(self):
+        return (self.assembly_metadata or {}).get("confirmed", {})
+
+    @property
+    def assembly_detection_confidence_percent(self):
+        confidence = self.detected_assembly.get("confidence")
+        if confidence is None:
+            return None
+        return round(float(confidence) * 100, 1)
 
     def ligation_concentration(self, units=True):
         if self.computed_size:

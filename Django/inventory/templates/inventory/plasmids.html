@@ -8,7 +8,7 @@
 {% block header_object_links %}
 {% include "inventory/parts/show_from_all_projects.html" %}
 <a href="{% url 'plasmids' %}" class="btn btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Refresh"><i class="bi bi-arrow-clockwise"></i></a>
-<a href="" class="btn btn-info" role="button"><i class="bi bi-ui-checks-grid"></i> Massive</a>
+<a href="{% url 'plasmid_import' %}" class="btn btn-outline-primary" role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Batch upload GenBank plasmids"><i class="bi bi-upload"></i></a>
 <a href="{% url 'plasmid_create_wizard' %}" class="btn btn-primary{% if not on_current_project_member_can_write_or_admin %} disabled{% endif %}" role="button" target="_blank"><i
         class="bi bi-plus"></i> Create</a>
 {% endblock %}

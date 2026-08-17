@@ -546,8 +546,13 @@ function extensionSecondsForAmplicon(amplicon) {
 			setPrimerMatchStatus("Amplicon sequence is not available.", true);
 			return;
 		}
+		const forwardPrimer = valueFromNotes(amplicon, "fwd_primer") || valueFromNotes(amplicon, "fwd_primer_id");
+		const reversePrimer = valueFromNotes(amplicon, "rev_primer") || valueFromNotes(amplicon, "rev_primer_id");
+		const blastName = forwardPrimer && reversePrimer ?
+			forwardPrimer + " + " + reversePrimer :
+			(amplicon.name || forwardPrimer || reversePrimer || "Amplicon");
 		const params = new URLSearchParams({
-			name: amplicon.name || "Amplicon",
+			name: blastName,
 			sequence,
 			project: "a"
 		});

@@ -29,6 +29,23 @@
     <div class="alert alert-danger">{{error}}</div>
 </div>
 {% else %}
+<style>
+    .blast-query-sequence {
+        margin-bottom: 0;
+        overflow-x: auto;
+        white-space: pre;
+    }
+
+    .blast-alignment-viewer {
+        margin: 0;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        overflow: auto;
+        font-family: var(--bs-font-monospace);
+        white-space: pre;
+        line-height: 1.35;
+    }
+</style>
 {% if form %}
 <div id="blast-search">
     <form method="POST" enctype="multipart/form-data">
@@ -68,7 +85,7 @@
                     <p><strong>Name</strong>: {{query.name}}</p>
                     <p><strong>Short blast?</strong>: {{short_blast}}</p>
                     <p><strong>Sequence</strong></p>
-                    <p><pre>{{query.seq}}</pre></p>
+                    <pre class="blast-query-sequence">{{query.seq}}</pre>
                 </div>
             </div>
         </div>
@@ -101,13 +118,19 @@
                             {% with result|get_element_by_key:'meta' as meta%}
                             <tr>
                                 <td>
-                                    <a href="{% url 'plasmid' plasmid_id=result|get_element_by_key:'subject'|get_element_by_key:'origin_record_id' %}"
-                                       target="_blank">{{ result|get_element_by_key:'subject'|get_element_by_key:'name' }} <i
-                                            class="bi bi-box-arrow-up-right"></i></a>
+                                    <a class="btn-group text-decoration-none" role="button"
+                                       href="{% url 'plasmid' plasmid_id=result.subject_plasmid_id %}"
+                                       target="_blank" rel="noopener">
+                                        <span class="btn btn-success">{{ result.subject_display_name }}</span>
+                                        {% if result.subject_display_idx %}
+                                        <span class="btn btn-success opacity-75 fw-bold">{{ result.subject_display_idx }}</span>
+                                        {% endif %}
+                                        <span class="btn btn-success opacity-75"><i class="bi bi-box-arrow-up-right"></i></span>
+                                    </a>
                                 </td>
                                 <td>
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#alignmentModal"
-                                            onclick="setAlignement(this)" data-alignment="<pre>{{ result|get_element_by_key:'alignment'|safe }}</pre>">
+                                            onclick="setAlignement(this)" data-alignment="{{ result|get_element_by_key:'alignment'|urlencode }}">
                                         View
                                     </button>
                                 </td>
@@ -127,9 +150,37 @@
         </div>
     </div>
     <script>
+        function alignmentBackgroundIsDark(element) {
+            const backgroundColor = window.getComputedStyle(element).backgroundColor || window.getComputedStyle(document.body).backgroundColor;
+            const rgb = backgroundColor.match(/\d+(\.\d+)?/g);
+            if (!rgb || rgb.length < 3) {
+                return false;
+            }
+            const channels = rgb.slice(0, 3).map((value) => {
+                const normalized = Number(value) / 255;
+                if (normalized <= 0.03928) {
+                    return normalized / 12.92;
+                }
+                return Math.pow((normalized + 0.055) / 1.055, 2.4);
+            });
+            const luminance = (0.2126 * channels[0]) + (0.7152 * channels[1]) + (0.0722 * channels[2]);
+            return luminance < 0.5;
+        }
+
         function setAlignement(button){
             const alignmentModal_body = document.getElementById('alignmentModal-body');
-            alignmentModal_body.innerHTML = button.getAttribute('data-alignment');
+            const alignment = decodeURIComponent(button.getAttribute('data-alignment') || '');
+            const alignmentViewer = document.createElement('pre');
+            const darkBackground = alignmentBackgroundIsDark(alignmentModal_body);
+
+            alignmentViewer.className = 'blast-alignment-viewer';
+            alignmentViewer.textContent = alignment;
+            alignmentViewer.style.backgroundColor = darkBackground ? 'rgba(255, 255, 255, 0.06)' : 'rgba(15, 23, 42, 0.06)';
+            alignmentViewer.style.border = darkBackground ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(15, 23, 42, 0.08)';
+            alignmentViewer.style.color = darkBackground ? '#f8f9fa' : '#212529';
+
+            alignmentModal_body.innerHTML = '';
+            alignmentModal_body.appendChild(alignmentViewer);
         }
     </script>
     {% if not_considered_subjects %}

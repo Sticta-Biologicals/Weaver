@@ -37,6 +37,8 @@ from .custom.restriction_digest import enzymes_with_effective_cuts
 from .custom.restriction_digest import normalize_regions
 from .custom.restriction_digest import serialize_digest_response
 from .custom.primer_access import visible_primers_for_user
+from .custom.genbank_import import GenBankImportError
+from .custom.genbank_import import import_plasmids_from_uploaded_genbanks
 from .custom.primer_import import PrimerImportError
 from .custom.primer_import import import_primers_from_fasta
 from .custom.sanger import alignment_tracks_for_ove
@@ -68,12 +70,16 @@ from organization.decorators import require_member_can_write_or_admin_project_of
 from organization.views import get_current_project_id
 from organization.views import get_current_project
 from organization.views import on_current_project_member_can_write_or_admin
+from organization.views import on_project_member_can_write_or_admin
+from organization.views import get_projects_where_member_can
 from organization.views import get_projects_where_member_can_any
 from organization.views import member_can_write_or_admin_plasmid
 from organization.views import member_can_write_or_admin_gs
 from organization.views import get_show_from_all_projects
 from organization.views import member_can_write_or_admin_primer
 from organization.views import on_project_member_can_any
+from organization.models import Membership
+from organization.models import Project
 
 from .forms import PlasmidValidationForm
 from .forms import PlasmidCreateForm
@@ -83,6 +89,8 @@ from .forms import PlasmidLabel
 from django.http import HttpResponseRedirect
 
 import html
+import re
+from urllib.parse import urlencode
 from django.conf import settings
 from django.http import HttpResponse, Http404
 from django.core.exceptions import ObjectDoesNotExist
@@ -111,10 +119,14 @@ from pyblast.utils import make_linear, make_circular
 DEFAULT_AMPLICON_REGION_FLANK_BP = 30
 
 from .forms import DigestForm
+from .forms import GenBankBatchUploadForm
 from .forms import PCRForm
 from .forms import PrimerBatchUploadForm
+from .forms import RestrictionEnzymeCreateForm
+from .forms import RestrictionEnzymeBufferFormSet
 from .forms import ServicesPCRForm
 from .forms import BatchPrintsForm
+from .forms import save_restriction_enzyme_buffers
 import json
 from io import StringIO
 from .forms import SangerAlignForm
@@ -172,7 +184,47 @@ def run_pyblast_compat(callback):
         return callback()
 
 
-def get_table_filters(level_from_table_filters, level_to_table_filters):
+def part_filter_slug(part_key):
+    return "ap-" + str(part_key or "").strip().lower().replace("_", "-")
+
+
+def part_filter_label(part_key, part_name=""):
+    normalized_key = str(part_key or "").strip().lower()
+    if normalized_key.startswith("ytk_"):
+        return "P" + normalized_key.split("_", 1)[1]
+    return str(part_name or part_key or "").strip()
+
+
+def part_filter_sort_key(part_key, part_name=""):
+    suffix = str(part_key or "").strip().lower()
+    if suffix.startswith("ytk_"):
+        suffix = suffix.split("_", 1)[1]
+    elif part_name:
+        suffix = str(part_name).strip().lower()
+
+    tokens = re.findall(r"\d+|[a-z]+", suffix)
+    if not tokens:
+        return ((1, suffix),)
+
+    sort_key = []
+    for token in tokens:
+        if token.isdigit():
+            sort_key.append((0, int(token)))
+        else:
+            sort_key.append((1, token))
+    return tuple(sort_key)
+
+
+def get_detected_part_info(plasmid):
+    detected = getattr(plasmid, "detected_assembly", {}) or {}
+    part_key = detected.get("part_type_key") or ""
+    part_name = detected.get("part_name") or ""
+    if not part_key:
+        return "", ""
+    return part_key, part_name or part_key.upper()
+
+
+def get_table_filters(level_from_table_filters, level_to_table_filters, part_filters=None):
     pt_table_filters = []
     for pt in PlasmidType.objects.all():
         pt_table_filters.append((pt.name, 't' + str(pt.id), 'success'))
@@ -180,6 +232,10 @@ def get_table_filters(level_from_table_filters, level_to_table_filters):
     level_table_filters = []
     for level in range(level_from_table_filters, level_to_table_filters + 1):
         level_table_filters.append(('L' + str(level), 'l' + str(level), 'warning'))
+
+    part_table_filters = []
+    for part_filter in sorted(part_filters or [], key=lambda item: item[2] if len(item) > 2 else item[0].casefold()):
+        part_table_filters.append((part_filter[0], part_filter[1], 'info'))
 
     sw_table_filters = []
     for tf in TableFilter.objects.all():
@@ -197,8 +253,11 @@ def get_table_filters(level_from_table_filters, level_to_table_filters):
                             ('All', 'all', 'primary'),
                         ]],
                         ['type', 'Type', pt_table_filters],
-                        ['level', 'Level', level_table_filters]
-                    ] + sw_table_filters
+                        ['level', 'Level', level_table_filters],
+                    ]
+    if part_table_filters:
+        table_filters.append(['part', 'Part', part_table_filters])
+    table_filters += sw_table_filters
     return table_filters
 
 
@@ -211,20 +270,66 @@ def json_serial(obj):
 
 def restrictionenzyme(request, restrictionenzyme_id):
     try:
-        restrictionenzyme_to_detail = RestrictionEnzyme.objects.get(id=restrictionenzyme_id)
+        restrictionenzyme_to_detail = RestrictionEnzyme.objects.prefetch_related('buffer_links__buffer').get(id=restrictionenzyme_id)
     except ObjectDoesNotExist:
         raise Http404
     context = {
         'restrictionenzyme': restrictionenzyme_to_detail,
+        'user_can_edit_restrictionenzyme': request.user.is_authenticated,
     }
     return render(request, 'inventory/restrictionenzyme.html', context)
 
 
 def restrictionenzymes(request):
     context = {
-        'restrictionenzymes': RestrictionEnzyme.objects.all(),
+        'restrictionenzymes': RestrictionEnzyme.objects.prefetch_related('buffer_links__buffer').all(),
     }
     return render(request, 'inventory/restrictionenzymes.html', context)
+
+
+class RestrictionEnzymeCreate(CreateView):
+    model = RestrictionEnzyme
+    form_class = RestrictionEnzymeCreateForm
+    template_name_suffix = '_create_form'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if 'buffer_formset' not in context:
+            context['buffer_formset'] = RestrictionEnzymeBufferFormSet(prefix='buffers')
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form = self.get_form()
+        buffer_formset = RestrictionEnzymeBufferFormSet(self.request.POST, prefix='buffers')
+        if form.is_valid() and buffer_formset.is_valid():
+            return self.forms_valid(form, buffer_formset)
+        return self.forms_invalid(form, buffer_formset)
+
+    @transaction.atomic
+    def forms_valid(self, form, buffer_formset):
+        self.object = form.save()
+        save_restriction_enzyme_buffers(self.object, buffer_formset)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def forms_invalid(self, form, buffer_formset):
+        return self.render_to_response(self.get_context_data(form=form, buffer_formset=buffer_formset))
+
+    def get_success_url(self, **kwargs):
+        return reverse('restrictionenzyme', args=(self.object.id,)) + '?form_result_restrictionenzyme_create_success=true'
+
+
+class RestrictionEnzymeDelete(DeleteView):
+    model = RestrictionEnzyme
+
+    def dispatch(self, *args, **kwargs):
+        self.extra_context = {
+            'user_can_edit_restrictionenzyme': True,
+        }
+        return super().dispatch(*args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse('restrictionenzymes') + '?form_result_object_deleted=true'
 
 
 @require_current_project_set
@@ -507,10 +612,18 @@ def plasmids(request, render_html=None):
         plasmids = Plasmid.objects.filter(project_id=get_current_project_id(request))
     level_from_table_filters = 0
     level_to_table_filters = 0
+    part_filters = set()
     hasPlasmids = False
     for plasmid in plasmids:
         hasPlasmids = True
         plasmid.refc = plasmid.recommended_enzyme_for_create()
+        part_key, part_name = get_detected_part_info(plasmid)
+        if part_key:
+            part_filters.add((
+                part_filter_label(part_key, part_name),
+                part_filter_slug(part_key),
+                part_filter_sort_key(part_key, part_name),
+            ))
         if plasmid.level:
             if plasmid.level > level_to_table_filters:
                 level_to_table_filters = plasmid.level
@@ -518,7 +631,7 @@ def plasmids(request, render_html=None):
                 level_from_table_filters = plasmid.level
     context = {
         'on_current_project_member_can_write_or_admin': on_current_project_member_can_write_or_admin(request),
-        'table_filters': get_table_filters(level_from_table_filters, level_to_table_filters),
+        'table_filters': get_table_filters(level_from_table_filters, level_to_table_filters, part_filters=part_filters),
         'has_plasmids': hasPlasmids,
         'RESTRICTION_ENZYMES': RestrictionEnzyme.objects.all,
         'show_from_all_projects': show_from_all_projects
@@ -2858,16 +2971,16 @@ def plasmid_update_computed_size(plasmid_to_update):
     sequence = grab_seq(plasmid_to_update)
 
     if sequence[0]:
+        plasmid_to_update.insert_computed_size = None
         if not plasmid_to_update.level is None:
-            if plasmid_to_update.level % 2:
-                re = RestrictionEnzyme.objects.filter(name="BsmBI")[0]
-            else:
-                re = RestrictionEnzyme.objects.filter(name="BsaI")[0]
+            enzyme_name = "BsmBI" if plasmid_to_update.level % 2 else "BsaI"
+            re = RestrictionEnzyme.objects.filter(name=enzyme_name).first() or createEnzymeFromName(enzyme_name)
 
-            hits = re_find_cut_positions(sequence[1], re, True, True)
+            if re:
+                hits = re_find_cut_positions(sequence[1], re, True, True)
 
-            if len(hits) == 2 and hits[1] > hits[0]:
-                plasmid_to_update.insert_computed_size = hits[1] - hits[0] + 4
+                if len(hits) == 2 and hits[1] > hits[0]:
+                    plasmid_to_update.insert_computed_size = hits[1] - hits[0] + 4
 
         plasmid_to_update.computed_size = len(sequence[1])
         plasmid_to_update.save()
@@ -3068,12 +3181,13 @@ def primer(request, primer_id):
     return render(request, 'inventory/primer.html', context)
 
 
+@require_current_project_set
 def primers(request):
     show_from_all_projects = get_show_from_all_projects(request)
     if show_from_all_projects:
         primers = visible_primers_for_user(request.user)
     else:
-        primers = visible_primers_for_user(request.user)
+        primers = Primer.objects.filter(project_id=get_current_project_id(request))
 
     primers = sorted(primers, key=lambda primer: (
         primer_numeric_id(primer) if primer_numeric_id(primer) is not None else 10**9,
@@ -3108,6 +3222,15 @@ def primer_import(request):
                 name_source=form.cleaned_data["name_source"],
                 default_direction=form.cleaned_data["default_direction"],
             )
+            query = urlencode({
+                "form_result_primer_import_success": "true",
+                "primer_import_changed": result["created"] + result["updated"],
+                "primer_import_created": result["created"],
+                "primer_import_updated": result["updated"],
+                "primer_import_skipped": result["skipped"],
+                "primer_import_errors": result["errors"],
+            })
+            return redirect(f"{reverse('primers')}?{query}")
         except UnicodeDecodeError:
             form.add_error("fasta_file", "Could not read this file as UTF-8 text.")
         except PrimerImportError as error:
@@ -3119,6 +3242,62 @@ def primer_import(request):
         "current_project": current_project,
     }
     return render(request, "inventory/primer_import.html", context)
+
+
+def plasmid_import(request):
+    result = None
+    current_project = get_current_project(request)
+    target_project = current_project
+    form = GenBankBatchUploadForm(
+        request.POST or None,
+        request.FILES or None,
+        user=request.user,
+        current_project=current_project,
+    )
+
+    if request.method == "POST" and form.is_valid():
+        if form.cleaned_data["target_mode"] == "existing":
+            target_project = get_projects_where_member_can(request.user, ['a', 'w']).filter(
+                id=int(form.cleaned_data["project"])
+            ).first()
+            if not target_project or not on_project_member_can_write_or_admin(target_project, request.user):
+                form.add_error("project", "Choose a project where you can write.")
+        else:
+            target_project = Project.objects.create(
+                name=form.cleaned_data["new_project_name"],
+                public=form.cleaned_data["new_project_public"],
+                assembly_standard=form.cleaned_data["new_project_assembly_standard"] or None,
+            )
+            Membership.objects.create(member=request.user, project=target_project, access_policies='a')
+
+        if not form.errors:
+            try:
+                result = import_plasmids_from_uploaded_genbanks(
+                    request.FILES.getlist("genbank_files"),
+                    target_project,
+                    update_existing=form.cleaned_data["update_existing"],
+                    public_visibility=form.cleaned_data["public_visibility"],
+                    reference_sequence=form.cleaned_data["reference_sequence"],
+                    infer_ytk_metadata=form.cleaned_data["infer_ytk_metadata"],
+                    name_source=form.cleaned_data["name_source"],
+                )
+                if target_project and target_project.pk:
+                    response = redirect(reverse("plasmids") + "?form_result_plasmid_import_success=true")
+                    response.set_cookie("current_project_id", target_project.pk)
+                    return response
+            except GenBankImportError as error:
+                form.add_error("genbank_files", str(error))
+
+    context = {
+        "form": form,
+        "result": result,
+        "current_project": current_project,
+        "target_project": target_project,
+    }
+    response = render(request, "inventory/plasmid_import.html", context)
+    if result is not None and target_project and target_project.pk:
+        response.set_cookie("current_project_id", target_project.pk)
+    return response
 
 
 class PrimerCreate(CreateView):
@@ -3505,6 +3684,7 @@ def run_local_blast(request, context, record, project_id='a', short_blast=False)
         plasmids = Plasmid.objects.filter(project__in=visible_projects)
     else:
         plasmids = Plasmid.objects.filter(project__in=visible_projects, project=project_id)
+    plasmids_by_id = {}
 
     subjects = []
     context['not_considered_subjects'] = []
@@ -3514,6 +3694,7 @@ def run_local_blast(request, context, record, project_id='a', short_blast=False)
             if seqio_get_result[0]:
                 seqio_get_result[1].id = plasmid.id
                 seqio_get_result[1].name = plasmid.name
+                plasmids_by_id[str(plasmid.id)] = plasmid
                 subjects.append(make_circular([seqio_get_result[1]])[0])
             else:
                 context['not_considered_subjects'].append((plasmid, 'No sequence file'))
@@ -3529,6 +3710,16 @@ def run_local_blast(request, context, record, project_id='a', short_blast=False)
             lambda: blast.blastn_short() if short_blast else blast.blastn()
         )
         for result in context['results']:
+            subject = result.get('subject') or {}
+            subject_plasmid_id = str(subject.get('origin_record_id') or subject.get('id') or '')
+            subject_plasmid = plasmids_by_id.get(subject_plasmid_id)
+            result['subject_plasmid_id'] = subject_plasmid.id if subject_plasmid else subject_plasmid_id
+            result['subject_display_name'] = (
+                subject_plasmid.name if subject_plasmid else subject.get('name', '')
+            )
+            result['subject_display_idx'] = (
+                subject_plasmid.idx if subject_plasmid else subject.get('idx')
+            )
             result['alignment'] = Bio.Align.MultipleSeqAlignment([
                 SeqRecord(Seq(result['meta']['query seq']), id=result['query']['name']),
                 SeqRecord(Seq(result['meta']['subject seq']), id=result['subject']['name']),
@@ -3632,17 +3823,27 @@ def api_plasmids(request):
     output = []
     level_from_table_filters = 0
     level_to_table_filters = 0
+    part_filters = set()
     if get_show_from_all_projects(request):
         plasmids = Plasmid.objects.filter(project_id__in=get_projects_where_member_can_any(request.user)).order_by(
             'name')
     else:
         plasmids = Plasmid.objects.filter(project_id=get_current_project_id(request)).order_by('name')
     for plasmid in plasmids:
+        part_key, part_name = get_detected_part_info(plasmid)
+        if part_key:
+            part_filters.add((
+                part_filter_label(part_key, part_name),
+                part_filter_slug(part_key),
+                part_filter_sort_key(part_key, part_name),
+            ))
         output.append({
             'cn': plasmid.__str__(),
             'n': plasmid.name,
             'l': plasmid.level,
             't': get_plasmid_type_id(plasmid),
+            'pk': part_key,
+            'pnm': part_name,
             'i': plasmid.id,
             'ix': str(plasmid.idx),
             'hs': bool(plasmid.sequence),
@@ -3663,7 +3864,7 @@ def api_plasmids(request):
             if plasmid.level < level_from_table_filters:
                 level_from_table_filters = plasmid.level
     context = {
-        'table_filters': get_table_filters(level_from_table_filters, level_to_table_filters),
+        'table_filters': get_table_filters(level_from_table_filters, level_to_table_filters, part_filters=part_filters),
         'plasmids': output,
         'csrf_token': django.middleware.csrf.get_token(request),
         'RESTRICTION_ENZYMES': list(RestrictionEnzyme.objects.values()),

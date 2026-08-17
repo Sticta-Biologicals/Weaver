@@ -106,13 +106,13 @@
                         <i class="bi bi-moon{% if request.COOKIES.dark_mode == 'true' %}-fill{% endif%}"></i>
                     </button>
                     <div class="btn-group me-2 dropdown-center">
-                        <button role="button" class="btn btn-primary border border-light opacity-50">{% with request.COOKIES.current_project_id as cpi %}
-                          {% if cpi %}
-                          <a class="text-light" href="{% url 'project' project_id=request.COOKIES.current_project_id %}">{{cpi|get_project_name}}</a>
+                        <button role="button" class="btn btn-primary border border-light opacity-50">{% with request.COOKIES.current_project_id as cpi %}{% with cpi|get_project_name as current_project_name %}
+                          {% if cpi and current_project_name %}
+                          <a class="text-light" href="{% url 'project' project_id=request.COOKIES.current_project_id %}">{{current_project_name}}</a>
                           {% else %}
                           No project set
                           {% endif %}
-                          {% endwith %}</button>
+                          {% endwith %}{% endwith %}</button>
                         <button type="button" class="btn btn-primary opacity-75 dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
                             <span class="visually-hidden">Toggle Dropdown</span>
                         </button>

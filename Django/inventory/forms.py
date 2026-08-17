@@ -3,8 +3,12 @@ from django import forms
 from .models import Plasmid
 from .models import Primer
 from .models import GlycerolStock
+from .models import RestrictionBuffer
+from .models import RestrictionEnzyme
+from .models import RestrictionEnzymeBuffer
 from .custom.primer_access import visible_primers_for_user
 from .custom.standards import assembly_standards
+from organization.models import Project
 from organization.views import get_projects_where_member_can
 from organization.views import get_projects_where_member_can_any
 
@@ -209,6 +213,265 @@ class PrimerBatchUploadForm(forms.Form):
         initial="f",
         required=False,
     )
+
+
+class RestrictionEnzymeCreateForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(RestrictionEnzymeCreateForm, self).__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs.update({'class': 'form-select'})
+        self.fields['hf_version'].widget.attrs.update({'class': 'form-check-input'})
+        self.fields['link_datasheet'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Optional datasheet URL',
+        })
+        self.fields['description'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Optional lab note',
+        })
+
+    class Meta:
+        model = RestrictionEnzyme
+        fields = [
+            'name',
+            'hf_version',
+            'link_datasheet',
+            'description',
+        ]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get("name")
+        hf_version = bool(cleaned_data.get("hf_version"))
+        duplicate_qs = RestrictionEnzyme.objects.filter(name=name, hf_version=hf_version)
+        if self.instance.pk:
+            duplicate_qs = duplicate_qs.exclude(pk=self.instance.pk)
+        if name and duplicate_qs.exists():
+            display_name = f"{name}-HF" if hf_version else name
+            self.add_error("name", f"{display_name} is already loaded in Weaver.")
+        return cleaned_data
+
+
+class RestrictionEnzymeBufferForm(forms.Form):
+    NEW_BUFFER_CHOICE = "__new__"
+
+    existing_buffer = forms.ChoiceField(
+        choices=(),
+        required=False,
+        label="Buffer",
+    )
+    new_buffer_name = forms.CharField(
+        required=False,
+        max_length=100,
+        label="New buffer",
+    )
+    activity_percent = forms.IntegerField(
+        required=False,
+        min_value=0,
+        max_value=100,
+        label="Activity %",
+    )
+    DELETE = forms.BooleanField(required=False, label="Remove")
+
+    def __init__(self, *args, **kwargs):
+        super(RestrictionEnzymeBufferForm, self).__init__(*args, **kwargs)
+        self.fields['existing_buffer'].choices = [
+            ("", "Select a buffer"),
+            *[
+                (str(buffer.id), buffer.name)
+                for buffer in RestrictionBuffer.objects.order_by('name')
+            ],
+            (self.NEW_BUFFER_CHOICE, "+ New buffer..."),
+        ]
+        self.fields['existing_buffer'].widget.attrs.update({
+            'class': 'form-select buffer-choice-select',
+            'data-new-buffer-value': self.NEW_BUFFER_CHOICE,
+        })
+        self.fields['new_buffer_name'].widget.attrs.update({
+            'class': 'form-control buffer-new-name',
+            'placeholder': 'e.g. NEB CutSmart',
+        })
+        self.fields['activity_percent'].widget.attrs.update({
+            'class': 'form-control',
+            'min': 0,
+            'max': 100,
+            'placeholder': '0-100',
+        })
+        self.fields['DELETE'].widget.attrs.update({'class': 'form-check-input'})
+
+    def clean(self):
+        cleaned_data = super().clean()
+        buffer_choice = cleaned_data.get("existing_buffer")
+        new_buffer_name = (cleaned_data.get("new_buffer_name") or "").strip()
+        activity_percent = cleaned_data.get("activity_percent")
+        delete_row = cleaned_data.get("DELETE")
+
+        existing_buffer = None
+        if buffer_choice and buffer_choice != self.NEW_BUFFER_CHOICE:
+            existing_buffer = RestrictionBuffer.objects.filter(pk=buffer_choice).first()
+            if existing_buffer is None:
+                self.add_error("existing_buffer", "Choose a valid buffer.")
+
+        is_empty = not existing_buffer and not new_buffer_name and activity_percent in (None, "")
+        cleaned_data["new_buffer_name"] = new_buffer_name
+        cleaned_data["existing_buffer"] = existing_buffer
+        cleaned_data["buffer_choice"] = buffer_choice
+        cleaned_data["is_empty"] = is_empty
+
+        if is_empty or delete_row:
+            return cleaned_data
+
+        if buffer_choice == self.NEW_BUFFER_CHOICE:
+            if not new_buffer_name:
+                self.add_error("new_buffer_name", "Enter the name for the new buffer.")
+        else:
+            cleaned_data["new_buffer_name"] = ""
+            if not existing_buffer:
+                raise forms.ValidationError("Choose a buffer or create a new one.")
+        if activity_percent is None:
+            self.add_error("activity_percent", "Enter the activity percentage for this buffer.")
+
+        return cleaned_data
+
+
+class BaseRestrictionEnzymeBufferFormSet(forms.BaseFormSet):
+    def clean(self):
+        if any(self.errors):
+            return
+
+        seen_buffers = set()
+        for form in self.forms:
+            cleaned_data = getattr(form, "cleaned_data", None)
+            if not cleaned_data or cleaned_data.get("DELETE") or cleaned_data.get("is_empty"):
+                continue
+            existing_buffer = cleaned_data.get("existing_buffer")
+            buffer_name = existing_buffer.name if existing_buffer else cleaned_data.get("new_buffer_name", "")
+            normalized_name = buffer_name.strip().lower()
+            if normalized_name in seen_buffers:
+                raise forms.ValidationError("Each buffer can only be added once per enzyme.")
+            seen_buffers.add(normalized_name)
+
+
+RestrictionEnzymeBufferFormSet = forms.formset_factory(
+    RestrictionEnzymeBufferForm,
+    formset=BaseRestrictionEnzymeBufferFormSet,
+    extra=1,
+    can_delete=True,
+)
+
+
+def save_restriction_enzyme_buffers(restriction_enzyme, buffer_formset):
+    for cleaned_data in buffer_formset.cleaned_data:
+        if not cleaned_data or cleaned_data.get("DELETE") or cleaned_data.get("is_empty"):
+            continue
+
+        buffer = cleaned_data.get("existing_buffer")
+        if buffer is None:
+            buffer_name = cleaned_data["new_buffer_name"]
+            buffer = RestrictionBuffer.objects.filter(name__iexact=buffer_name).first()
+            if buffer is None:
+                buffer = RestrictionBuffer.objects.create(name=buffer_name)
+
+        RestrictionEnzymeBuffer.objects.create(
+            restriction_enzyme=restriction_enzyme,
+            buffer=buffer,
+            activity_percent=cleaned_data["activity_percent"],
+        )
+
+
+class GenBankBatchUploadForm(forms.Form):
+    PROJECT_TARGET_CHOICES = (
+        ("existing", "Upload to an existing project"),
+        ("new", "Create a new project and upload there"),
+    )
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        current_project = kwargs.pop("current_project", None)
+        super(GenBankBatchUploadForm, self).__init__(*args, **kwargs)
+        writable_projects = get_projects_where_member_can(user, ['a', 'w']).order_by('name') if user else Project.objects.none()
+        self.fields['target_mode'].widget.attrs.update({'class': 'form-select'})
+        self.fields['project'].widget.attrs.update({'class': 'form-select'})
+        self.fields['genbank_files'].widget.attrs.update({
+            'class': 'form-control',
+            'accept': '.gb,.gbk,.genbank',
+        })
+        self.fields['name_source'].widget.attrs.update({'class': 'form-select'})
+        self.fields['new_project_name'].widget.attrs.update({'class': 'form-control'})
+        self.fields['new_project_assembly_standard'].widget.attrs.update({'class': 'form-select'})
+        self.fields['update_existing'].widget.attrs.update({'class': 'form-check-input'})
+        self.fields['public_visibility'].widget.attrs.update({'class': 'form-check-input'})
+        self.fields['reference_sequence'].widget.attrs.update({'class': 'form-check-input'})
+        self.fields['infer_ytk_metadata'].widget.attrs.update({'class': 'form-check-input'})
+        self.fields['new_project_public'].widget.attrs.update({'class': 'form-check-input'})
+
+        self.fields['project'].choices = [
+            (str(project.id), project.name)
+            for project in writable_projects
+        ]
+
+        if current_project and any(str(current_project.id) == choice[0] for choice in self.fields['project'].choices):
+            self.fields['project'].initial = str(current_project.id)
+            self.fields['target_mode'].initial = "existing"
+        elif self.fields['project'].choices:
+            self.fields['project'].initial = self.fields['project'].choices[0][0]
+            self.fields['target_mode'].initial = "existing"
+        else:
+            self.fields['target_mode'].initial = "new"
+
+        self.fields['new_project_assembly_standard'].initial = (
+            current_project.assembly_standard
+            if current_project and current_project.assembly_standard
+            else "ytk"
+        )
+
+    target_mode = forms.ChoiceField(
+        label="Upload destination",
+        choices=PROJECT_TARGET_CHOICES,
+        initial="existing",
+    )
+    project = forms.ChoiceField(label="Existing project", required=False, choices=())
+    genbank_files = MultipleFileField(
+        label="GenBank files",
+        required=False,
+        widget=MultipleFileInput(attrs={"multiple": True}),
+    )
+    new_project_name = forms.CharField(label="New project name", required=False, max_length=128)
+    new_project_public = forms.BooleanField(label="Make the new project public", required=False)
+    new_project_assembly_standard = forms.ChoiceField(
+        label="Assembly standard",
+        choices=tuple((index, assembly_standard['name']) for index, assembly_standard in assembly_standards.items()),
+        required=False,
+    )
+    update_existing = forms.BooleanField(label="Update existing plasmids with the same name", required=False)
+    public_visibility = forms.BooleanField(label="Mark imported plasmids as public", required=False)
+    reference_sequence = forms.BooleanField(label="Import as reference sequences", required=False, initial=False)
+    infer_ytk_metadata = forms.BooleanField(
+        label="Infer assembly type, level, and resistance",
+        required=False,
+        initial=True,
+    )
+    name_source = forms.ChoiceField(
+        label="Plasmid name source",
+        choices=(("filename", "Filename stem"), ("record", "GenBank LOCUS / record name")),
+        initial="filename",
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        files = self.files.getlist("genbank_files")
+        if not files:
+            raise forms.ValidationError("Upload at least one .gb, .gbk, or .genbank file.")
+        if cleaned_data.get("target_mode") == "existing":
+            if not cleaned_data.get("project"):
+                self.add_error("project", "Choose the destination project.")
+        else:
+            project_name = str(cleaned_data.get("new_project_name") or "").strip()
+            if not project_name:
+                self.add_error("new_project_name", "Provide a name for the new project.")
+            elif Project.objects.filter(name__iexact=project_name).exists():
+                self.add_error("new_project_name", "A project with this name already exists.")
+            cleaned_data["new_project_name"] = project_name
+        return cleaned_data
 
 
 class ServicesPCRForm(forms.Form):

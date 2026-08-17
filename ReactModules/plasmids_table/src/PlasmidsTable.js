@@ -9,6 +9,8 @@ class PlasmidElement extends React.Component {
         if (plasmid.l !== null) plasmid_level = " filter-l" + plasmid.l
         let plasmid_type = ""
         if (plasmid.t !== null) plasmid_type = " filter-t" + plasmid.t
+        let plasmid_part = ""
+        if (plasmid.pk) plasmid_part = " filter-ap-" + plasmid.pk.replaceAll("_", "-")
 
         let plasmid_computed_size = 'No edit perms'
         let plasmid_create_build = 'No edit perms'
@@ -162,6 +164,7 @@ class PlasmidElement extends React.Component {
         }
         let plasmid_type_output = []
         let plasmid_level_output = []
+        let plasmid_part_output = []
         if (plasmid.l !== undefined) {
             plasmid_level_output.push(plasmid.l)
         }
@@ -172,6 +175,9 @@ class PlasmidElement extends React.Component {
             }
             plasmid_type_output.push(type_name)
         }
+        if (plasmid.pnm) {
+            plasmid_part_output.push(plasmid.pnm)
+        }
         let plasmid_name = plasmid.n
         if (plasmid.n.length > 25)
             plasmid_name = plasmid.n.substring(0, 26) + "..."
@@ -179,7 +185,7 @@ class PlasmidElement extends React.Component {
         if (plasmid.p)
             plasmid_edit = <a href={"/inventory/plasmid/edit/" + plasmid.i} className="btn text-secondary me-1"
                 role="button" target="_blank" rel="noreferrer" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i className="bi bi-pencil-fill"></i></a>
-        output.push(<tr key={plasmid.i} className={"filter-item" + plasmid_level + plasmid_type + table_filters_output}>
+        output.push(<tr key={plasmid.i} className={"filter-item" + plasmid_level + plasmid_type + plasmid_part + table_filters_output}>
             <td>
                 <a href={"/inventory/plasmid/" + plasmid.i}
                     className="btn-group table-search-search_on me-1"
@@ -249,6 +255,10 @@ class PlasmidElement extends React.Component {
                                         <tr>
                                             <td>Type</td>
                                             <td>{plasmid_type_output}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Part</td>
+                                            <td>{plasmid_part_output}</td>
                                         </tr>
                                         <tr>
                                             <td>Marker</td>

@@ -1,6 +1,7 @@
 # Local Weaver data. This can contain confidential sequences, uploaded
 # plasmids/primers/Sanger reads, SQLite rows, and local exports.
 /local_data/
+/local_backups/
 /uploads/
 /db.sqlite3
 /data.json

@@ -319,6 +319,56 @@
             {{plasmid.level}}
         </td>
     </tr>
+    {% if plasmid.detected_assembly %}
+    <tr>
+        <th scope="row">Assembly classification</th>
+        <td>
+            <div><strong>{{ plasmid.detected_assembly.part_name|default:"Detected assembly" }}</strong></div>
+            <div class="small text-muted">
+                {{ plasmid.detected_assembly.standard_name }} {{ plasmid.detected_assembly.standard_version }}
+                {% if plasmid.detected_assembly.part_type_key %}| {{ plasmid.detected_assembly.part_type_key }}{% endif %}
+                {% if plasmid.detected_assembly.assembly_level %}| {{ plasmid.detected_assembly.assembly_level }}{% endif %}
+                {% if plasmid.detected_assembly.plasmid_role %}| {{ plasmid.detected_assembly.plasmid_role }}{% endif %}
+            </div>
+            <div class="small">
+                {% if plasmid.detected_assembly.enzyme_name %}<span class="me-2"><strong>Enzyme:</strong> {{ plasmid.detected_assembly.enzyme_name }}</span>{% endif %}
+                {% if plasmid.detected_assembly.upstream_overhang %}<span class="me-2"><strong>OH5:</strong> {{ plasmid.detected_assembly.upstream_overhang }}</span>{% endif %}
+                {% if plasmid.detected_assembly.downstream_overhang %}<span class="me-2"><strong>OH3:</strong> {{ plasmid.detected_assembly.downstream_overhang }}</span>{% endif %}
+            </div>
+            <div class="small">
+                {% if plasmid.assembly_detection_confidence_percent != None %}
+                <span class="me-2"><strong>Confidence:</strong> {{ plasmid.assembly_detection_confidence_percent }}% ({{ plasmid.detected_assembly.confidence_band }})</span>
+                {% endif %}
+                {% if plasmid.detected_assembly.source %}
+                <span class="me-2"><strong>Source:</strong> {{ plasmid.detected_assembly.source }}</span>
+                {% endif %}
+                {% if plasmid.detected_assembly.classifier_version %}
+                <span><strong>Classifier:</strong> {{ plasmid.detected_assembly.classifier_version }}</span>
+                {% endif %}
+            </div>
+            {% if plasmid.detected_assembly.evidence %}
+            <div class="mt-2">
+                <strong class="small">Evidence</strong>
+                <ul class="mb-1">
+                    {% for item in plasmid.detected_assembly.evidence %}
+                    <li class="small">{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            {% if plasmid.detected_assembly.warnings %}
+            <div class="mt-2">
+                <strong class="small text-warning">Warnings</strong>
+                <ul class="mb-1">
+                    {% for item in plasmid.detected_assembly.warnings %}
+                    <li class="small text-warning">{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </td>
+    </tr>
+    {% endif %}
     <tr>
         <th scope="row">Description</th>
         <td>{{plasmid.description | markdown | safe }}</td>

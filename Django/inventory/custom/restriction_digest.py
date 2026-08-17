@@ -14,12 +14,12 @@ DEFAULT_MIN_BUFFER_ACTIVITY_PERCENT = 100
 DEFAULT_MAX_ENZYMES = 2
 DEFAULT_RESULT_LIMIT = 10
 
-BUFFER_FIELDS = (
-    ("buffer_1_1", "NEB 1.1", "activity_buffer_1_1"),
-    ("buffer_2_1", "NEB 2.1", "activity_buffer_2_1"),
-    ("buffer_3_1", "NEB 3.1", "activity_buffer_3_1"),
-    ("buffer_CS", "NEB CutSmart", "activity_buffer_CS"),
-    ("buffer_aari", "Thermo AarI", "activity_buffer_aari"),
+LEGACY_BUFFER_ACTIVITY_FIELDS = (
+    ("activity_buffer_1_1", "NEB 1.1"),
+    ("activity_buffer_2_1", "NEB 2.1"),
+    ("activity_buffer_3_1", "NEB 3.1"),
+    ("activity_buffer_CS", "NEB CutSmart"),
+    ("activity_buffer_aari", "Thermo AarI"),
 )
 
 
@@ -73,11 +73,23 @@ def lab_enzyme_from_model(enzyme):
         fcut=enzyme_info.get("fst5"),
         rcut=(enzyme_info.get("size") or 0) + enzyme_info.get("fst3") if enzyme_info.get("fst3") is not None else None,
         temperature=enzyme_info.get("opt_temp"),
-        activities={
-            key: getattr(enzyme, field, None)
-            for key, _label, field in BUFFER_FIELDS
-        },
+        activities=enzyme_activity_map(enzyme),
     )
+
+
+def enzyme_activity_map(enzyme):
+    activity_map = getattr(enzyme, "buffer_activity_map", None)
+    if callable(activity_map):
+        return activity_map()
+    if isinstance(activity_map, dict):
+        return activity_map
+
+    activities = {}
+    for field_name, buffer_name in LEGACY_BUFFER_ACTIVITY_FIELDS:
+        activity = getattr(enzyme, field_name, None)
+        if activity is not None:
+            activities[buffer_name] = activity
+    return activities
 
 
 def effective_cut_sites(sequence, enzyme, is_circular=True):
@@ -185,24 +197,31 @@ def compatible_temperature(enzyme_group):
 
 
 def compatible_buffers(enzyme_group, min_activity):
+    shared_buffer_names = None
+    for enzyme in enzyme_group:
+        enzyme_buffer_names = set(enzyme.activities.keys())
+        if shared_buffer_names is None:
+            shared_buffer_names = enzyme_buffer_names
+        else:
+            shared_buffer_names &= enzyme_buffer_names
+
+    if not shared_buffer_names:
+        return []
+
     buffers = []
-    for key, label, _field in BUFFER_FIELDS:
+    for buffer_name in sorted(shared_buffer_names):
         activities = []
-        unknown = False
         for enzyme in enzyme_group:
-            activity = enzyme.activities.get(key)
-            if activity is None:
-                unknown = True
-                break
+            activity = enzyme.activities.get(buffer_name)
             activities.append(activity)
-        if unknown:
+        if any(activity is None for activity in activities):
             continue
         if all(activity >= min_activity for activity in activities):
             buffers.append({
-                "key": key,
-                "name": label,
+                "key": buffer_name,
+                "name": buffer_name,
                 "activities": {
-                    enzyme.display_name: enzyme.activities[key]
+                    enzyme.display_name: enzyme.activities[buffer_name]
                     for enzyme in enzyme_group
                 },
                 "min_activity": min(activities),

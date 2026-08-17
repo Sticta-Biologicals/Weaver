@@ -355,13 +355,23 @@ div#ove-viewer {
 }
 
 .weaver-amplicon-dimer-chip {
+    align-items: center;
     border-color: #f0ad4e !important;
     color: #8a5a00;
     cursor: pointer;
+    display: inline-flex;
+    gap: 0.3rem;
 }
 
 .weaver-amplicon-dimer-chip::after {
-    content: " ▾";
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid currentColor;
+    content: "";
+    display: inline-block;
+    flex: 0 0 auto;
+    height: 0;
+    width: 0;
 }
 
 .weaver-amplicon-partial-chip {
@@ -602,11 +612,17 @@ div#ove-viewer {
 
 .weaver-amplicon-filter-range {
     gap: 0.4rem;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(124px, 1fr) minmax(124px, 1fr);
+}
+
+.weaver-amplicon-filter-range .form-control,
+.weaver-amplicon-region-row .form-control {
+    min-height: 38px;
+    padding-inline: 0.55rem;
 }
 
 .weaver-amplicon-region-row {
-    grid-template-columns: minmax(104px, 1fr) minmax(104px, 1fr) 36px 36px;
+    grid-template-columns: minmax(124px, 1fr) minmax(124px, 1fr) 36px 36px;
 }
 
 .weaver-digest-panel-list {

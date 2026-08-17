@@ -4,6 +4,7 @@
 
 {% block header_object_name %}Primers{% endblock %}
 {% block header_object_links %}
+    {% include "inventory/parts/show_from_all_projects.html" %}
     <a href="{% url 'primers' %}" class="btn btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Refresh"><i class="bi bi-arrow-clockwise"></i></a>
     <a href="{% url 'primer_import' %}" class="btn btn-outline-primary{% if not on_current_project_member_can_write_or_admin %} disabled{% endif %}" role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Batch upload primers"><i class="bi bi-upload"></i></a>
     <a href="{% url 'primer_create' %}" class="btn btn-primary{% if not on_current_project_member_can_write_or_admin %} disabled{% endif %}" role="button" target="_blank"><i
@@ -23,7 +24,6 @@
     <thead>
     <tr>
 	        <th scope="col">Name</th>
-	        <th scope="col">Project</th>
 	        <th scope="col">Sequence (5' → 3') (5' overhang undelined)</th>
         <th scope="col" data-defaultsort='disabled'>Intended use</th>
         <th scope="col">Length</th>
@@ -38,18 +38,17 @@
     {% with primer_id=primer.display_idx|default_if_none:"" %}
     <tr>
         <td>
-            <a class="btn btn-success table-search-search_on" role="button" href="{% url 'primer' primer_id=primer.id %}"
+            <a class="btn-group table-search-search_on me-1" role="button" href="{% url 'primer' primer_id=primer.id %}"
                data-search-all="{{primer_id}} {{primer.display_name}} {{primer.project}} {{primer.intended_use}} {{primer.sequence_5}}{{primer.sequence_3}}"
                data-search-idx="{{primer_id}}"
                data-search-name="{{primer.display_name}}">
                 {% if primer_id %}
-                <span class="badge text-bg-light border fw-light p-1 m-0 me-1 align-middle" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Primer ID">{{primer_id}}</span>
+                <span class="btn btn-success opacity-75 fw-bold" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Primer ID">{{primer_id}}</span>
                 {% endif %}
-                <span>{{primer.display_name}}</span>
+                <span class="btn btn-success">{{primer.display_name}}</span>
             </a>
 	            <a href="{% url 'primer_edit' pk=primer.id %}" class="btn text-secondary{% if not primer.can_edit %} disabled{% endif %}" role="button"><i class="bi bi-pencil-fill"></i></a>
 	        </td>
-	        <td>{{primer.project}}</td>
 	        <td><span class="overhang">{{primer.sequence_5}}</span>{{primer.sequence_3}}</td>
         <td>{{primer.intended_use}}</td>
         <td>{{complete_sequence|length}}</td>

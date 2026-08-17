@@ -1,16 +1,26 @@
+import datetime
+import tempfile
 from io import StringIO
 from pathlib import Path
 from types import SimpleNamespace
 from uuid import uuid4
 
+from Bio import SeqIO
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth.models import User
 from django.test import RequestFactory
 from django.test import SimpleTestCase
 from django.test import TestCase
+from django.test import override_settings
 from django.urls import reverse
 from Bio.Seq import Seq
+from Bio.SeqFeature import FeatureLocation
+from Bio.SeqFeature import SeqFeature
+from Bio.SeqRecord import SeqRecord
 
+from inventory.custom.genbank_import import import_plasmids_from_genbank_dir
+from inventory.custom.genbank_import import import_plasmids_from_uploaded_genbanks
+from inventory.custom.assembly_classification import classify_assembly_record
 from inventory.custom.primer_access import visible_primers_for_user
 from inventory.custom.primer_dimers import PrimerDimerConditions
 from inventory.custom.primer_dimers import PrimerDimerInputError
@@ -53,6 +63,8 @@ from inventory.custom.sanger import parse_seq
 from inventory.custom.sanger import process_sanger_files
 from inventory.models import Primer
 from inventory.models import Plasmid
+from inventory.models import RestrictionBuffer
+from inventory.models import RestrictionEnzyme
 from inventory.models import SangerVerificationRun
 from inventory.views import fasta_alignment_result
 from inventory.views import fasta_record_from_text
@@ -61,6 +73,8 @@ from inventory.views import amplicon_contains_region
 from inventory.views import amplicon_matches_any_primer_id
 from inventory.views import amplicon_matches_primer_id
 from inventory.views import optional_int_query_param
+from inventory.views import plasmid_update_computed_size
+from inventory.views import run_local_blast
 from inventory.views import sanger_feature_color
 from organization.models import Membership
 from organization.models import Project
@@ -112,11 +126,11 @@ def lab_enzyme(name, temperature=37, activities=None):
         rcut=1,
         temperature=temperature,
         activities=activities or {
-            "buffer_1_1": 100,
-            "buffer_2_1": 100,
-            "buffer_3_1": 100,
-            "buffer_CS": 100,
-            "buffer_aari": 100,
+            "NEB 1.1": 100,
+            "NEB 2.1": 100,
+            "NEB 3.1": 100,
+            "NEB CutSmart": 100,
+            "Thermo AarI": 100,
         },
     )
 
@@ -941,18 +955,18 @@ class RestrictionDigestTests(SimpleTestCase):
 
     def test_best_buffer_maximizes_minimum_then_average_activity(self):
         left = lab_enzyme("Left", activities={
-            "buffer_1_1": 100,
-            "buffer_2_1": 90,
-            "buffer_3_1": 80,
-            "buffer_CS": 80,
-            "buffer_aari": 10,
+            "NEB 1.1": 100,
+            "NEB 2.1": 90,
+            "NEB 3.1": 80,
+            "NEB CutSmart": 80,
+            "Thermo AarI": 10,
         })
         right = lab_enzyme("Right", activities={
-            "buffer_1_1": 80,
-            "buffer_2_1": 90,
-            "buffer_3_1": 100,
-            "buffer_CS": 80,
-            "buffer_aari": 10,
+            "NEB 1.1": 80,
+            "NEB 2.1": 90,
+            "NEB 3.1": 100,
+            "NEB CutSmart": 80,
+            "Thermo AarI": 10,
         })
 
         buffers = compatible_buffers([left, right], 75)
@@ -971,11 +985,11 @@ class RestrictionDigestTests(SimpleTestCase):
 
     def test_unknown_activity_or_temperature_is_not_exact(self):
         enzyme = lab_enzyme("EcoRI", temperature=None, activities={
-            "buffer_1_1": None,
-            "buffer_2_1": None,
-            "buffer_3_1": None,
-            "buffer_CS": None,
-            "buffer_aari": None,
+            "NEB 1.1": None,
+            "NEB 2.1": None,
+            "NEB 3.1": None,
+            "NEB CutSmart": None,
+            "Thermo AarI": None,
         })
 
         result = evaluate_digest(
@@ -1105,6 +1119,51 @@ class PrimerBatchImportTests(TestCase):
         self.assertEqual(entries[0]["sequence_5"], "aaCGTCTCtctcc")
         self.assertEqual(entries[0]["sequence"], "TATGACTTCTGCTTTGTATGCATCAG")
 
+    def test_primer_import_view_redirects_to_primer_list_with_summary_counts(self):
+        user = User.objects.create_user(username="primer-import-user", password="pw")
+        project = Project.objects.create(name="Primer Import Project", public=False)
+        Membership.objects.create(member=user, project=project, access_policies="w")
+        self.client.force_login(user)
+        self.client.cookies["current_project_id"] = str(project.id)
+
+        upload = SimpleUploadedFile(
+            "primers.fasta",
+            b">1001-Test-F\nAAAACCCC\n>1002-Test-R\nGGGGTTTT\n",
+            content_type="text/plain",
+        )
+
+        response = self.client.post(reverse("primer_import"), {
+            "fasta_file": upload,
+            "name_source": "id",
+            "default_direction": "f",
+            "update_existing": "",
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.url,
+            reverse("primers") + "?form_result_primer_import_success=true&primer_import_changed=2&primer_import_created=2&primer_import_updated=0&primer_import_skipped=0&primer_import_errors=0",
+        )
+        self.assertTrue(Primer.objects.filter(project=project, name="1001-Test-F").exists())
+        self.assertTrue(Primer.objects.filter(project=project, name="1002-Test-R").exists())
+
+        summary_response = self.client.get(response.url)
+        self.assertContains(summary_response, "Primer batch import complete! 2 primers loaded into Weaver.")
+        self.assertContains(summary_response, "Created 2, updated 0, skipped 0, errors 0.")
+
+    def test_primer_delete_view_renders_confirmation_page(self):
+        user = User.objects.create_user(username="primer-delete-user", password="pw")
+        project = Project.objects.create(name="Primer Delete Project", public=False)
+        Membership.objects.create(member=user, project=project, access_policies="w")
+        primer = Primer.objects.create(name="1001-Test-F", sequence_3="AAAACCCC", fwd_or_rev="f", project=project)
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("primer_delete", args=(primer.id,)))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Are you sure you want to delete")
+        self.assertContains(response, "1001-Test-F")
+
 
 class PrimerAccessTests(TestCase):
     def test_visible_primers_include_all_readable_projects(self):
@@ -1132,6 +1191,102 @@ class PrimerAccessTests(TestCase):
         self.assertEqual(entries[0]["direction"], "f")
         self.assertEqual(entries[0]["sequence_5"], "aaCGTCTCtctcc")
         self.assertEqual(entries[0]["sequence"], "TATGACTTCTGCTTTGTATGCATCAG")
+
+
+class PrimerListViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="primer-list-user", password="pw")
+        self.project_a = Project.objects.create(name="Primer Project A", public=False)
+        self.project_b = Project.objects.create(name="Primer Project B", public=False)
+        Membership.objects.create(member=self.user, project=self.project_a, access_policies="w")
+        Membership.objects.create(member=self.user, project=self.project_b, access_policies="w")
+        Primer.objects.create(name="1001-Project-A-F", sequence_3="AAAACCCC", fwd_or_rev="f", project=self.project_a)
+        Primer.objects.create(name="2001-Project-B-R", sequence_3="GGGGTTTT", fwd_or_rev="r", project=self.project_b)
+        self.client.force_login(self.user)
+        self.client.cookies["current_project_id"] = str(self.project_a.id)
+
+    def test_primers_view_defaults_to_current_project_only(self):
+        response = self.client.get(reverse("primers"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Project-A-F")
+        self.assertNotContains(response, "Project-B-R")
+
+    def test_primers_view_can_show_all_projects_with_cookie_toggle(self):
+        self.client.cookies["show_from_all_projects"] = "True"
+
+        response = self.client.get(reverse("primers"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Project-A-F")
+        self.assertContains(response, "Project-B-R")
+
+    def test_primers_view_does_not_render_project_column(self):
+        response = self.client.get(reverse("primers"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "<th scope=\"col\">Project</th>", html=True)
+
+
+class LocalBlastFormattingTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="blast-user", password="pw")
+        self.project = Project.objects.create(name="Blast Project", public=False)
+        Membership.objects.create(member=self.user, project=self.project, access_policies="w")
+        self.plasmid = Plasmid.objects.create(
+            idx=96,
+            name="pYTK096",
+            intended_use="test",
+            project=self.project,
+        )
+
+    def test_run_local_blast_enriches_subject_display_fields(self):
+        request = RequestFactory().get("/inventory/services/blast/")
+        request.user = self.user
+        context = {}
+        record = fasta_record_from_text("ACGTACGT", name="FWD + REV")
+        blast_result = [{
+            "query": {"name": "FWD + REV"},
+            "subject": {"name": "Subject fallback", "origin_record_id": str(self.plasmid.id)},
+            "meta": {"query seq": "ACGT", "subject seq": "ACGT"},
+        }]
+
+        original_seqio_get = run_local_blast.__globals__["seqio_get"]
+        original_make_circular = run_local_blast.__globals__["make_circular"]
+        original_make_linear = run_local_blast.__globals__["make_linear"]
+        original_bio_blast = run_local_blast.__globals__["BioBlast"]
+        original_run_pyblast_compat = run_local_blast.__globals__["run_pyblast_compat"]
+
+        class FakeBioBlast:
+            def __init__(self, subjects, queries):
+                self.subjects = subjects
+                self.queries = queries
+
+            def blastn(self):
+                return blast_result
+
+            def blastn_short(self):
+                return blast_result
+
+        try:
+            run_local_blast.__globals__["seqio_get"] = lambda plasmid: (True, SeqRecord(Seq("ACGTACGT"), id=str(plasmid.id), name=plasmid.name))
+            run_local_blast.__globals__["make_circular"] = lambda records: records
+            run_local_blast.__globals__["make_linear"] = lambda records: records
+            run_local_blast.__globals__["BioBlast"] = FakeBioBlast
+            run_local_blast.__globals__["run_pyblast_compat"] = lambda callback: callback()
+
+            run_local_blast(request, context, record, project_id='a', short_blast=False)
+        finally:
+            run_local_blast.__globals__["seqio_get"] = original_seqio_get
+            run_local_blast.__globals__["make_circular"] = original_make_circular
+            run_local_blast.__globals__["make_linear"] = original_make_linear
+            run_local_blast.__globals__["BioBlast"] = original_bio_blast
+            run_local_blast.__globals__["run_pyblast_compat"] = original_run_pyblast_compat
+
+        self.assertEqual(context["results"][0]["subject_plasmid_id"], self.plasmid.id)
+        self.assertEqual(context["results"][0]["subject_display_name"], "pYTK096")
+        self.assertEqual(context["results"][0]["subject_display_idx"], 96)
+        self.assertIn("FWD_+_REV", context["results"][0]["alignment"])
 
 
 class SangerVerificationEntryTests(TestCase):
@@ -1370,3 +1525,526 @@ class PrimerDimerAnalysisTests(SimpleTestCase):
         ], conditions=PrimerDimerConditions(annealing_temp_c=55))
 
         self.assertEqual(len(analysis["results"]), 6)
+
+
+class GenBankImportTests(TestCase):
+    def setUp(self):
+        self.project = Project.objects.create(name="YTK Import", public=False, assembly_standard="ytk")
+
+    def write_genbank(self, directory, filename, labels, sequence="ATGC" * 40, date="18-DEC-2014"):
+        record = SeqRecord(Seq(sequence), id=filename.replace(".gb", ""), name=filename.replace(".gb", ""), description=".")
+        record.annotations["molecule_type"] = "DNA"
+        record.annotations["topology"] = "circular"
+        record.annotations["date"] = date
+        record.features = [
+            SeqFeature(FeatureLocation(index * 4, (index * 4) + 4), type="misc_feature", qualifiers={"label": [label]})
+            for index, label in enumerate(labels)
+        ]
+        path = Path(directory) / filename
+        with path.open("w", encoding="utf-8") as handle:
+            SeqIO.write(record, handle, "genbank")
+        return path
+
+    def write_ytk_part_genbank(
+            self,
+            directory,
+            filename,
+            upstream_overhang,
+            downstream_overhang,
+            payload="ATGC" * 40,
+            feature_type="misc_feature",
+            feature_label="Part",
+            prefix="AA",
+            suffix="TT",
+            extra_features=None,
+            date="18-DEC-2014"):
+        sequence = (
+            prefix
+            + "GGTCTC"
+            + "A"
+            + upstream_overhang
+            + payload
+            + downstream_overhang
+            + "A"
+            + "GAGACC"
+            + suffix
+        )
+        record = SeqRecord(Seq(sequence), id=filename.replace(".gb", ""), name=filename.replace(".gb", ""), description=".")
+        record.annotations["molecule_type"] = "DNA"
+        record.annotations["topology"] = "circular"
+        record.annotations["date"] = date
+
+        payload_start = len(prefix) + 6 + 1 + 4
+        payload_end = payload_start + len(payload)
+        record.features = [
+            SeqFeature(
+                FeatureLocation(payload_start, payload_end),
+                type=feature_type,
+                qualifiers={"label": [feature_label]},
+            )
+        ]
+        for feature in extra_features or []:
+            record.features.append(feature)
+
+        path = Path(directory) / filename
+        with path.open("w", encoding="utf-8") as handle:
+            SeqIO.write(record, handle, "genbank")
+        return path
+
+    def write_ytk_receiver_dropout_genbank(
+            self,
+            directory,
+            filename,
+            upstream_overhang,
+            downstream_overhang,
+            dropout_payload="ATGC" * 20,
+            backbone_payload="GCTA" * 20,
+            backbone_feature_label="CamR",
+            backbone_feature_type="CDS",
+            date="18-DEC-2014"):
+        sequence = (
+            downstream_overhang
+            + "A"
+            + "GAGACC"
+            + dropout_payload
+            + "GGTCTC"
+            + "A"
+            + upstream_overhang
+            + backbone_payload
+        )
+        record = SeqRecord(Seq(sequence), id=filename.replace(".gb", ""), name=filename.replace(".gb", ""), description=".")
+        record.annotations["molecule_type"] = "DNA"
+        record.annotations["topology"] = "circular"
+        record.annotations["date"] = date
+
+        backbone_start = len(downstream_overhang) + 1 + 6 + len(dropout_payload) + 6 + 1 + len(upstream_overhang)
+        backbone_end = backbone_start + len(backbone_payload)
+        record.features = [
+            SeqFeature(
+                FeatureLocation(backbone_start, backbone_end),
+                type=backbone_feature_type,
+                qualifiers={"label": [backbone_feature_label]},
+            )
+        ]
+
+        path = Path(directory) / filename
+        with path.open("w", encoding="utf-8") as handle:
+            SeqIO.write(record, handle, "genbank")
+        return path
+
+    def test_import_genbank_creates_reference_plasmid_with_metadata(self):
+        with tempfile.TemporaryDirectory() as tempdir:
+            with override_settings(MEDIA_ROOT=tempdir):
+                extra_features = [
+                    SeqFeature(FeatureLocation(0, 7), type="protein_bind", qualifiers={"label": ["BsmBI"]}),
+                    SeqFeature(FeatureLocation(20, 40), type="CDS", qualifiers={"label": ["CamR"]}),
+                ]
+                self.write_ytk_part_genbank(
+                    tempdir,
+                    "pYTK999.gb",
+                    "GCTG",
+                    "TACA",
+                    feature_label="ConR1",
+                    prefix="AACGTCTCA",
+                    extra_features=extra_features,
+                )
+
+                result = import_plasmids_from_genbank_dir(tempdir, self.project)
+
+        plasmid = Plasmid.objects.get(name="pYTK999", project=self.project)
+        expected_size = len("AACGTCTCA" + "GGTCTC" + "A" + "GCTG" + ("ATGC" * 40) + "TACA" + "A" + "GAGACC" + "TT")
+
+        self.assertEqual(result["created"], 1)
+        self.assertEqual(plasmid.computed_size, expected_size)
+        self.assertEqual(plasmid.level, 0)
+        self.assertEqual(plasmid.type.name, "Insert")
+        self.assertTrue(plasmid.reference_sequence)
+        self.assertEqual(plasmid.created_on, datetime.date(2014, 12, 18))
+        self.assertTrue(RestrictionEnzyme.objects.filter(name="BsaI", hf_version=False).exists())
+        bsai_hf = RestrictionEnzyme.objects.get(name="BsaI", hf_version=True)
+        self.assertTrue(RestrictionEnzyme.objects.filter(name="BsmBI", hf_version=False).exists())
+        bsmbi = RestrictionEnzyme.objects.get(name="BsmBI", hf_version=False)
+        self.assertEqual(bsai_hf.link_datasheet, "https://www.neb.com/en/products/r3733-bsai-hf-v2")
+        self.assertEqual(bsai_hf.buffer_activity_map(), {
+            "NEB 1.1": 100,
+            "NEB 2.1": 100,
+            "NEB 3.1": 100,
+            "NEB CutSmart": 100,
+        })
+        self.assertEqual(bsmbi.link_datasheet, "https://www.neb.com/en/products/r0739-bsmbi-v2")
+        self.assertEqual(bsmbi.buffer_activity_map(), {
+            "NEB 1.1": 10,
+            "NEB 2.1": 50,
+            "NEB 3.1": 100,
+            "NEB CutSmart": 25,
+        })
+        self.assertIn("<10%", bsmbi.description)
+        self.assertEqual(list(plasmid.selectable_markers.values_list("three_letter_code", flat=True)), ["CLM"])
+        self.assertIn("ConR1", plasmid.description)
+        self.assertTrue(plasmid.sequence.name.endswith("pYTK999.gb"))
+        self.assertEqual(plasmid.assembly_metadata["detected"]["part_type_key"], "ytk_5")
+        self.assertEqual(plasmid.assembly_metadata["detected"]["source"], "digest")
+        self.assertEqual(plasmid.assembly_metadata["confirmed"]["type_name"], "Insert")
+        self.assertEqual(plasmid.assembly_metadata["confirmed"]["level"], 0)
+
+    def test_plasmid_update_computed_size_without_restriction_enzyme_records(self):
+        with tempfile.TemporaryDirectory() as tempdir:
+            with override_settings(MEDIA_ROOT=tempdir):
+                self.write_genbank(tempdir, "pYTK998.gb", ["BsaI", "BsaI(1)", "CamR", "sfGFP"])
+                import_plasmids_from_genbank_dir(tempdir, self.project)
+
+                plasmid = Plasmid.objects.get(name="pYTK998", project=self.project)
+                plasmid.computed_size = None
+                plasmid.insert_computed_size = None
+                plasmid.save(update_fields=["computed_size", "insert_computed_size"])
+                RestrictionEnzyme.objects.all().delete()
+
+                result = plasmid_update_computed_size(plasmid)
+                plasmid.refresh_from_db()
+
+        self.assertTrue(result)
+        self.assertEqual(plasmid.computed_size, 160)
+
+    def test_import_genbank_updates_existing_plasmid_when_requested(self):
+        with tempfile.TemporaryDirectory() as tempdir:
+            with override_settings(MEDIA_ROOT=tempdir):
+                self.write_genbank(tempdir, "pYTK001.gb", ["BsmBI", "BsmBI(1)", "CamR", "sfGFP"])
+                Plasmid.objects.create(
+                    name="pYTK001",
+                    project=self.project,
+                    intended_use="Legacy",
+                    description="Old description",
+                )
+
+                result = import_plasmids_from_genbank_dir(
+                    tempdir,
+                    self.project,
+                    update_existing=True,
+                )
+
+        plasmid = Plasmid.objects.get(name="pYTK001", project=self.project)
+
+        self.assertEqual(result["updated"], 1)
+        self.assertEqual(plasmid.type.name, "Receiver")
+        self.assertEqual(plasmid.level, 0)
+        self.assertEqual(plasmid.intended_use, "Imported from GenBank")
+        self.assertEqual(list(plasmid.selectable_markers.values_list("three_letter_code", flat=True)), ["CLM"])
+        self.assertEqual(plasmid.assembly_metadata["detected"]["source"], "legacy_labels")
+
+    def test_classifier_is_invariant_to_rotation_and_reverse_complement(self):
+        payload = "ATGC" * 20
+        sequence = "AA" + "GGTCTC" + "A" + "GCTG" + payload + "TACA" + "A" + "GAGACC" + "TT"
+        rotated_sequence = sequence[25:] + sequence[:25]
+        reverse_complement_sequence = str(Seq(sequence).reverse_complement())
+
+        records = []
+        for index, sequence_variant in enumerate((sequence, rotated_sequence, reverse_complement_sequence), start=1):
+            record = SeqRecord(Seq(sequence_variant), id=f"variant{index}", name=f"variant{index}", description=".")
+            record.annotations["molecule_type"] = "DNA"
+            record.annotations["topology"] = "circular"
+            records.append(record)
+
+        results = [classify_assembly_record(record, standard_id="ytk", allow_legacy_fallback=False) for record in records]
+
+        self.assertTrue(all(result is not None for result in results))
+        self.assertEqual({result.part_type_key for result in results}, {"ytk_5"})
+        self.assertEqual({result.model_type_name for result in results}, {"Insert"})
+        self.assertEqual({result.model_level for result in results}, {0})
+
+    def test_import_prefers_digest_based_classification_even_with_extra_bsmbi_site(self):
+        with tempfile.TemporaryDirectory() as tempdir:
+            with override_settings(MEDIA_ROOT=tempdir):
+                self.write_ytk_part_genbank(
+                    tempdir,
+                    "pYTK067_like.gb",
+                    "GCTG",
+                    "TACA",
+                    feature_label="Con1",
+                    prefix="AACGTCTCA",
+                    extra_features=[SeqFeature(FeatureLocation(2, 8), type="protein_bind", qualifiers={"label": ["BsmBI"]})],
+                )
+
+                result = import_plasmids_from_genbank_dir(tempdir, self.project)
+
+        plasmid = Plasmid.objects.get(name="pYTK067_like", project=self.project)
+
+        self.assertEqual(result["created"], 1)
+        self.assertEqual(plasmid.type.name, "Insert")
+        self.assertEqual(plasmid.level, 0)
+        self.assertEqual(plasmid.assembly_metadata["detected"]["part_type_key"], "ytk_5")
+
+    def test_classifier_detects_ytk_234r_receiver_dropout(self):
+        with tempfile.TemporaryDirectory() as tempdir:
+            genbank_path = self.write_ytk_receiver_dropout_genbank(
+                tempdir,
+                "pYTK047_like.gb",
+                "GCTG",
+                "AACG",
+            )
+            record = SeqIO.read(str(genbank_path), "genbank")
+
+        result = classify_assembly_record(record, standard_id="ytk", allow_legacy_fallback=False)
+
+        self.assertIsNotNone(result)
+        self.assertEqual(result.part_type_key, "ytk_234r")
+        self.assertEqual(result.model_type_name, "Receiver")
+        self.assertEqual(result.model_level, 1)
+
+    def test_import_detects_ytk_234r_receiver_dropout_as_level_one_receiver(self):
+        with tempfile.TemporaryDirectory() as tempdir:
+            with override_settings(MEDIA_ROOT=tempdir):
+                self.write_ytk_receiver_dropout_genbank(
+                    tempdir,
+                    "pYTK047_like.gb",
+                    "GCTG",
+                    "AACG",
+                )
+
+                result = import_plasmids_from_genbank_dir(tempdir, self.project)
+
+        plasmid = Plasmid.objects.get(name="pYTK047_like", project=self.project)
+
+        self.assertEqual(result["created"], 1)
+        self.assertEqual(plasmid.type.name, "Receiver")
+        self.assertEqual(plasmid.level, 1)
+        self.assertEqual(plasmid.assembly_metadata["detected"]["part_type_key"], "ytk_234r")
+        self.assertEqual(plasmid.assembly_metadata["confirmed"]["type_name"], "Receiver")
+        self.assertEqual(plasmid.assembly_metadata["confirmed"]["level"], 1)
+
+    def test_import_uploaded_genbanks_supports_multiple_files(self):
+        with tempfile.TemporaryDirectory() as tempdir:
+            first_path = self.write_genbank(tempdir, "pYTK111.gb", ["BsaI", "BsaI(1)", "CamR", "sfGFP"])
+            second_path = self.write_genbank(tempdir, "pYTK112.gbk", ["BsmBI", "BsmBI(1)", "AmpR", "mRuby2"])
+            uploads = [
+                SimpleUploadedFile(first_path.name, first_path.read_bytes(), content_type="text/plain"),
+                SimpleUploadedFile(second_path.name, second_path.read_bytes(), content_type="text/plain"),
+            ]
+
+            with override_settings(MEDIA_ROOT=tempdir):
+                result = import_plasmids_from_uploaded_genbanks(uploads, self.project)
+
+        self.assertEqual(result["created"], 2)
+        self.assertEqual(Plasmid.objects.filter(project=self.project, name="pYTK111").count(), 1)
+        self.assertEqual(Plasmid.objects.filter(project=self.project, name="pYTK112").count(), 1)
+
+    def test_import_uploaded_genbanks_sorts_files_alphabetically_before_creation(self):
+        with tempfile.TemporaryDirectory() as tempdir:
+            first_path = self.write_genbank(tempdir, "pYTK002.gb", ["BsaI", "BsaI(1)", "CamR", "sfGFP"])
+            second_path = self.write_genbank(tempdir, "pYTK001.gbk", ["BsmBI", "BsmBI(1)", "AmpR", "mRuby2"])
+            uploads = [
+                SimpleUploadedFile(first_path.name, first_path.read_bytes(), content_type="text/plain"),
+                SimpleUploadedFile(second_path.name, second_path.read_bytes(), content_type="text/plain"),
+            ]
+
+            with override_settings(MEDIA_ROOT=tempdir):
+                result = import_plasmids_from_uploaded_genbanks(uploads, self.project)
+
+        plasmids_by_idx = list(Plasmid.objects.filter(project=self.project).order_by("idx").values_list("name", flat=True))
+
+        self.assertEqual(result["created"], 2)
+        self.assertEqual(plasmids_by_idx, ["pYTK001", "pYTK002"])
+
+    def test_plasmid_import_view_imports_into_current_project(self):
+        user = User.objects.create_user(username="genbank-user", password="pw")
+        Membership.objects.create(member=user, project=self.project, access_policies="w")
+        self.client.force_login(user)
+        self.client.cookies["current_project_id"] = str(self.project.id)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            genbank_path = self.write_genbank(tempdir, "pYTK201.gb", ["BsaI", "BsaI(1)", "CamR", "Venus"])
+            upload = SimpleUploadedFile(genbank_path.name, genbank_path.read_bytes(), content_type="text/plain")
+
+            with override_settings(MEDIA_ROOT=tempdir):
+                response = self.client.post(reverse("plasmid_import"), {
+                    "target_mode": "existing",
+                    "project": str(self.project.id),
+                    "genbank_files": [upload],
+                    "name_source": "filename",
+                    "update_existing": "",
+                    "public_visibility": "on",
+                    "reference_sequence": "on",
+                    "infer_ytk_metadata": "on",
+                })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("plasmids") + "?form_result_plasmid_import_success=true")
+        plasmid = Plasmid.objects.get(name="pYTK201", project=self.project)
+        self.assertTrue(plasmid.public_visibility)
+        self.assertTrue(plasmid.reference_sequence)
+        self.assertEqual(response.cookies["current_project_id"].value, str(self.project.id))
+
+    def test_plasmid_detail_view_shows_persisted_assembly_classification(self):
+        user = User.objects.create_user(username="assembly-detail-user", password="pw")
+        Membership.objects.create(member=user, project=self.project, access_policies="w")
+        self.client.force_login(user)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            with override_settings(MEDIA_ROOT=tempdir):
+                self.write_ytk_part_genbank(
+                    tempdir,
+                    "pYTK067_detail.gb",
+                    "GCTG",
+                    "TACA",
+                    feature_label="Con1",
+                    prefix="AACGTCTCA",
+                )
+                import_plasmids_from_genbank_dir(tempdir, self.project)
+
+                plasmid = Plasmid.objects.get(name="pYTK067_detail", project=self.project)
+                response = self.client.get(reverse("plasmid", args=(plasmid.id,)))
+
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, "Assembly classification")
+                self.assertContains(response, "YTK Part 5")
+                self.assertContains(response, "GCTG")
+                self.assertContains(response, "TACA")
+
+    def test_api_plasmids_exposes_part_metadata_and_filters(self):
+        user = User.objects.create_user(username="assembly-api-user", password="pw")
+        Membership.objects.create(member=user, project=self.project, access_policies="w")
+        self.client.force_login(user)
+        self.client.cookies["current_project_id"] = str(self.project.id)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            with override_settings(MEDIA_ROOT=tempdir):
+                self.write_ytk_part_genbank(
+                    tempdir,
+                    "pYTK067_api.gb",
+                    "GCTG",
+                    "TACA",
+                    feature_label="Con1",
+                    prefix="AACGTCTCA",
+                )
+                import_plasmids_from_genbank_dir(tempdir, self.project)
+
+        response = self.client.get(reverse("api-plasmids"))
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["plasmids"][0]["pk"], "ytk_5")
+        self.assertEqual(payload["plasmids"][0]["pnm"], "YTK Part 5")
+        self.assertIn(
+            ["part", "Part", [["P5", "ap-ytk-5", "info"]]],
+            payload["table_filters"],
+        )
+
+    def test_plasmid_import_view_can_create_destination_project(self):
+        user = User.objects.create_user(username="new-project-user", password="pw")
+        self.client.force_login(user)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            genbank_path = self.write_genbank(tempdir, "pYTK301.gb", ["BsaI", "BsaI(1)", "CamR", "Venus"])
+            upload = SimpleUploadedFile(genbank_path.name, genbank_path.read_bytes(), content_type="text/plain")
+
+            with override_settings(MEDIA_ROOT=tempdir):
+                response = self.client.post(reverse("plasmid_import"), {
+                    "target_mode": "new",
+                    "project": "",
+                    "new_project_name": "Imported From Form",
+                    "new_project_public": "",
+                    "new_project_assembly_standard": "ytk",
+                    "genbank_files": [upload],
+                    "name_source": "filename",
+                    "update_existing": "",
+                    "public_visibility": "",
+                    "reference_sequence": "on",
+                    "infer_ytk_metadata": "on",
+                })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("plasmids") + "?form_result_plasmid_import_success=true")
+        project = Project.objects.get(name="Imported From Form")
+        self.assertEqual(project.assembly_standard, "ytk")
+        self.assertTrue(Membership.objects.filter(member=user, project=project, access_policies="a").exists())
+        self.assertTrue(Plasmid.objects.filter(name="pYTK301", project=project).exists())
+        self.assertEqual(response.cookies["current_project_id"].value, str(project.id))
+
+
+class RestrictionEnzymeCreateTests(TestCase):
+    def test_restrictionenzyme_create_view_creates_record(self):
+        user = User.objects.create_user(username="enzyme-user", password="pw")
+        self.client.force_login(user)
+
+        response = self.client.post(reverse("restrictionenzyme_create"), {
+            "name": "SapI",
+            "hf_version": "",
+            "link_datasheet": "",
+            "description": "Loaded from frontend",
+            "buffers-TOTAL_FORMS": "1",
+            "buffers-INITIAL_FORMS": "0",
+            "buffers-MIN_NUM_FORMS": "0",
+            "buffers-MAX_NUM_FORMS": "1000",
+            "buffers-0-existing_buffer": "__new__",
+            "buffers-0-new_buffer_name": "NEB CutSmart",
+            "buffers-0-activity_percent": "100",
+            "buffers-0-DELETE": "",
+        })
+
+        enzyme = RestrictionEnzyme.objects.get(name="SapI", hf_version=False)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.url,
+            reverse("restrictionenzyme", args=(enzyme.id,)) + "?form_result_restrictionenzyme_create_success=true",
+        )
+        self.assertEqual(enzyme.buffer_activity_map(), {"NEB CutSmart": 100})
+        self.assertEqual(enzyme.description, "Loaded from frontend")
+        self.assertTrue(RestrictionBuffer.objects.filter(name="NEB CutSmart").exists())
+
+    def test_restrictionenzyme_create_view_reuses_existing_buffer(self):
+        user = User.objects.create_user(username="enzyme-buffer-user", password="pw")
+        self.client.force_login(user)
+        buffer = RestrictionBuffer.objects.create(name="Buffer R")
+
+        response = self.client.post(reverse("restrictionenzyme_create"), {
+            "name": "SapI",
+            "hf_version": "",
+            "link_datasheet": "",
+            "description": "",
+            "buffers-TOTAL_FORMS": "1",
+            "buffers-INITIAL_FORMS": "0",
+            "buffers-MIN_NUM_FORMS": "0",
+            "buffers-MAX_NUM_FORMS": "1000",
+            "buffers-0-existing_buffer": str(buffer.id),
+            "buffers-0-new_buffer_name": "",
+            "buffers-0-activity_percent": "75",
+            "buffers-0-DELETE": "",
+        })
+
+        enzyme = RestrictionEnzyme.objects.get(name="SapI", hf_version=False)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(enzyme.buffer_activity_map(), {"Buffer R": 75})
+        self.assertEqual(RestrictionBuffer.objects.filter(name="Buffer R").count(), 1)
+
+    def test_restrictionenzyme_create_view_blocks_duplicate_name_and_hf(self):
+        user = User.objects.create_user(username="enzyme-duplicate-user", password="pw")
+        self.client.force_login(user)
+        RestrictionEnzyme.objects.create(name="BsmBI", hf_version=True)
+
+        response = self.client.post(reverse("restrictionenzyme_create"), {
+            "name": "BsmBI",
+            "hf_version": "on",
+            "link_datasheet": "",
+            "description": "",
+            "buffers-TOTAL_FORMS": "1",
+            "buffers-INITIAL_FORMS": "0",
+            "buffers-MIN_NUM_FORMS": "0",
+            "buffers-MAX_NUM_FORMS": "1000",
+            "buffers-0-existing_buffer": "",
+            "buffers-0-new_buffer_name": "",
+            "buffers-0-activity_percent": "",
+            "buffers-0-DELETE": "",
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "BsmBI-HF is already loaded in Weaver.")
+
+    def test_restrictionenzyme_delete_view_removes_record(self):
+        user = User.objects.create_user(username="enzyme-delete-user", password="pw")
+        self.client.force_login(user)
+        enzyme = RestrictionEnzyme.objects.create(name="SapI", hf_version=False)
+
+        response = self.client.post(reverse("restrictionenzyme_delete", args=(enzyme.id,)))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("restrictionenzymes") + "?form_result_object_deleted=true")
+        self.assertFalse(RestrictionEnzyme.objects.filter(id=enzyme.id).exists())

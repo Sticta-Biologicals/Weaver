@@ -77,7 +77,11 @@ function onReady(){
     /* filters */
     var filter_buttons = $('.pe-table-filter-button');
     var filter_items = $('.filter-item');
-    filter_buttons.click(function(){
+    function resetTableFilters() {
+        filter_buttons.removeClass('active');
+        filter_items.removeClass('filter-hide');
+    }
+    filter_buttons.off("click").on("click", function(){
         filter_buttons.removeClass('active');
         $(this).addClass('active');
         var filter_id = $(this).attr('data-target');
@@ -99,6 +103,13 @@ function onReady(){
             }
         });
     });
+    $('#pe-table-filter-clear').off("click").on("click", function(){
+        resetTableFilters();
+        filter_buttons.filter('[data-target="all"]').first().addClass('active');
+    });
+    if (filter_buttons.length && !filter_buttons.filter('.active').length) {
+        filter_buttons.filter('[data-target="all"]').first().addClass('active');
+    }
     /* show_from_all_projects */
     $('#show_from_all_projects').click(function(){
         $(this).parent().submit();

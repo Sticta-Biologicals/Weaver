@@ -17,17 +17,17 @@ PREFERRED_TYPE_IIS_SPACER_LENGTH = 5
 MIN_INFERRED_HYBRIDIZING_LENGTH = 15
 MIN_PRIMER_3PRIME_BINDING_LENGTH = 15
 YTK_OVERHANGS = {
-    "8-1": {"name": "YTK Type 8 / Type 1", "overhang": "CCCT"},
-    "1-2": {"name": "YTK Type 1 / Type 2", "overhang": "AACG"},
-    "2-3": {"name": "YTK Type 2 / Type 3", "overhang": "TATG"},
-    "3a-3b": {"name": "YTK Type 3a / Type 3b", "overhang": "TTCT"},
-    "3-4": {"name": "YTK Type 3 / Type 4", "overhang": "ATCC"},
-    "4a-4b": {"name": "YTK Type 4a / Type 4b", "overhang": "TGGC"},
-    "4-5": {"name": "YTK Type 4 / Type 5", "overhang": "GCTG"},
-    "5-6": {"name": "YTK Type 5 / Type 6", "overhang": "TACA"},
-    "6-7": {"name": "YTK Type 6 / Type 7", "overhang": "GAGT"},
-    "7-8": {"name": "YTK Type 7 / Type 8", "overhang": "CCGA"},
-    "8a-8b": {"name": "YTK Type 8a / Type 8b", "overhang": "CAAT"},
+    "8-1": {"name": "YTK Part 8 / Part 1", "overhang": "CCCT"},
+    "1-2": {"name": "YTK Part 1 / Part 2", "overhang": "AACG"},
+    "2-3": {"name": "YTK Part 2 / Part 3", "overhang": "TATG"},
+    "3a-3b": {"name": "YTK Part 3a / Part 3b", "overhang": "TTCT"},
+    "3-4": {"name": "YTK Part 3 / Part 4", "overhang": "ATCC"},
+    "4a-4b": {"name": "YTK Part 4a / Part 4b", "overhang": "TGGC"},
+    "4-5": {"name": "YTK Part 4 / Part 5", "overhang": "GCTG"},
+    "5-6": {"name": "YTK Part 5 / Part 6", "overhang": "TACA"},
+    "6-7": {"name": "YTK Part 6 / Part 7", "overhang": "GAGT"},
+    "7-8": {"name": "YTK Part 7 / Part 8", "overhang": "CCGA"},
+    "8a-8b": {"name": "YTK Part 8a / Part 8b", "overhang": "CAAT"},
 }
 
 
