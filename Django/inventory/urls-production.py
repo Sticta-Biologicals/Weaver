@@ -94,6 +94,12 @@ urlpatterns = [
     path('services/batch-prints/', login_required(ServicesBatchPrints, redirect_field_name='next'), name='services-batch-prints'),
     path('services/stats/', login_required(ServicesStats, redirect_field_name='next'), name='services-stats'),
 
+    path('experiments', login_required(views.experiments, redirect_field_name='next'), name='experiments'),
+    path('experiment/create/', login_required(views.experiment_create, redirect_field_name='next'), name='experiment_create'),
+    path('experiment/<int:experiment_id>/edit/', login_required(views.experiment_edit, redirect_field_name='next'), name='experiment_edit'),
+    path('experiment/<int:experiment_id>/delete/', login_required(views.experiment_delete, redirect_field_name='next'), name='experiment_delete'),
+    path('api/experiments-map/', login_required(views.api_experiments_map, redirect_field_name='next'), name='api-experiments-map'),
+
     path('api/fidelity_calc/<str:enzyme>/<str:ohs>', login_required(views.api_fidelity_calc, redirect_field_name='next'), name='api-fidelity_calc'),
     path('api/plasmids/', login_required(views.api_plasmids, redirect_field_name='next'), name='api-plasmids'),
     path('api/parts/<str:enzyme_name>/<str:assembly_standard>/', login_required(views.api_parts, redirect_field_name='next'), name='api-parts'),

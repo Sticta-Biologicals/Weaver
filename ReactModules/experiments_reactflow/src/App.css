@@ -5,6 +5,15 @@
   background: #14191d;
 }
 
+.weaver-flow-shell.is-archived {
+  border-color: rgba(108, 117, 125, 0.7);
+}
+
+.weaver-flow-archived-badge {
+  color: #ced4da;
+  background: #495057;
+}
+
 .weaver-flow-stats {
   display: flex;
   flex-wrap: wrap;

@@ -105,6 +105,9 @@ urlpatterns = [
     path('services/stats/', login_required(ServicesStats, redirect_field_name='next'), name='services-stats'),
 
     path('experiments', login_required(views.experiments, redirect_field_name='next'), name='experiments'),
+    path('experiment/create/', login_required(views.experiment_create, redirect_field_name='next'), name='experiment_create'),
+    path('experiment/<int:experiment_id>/edit/', login_required(views.experiment_edit, redirect_field_name='next'), name='experiment_edit'),
+    path('experiment/<int:experiment_id>/delete/', login_required(views.experiment_delete, redirect_field_name='next'), name='experiment_delete'),
 
     #path('api/plasmid/get_fasta/by_name/<str:name>/', api_plasmid_get_fasta_by_name, name='api-plasmid-get_fasta_by_name'),
     #path('api/plasmid/get_fasta/by_idx/<int:idx>/', api_plasmid_get_fasta_by_idx, name='api-plasmid-get_fasta_by_idx'),

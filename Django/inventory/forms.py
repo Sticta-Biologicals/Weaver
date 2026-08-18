@@ -1,8 +1,10 @@
 import datetime
 from django import forms
+from django.urls import reverse
 from .models import Plasmid
 from .models import Primer
 from .models import GlycerolStock
+from .models import Experiment
 from .models import RestrictionBuffer
 from .models import RestrictionEnzyme
 from .models import RestrictionEnzymeBuffer
@@ -117,6 +119,76 @@ class GstockCreateForm(forms.ModelForm):
             'created_on': DateInput()
         }
 
+
+class ExperimentPlasmidField(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        return f'{obj.name} [{obj.idx}]'
+
+
+class ExperimentForm(forms.ModelForm):
+    plasmids = ExperimentPlasmidField(queryset=Plasmid.objects.none())
+
+    class Meta:
+        model = Experiment
+        fields = ('name', 'description', 'project', 'plasmids')
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3}),
+            'plasmids': forms.SelectMultiple(attrs={'size': 12}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        self.fields['plasmids'].label = 'Target plasmids'
+        self.fields['plasmids'].help_text = (
+            'Select only the final plasmids. Their backbone and inserts are included automatically.'
+        )
+
+        writable_projects = (
+            get_projects_where_member_can(user, ['a', 'w']).order_by('name')
+            if user else Project.objects.none()
+        )
+        self.fields['project'].queryset = writable_projects
+        self.fields['project'].required = False
+        self.fields['project'].empty_label = 'Unassigned project'
+        visible_projects = get_projects_where_member_can_any(user) if user else Project.objects.none()
+        plasmid_queryset = Plasmid.objects.filter(
+            project__in=visible_projects
+        ).select_related('project').prefetch_related('inserts').order_by(
+            'project__name', 'name', 'idx'
+        )
+        self.fields['plasmids'].queryset = plasmid_queryset
+
+        plasmids = list(plasmid_queryset)
+        self.has_level_3 = any(plasmid.level == 3 for plasmid in plasmids)
+        self.has_level_4 = any(plasmid.level == 4 for plasmid in plasmids)
+        self.has_unidentified_level = any(plasmid.level is None for plasmid in plasmids)
+        self.plasmid_dependencies = {}
+        self.plasmid_labels = {}
+        self.plasmid_levels = {}
+        self.plasmid_urls = {}
+        for plasmid in plasmids:
+            dependencies = list(plasmid.inserts.all())
+            if plasmid.backbone:
+                dependencies.insert(0, plasmid.backbone)
+            self.plasmid_dependencies[str(plasmid.id)] = [str(item.id) for item in dependencies]
+            for item in [plasmid, *dependencies]:
+                self.plasmid_labels[str(item.id)] = f'{item.name} [{item.idx}]'
+                self.plasmid_levels[str(item.id)] = (
+                    f'L{item.level}' if item.level is not None else 'Unidentified Level'
+                )
+                self.plasmid_urls[str(item.id)] = reverse(
+                    'plasmid', kwargs={'plasmid_id': item.id}
+                )
+
+        for field in self.fields.values():
+            field.widget.attrs.setdefault('class', 'form-control')
+        self.fields['project'].widget.attrs['class'] = 'form-select'
+        self.fields['plasmids'].widget.attrs.update({
+            'class': 'form-select',
+            'data-plasmid-selector': 'true',
+        })
 
 class GstockEditForm(forms.ModelForm):
     class Meta:

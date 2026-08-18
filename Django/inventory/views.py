@@ -1,10 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.utils.text import get_valid_filename
 from django.shortcuts import redirect
 
 from .models import Plasmid
+from .models import Experiment
 from .models import GlycerolStock
 from .models import RestrictionEnzyme
 from .models import Primer
@@ -85,6 +86,7 @@ from .forms import PlasmidValidationForm
 from .forms import PlasmidCreateForm
 from .forms import PlasmidEditForm
 from .forms import PlasmidLabel
+from .forms import ExperimentForm
 
 from django.http import HttpResponseRedirect
 
@@ -3931,16 +3933,112 @@ def api_glycerolstocks(request):
 
 
 def experiments(request):
-    projects_with_experiments = []
+    visible_projects = get_projects_where_member_can_any(request.user)
+    projects_with_experiments = visible_projects.filter(
+        experiment__isnull=False
+    ).distinct().prefetch_related('experiment_set__plasmids')
+    writable_projects = get_projects_where_member_can(request.user, ['a', 'w']).order_by('name')
+    writable_project_ids = set(writable_projects.values_list('id', flat=True))
 
-    for project in get_projects_where_member_can_any(request.user):
-        if project.experiment_set.all():
-            projects_with_experiments.append(project)
+    experiment_groups = []
+    for project in projects_with_experiments:
+        project_experiments = list(project.experiment_set.all())
+        for experiment in project_experiments:
+            nodes = _experiment_nodes(experiment, request)
+            experiment.archived = bool(nodes) and all(
+                node['status'] in ('V', 'RS') for node in nodes.values()
+            )
+            experiment.can_manage = experiment.project_id in writable_project_ids
+        if project_experiments:
+            experiment_groups.append({
+                'id': project.id,
+                'name': str(project),
+                'experiments': project_experiments,
+            })
+
+    if writable_projects.exists():
+        unassigned_experiments = list(
+            Experiment.objects.filter(project__isnull=True)
+            .prefetch_related('plasmids')
+        )
+        for experiment in unassigned_experiments:
+            nodes = _experiment_nodes(experiment, request)
+            experiment.archived = bool(nodes) and all(
+                node['status'] in ('V', 'RS') for node in nodes.values()
+            )
+            experiment.can_manage = True
+        if unassigned_experiments:
+            experiment_groups.append({
+                'id': 'unassigned',
+                'name': 'Unassigned project',
+                'experiments': unassigned_experiments,
+            })
 
     context = {
-        'projects': projects_with_experiments
+        'projects': projects_with_experiments,
+        'experiment_groups': experiment_groups,
+        'writable_projects': writable_projects,
+        'writable_project_ids': writable_project_ids,
+        'can_manage_experiments': writable_projects.exists(),
     }
     return render(request, 'inventory/experiments.html', context)
+
+
+def experiment_create(request):
+    writable_projects = get_projects_where_member_can(request.user, ['a', 'w']).order_by('name')
+    if request.method == 'POST':
+        form = ExperimentForm(request.POST, user=request.user)
+        if form.is_valid():
+            experiment = form.save()
+            return redirect('experiments')
+    else:
+        form = ExperimentForm(user=request.user)
+
+    return render(request, 'inventory/experiment_form.html', {
+        'form': form,
+        'title': 'Create experiment',
+        'submit_label': 'Create experiment',
+        'writable_projects': writable_projects,
+    })
+
+
+def _can_manage_experiment(experiment, user):
+    if experiment.project_id is None:
+        return get_projects_where_member_can(user, ['a', 'w']).exists()
+    return on_project_member_can_write_or_admin(experiment.project, user)
+
+
+def experiment_edit(request, experiment_id):
+    experiment = get_object_or_404(Experiment.objects.select_related('project'), pk=experiment_id)
+    if not _can_manage_experiment(experiment, request.user):
+        return render(request, 'common/no_permission_to_edit.html')
+
+    if request.method == 'POST':
+        form = ExperimentForm(request.POST, instance=experiment, user=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('experiments')
+    else:
+        form = ExperimentForm(instance=experiment, user=request.user)
+
+    return render(request, 'inventory/experiment_form.html', {
+        'form': form,
+        'title': 'Edit experiment',
+        'submit_label': 'Save changes',
+        'experiment': experiment,
+    })
+
+
+def experiment_delete(request, experiment_id):
+    experiment = get_object_or_404(Experiment.objects.select_related('project'), pk=experiment_id)
+    if not _can_manage_experiment(experiment, request.user):
+        return render(request, 'common/no_permission_to_edit.html')
+    if request.method == 'POST':
+        experiment.delete()
+        return redirect('experiments')
+    return render(request, 'inventory/experiment_confirm_delete.html', {
+        'experiment': experiment,
+    })
 
 
 def _experiment_plasmid_status(plasmid):
@@ -4031,37 +4129,62 @@ def _experiment_map_stats(nodes):
         'pending': len(pending_nodes),
         'ready_to_build': ready_to_build,
         'blocked': blocked,
-        'progress': round((validated / total) * 100) if total else 0,
+        'progress': round(((validated + reference) / total) * 100) if total else 0,
+        'archived': bool(nodes) and all(
+            node['status'] in ('V', 'RS') for node in nodes.values()
+        ),
     }
+
+
+def _experiment_nodes(experiment, request):
+    nodes = {}
+    for plasmid in experiment.plasmids.all():
+        if plasmid.idx is None:
+            continue
+        _collect_experiment_plasmid(plasmid, request, nodes)
+    return nodes
 
 
 def api_experiments_map(request):
     projects = []
-    for project in get_projects_where_member_can_any(request.user):
+    visible_projects = get_projects_where_member_can_any(request.user)
+
+    def experiment_output(experiment):
+        nodes = _experiment_nodes(experiment, request)
+        root_ids = [
+            plasmid.idx for plasmid in experiment.plasmids.all()
+            if plasmid.idx is not None
+        ]
+        stats = _experiment_map_stats(nodes)
+        return {
+            'id': experiment.id,
+            'name': experiment.name,
+            'description': experiment.description,
+            'root_ids': root_ids,
+            'stats': stats,
+            'archived': stats['archived'],
+            'plasmids': list(nodes.values()),
+        }
+
+    for project in visible_projects:
         experiments_output = []
         for experiment in project.experiment_set.all():
-            nodes = {}
-            root_ids = []
-            for plasmid in experiment.plasmids.all():
-                if plasmid.idx is None:
-                    continue
-                root_ids.append(plasmid.idx)
-                _collect_experiment_plasmid(plasmid, request, nodes)
-
-            experiments_output.append({
-                'id': experiment.id,
-                'name': experiment.name,
-                'description': experiment.description,
-                'root_ids': root_ids,
-                'stats': _experiment_map_stats(nodes),
-                'plasmids': list(nodes.values()),
-            })
+            experiments_output.append(experiment_output(experiment))
 
         if experiments_output:
             projects.append({
                 'id': project.id,
                 'name': str(project),
                 'experiments': experiments_output,
+            })
+
+    if get_projects_where_member_can(request.user, ['a', 'w']).exists():
+        unassigned_experiments = Experiment.objects.filter(project__isnull=True).prefetch_related('plasmids')
+        if unassigned_experiments.exists():
+            projects.append({
+                'id': None,
+                'name': 'Unassigned project',
+                'experiments': [experiment_output(experiment) for experiment in unassigned_experiments],
             })
 
     return JsonResponse({'projects': projects})

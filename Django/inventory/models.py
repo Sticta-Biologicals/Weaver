@@ -689,7 +689,7 @@ class Experiment(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=128, help_text="Experiment name")
     description = models.CharField(max_length=500, help_text="Experiment description", null=True, blank=True)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, blank=True, null=True)
     plasmids = models.ManyToManyField(Plasmid, blank=True, related_name='+')
 
     def __str__(self):

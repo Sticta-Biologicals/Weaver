@@ -63,6 +63,7 @@ from inventory.custom.sanger import parse_seq
 from inventory.custom.sanger import process_sanger_files
 from inventory.models import Primer
 from inventory.models import Plasmid
+from inventory.models import Experiment
 from inventory.models import RestrictionBuffer
 from inventory.models import RestrictionEnzyme
 from inventory.models import SangerVerificationRun
@@ -1958,6 +1959,114 @@ class GenBankImportTests(TestCase):
         self.assertTrue(Membership.objects.filter(member=user, project=project, access_policies="a").exists())
         self.assertTrue(Plasmid.objects.filter(name="pYTK301", project=project).exists())
         self.assertEqual(response.cookies["current_project_id"].value, str(project.id))
+
+
+class ExperimentManagementTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="experiment-user", password="pw")
+        self.project = Project.objects.create(name="Experiment Project", public=False)
+        self.other_project = Project.objects.create(name="Other Project", public=False)
+        Membership.objects.create(member=self.user, project=self.project, access_policies="w")
+        Membership.objects.create(member=self.user, project=self.other_project, access_policies="r")
+        self.plasmid = Plasmid.objects.create(
+            name="pRoot", intended_use="Experiment", project=self.project
+        )
+        self.other_plasmid = Plasmid.objects.create(
+            name="pOther", intended_use="Experiment", project=self.other_project
+        )
+        self.client.force_login(self.user)
+
+    def test_create_assigns_plasmids_from_selected_project(self):
+        response = self.client.post(reverse("experiment_create"), {
+            "name": "Assembly run",
+            "description": "Test assembly",
+            "project": self.project.id,
+            "plasmids": [str(self.plasmid.id)],
+        })
+
+        self.assertRedirects(response, reverse("experiments"))
+        experiment = Experiment.objects.get(name="Assembly run")
+        self.assertEqual(experiment.project, self.project)
+        self.assertEqual(list(experiment.plasmids.all()), [self.plasmid])
+
+    def test_create_form_renders_target_dependency_preview(self):
+        response = self.client.get(reverse("experiment_create"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "experiment-form-plasmids")
+        self.assertContains(response, "Automatically included components")
+        self.assertContains(response, "plasmid-dependencies")
+        self.assertContains(response, "plasmid-levels")
+        self.assertContains(response, "plasmid-urls")
+        self.assertContains(response, "bi-box-arrow-up-right")
+        self.assertContains(response, "Saltar a la página del plasmidio")
+        self.assertContains(response, "Unassigned project")
+        self.assertContains(response, "<details", html=False)
+
+    def test_create_accepts_visible_plasmid_from_another_project(self):
+        response = self.client.post(reverse("experiment_create"), {
+            "name": "Cross-project run",
+            "project": self.project.id,
+            "plasmids": [str(self.other_plasmid.id)],
+        })
+
+        self.assertRedirects(response, reverse("experiments"))
+        experiment = Experiment.objects.get(name="Cross-project run")
+        self.assertEqual(experiment.project, self.project)
+        self.assertEqual(list(experiment.plasmids.all()), [self.other_plasmid])
+
+    def test_create_allows_unassigned_project(self):
+        response = self.client.post(reverse("experiment_create"), {
+            "name": "Unassigned run",
+            "description": "No project yet",
+            "plasmids": [str(self.plasmid.id)],
+        })
+
+        self.assertRedirects(response, reverse("experiments"))
+        experiment = Experiment.objects.get(name="Unassigned run")
+        self.assertIsNone(experiment.project)
+
+        response = self.client.get(reverse("experiments"))
+        self.assertContains(response, "Unassigned project")
+        self.assertContains(response, "Unassigned run")
+
+    def test_experiment_is_archived_when_all_plasmids_are_final(self):
+        self.plasmid.ligation_state = 1
+        self.plasmid.colonypcr_state = 0
+        self.plasmid.digestion_state = 0
+        self.plasmid.sequencing_state = 0
+        self.plasmid.save()
+        experiment = Experiment.objects.create(name="Finished run", project=self.project)
+        experiment.plasmids.add(self.plasmid)
+
+        response = self.client.get(reverse("experiments"))
+        self.assertContains(response, "Archived")
+
+        response = self.client.get(reverse("api-experiments-map"))
+        payload = response.json()
+        mapped = payload["projects"][0]["experiments"][0]
+        self.assertTrue(mapped["archived"])
+        self.assertEqual(mapped["stats"]["progress"], 100)
+
+    def test_edit_updates_assignments_and_delete_does_not_delete_plasmids(self):
+        experiment = Experiment.objects.create(
+            name="Existing run", project=self.project
+        )
+        response = self.client.post(reverse("experiment_edit", args=(experiment.id,)), {
+            "name": "Updated run",
+            "description": "Updated",
+            "project": self.project.id,
+            "plasmids": [str(self.plasmid.id)],
+        })
+        self.assertRedirects(response, reverse("experiments"))
+        experiment.refresh_from_db()
+        self.assertEqual(experiment.name, "Updated run")
+        self.assertEqual(list(experiment.plasmids.all()), [self.plasmid])
+
+        response = self.client.post(reverse("experiment_delete", args=(experiment.id,)))
+        self.assertRedirects(response, reverse("experiments"))
+        self.assertFalse(Experiment.objects.filter(pk=experiment.id).exists())
+        self.assertTrue(Plasmid.objects.filter(pk=self.plasmid.id).exists())
 
 
 class RestrictionEnzymeCreateTests(TestCase):

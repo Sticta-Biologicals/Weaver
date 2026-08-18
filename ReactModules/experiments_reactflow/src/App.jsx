@@ -605,7 +605,7 @@ function ExperimentFlow({ experimentId }) {
   const selectedGroups = groupByLevel(selectedPlasmids);
 
   return (
-    <div className="weaver-flow-shell">
+    <div className={`weaver-flow-shell${state.experiment.archived ? ' is-archived' : ''}`}>
       <div className="weaver-flow-stats" aria-label="Experiment assembly stats">
         {statConfig.map((stat) => (
           <button
@@ -619,6 +619,11 @@ function ExperimentFlow({ experimentId }) {
           </button>
         ))}
         <span><strong>{stats.progress}%</strong> complete</span>
+        {state.experiment.archived && (
+          <span className="weaver-flow-archived-badge">
+            <i className="bi bi-archive" aria-hidden="true"></i> Archived
+          </span>
+        )}
       </div>
       {selectedStat && (
         <div className="weaver-flow-stat-panel">
