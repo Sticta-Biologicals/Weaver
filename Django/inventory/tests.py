@@ -75,6 +75,7 @@ from inventory.views import amplicon_matches_any_primer_id
 from inventory.views import amplicon_matches_primer_id
 from inventory.views import optional_int_query_param
 from inventory.views import plasmid_update_computed_size
+from inventory.views import build_restriction_enzymes
 from inventory.views import run_local_blast
 from inventory.views import sanger_feature_color
 from organization.models import Membership
@@ -2070,6 +2071,32 @@ class ExperimentManagementTests(TestCase):
 
 
 class RestrictionEnzymeCreateTests(TestCase):
+    def test_recommended_enzyme_ignores_hf_duplicate(self):
+        project = Project.objects.create(name="YTK", public=False, assembly_standard="ytk")
+        plasmid = Plasmid.objects.create(
+            name="L1 test",
+            intended_use="test",
+            level=1,
+            project=project,
+        )
+        RestrictionEnzyme.objects.create(name="BsaI", hf_version=True)
+        RestrictionEnzyme.objects.create(name="BsaI", hf_version=False)
+
+        self.assertEqual(plasmid.recommended_enzyme_for_create(return_name=True), "BsaI")
+
+    def test_build_restriction_enzymes_deduplicates_hf_variants(self):
+        RestrictionEnzyme.objects.filter(name="BsaI").delete()
+        regular = RestrictionEnzyme.objects.create(name="BsaI", hf_version=False)
+        RestrictionEnzyme.objects.create(name="BsaI", hf_version=True)
+        other = RestrictionEnzyme.objects.create(name="SapI", hf_version=True)
+
+        enzymes = build_restriction_enzymes()
+
+        enzyme_by_name = {enzyme.name: enzyme for enzyme in enzymes}
+        self.assertEqual(list(enzyme_by_name), ["BsaI", "BsmBI", "SapI"])
+        self.assertEqual(enzyme_by_name["BsaI"].pk, regular.pk)
+        self.assertEqual(enzyme_by_name["SapI"].pk, other.pk)
+
     def test_restrictionenzyme_create_view_creates_record(self):
         user = User.objects.create_user(username="enzyme-user", password="pw")
         self.client.force_login(user)

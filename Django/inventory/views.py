@@ -670,6 +670,24 @@ def recursive_plasmid_build(plasmid):
                 return recursive_result
 
 
+def build_restriction_enzymes():
+    """Return one build option per restriction-enzyme cutting definition.
+
+    The HF flag describes a reagent variant, but does not change the
+    Biopython enzyme (or its cut positions) used to build a plasmid.  Keep
+    the regular record when both variants are present so the build menu does
+    not show duplicate buttons with the same submitted enzyme name.
+    """
+    enzymes = []
+    seen_names = set()
+    for enzyme in RestrictionEnzyme.objects.order_by('name', 'hf_version', 'id'):
+        if enzyme.name in seen_names:
+            continue
+        seen_names.add(enzyme.name)
+        enzymes.append(enzyme)
+    return enzymes
+
+
 
 @require_member_can_read_project_of_plasmid
 def plasmid(request, plasmid_id):
@@ -686,7 +704,7 @@ def plasmid(request, plasmid_id):
         'plasmid': plasmid_to_detail,
         'resistantes_human': resistantes_human(plasmid_to_detail.selectable_markers),
         'CHECK_STATES': CHECK_STATES,
-        'RESTRICTION_ENZYMES': RestrictionEnzyme.objects.all(),
+        'RESTRICTION_ENZYMES': build_restriction_enzymes(),
         'user_can_edit_plasmid': member_can_write_or_admin_plasmid(plasmid_to_detail, request.user)
     }
 

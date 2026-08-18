@@ -401,7 +401,9 @@ class Plasmid(models.Model):
     def recommended_enzyme_for_create(self, return_name=False):
         try:
             if return_name:
-                re = RestrictionEnzyme.objects.get(name__iexact=assembly_standards[self.project.assembly_standard]['enzymes'][self.level])
+                re = RestrictionEnzyme.objects.filter(
+                    name__iexact=assembly_standards[self.project.assembly_standard]['enzymes'][self.level]
+                ).order_by('hf_version', 'id').first()
                 return re.name
             else:
                 return assembly_standards[self.project.assembly_standard]['enzymes'][self.level]
