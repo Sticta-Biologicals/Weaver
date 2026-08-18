@@ -15,6 +15,7 @@ from .views import PrimerCreate
 from .views import PrimerEdit
 from .views import PrimerDelete
 from .views import RestrictionEnzymeCreate
+from .views import RestrictionEnzymeEdit
 from .views import RestrictionEnzymeDelete
 
 from .views import PlasmidValidations
@@ -79,6 +80,7 @@ urlpatterns = [
 
     path('restrictionenzymes/', login_required(views.restrictionenzymes, redirect_field_name='next'), name='restrictionenzymes'),
     path('restrictionenzyme/create/', login_required(RestrictionEnzymeCreate.as_view(), redirect_field_name='next'), name='restrictionenzyme_create'),
+    path('restrictionenzyme/edit/<uuid:pk>/', login_required(RestrictionEnzymeEdit.as_view(), redirect_field_name='next'), name='restrictionenzyme_edit'),
     path('restrictionenzyme/delete/<uuid:pk>/', login_required(RestrictionEnzymeDelete.as_view(), redirect_field_name='next'), name='restrictionenzyme_delete'),
     path('restrictionenzyme/<uuid:restrictionenzyme_id>/', login_required(views.restrictionenzyme, redirect_field_name='next'), name='restrictionenzyme'),
 

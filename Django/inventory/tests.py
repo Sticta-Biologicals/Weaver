@@ -66,6 +66,7 @@ from inventory.models import Plasmid
 from inventory.models import Experiment
 from inventory.models import RestrictionBuffer
 from inventory.models import RestrictionEnzyme
+from inventory.models import RestrictionEnzymeBuffer
 from inventory.models import SangerVerificationRun
 from inventory.views import fasta_alignment_result
 from inventory.views import fasta_record_from_text
@@ -2096,6 +2097,47 @@ class RestrictionEnzymeCreateTests(TestCase):
         self.assertEqual(list(enzyme_by_name), ["BsaI", "BsmBI", "SapI"])
         self.assertEqual(enzyme_by_name["BsaI"].pk, regular.pk)
         self.assertEqual(enzyme_by_name["SapI"].pk, other.pk)
+
+    def test_restrictionenzyme_edit_updates_metadata_and_buffers(self):
+        user = User.objects.create_user(username="enzyme-edit-user", password="pw")
+        self.client.force_login(user)
+        RestrictionEnzyme.objects.filter(name="BsaI", hf_version=False).delete()
+        enzyme = RestrictionEnzyme.objects.create(
+            name="BsaI",
+            hf_version=False,
+            description="Old description",
+        )
+        old_buffer = RestrictionBuffer.objects.create(name="Old buffer")
+        new_buffer = RestrictionBuffer.objects.create(name="New buffer")
+        RestrictionEnzymeBuffer.objects.create(
+            restriction_enzyme=enzyme,
+            buffer=old_buffer,
+            activity_percent=60,
+        )
+
+        response = self.client.post(reverse("restrictionenzyme_edit", args=(enzyme.id,)), {
+            "name": "BsaI",
+            "hf_version": "",
+            "link_datasheet": "https://example.com/bsai",
+            "description": "Updated description",
+            "buffers-TOTAL_FORMS": "1",
+            "buffers-INITIAL_FORMS": "0",
+            "buffers-MIN_NUM_FORMS": "0",
+            "buffers-MAX_NUM_FORMS": "1000",
+            "buffers-0-existing_buffer": str(new_buffer.id),
+            "buffers-0-new_buffer_name": "",
+            "buffers-0-activity_percent": "95",
+            "buffers-0-DELETE": "",
+        })
+
+        enzyme.refresh_from_db()
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("form_result_restrictionenzyme_edit_success=true", response.url)
+        self.assertEqual(enzyme.description, "Updated description")
+        self.assertEqual(
+            list(enzyme.buffer_activity_map().items()),
+            [("New buffer", 95)],
+        )
 
     def test_restrictionenzyme_create_view_creates_record(self):
         user = User.objects.create_user(username="enzyme-user", password="pw")

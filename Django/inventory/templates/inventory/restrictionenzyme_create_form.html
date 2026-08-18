@@ -1,9 +1,9 @@
 {% extends "inventory/parts/base.html" %}
 
 {% block header_object_type %}Restriction Enzyme{% endblock %}
-{% block header_object_name %}Create{% endblock %}
+{% block header_object_name %}{% if is_edit %}Edit {{ restrictionenzyme }}{% else %}Create{% endif %}{% endblock %}
 {% block header_object_links %}
-<a href="{% url 'restrictionenzymes' %}" class="btn btn-outline-warning" role="button"><i class="bi bi-arrow-return-left"></i></a>
+<a href="{% if is_edit %}{% url 'restrictionenzyme' restrictionenzyme_id=restrictionenzyme.id %}{% else %}{% url 'restrictionenzymes' %}{% endif %}" class="btn btn-outline-warning" role="button"><i class="bi bi-arrow-return-left"></i></a>
 {% endblock %}
 
 {% block content %}
@@ -19,7 +19,7 @@
 
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="mb-0">Lab enzyme record</h5>
-                <input type="submit" value="Create" class="btn btn-primary">
+                <input type="submit" value="{% if is_edit %}Save changes{% else %}Create{% endif %}" class="btn btn-primary">
             </div>
 
             <div class="row g-3 mb-4">
@@ -102,7 +102,7 @@
             </div>
 
             <div class="mt-4">
-                <input type="submit" value="Create" class="btn btn-primary">
+                <input type="submit" value="{% if is_edit %}Save changes{% else %}Create{% endif %}" class="btn btn-primary">
             </div>
         </form>
     </div>

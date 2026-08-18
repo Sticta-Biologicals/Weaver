@@ -321,6 +321,50 @@ class RestrictionEnzymeCreate(CreateView):
         return reverse('restrictionenzyme', args=(self.object.id,)) + '?form_result_restrictionenzyme_create_success=true'
 
 
+class RestrictionEnzymeEdit(UpdateView):
+    model = RestrictionEnzyme
+    form_class = RestrictionEnzymeCreateForm
+    template_name = 'inventory/restrictionenzyme_create_form.html'
+    context_object_name = 'restrictionenzyme'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if 'buffer_formset' not in context:
+            context['buffer_formset'] = RestrictionEnzymeBufferFormSet(
+                prefix='buffers',
+                initial=[
+                    {
+                        'existing_buffer': str(link.buffer_id),
+                        'activity_percent': link.activity_percent,
+                    }
+                    for link in self.object.buffer_links.select_related('buffer').all()
+                ],
+            )
+        context['is_edit'] = True
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        buffer_formset = RestrictionEnzymeBufferFormSet(self.request.POST, prefix='buffers')
+        if form.is_valid() and buffer_formset.is_valid():
+            return self.forms_valid(form, buffer_formset)
+        return self.forms_invalid(form, buffer_formset)
+
+    @transaction.atomic
+    def forms_valid(self, form, buffer_formset):
+        self.object = form.save()
+        self.object.buffer_links.all().delete()
+        save_restriction_enzyme_buffers(self.object, buffer_formset)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def forms_invalid(self, form, buffer_formset):
+        return self.render_to_response(self.get_context_data(form=form, buffer_formset=buffer_formset))
+
+    def get_success_url(self, **kwargs):
+        return reverse('restrictionenzyme', args=(self.object.id,)) + '?form_result_restrictionenzyme_edit_success=true'
+
+
 class RestrictionEnzymeDelete(DeleteView):
     model = RestrictionEnzyme
 
