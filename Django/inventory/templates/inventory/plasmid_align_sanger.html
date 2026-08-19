@@ -873,7 +873,6 @@
     <div class="sanger-metric"><div class="text-muted">Useful-region identity</div><strong>{{ sanger_result.combined.mean_identity }}%</strong></div>
     <div class="sanger-metric"><div class="text-muted">Useful reads</div><strong>{{ sanger_result.combined.useful_reads }} / {{ sanger_result.combined.read_count }}</strong></div>
     <div class="sanger-metric"><div class="text-muted">High-confidence variants</div><strong>{{ sanger_result.combined.high_quality_variant_count }}</strong>{% if sanger_result.combined.high_quality_variant_density != None %}<div class="text-muted">{{ sanger_result.combined.high_quality_variant_density }}% of aligned bases</div>{% endif %}</div>
-    <div class="sanger-metric"><div class="text-muted">Uncovered regions</div><strong>{{ sanger_result.combined.uncovered_regions|length }}</strong></div>
 </div>
 {% endif %}
 
@@ -936,7 +935,6 @@
         <span class="low-quality">Low quality</span>
         <span class="intermediate-quality">Intermediate</span>
         {% endif %}
-        <span class="gap">Uncovered</span>
         <span class="feature-cds">CDS</span>
         <span class="feature-promoter">Promoter</span>
         <span class="feature-terminator">Terminator</span>
@@ -1065,7 +1063,7 @@
                 <td>{{ read.alignment.identity|default:"-" }}%</td>
                 <td>{% if read.alignment %}{{ read.alignment.variants|length }}{% else %}0{% endif %}</td>
                 <td>
-                    {% if run and read.id %}
+                    {% if run and read.id and read.chromatogram.aTrace %}
                     <a class="btn btn-outline-primary btn-sm me-2" href="{% url 'sanger_read_chromatogram' plasmid_id=plasmid.id run_id=run.id read_id=read.id %}" target="_blank" rel="noopener">Chromatogram</a>
                     {% endif %}
                     {% if read.is_usable %}
@@ -1088,15 +1086,6 @@
         </tbody>
     </table>
 </div>
-{% endif %}
-
-{% if sanger_result.combined.uncovered_regions and alignment_source_type != "FASTA" %}
-<h4>Uncovered Regions</h4>
-<p>
-{% for region in sanger_result.combined.uncovered_regions %}
-<span class="badge bg-secondary me-1">{{ region.start_display }}..{{ region.end_display }}</span>
-{% endfor %}
-</p>
 {% endif %}
 
 {% if sanger_result.combined.variants and alignment_source_type != "FASTA" %}
@@ -1311,7 +1300,7 @@
         el.style.top = `${top}px`;
         el.style.background = featureColor(feature);
         el.style.color = textColorForBackground(featureColor(feature));
-        el.title = `${feature.name}: sequencing bp ${displayBp(feature.start)}..${displayBp(feature.end)}${feature.strand < 0 ? " reverse" : ""}`;
+        el.title = `${feature.name}: plasmid bp ${displayBp(feature.start)}..${displayBp(feature.end)}${feature.strand < 0 ? " reverse" : ""}`;
         if (widthPct >= 4.5) {
             el.textContent = feature.name;
         }
@@ -1319,7 +1308,7 @@
     }
     function addReadSegment(read, segmentStart, segmentEnd, index) {
         const cls = `sanger-map-read ${read.orientation === "reverse" ? "reverse" : ""}`;
-        addPlasmidSegment(cls, segmentStart, segmentEnd, 48 + index * 15, `${read.name}: sequencing bp ${displayBp(segmentStart)}..${displayBp(segmentEnd)}`);
+        addPlasmidSegment(cls, segmentStart, segmentEnd, 48 + index * 15, `${read.name}: plasmid bp ${displayBp(segmentStart)}..${displayBp(segmentEnd)}`);
     }
     function addReadLowQualitySegments(read, index) {
         const lowRegions = read.confidenceRegions || [];
@@ -1376,9 +1365,6 @@
                 addFeatureMapSegment(feature, feature.start, feature.end, 12);
             }
         });
-        data.uncoveredRegions.forEach((region) => {
-            addPlasmidSegment("sanger-map-gap", region.start, region.end, null, `Uncovered: sequencing bp ${displayBp(region.start)}..${displayBp(region.end)}`);
-        });
         visibleEntries.forEach(({read}, index) => {
             addReadLowQualitySegments(read, index);
             const segments = (read.segments || []).length ? read.segments : [read];
@@ -1398,7 +1384,7 @@
                 if (lowQualityVariant) return;
                 el.className = `sanger-map-variant ${variant.type === "deletion" ? "deletion" : variant.type === "insertion" ? "insertion" : ""}${lowQualityVariant ? " low-quality" : ""}`;
                 el.style.left = `${pct(displayCoord(variant.coordinate))}%`;
-                el.title = `${read.name} ${variant.type} at sequencing bp ${displayBp(variant.coordinate)}: ${variant.expected || "-"} -> ${variant.observed || "-"}${variant.quality === null ? "" : " Q" + variant.quality}`;
+                el.title = `${read.name} ${variant.type} at plasmid bp ${displayBp(variant.coordinate)}: ${variant.expected || "-"} -> ${variant.observed || "-"}${variant.quality === null ? "" : " Q" + variant.quality}`;
                 map.appendChild(el);
             });
         });
@@ -1547,7 +1533,7 @@
                 const lowQuality = insertion.low_quality || isLowQualityValue(insertion.quality) || isLocalLowQualityBase(read, baseIndex);
                 const confidenceClass = confidenceRegionsVisible() && lowRegion ? " sanger-base-low-quality" : confidenceRegionsVisible() && intermediateRegion ? " sanger-base-intermediate-quality" : "";
                 const regionTitle = lowRegion || intermediateRegion;
-                const title = `Insertion after sequencing bp ${displayBp(referenceCoordinate)}: ${base}${insertion.quality === null || insertion.quality === undefined ? "" : " Q" + insertion.quality}${lowQuality ? " | local low-quality region, not trusted" : ""}${regionTitle ? " | " + confidenceRegionTitle(regionTitle) : ""}`;
+                    const title = `Insertion after plasmid bp ${displayBp(referenceCoordinate)}: ${base}${insertion.quality === null || insertion.quality === undefined ? "" : " Q" + insertion.quality}${lowQuality ? " | local low-quality region, not trusted" : ""}${regionTitle ? " | " + confidenceRegionTitle(regionTitle) : ""}`;
                 return `<span class="sanger-base-insertion${confidenceClass} sanger-base-clickable${selected}" data-read-index="${readIndex}" data-reference-coordinate="${referenceCoordinate}" data-variant-type="insertion" data-insertion-index="${column.insertionIndex}"${baseIndexAttr} title="${escapeHtml(title)}">${escapeHtml(base)}</span>`;
             }
             const base = (read.projection || "")[referenceCoordinate] || "-";
@@ -1572,8 +1558,8 @@
                 const selected = selectedBaseKey === `${readIndex}:${referenceCoordinate}:base:0` ? " sanger-base-selected" : "";
                 const baseIndexAttr = baseIndex !== null && baseIndex !== undefined ? ` data-base-index="${baseIndex}"` : "";
                 const title = variant
-                    ? `${variant.type} at sequencing bp ${displayBp(referenceCoordinate)}: ${variant.expected || "-"} -> ${variant.observed || "-"}${lowRegion || intermediateRegion ? " | " + confidenceRegionTitle(lowRegion || intermediateRegion) : ""}`
-                    : `Inspect base ${baseIndex + 1}, sequencing bp ${displayBp(referenceCoordinate)}${lowRegion || intermediateRegion ? " | " + confidenceRegionTitle(lowRegion || intermediateRegion) : ""}`;
+                    ? `${variant.type} at plasmid bp ${displayBp(referenceCoordinate)}: ${variant.expected || "-"} -> ${variant.observed || "-"}${lowRegion || intermediateRegion ? " | " + confidenceRegionTitle(lowRegion || intermediateRegion) : ""}`
+                    : `Inspect base ${baseIndex + 1}, plasmid bp ${displayBp(referenceCoordinate)}${lowRegion || intermediateRegion ? " | " + confidenceRegionTitle(lowRegion || intermediateRegion) : ""}`;
                 return `<span class="${cls} sanger-base-clickable${selected}" data-read-index="${readIndex}"${baseIndexAttr} data-reference-coordinate="${referenceCoordinate}" data-column-kind="base" title="${escapeHtml(title)}">${escapeHtml(base)}</span>`;
             }
             return `<span class="${cls}">${escapeHtml(base)}</span>`;
@@ -1627,7 +1613,7 @@
                     el.style.width = `${visibleWidth / columns.length * 100}%`;
                     el.style.background = featureColor(feature);
                     el.style.color = textColorForBackground(featureColor(feature));
-                    el.title = `${feature.name} sequencing bp ${displayBp(feature.start)}..${displayBp(feature.end)}${feature.strand < 0 ? " reverse" : ""}`;
+                    el.title = `${feature.name} plasmid bp ${displayBp(feature.start)}..${displayBp(feature.end)}${feature.strand < 0 ? " reverse" : ""}`;
                     if (visibleWidth >= Math.max(6, feature.name.length + 2)) {
                         el.textContent = `${feature.strand < 0 ? "< " : ""}${feature.name}${feature.strand > 0 ? " >" : ""}`;
                     }
@@ -1866,10 +1852,10 @@
         const baseIndex = variant.base_index === null || variant.base_index === undefined ? null : Number(variant.base_index);
         const readBaseText = baseIndex !== null && !Number.isNaN(baseIndex) ? `, read base ${baseIndex + 1}` : "";
         if (variant.type === "insertion") {
-            detail.textContent = `${variant.readName} (${variant.orientation}) | insertion after sequencing bp ${displayBp(variant.coordinate)}: + column, inserted base ${observed}${readBaseText}, Phred ${quality}${variant.low_quality ? " | low quality" : ""}`;
+            detail.textContent = `${variant.readName} (${variant.orientation}) | insertion after plasmid bp ${displayBp(variant.coordinate)}: + column, inserted base ${observed}${readBaseText}, Phred ${quality}${variant.low_quality ? " | low quality" : ""}`;
             return;
         }
-        detail.textContent = `${variant.readName} (${variant.orientation}) | ${variant.type} at sequencing bp ${displayBp(variant.coordinate)}: reference ${expected}, observed ${observed}, Phred ${quality}${variant.low_quality ? " | low quality" : ""}`;
+        detail.textContent = `${variant.readName} (${variant.orientation}) | ${variant.type} at plasmid bp ${displayBp(variant.coordinate)}: reference ${expected}, observed ${observed}, Phred ${quality}${variant.low_quality ? " | low quality" : ""}`;
     }
     function qualityLabel(quality) {
         if (quality === null || quality === undefined || Number.isNaN(Number(quality))) return "not available";
@@ -1885,7 +1871,7 @@
         const qualNums = chrom.qualNums || [];
         const quality = baseIndex !== null && baseIndex !== undefined && !Number.isNaN(Number(baseIndex)) ? qualNums[Number(baseIndex)] : undefined;
         const readBaseText = baseIndex !== null && baseIndex !== undefined && !Number.isNaN(Number(baseIndex)) ? `read base ${Number(baseIndex) + 1}` : "read base not mapped";
-        detail.textContent = `${read.name} (${read.orientation}) | match at sequencing bp ${displayBp(referenceCoordinate)}: base ${observed || expected}, ${readBaseText}, Phred ${qualityLabel(quality)}`;
+        detail.textContent = `${read.name} (${read.orientation}) | match at plasmid bp ${displayBp(referenceCoordinate)}: base ${observed || expected}, ${readBaseText}, Phred ${qualityLabel(quality)}`;
     }
     function renderBases() {
         refreshWindowSize();
@@ -1941,6 +1927,20 @@
     map.addEventListener("pointerup", function () {
         dragging = false;
     });
+    map.addEventListener("wheel", function (event) {
+        event.preventDefault();
+        const delta = event.deltaY || event.deltaX;
+        if (!delta) return;
+        const step = Math.max(1, Math.round(windowSize * 0.2));
+        setStartBounded(start + (delta > 0 ? step : -step));
+    }, { passive: false });
+    baseView.addEventListener("wheel", function (event) {
+        event.preventDefault();
+        const delta = event.deltaY || event.deltaX;
+        if (!delta) return;
+        const step = Math.max(1, Math.round(windowSize * 0.2));
+        setStartBounded(start + (delta > 0 ? step : -step));
+    }, { passive: false });
     slider.addEventListener("input", function () {
         setStart(Number(slider.value));
     });
@@ -2389,53 +2389,6 @@
 })();
 </script>
 
-{% if alignment_source_type != "FASTA" %}
-<details class="mb-4">
-    <summary>Open Vector Editor alignment preview</summary>
-    <div id="alignmentView" class="mt-3"></div>
-</details>
-<script type="text/javascript" src="{% static 'js/open-vector-editor.js' %}{{version}}"></script>
-<script>
-    const createAlignmentViewNode = document.createElement("div");
-    document.getElementById("alignmentView").append(createAlignmentViewNode);
-    var plasmid_sequence_file_contents = `{{plasmid_sequence_file_contents}}`;
-    var align_data = JSON.parse(`{{align_data|safe}}`);
-
-    async function sequenceToJson() {
-        if(typeof plasmid_sequence_file_contents == 'undefined') {return;}
-        var jsonOutput = await window.bioParsers.anyToJson(plasmid_sequence_file_contents);
-        if(jsonOutput[0]['success']){
-            var alignmentTracks = [];
-            alignmentTracks.push({
-                sequenceData: jsonOutput[0]['parsedSequence'],
-                alignmentData: { name: align_data[0][0], sequence: align_data[2][0] },
-            });
-            for(var r = 1; r < align_data[0].length; r++) {
-                alignmentTracks.push({
-                    sequenceData: { name: align_data[0][r], sequence: align_data[1][r] },
-                    alignmentData: { name: align_data[0][r], sequence: align_data[2][r] },
-                    chromatogramData: align_data[3][r],
-                });
-            }
-            window.createAlignmentView(createAlignmentViewNode, {
-                id: 'sanger',
-                alignmentName: "{{plasmid.name}}",
-                alignmentType: 'Sanger',
-                alignmentAnnotationLabelVisibility: {
-                    "features": true,
-                    "parts": true,
-                    "chromatogram": true,
-                    "reverseSequence": false,
-                    "dnaColors": true,
-                    "cutsites": false
-                },
-                alignmentTracks: alignmentTracks
-            });
-        }
-    }
-    sequenceToJson();
-</script>
-{% endif %}
 {% endif %}
 
 {% else %}
