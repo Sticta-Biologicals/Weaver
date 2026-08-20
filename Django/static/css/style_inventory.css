@@ -2060,3 +2060,283 @@ span.plasmid-opts:hover {
         line-height: 1em;
     }
 }
+
+/* Local BLAST follows the shared inventory form and compact result-table style. */
+.blast-page {
+    --blast-border: rgba(108, 117, 125, .35);
+}
+
+.blast-search-panel {
+    margin-bottom: 1rem;
+}
+
+.blast-form-icon {
+    color: var(--bs-primary);
+    font-size: 1.8rem;
+}
+
+.blast-form-fields {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.blast-project-field {
+    grid-column: span 7;
+}
+
+.blast-short-field {
+    display: flex;
+    align-items: flex-end;
+    grid-column: span 5;
+}
+
+.blast-sequence-field {
+    grid-column: span 8;
+}
+
+.blast-file-field {
+    grid-column: span 4;
+}
+
+.blast-checkbox-label {
+    display: flex !important;
+    align-items: center;
+    gap: .5rem;
+    min-height: 2.25rem;
+    margin: 0 !important;
+    padding: .45rem .65rem;
+    border: 1px solid var(--bs-secondary-border-subtle);
+    border-radius: .35rem;
+    background: var(--bs-body-bg);
+    color: var(--bs-body-color) !important;
+    font-size: .8rem !important;
+    font-weight: 400 !important;
+}
+
+.blast-checkbox-label input[type="checkbox"] {
+    margin: 0;
+}
+
+.blast-file-field input[type="file"] {
+    padding: .32rem .45rem;
+    font-size: .78rem;
+}
+
+.blast-alert {
+    margin-top: 1rem;
+}
+
+.blast-results-page {
+    display: grid;
+    gap: .75rem;
+}
+
+.blast-accordion {
+    overflow: hidden;
+    border: 1px solid var(--blast-border);
+    border-radius: .6rem;
+    background: var(--bs-tertiary-bg);
+}
+
+.blast-accordion .accordion-item {
+    border: 0;
+    background: transparent;
+}
+
+.blast-accordion .accordion-button {
+    padding: .85rem 1rem;
+    border: 0;
+    background: transparent;
+    color: var(--bs-body-color);
+    font-size: .9rem;
+    font-weight: 600;
+    box-shadow: none;
+}
+
+.blast-accordion .accordion-button:not(.collapsed) {
+    border-bottom: 1px solid var(--blast-border);
+    background: var(--bs-primary-bg-subtle);
+    color: var(--bs-primary-text-emphasis);
+    box-shadow: inset 3px 0 0 var(--bs-primary);
+}
+
+.blast-accordion .accordion-button::after {
+    opacity: .8;
+}
+
+.blast-accordion .accordion-body {
+    padding: .85rem 1rem 1rem;
+}
+
+.blast-results-body {
+    overflow-x: auto;
+}
+
+.blast-query-sequence,
+.blast-alignment-viewer {
+    margin: .65rem 0 0;
+    overflow: auto;
+    padding: .8rem;
+    border: 1px solid rgba(108, 117, 125, .25);
+    border-radius: .4rem;
+    background: rgba(108, 117, 125, .08);
+    color: var(--bs-body-color);
+    font-family: var(--bs-font-monospace);
+    line-height: 1.35;
+    white-space: pre;
+}
+
+.blast-results-table {
+    width: 100%;
+    min-width: 760px;
+    margin: 0;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0 .35rem;
+}
+
+.blast-results-table th {
+    padding: 0 .45rem .35rem;
+    border: 0 !important;
+    border-bottom: 1px solid rgba(108, 117, 125, .32) !important;
+    background: transparent !important;
+    color: var(--bs-secondary-color);
+    font-size: .68rem;
+    font-weight: 600;
+    letter-spacing: .025em;
+    line-height: 1.2;
+    text-transform: none;
+}
+
+.blast-results-table > thead > tr {
+    background: transparent !important;
+}
+
+.blast-results-table td {
+    padding: .5rem .45rem;
+    border-top: 1px solid rgba(108, 117, 125, .22);
+    border-bottom: 1px solid rgba(108, 117, 125, .22);
+    background: rgba(33, 37, 41, .18);
+    color: var(--bs-body-color);
+    vertical-align: middle;
+    text-align: center;
+}
+
+.blast-results-table th:first-child,
+.blast-results-table td:first-child {
+    width: 27%;
+    text-align: left;
+}
+
+.blast-results-table th:nth-child(2),
+.blast-results-table td:nth-child(2) {
+    width: 14%;
+}
+
+.blast-results-table td:first-child {
+    border-left: 1px solid rgba(108, 117, 125, .22);
+    border-radius: .4rem 0 0 .4rem;
+}
+
+.blast-results-table td:last-child {
+    border-right: 1px solid rgba(108, 117, 125, .22);
+    border-radius: 0 .4rem .4rem 0;
+}
+
+.blast-results-table tbody tr:hover td {
+    border-color: rgba(var(--bs-primary-rgb), .32);
+    background: rgba(var(--bs-primary-rgb), .06);
+}
+
+.blast-plasmid-chip {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    min-height: 1.95rem;
+    overflow: hidden;
+    border: 1px solid rgba(25, 135, 84, .35);
+    border-radius: .4rem;
+    background: var(--bs-success);
+    color: #fff;
+    vertical-align: middle;
+}
+
+.blast-plasmid-chip:hover {
+    background: var(--bs-success-text-emphasis);
+    color: #fff;
+}
+
+.blast-plasmid-name {
+    min-width: 0;
+    overflow: hidden;
+    padding: .32rem .55rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.blast-plasmid-id {
+    flex: 0 0 auto;
+    align-self: stretch;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 .45rem;
+    background: rgba(0, 0, 0, .15);
+    font-size: .72rem;
+    font-weight: 700;
+}
+
+.blast-plasmid-link-icon {
+    flex: 0 0 auto;
+    padding: 0 .45rem;
+    font-size: .75rem;
+    opacity: .85;
+}
+
+.blast-plasmid-chip-muted {
+    border-color: var(--bs-secondary-border-subtle);
+    background: rgba(108, 117, 125, .35);
+}
+
+.blast-alignment-button {
+    white-space: nowrap;
+}
+
+.blast-empty-state {
+    padding: 1.25rem;
+    border: 1px solid var(--blast-border);
+    border-radius: .65rem;
+    background: var(--bs-tertiary-bg);
+}
+
+.blast-empty-state h2 {
+    margin: 0;
+    font-size: 1.15rem;
+}
+
+.blast-empty-state p {
+    margin: .25rem 0 1rem;
+    color: var(--bs-secondary-color);
+}
+
+.blast-not-considered-table th:first-child,
+.blast-not-considered-table td:first-child {
+    width: 42%;
+}
+
+.blast-not-considered-table th:nth-child(2),
+.blast-not-considered-table td:nth-child(2) {
+    width: 58%;
+    text-align: left;
+}
+
+@media (max-width: 768px) {
+    .blast-project-field,
+    .blast-short-field,
+    .blast-sequence-field,
+    .blast-file-field {
+        grid-column: span 12;
+    }
+
+    .blast-short-field {
+        align-items: flex-start;
+    }
+}
