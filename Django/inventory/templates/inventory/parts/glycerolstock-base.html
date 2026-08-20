@@ -11,7 +11,7 @@
 {% block header_object_links %}
         {% if user_can_edit_gs %}
         <a href="{% url 'glycerolstock_edit' pk=glycerolstock.id %}" class="btn btn-outline-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="bi bi-pencil"></i></a>
-        <a href="{% url 'glycerolstock_delete' pk=glycerolstock.id %}" class="btn btn-outline-danger" role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Trash"><i class="bi bi-trash"></i></a>
+        <a href="{% url 'glycerolstock_delete' pk=glycerolstock.id %}{% if return_to_box %}?return_to_box={{return_to_box}}{% endif %}" class="btn btn-outline-danger" role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Trash"><i class="bi bi-trash"></i></a>
         {% endif %}
         <a href="{% url 'glycerolstock_label' glycerolstock_id=glycerolstock.id %}" class="btn btn-outline-info"
                role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Label"><i class="bi bi-tag-fill"></i></a>

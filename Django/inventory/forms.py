@@ -235,11 +235,21 @@ class PlasmidValidationForm(forms.ModelForm):
                   'colonypcr_state', 'colonypcr_date', 'colonypcr_observations',
                   'digestion_state', 'digestion_date', 'digestion_observations',
                   'sequencing_state', 'sequencing_date', 'sequencing_observations',
-                  'sequencing_observations', 'sequencing_clustal_file']
+                  'sequencing_clustal_file']
         widgets = {
             'colonypcr_date': DateInput(),
             'digestion_date': DateInput(),
             'sequencing_date': DateInput()
+        }
+        labels = {
+            'colonypcr_observations': 'cPCR description',
+            'digestion_observations': 'Digestion description',
+            'sequencing_observations': 'Sequencing description',
+        }
+        help_texts = {
+            'colonypcr_observations': 'Primers used, phenotype, or other interpretation.',
+            'digestion_observations': 'Enzymes used and expected or observed band pattern.',
+            'sequencing_observations': 'Reads or primers used, coverage, or interpretation.',
         }
 
 

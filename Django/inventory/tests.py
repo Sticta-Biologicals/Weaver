@@ -20,6 +20,7 @@ from Bio.SeqRecord import SeqRecord
 
 from inventory.custom.genbank_import import import_plasmids_from_genbank_dir
 from inventory.custom.genbank_import import import_plasmids_from_uploaded_genbanks
+from inventory.custom.glycerolstock_storage import suggest_storage_positions
 from inventory.custom.assembly_classification import classify_assembly_record
 from inventory.custom.primer_access import visible_primers_for_user
 from inventory.custom.primer_dimers import PrimerDimerConditions
@@ -64,10 +65,14 @@ from inventory.custom.sanger import process_sanger_files
 from inventory.models import Primer
 from inventory.models import Plasmid
 from inventory.models import Experiment
+from inventory.models import Box
+from inventory.models import GlycerolStock
+from inventory.models import Location
 from inventory.models import RestrictionBuffer
 from inventory.models import RestrictionEnzyme
 from inventory.models import RestrictionEnzymeBuffer
 from inventory.models import SangerVerificationRun
+from inventory.models import Strain
 from inventory.views import fasta_alignment_result
 from inventory.views import fasta_record_from_text
 from inventory.views import fasta_records_from_text
@@ -81,6 +86,310 @@ from inventory.views import run_local_blast
 from inventory.views import sanger_feature_color
 from organization.models import Membership
 from organization.models import Project
+
+
+class GlycerolstockStorageSuggestionTests(SimpleTestCase):
+    def test_suggestions_order_plasmids_by_idx_and_fill_positions(self):
+        boxes = [
+            SimpleNamespace(id="box-1", name="L0 B1"),
+            SimpleNamespace(id="box-2", name="L0 B2"),
+        ]
+        plasmids = [
+            SimpleNamespace(idx=20, level=0),
+            SimpleNamespace(idx=10, level=0),
+        ]
+
+        suggestions = suggest_storage_positions(plasmids, boxes)
+
+        self.assertEqual([item["plasmid"].idx for item in suggestions], [10, 20])
+        self.assertEqual([item["box"].name for item in suggestions], ["L0 B1", "L0 B1"])
+        self.assertEqual([item["position"] for item in suggestions], ["A1", "A2"])
+
+    def test_suggestions_skip_occupied_positions_before_assigning(self):
+        box = SimpleNamespace(id="box-1", name="L1 B1")
+        plasmid = SimpleNamespace(idx=30, level=1)
+
+        suggestions = suggest_storage_positions(
+            [plasmid],
+            [box],
+            occupied_positions=[("box-1", "A", 1)],
+        )
+
+        self.assertEqual(suggestions[0]["position"], "A2")
+
+
+class GlycerolstockBatchFlowTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="gs-batch-user", password="pw")
+        self.project = Project.objects.create(name="GS Batch Project", public=False)
+        Membership.objects.create(member=self.user, project=self.project, access_policies="w")
+        self.location = Location.objects.create(name="Freezer 1")
+        self.box = Box.objects.create(name="L0 B1", location=self.location)
+        self.primary_strain = Strain.objects.create(name="Top10", for_primary_gs=True)
+        self.plasmid = Plasmid.objects.create(
+            idx=100,
+            name="Batch plasmid",
+            intended_use="Test",
+            level=0,
+            ligation_state=1,
+            colonypcr_state=2,
+            digestion_state=2,
+            sequencing_state=2,
+            project=self.project,
+        )
+        self.client.force_login(self.user)
+        self.client.cookies["current_project_id"] = str(self.project.id)
+
+    def test_prepare_page_tracks_created_gs_and_links_to_print_preview(self):
+        response = self.client.post(
+            reverse("glycerolstock_batch_prepare"),
+            {"plasmid_idx": [str(self.plasmid.idx)]},
+        )
+
+        self.assertContains(response, "Pending GS")
+        self.assertContains(response, "Create selected GS")
+        self.assertContains(response, "batch_plasmid_idx")
+
+        glycerolstock = GlycerolStock.objects.create(
+            strain=self.primary_strain,
+            plasmid=self.plasmid,
+            box=self.box,
+            box_row="A",
+            box_column=1,
+            project=self.project,
+        )
+        response = self.client.get(
+            reverse("glycerolstock_batch_prepare"),
+            {"plasmid_idx": str(self.plasmid.idx)},
+        )
+
+        self.assertContains(response, "GS created")
+        self.assertContains(response, "Print GS labels")
+        print_url = response.context["print_url"]
+        self.assertIn(str(glycerolstock.id), print_url)
+
+        print_response = self.client.get(print_url)
+        self.assertContains(print_response, "Print GS labels")
+        self.assertNotContains(print_response, "GS labels ready")
+        self.assertContains(print_response, self.plasmid.name)
+
+    def test_create_selected_gs_uses_suggested_position_and_refreshes_batch(self):
+        response = self.client.post(
+            reverse("glycerolstock_batch_prepare"),
+            {
+                "batch_create_gs": "1",
+                "batch_plasmid_idx": [str(self.plasmid.idx)],
+                "plasmid_idx": [str(self.plasmid.idx)],
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        glycerolstock = GlycerolStock.objects.get(plasmid=self.plasmid)
+        self.assertEqual(glycerolstock.strain, self.primary_strain)
+        self.assertEqual(glycerolstock.box, self.box)
+        self.assertEqual(glycerolstock.box_row, "A")
+        self.assertEqual(glycerolstock.box_column, 1)
+
+        refreshed = self.client.get(response.url)
+        self.assertContains(refreshed, "GS created")
+        self.assertContains(refreshed, "Print GS labels")
+
+    def test_batch_creation_uses_selected_same_level_box_and_position(self):
+        selected_box = Box.objects.create(name="L0 B2", location=self.location)
+        Box.objects.create(name="L1 B1", location=self.location)
+
+        response = self.client.get(
+            reverse("glycerolstock_batch_prepare"),
+            {"batch_plasmid_idx": str(self.plasmid.idx)},
+        )
+        self.assertContains(response, "L0 B2")
+        self.assertNotContains(response, "L1 B1")
+
+        self.client.post(
+            reverse("glycerolstock_batch_prepare"),
+            {
+                "batch_create_gs": "1",
+                "batch_plasmid_idx": [str(self.plasmid.idx)],
+                "plasmid_idx": [str(self.plasmid.idx)],
+                f"box_id-{self.plasmid.idx}": str(selected_box.id),
+                f"position-{self.plasmid.idx}": "B2",
+            },
+        )
+
+        glycerolstock = GlycerolStock.objects.get(plasmid=self.plasmid)
+        self.assertEqual(glycerolstock.box, selected_box)
+        self.assertEqual(glycerolstock.box_row, "B")
+        self.assertEqual(glycerolstock.box_column, 2)
+
+    def test_batch_creation_can_create_a_new_level_box(self):
+        response = self.client.post(
+            reverse("glycerolstock_batch_prepare"),
+            {
+                "batch_create_gs": "1",
+                "batch_plasmid_idx": [str(self.plasmid.idx)],
+                "plasmid_idx": [str(self.plasmid.idx)],
+                f"box_id-{self.plasmid.idx}": "new",
+                f"new_box_location-{self.plasmid.idx}": str(self.location.id),
+                f"position-{self.plasmid.idx}": "C3",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        glycerolstock = GlycerolStock.objects.get(plasmid=self.plasmid)
+        self.assertEqual(glycerolstock.box.name, "L0 B2")
+        self.assertEqual(glycerolstock.box.location, self.location)
+        self.assertEqual(glycerolstock.box_row, "C")
+        self.assertEqual(glycerolstock.box_column, 3)
+
+    def test_batch_creation_fills_a_new_box_after_existing_positions_run_out(self):
+        for row in "ABCDEFG":
+            for column in range(1, 10):
+                if row == "G" and column > 7:
+                    break
+                GlycerolStock.objects.create(
+                    strain=self.primary_strain,
+                    plasmid=None,
+                    box=self.box,
+                    box_row=row,
+                    box_column=column,
+                    project=self.project,
+                )
+
+        plasmids = [self.plasmid]
+        for index in range(101, 130):
+            plasmids.append(Plasmid.objects.create(
+                idx=index,
+                name=f"Overflow plasmid {index}",
+                intended_use="Test",
+                level=0,
+                ligation_state=1,
+                colonypcr_state=2,
+                digestion_state=2,
+                sequencing_state=2,
+                project=self.project,
+            ))
+        indices = [str(plasmid.idx) for plasmid in plasmids]
+
+        response = self.client.get(
+            reverse("glycerolstock_batch_prepare"),
+            {"batch_plasmid_idx": indices},
+        )
+        suggestions = response.context["suggestions"]
+        self.assertEqual(len(suggestions), 30)
+        self.assertEqual(
+            [suggestion["position"] for suggestion in suggestions[:20]],
+            [f"G{column}" for column in range(8, 10)]
+            + [f"{row}{column}" for row in "HI" for column in range(1, 10)],
+        )
+        self.assertEqual(suggestions[20]["default_box_id"], "new")
+        self.assertEqual(suggestions[20]["default_position"], "A1")
+        self.assertEqual(suggestions[28]["default_position"], "A9")
+        self.assertEqual(suggestions[29]["default_position"], "B1")
+
+        post_data = {
+            "batch_create_gs": "1",
+            "batch_plasmid_idx": indices,
+            "plasmid_idx": indices,
+        }
+        for suggestion in suggestions:
+            plasmid_idx = str(suggestion["plasmid"].idx)
+            post_data[f"box_id-{plasmid_idx}"] = suggestion["default_box_id"]
+            post_data[f"position-{plasmid_idx}"] = suggestion["default_position"]
+            if suggestion["default_box_id"] == "new":
+                post_data[f"new_box_location-{plasmid_idx}"] = str(self.location.id)
+
+        response = self.client.post(reverse("glycerolstock_batch_prepare"), post_data)
+
+        self.assertEqual(response.status_code, 302)
+        created_stocks = list(
+            GlycerolStock.objects.filter(plasmid__in=plasmids).select_related("box")
+        )
+        self.assertEqual(len(created_stocks), 30)
+        new_box_stocks = sorted(
+            (stock for stock in created_stocks if stock.box != self.box),
+            key=lambda stock: ("ABCDEFGHI".index(stock.box_row), stock.box_column),
+        )
+        self.assertEqual(len(new_box_stocks), 10)
+        self.assertEqual({stock.box.name for stock in new_box_stocks}, {"L0 B2"})
+        self.assertEqual(
+            [(stock.box_row, stock.box_column) for stock in new_box_stocks],
+            [("A", column) for column in range(1, 10)] + [("B", 1)],
+        )
+
+    def test_deleting_gs_from_box_keeps_back_to_box_navigation(self):
+        glycerolstock = GlycerolStock.objects.create(
+            strain=self.primary_strain,
+            plasmid=self.plasmid,
+            box=self.box,
+            box_row="A",
+            box_column=1,
+            project=self.project,
+        )
+
+        box_response = self.client.get(
+            reverse("glycerolstock_box", kwargs={"box_id": self.box.id})
+        )
+        self.assertContains(box_response, f"return_to_box={self.box.id}")
+
+        return_query = f"?return_to_box={self.box.id}"
+        delete_response = self.client.post(
+            reverse("glycerolstock_delete", kwargs={"pk": glycerolstock.id}) + return_query
+        )
+
+        self.assertEqual(delete_response.status_code, 302)
+        deleted_response = self.client.get(delete_response.url)
+        self.assertContains(deleted_response, "Back to box")
+        self.assertContains(
+            deleted_response,
+            reverse("glycerolstock_box", kwargs={"box_id": self.box.id}),
+        )
+
+    def test_prepare_page_accepts_selected_plasmids_from_multiple_projects(self):
+        other_project = Project.objects.create(name="Other GS Batch Project", public=False)
+        Membership.objects.create(member=self.user, project=other_project, access_policies="w")
+        other_plasmid = Plasmid.objects.create(
+            idx=101,
+            name="Other batch plasmid",
+            intended_use="Test",
+            level=0,
+            ligation_state=1,
+            colonypcr_state=2,
+            digestion_state=2,
+            sequencing_state=2,
+            project=other_project,
+        )
+
+        response = self.client.post(
+            reverse("glycerolstock_batch_prepare"),
+            {"plasmid_idx": [str(self.plasmid.idx), str(other_plasmid.idx)]},
+        )
+
+        self.assertEqual(
+            [suggestion["plasmid"].idx for suggestion in response.context["suggestions"]],
+            [self.plasmid.idx, other_plasmid.idx],
+        )
+        self.assertContains(response, self.plasmid.name)
+        self.assertContains(response, other_plasmid.name)
+
+    def test_pichia_gs_does_not_count_as_library_gs(self):
+        pichia_strain = Strain.objects.create(name="Pichia Producción")
+        GlycerolStock.objects.create(
+            strain=pichia_strain,
+            plasmid=self.plasmid,
+            box=self.box,
+            box_row="A",
+            box_column=1,
+            project=self.project,
+        )
+
+        response = self.client.get(
+            reverse("glycerolstock_batch_prepare"),
+            {"batch_plasmid_idx": str(self.plasmid.idx)},
+        )
+
+        self.assertContains(response, "Pending GS")
+        self.assertEqual(response.context["created_count"], 0)
+        self.assertFalse(response.context["all_created"])
 
 
 def primer(name, sequence_3, direction):

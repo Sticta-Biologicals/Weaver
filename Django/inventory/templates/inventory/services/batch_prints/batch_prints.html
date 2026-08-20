@@ -64,6 +64,9 @@
         margin-bottom: .2rem;
     }
     @media print {
+        .batch-print-actions {
+            display: none !important;
+        }
         .batch-print-sheet {
             display: block;
         }
@@ -104,6 +107,16 @@
     }
 </style>
 
+{% if batch_from_gs %}
+<div class="batch-print-actions d-flex align-items-center justify-content-end gap-2 mb-3">
+    {% if batch_return_url %}
+    <a class="btn btn-outline-success text-nowrap" href="{{batch_return_url}}">Back to GS preparation</a>
+    {% endif %}
+    <button id="label-print-button" type="button" class="btn btn-info text-nowrap" onclick="window.print();return false;">
+        <i class="bi bi-printer"></i> Print GS labels
+    </button>
+</div>
+{% else %}
 <form method="post" id="label-inputs" class="alert alert-light border">
     {% csrf_token %}
     <table class="table table-sm batch-print-table">
@@ -152,6 +165,7 @@
     <button id="label-print-button" type="button" class="btn btn-info ms-2" onclick="window.print();return false;"><i class="bi bi-printer"></i> Print batch</button>
     {% endif %}
 </form>
+{% endif %}
 
 {% if missing %}
 <div class="alert alert-warning">

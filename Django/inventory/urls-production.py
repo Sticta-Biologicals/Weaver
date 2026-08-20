@@ -8,6 +8,7 @@ from .views import PlasmidCreateL0d
 
 from .views import GstockCreate
 from .views import GstockCreatePlasmidDefined
+from .views import GlycerolstockBatchPrepare
 from .views import GstockEdit
 from .views import GstockDelete
 
@@ -72,6 +73,7 @@ urlpatterns = [
     path('qr/g/<str:glycerolstock_qr_id>/', login_required(views.glycerolstock_from_qr, redirect_field_name='next'), name='glycerolstock_from_qr'), # for QR
     path('glycerolstock/create/', login_required(GstockCreate.as_view(), redirect_field_name='next'), name='glycerolstock_create'),
     path('glycerolstock/create/<uuid:pid>', login_required(GstockCreatePlasmidDefined.as_view(), redirect_field_name='next'), name='glycerolstock_create_plasmid_defined'),
+    path('glycerolstock/batch/prepare/', login_required(GlycerolstockBatchPrepare, redirect_field_name='next'), name='glycerolstock_batch_prepare'),
     path('glycerolstock/edit/<uuid:pk>/', login_required(GstockEdit.as_view(), redirect_field_name='next'), name='glycerolstock_edit'),
     path('glycerolstock/delete/<uuid:pk>/', login_required(GstockDelete.as_view(), redirect_field_name='next'), name='glycerolstock_delete'),
     path('glycerolstock/deleted/', login_required(views.glycerolstock_deleted, redirect_field_name='next'), name='glycerolstock_deleted'),

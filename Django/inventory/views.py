@@ -7,6 +7,7 @@ from django.shortcuts import redirect
 from .models import Plasmid
 from .models import Experiment
 from .models import GlycerolStock
+from .models import Strain
 from .models import RestrictionEnzyme
 from .models import Primer
 from .models import Box
@@ -55,6 +56,8 @@ from .custom.sanger import read_metrics_tsv
 from .custom.sanger import SangerProcessingParameters
 from .custom.sanger import trim_by_quality
 from .custom.sanger import variants_csv
+from .custom.glycerolstock_storage import suggest_storage_positions_for_plasmids
+from .custom.glycerolstock_storage import storage_box_identity
 from .models import Stats
 from .models import PlasmidType
 from .models import TableFilter
@@ -103,6 +106,7 @@ from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 from django.urls import reverse
 from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Q
 
@@ -424,6 +428,7 @@ def glycerolstock(request, glycerolstock_id):
     context = {
         'glycerolstock': glycerolstock_to_detail,
         'user_can_edit_gs': member_can_write_or_admin_gs(glycerolstock_to_detail, request.user),
+        'return_to_box': request.GET.get('return_to_box'),
     }
     return render(request, 'inventory/glycerolstock.html', context)
 
@@ -462,6 +467,306 @@ def gstock_check_pos(the_class, the_self, the_form):
         return super(the_class, the_self).form_valid(the_form)
     except GlycerolStock.DoesNotExist:
         return super(the_class, the_self).form_valid(the_form)
+
+
+@require_current_project_set
+def GlycerolstockBatchPrepare(request):
+    """Show preliminary GS box/position assignments for selected plasmids."""
+    batch_create_requested = (
+        request.method == "POST"
+        and request.POST.get("batch_create_gs") == "1"
+    )
+    if request.method == "POST":
+        selected_raw_indices = request.POST.getlist("plasmid_idx")
+        raw_indices = request.POST.getlist("batch_plasmid_idx") or selected_raw_indices
+    else:
+        selected_raw_indices = []
+        raw_indices = request.GET.getlist("plasmid_idx") or request.GET.getlist("batch_plasmid_idx")
+
+    try:
+        indices = {int(value) for value in raw_indices}
+    except (TypeError, ValueError):
+        indices = set()
+
+    if not indices:
+        return render(request, "inventory/glycerolstock_batch_prepare.html", {
+            "suggestions": [],
+            "selection_error": "Select at least one validated plasmid first.",
+        })
+
+    visible_projects = get_projects_where_member_can_any(request.user)
+    plasmids = list(Plasmid.objects.filter(
+        idx__in=indices,
+        project__in=visible_projects,
+    ))
+    plasmids = [
+        plasmid for plasmid in plasmids
+        if plasmid.is_validated() and member_can_write_or_admin_plasmid(plasmid, request.user)
+    ]
+    if not plasmids:
+        return render(request, "inventory/glycerolstock_batch_prepare.html", {
+            "suggestions": [],
+            "selection_error": "No writable validated plasmids were selected.",
+        })
+
+    plasmids.sort(key=lambda plasmid: (plasmid.idx is None, plasmid.idx or 0))
+    primary_strain = (
+        Strain.objects.filter(for_primary_gs=True).first()
+        or Strain.objects.filter(name__iexact="Top10").first()
+    )
+    glycerolstock_query = GlycerolStock.objects.filter(
+        project__in=visible_projects,
+        plasmid_id__in=[plasmid.id for plasmid in plasmids],
+    ).select_related("plasmid", "strain", "box", "box__location").order_by(
+        "plasmid_id", "-created_on", "-id"
+    )
+    glycerolstocks = list(
+        glycerolstock_query.filter(strain=primary_strain)
+        if primary_strain is not None else []
+    )
+    glycerolstock_by_plasmid = {}
+    for glycerolstock in glycerolstocks:
+        glycerolstock_by_plasmid.setdefault(glycerolstock.plasmid_id, glycerolstock)
+
+    pending_plasmids = [
+        plasmid for plasmid in plasmids
+        if plasmid.id not in glycerolstock_by_plasmid
+    ]
+    pending_suggestions = suggest_storage_positions_for_plasmids(pending_plasmids)
+    pending_by_plasmid = {item["plasmid"].id: item for item in pending_suggestions}
+    locations = list(Location.objects.all().order_by("name"))
+    boxes = list(Box.objects.select_related("location").order_by("name"))
+    occupied_positions = {
+        (str(box_id), str(box_row), int(box_column))
+        for box_id, box_row, box_column in GlycerolStock.objects.values_list(
+            "box_id", "box_row", "box_column"
+        )
+    }
+    boxes_by_level = {}
+    for box in boxes:
+        identity = storage_box_identity(box)
+        if identity is not None:
+            boxes_by_level.setdefault(identity[0], []).append(box)
+
+    position_values = [
+        f"{box_row[0]}{box_column[0]}"
+        for box_row in BOX_ROWS
+        for box_column in BOX_COLUMNS
+    ]
+    new_box_position_indices = {}
+    for suggestion in pending_suggestions:
+        level = suggestion["level"]
+        level_boxes = boxes_by_level.get(level, [])
+        if not suggestion["available"] and level is not None and locations:
+            suggestion["available"] = True
+            suggestion["message"] = "New box required"
+
+        box_options = []
+        for box in level_boxes:
+            free_positions = [
+                position for position in position_values
+                if (str(box.id), position[0], int(position[1:])) not in occupied_positions
+            ]
+            if free_positions:
+                box_options.append({
+                    "value": str(box.id),
+                    "label": box.name,
+                    "location": str(box.location),
+                    "positions": free_positions,
+                })
+
+        default_box_id = str(suggestion["box"].id) if suggestion["box"] else "new"
+        default_position = suggestion["position"] or "A1"
+        default_location = (
+            suggestion["box"].location if suggestion["box"] else
+            (level_boxes[0].location if level_boxes else (locations[0] if locations else None))
+        )
+        if suggestion["box"] is None and level is not None and default_location:
+            new_box_key = (level, str(default_location.id))
+            position_index = new_box_position_indices.get(new_box_key, 0)
+            if position_index < len(position_values):
+                default_position = position_values[position_index]
+                new_box_position_indices[new_box_key] = position_index + 1
+        if level is not None and locations:
+            box_options.append({
+                "value": "new",
+                "label": f"New L{level} box",
+                "location": "",
+                "positions": position_values,
+                "is_new": True,
+            })
+
+        suggestion["box_options"] = box_options
+        suggestion["default_box_id"] = default_box_id
+        suggestion["default_position"] = default_position
+        suggestion["default_location_id"] = str(default_location.id) if default_location else ""
+
+    batch_error = None
+    batch_created_count = 0
+    if batch_create_requested:
+        selected_pending = [
+            item for item in pending_suggestions
+            if str(item["plasmid"].idx) in selected_raw_indices
+        ]
+
+        if primary_strain is None:
+            batch_error = "No primary library strain is configured."
+        elif not selected_pending:
+            batch_error = "Select at least one pending GS."
+        elif any(not item["available"] for item in selected_pending):
+            batch_error = "One or more selected plasmids do not have an available box position."
+        else:
+            allocations = []
+            claimed_positions = set()
+            allocation_error = None
+            for item in selected_pending:
+                plasmid_idx = str(item["plasmid"].idx)
+                box_value = request.POST.get(
+                    f"box_id-{plasmid_idx}", item["default_box_id"]
+                )
+                position_value = request.POST.get(
+                    f"position-{plasmid_idx}", item["default_position"]
+                )
+                if position_value not in position_values:
+                    allocation_error = f"Invalid position selected for plasmid {plasmid_idx}."
+                    break
+
+                box = None
+                location = None
+                position_key = None
+                if box_value == "new":
+                    location_id = request.POST.get(
+                        f"new_box_location-{plasmid_idx}", item["default_location_id"]
+                    )
+                    try:
+                        location = Location.objects.get(pk=location_id)
+                    except (Location.DoesNotExist, TypeError, ValueError, ValidationError):
+                        allocation_error = f"Select a location for the new box of plasmid {plasmid_idx}."
+                        break
+                    position_key = (
+                        f"new:{item['level']}:{location.id}",
+                        position_value[0],
+                        int(position_value[1:]),
+                    )
+                else:
+                    try:
+                        box = Box.objects.select_related("location").get(pk=box_value)
+                    except (Box.DoesNotExist, TypeError, ValueError, ValidationError):
+                        allocation_error = f"Invalid box selected for plasmid {plasmid_idx}."
+                        break
+                    box_identity = storage_box_identity(box)
+                    if box_identity is None or box_identity[0] != item["level"]:
+                        allocation_error = f"The selected box does not match the level of plasmid {plasmid_idx}."
+                        break
+                    allowed_positions = {
+                        position
+                        for option in item["box_options"]
+                        if option["value"] == str(box.id)
+                        for position in option["positions"]
+                    }
+                    if position_value not in allowed_positions:
+                        allocation_error = f"Position {position_value} is not available in the selected box for plasmid {plasmid_idx}."
+                        break
+                    position_key = (str(box.id), position_value[0], int(position_value[1:]))
+                    if position_key in occupied_positions:
+                        allocation_error = "One or more selected positions are no longer available. Reload and try again."
+                        break
+
+                if position_key in claimed_positions:
+                    allocation_error = f"Position {position_value} was selected more than once."
+                    break
+                claimed_positions.add(position_key)
+                allocations.append({
+                    "item": item,
+                    "box": box,
+                    "location": location,
+                    "box_value": box_value,
+                    "position": position_value,
+                })
+
+            if allocation_error:
+                batch_error = allocation_error
+            else:
+                with transaction.atomic():
+                    new_boxes = {}
+                    for allocation in allocations:
+                        item = allocation["item"]
+                        if allocation["box_value"] == "new":
+                            new_box_key = (item["level"], str(allocation["location"].id))
+                            if new_box_key not in new_boxes:
+                                level_box_numbers = [
+                                    identity[1]
+                                    for existing_box in Box.objects.all()
+                                    for identity in [storage_box_identity(existing_box)]
+                                    if identity is not None and identity[0] == item["level"]
+                                ]
+                                next_box_number = max(level_box_numbers, default=0) + 1
+                                new_box_name = f"L{item['level']} B{next_box_number}"
+                                while Box.objects.filter(name=new_box_name).exists():
+                                    next_box_number += 1
+                                    new_box_name = f"L{item['level']} B{next_box_number}"
+                                new_boxes[new_box_key] = Box.objects.create(
+                                    name=new_box_name,
+                                    location=allocation["location"],
+                                )
+                            allocation["box"] = new_boxes[new_box_key]
+
+                        position = allocation["position"]
+                        GlycerolStock.objects.create(
+                            strain=primary_strain,
+                            plasmid=item["plasmid"],
+                            box=allocation["box"],
+                            box_row=position[0],
+                            box_column=int(position[1:]),
+                            project=item["plasmid"].project,
+                        )
+                        batch_created_count += 1
+
+                refresh_query = urlencode(
+                    [("batch_plasmid_idx", str(index)) for index in sorted(indices)]
+                    + [("batch_created", str(batch_created_count))]
+                )
+                return redirect(f"{reverse('glycerolstock_batch_prepare')}?{refresh_query}")
+
+    suggestions = []
+    for plasmid in plasmids:
+        glycerolstock = glycerolstock_by_plasmid.get(plasmid.id)
+        if glycerolstock:
+            suggestions.append({
+                "plasmid": plasmid,
+                "level": plasmid.level,
+                "box": glycerolstock.box,
+                "box_row": glycerolstock.box_row,
+                "box_column": glycerolstock.box_column,
+                "position": f"{glycerolstock.box_row}{glycerolstock.box_column}",
+                "available": True,
+                "created": True,
+                "glycerolstock": glycerolstock,
+                "message": "GS already created",
+            })
+        else:
+            suggestion = pending_by_plasmid[plasmid.id]
+            suggestion["created"] = False
+            suggestion["glycerolstock"] = None
+            suggestions.append(suggestion)
+
+    batch_indices = [("batch_plasmid_idx", str(plasmid.idx)) for plasmid in plasmids]
+    batch_create_query = urlencode([("return_to_batch", "1")] + batch_indices)
+    created_stocks = [item["glycerolstock"] for item in suggestions if item["glycerolstock"]]
+    print_query = urlencode(
+        [("glycerolstock_id", str(glycerolstock.id)) for glycerolstock in created_stocks] + batch_indices
+    )
+    return render(request, "inventory/glycerolstock_batch_prepare.html", {
+        "suggestions": suggestions,
+        "selected_count": len(suggestions),
+        "created_count": len(created_stocks),
+        "all_created": len(created_stocks) == len(suggestions),
+        "batch_strain": primary_strain,
+        "batch_error": batch_error,
+        "batch_created_count": request.GET.get("batch_created", 0),
+        "batch_create_query": batch_create_query,
+        "print_url": f"{reverse('services-batch-prints')}?{print_query}" if created_stocks else "",
+    })
 
 
 def build_box(request, mode, box):
@@ -567,6 +872,26 @@ class GstockCreatePlasmidDefined(CreateView):
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
+    def get_initial(self):
+        initial = super().get_initial()
+        initial["plasmid"] = self.kwargs["pid"]
+
+        box_id = self.request.GET.get("box_id")
+        box_row = self.request.GET.get("box_row")
+        box_column = self.request.GET.get("box_column")
+        if box_id and box_row and box_column:
+            try:
+                box = Box.objects.get(id=box_id)
+                if box_row in dict(BOX_ROWS) and int(box_column) in dict(BOX_COLUMNS):
+                    initial.update({
+                        "box": box.id,
+                        "box_row": box_row,
+                        "box_column": int(box_column),
+                    })
+            except (Box.DoesNotExist, TypeError, ValueError):
+                pass
+        return initial
+
     def form_valid(self, form):
         form.instance.project = get_current_project(self.request)
         return gstock_check_pos(GstockCreatePlasmidDefined, self, form)
@@ -579,6 +904,13 @@ class GstockCreatePlasmidDefined(CreateView):
         return context
 
     def get_success_url(self, **kwargs):
+        if self.request.GET.get("return_to_batch") == "1":
+            batch_indices = [
+                ("plasmid_idx", value)
+                for value in self.request.GET.getlist("batch_plasmid_idx")
+            ]
+            if batch_indices:
+                return f"{reverse('glycerolstock_batch_prepare')}?{urlencode(batch_indices)}"
         return reverse('glycerolstock', args=(self.object.id,)) + '?form_result_glycerolstock_create_success=true'
 
 
@@ -593,11 +925,21 @@ class GstockDelete(DeleteView):
         return super().dispatch(*args, **kwargs)
 
     def get_success_url(self, **kwargs):
+        return_to_box = self.request.GET.get('return_to_box')
+        if return_to_box:
+            return f"{reverse('glycerolstock_deleted')}?{urlencode({'return_to_box': return_to_box})}"
         return reverse('glycerolstock_deleted')
 
 
 def glycerolstock_deleted(request):
-    return render(request, 'inventory/glycerolstock_deleted.html')
+    box = None
+    return_to_box = request.GET.get('return_to_box')
+    if return_to_box:
+        try:
+            box = Box.objects.get(pk=return_to_box)
+        except (Box.DoesNotExist, TypeError, ValueError, ValidationError):
+            pass
+    return render(request, 'inventory/glycerolstock_deleted.html', {'box': box})
 
 
 @require_member_can_read_project_of_gs
@@ -2984,9 +3326,30 @@ def PlasmidValidations(request):
 
     all_plasmids_not_ref = all_plasmids.exclude(reference_sequence=True)
     all_plasmids_ligated = all_plasmids_not_ref.filter(ligation_state=1)
+    project_filters = [
+        {
+            "id": item["project_id"],
+            "name": item["project__name"],
+        }
+        for item in all_plasmids.values("project_id", "project__name")
+        .distinct()
+        .order_by("project__name")
+    ]
+    stock_level_values = sorted({
+        plasmid.level for plasmid in plasmidsToStock
+        if plasmid.level is not None
+    })
+    level_filters = [
+        {"value": str(level), "name": f"L{level}"}
+        for level in stock_level_values
+    ]
+    if any(plasmid.level is None for plasmid in plasmidsToStock):
+        level_filters.append({"value": "999", "name": "No level"})
 
     context = {
         'show_from_all_projects': show_from_all_projects,
+        'project_filters': project_filters,
+        'level_filters': level_filters,
         'CHECK_STATES': dict(CHECK_STATES),
         'LIGATION_STATES': dict(LIGATION_STATES),
         'plasmid_massive_action_results': plasmid_massive_action_results,
@@ -3643,6 +4006,8 @@ def ServicesBatchPrints(request):
     labels = []
     missing = []
     searched = False
+    batch_from_gs = False
+    batch_return_url = ""
     rows = [{
         "label_type": "plasmids",
         "identifier": "",
@@ -3674,6 +4039,31 @@ def ServicesBatchPrints(request):
                 "concentration": "",
             }]
 
+    preselected_glycerolstock_ids = request.GET.getlist("glycerolstock_id")
+    if request.method == "GET" and preselected_glycerolstock_ids:
+        batch_from_gs = True
+        searched = True
+        rows = []
+        glycerolstocks, missing = find_batch_glycerolstocks(
+            preselected_glycerolstock_ids,
+            request.user,
+        )
+        for glycerolstock in glycerolstocks:
+            labels.append({
+                "kind": "glycerolstocks",
+                "object": glycerolstock,
+                "colony": "",
+                "date": glycerolstock.created_on,
+                "concentration": "",
+            })
+
+        batch_indices = [
+            ("batch_plasmid_idx", value)
+            for value in request.GET.getlist("batch_plasmid_idx")
+        ]
+        if batch_indices:
+            batch_return_url = f"{reverse('glycerolstock_batch_prepare')}?{urlencode(batch_indices)}"
+
     context = {
         "rows": rows,
         "label_types": BatchPrintsForm.LABEL_TYPES,
@@ -3681,6 +4071,8 @@ def ServicesBatchPrints(request):
         "missing": missing,
         "searched": searched,
         "today": date.today().isoformat(),
+        "batch_from_gs": batch_from_gs,
+        "batch_return_url": batch_return_url,
     }
     return render(request, "inventory/services/batch_prints/batch_prints.html", context)
 
