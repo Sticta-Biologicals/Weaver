@@ -15,9 +15,8 @@
     Validation was not saved. Please review the highlighted fields.
 </div>
 {% endif %}
-<div id="form-inventory">
-    {% include "inventory/parts/inventory_update_form.html" %}
-</div>
+{% url 'plasmid' plasmid_id=plasmid.id as cancel_url %}
+{% include "inventory/parts/inventory_form_panel.html" with form_section_label="Validation" form_title="Update validation" form_description="Review validation states, dates and observations." form_icon="bi-check2-square" submit_label="Save validation" submit_icon="bi-check-lg" cancel_url=cancel_url cancel_label="Back to plasmid" %}
 {% endif %}
 {% else %}
 <div class="alert alert-warning">No Plasmid found.</div>

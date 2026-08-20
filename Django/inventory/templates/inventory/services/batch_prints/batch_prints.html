@@ -5,176 +5,104 @@
 {% block header_object_name %}Batch Prints{% endblock %}
 
 {% block content %}
-<style>
-    .batch-print-table td {
-        vertical-align: middle;
-    }
-    .batch-print-table .batch-type {
-        min-width: 10rem;
-    }
-    .batch-print-table .batch-identifier {
-        min-width: 16rem;
-    }
-    .batch-print-table .batch-colony {
-        min-width: 7rem;
-    }
-    .batch-print-table .batch-date {
-        min-width: 10rem;
-    }
-    .batch-print-table .batch-concentration {
-        min-width: 9rem;
-    }
-    .batch-print-sheet {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 1rem;
-    }
-    .batch-print-sheet div.label {
-        position: static;
-        left: auto;
-        top: auto;
-        max-width: none;
-        border: 1px solid rgba(128, 128, 128, .35);
-        border-radius: .5rem;
-        padding: .85rem;
-        background: var(--bs-body-bg);
-        color: var(--bs-body-color);
-        min-height: 8.5rem;
-        box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .08);
-    }
-    .batch-print-sheet div.label-info {
-        margin: 0;
-        padding: 0;
-    }
-    .batch-print-sheet .batch-label-title,
-    .batch-print-sheet .batch-label-subtitle,
-    .batch-print-sheet div.label-info p.label-id-colony {
-        font-size: .95rem;
-        line-height: 1.1em;
-        margin: 0 0 .35rem 0;
-    }
-    .batch-print-sheet .batch-label-subtitle {
-        font-size: .85rem;
-        line-height: 1.05em;
-    }
-    .batch-print-sheet div.label-info p:not(.label-id-colony) {
-        font-size: .75rem;
-        line-height: 1.15em;
-        padding: 0;
-        margin-bottom: .2rem;
-    }
-    @media print {
-        .batch-print-actions {
-            display: none !important;
-        }
-        .batch-print-sheet {
-            display: block;
-        }
-        .batch-print-sheet div.label {
-            position: static !important;
-            left: auto !important;
-            top: auto !important;
-            border: none;
-            border-radius: 0;
-            padding: 0;
-            background: none;
-            box-shadow: none;
-            break-inside: avoid;
-            page-break-inside: avoid;
-            break-after: page;
-            page-break-after: always;
-        }
-        .batch-print-sheet div.label:last-child {
-            break-after: auto;
-            page-break-after: auto;
-        }
-        .batch-print-sheet .batch-label-title,
-        .batch-print-sheet .batch-label-subtitle,
-        .batch-print-sheet div.label-info p.label-id-colony {
-            font-size: .8rem;
-            line-height: 1em;
-            margin: 0 0 .5rem 0;
-        }
-        .batch-print-sheet .batch-label-subtitle {
-            font-size: .6rem;
-            line-height: .8em;
-        }
-        .batch-print-sheet div.label-info p:not(.label-id-colony) {
-            font-size: .4rem;
-            line-height: 1em;
-            padding: 0;
-        }
-    }
-</style>
+<div class="batch-prints-page">
 
 {% if batch_from_gs %}
-<div class="batch-print-actions d-flex align-items-center justify-content-end gap-2 mb-3">
-    {% if batch_return_url %}
-    <a class="btn btn-outline-success text-nowrap" href="{{batch_return_url}}">Back to GS preparation</a>
-    {% endif %}
-    <button id="label-print-button" type="button" class="btn btn-info text-nowrap" onclick="window.print();return false;">
-        <i class="bi bi-printer"></i> Print GS labels
-    </button>
+<div class="batch-print-actions">
+    <div class="batch-print-actions-copy">
+        <span class="batch-print-kicker">Glycerol stocks</span>
+        <strong>GS label batch</strong>
+        <span class="text-secondary small">Review the generated labels before printing.</span>
+    </div>
+    <div class="batch-print-actions-buttons">
+        {% if batch_return_url %}
+        <a class="btn btn-outline-secondary text-nowrap" href="{{batch_return_url}}"><i class="bi bi-arrow-left"></i> Back to GS preparation</a>
+        {% endif %}
+        <button id="label-print-button" type="button" class="btn btn-primary text-nowrap" onclick="window.print();return false;">
+            <i class="bi bi-printer"></i> Print GS labels
+        </button>
+    </div>
 </div>
 {% else %}
-<form method="post" id="label-inputs" class="alert alert-light border">
+<form method="post" id="label-inputs" class="batch-print-form">
     {% csrf_token %}
-    <table class="table table-sm batch-print-table">
-        <thead>
-            <tr>
-                <th scope="col">Print type</th>
-                <th scope="col">ID / code / QR / name</th>
-                <th scope="col">Colony</th>
-                <th scope="col">Concentration</th>
-                <th scope="col">Date</th>
-                <th scope="col" data-defaultsort="disabled"></th>
-            </tr>
-        </thead>
-        <tbody id="batch-print-rows">
-            {% for row in rows %}
-            <tr class="batch-print-row">
-                <td>
-                    <select name="label_type" class="form-select form-select-sm batch-type">
-                        {% for value, label in label_types %}
-                        <option value="{{ value }}"{% if value == row.label_type %} selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                </td>
-                <td>
-                    <input name="identifier" type="text" class="form-control form-control-sm batch-identifier" value="{{ row.identifier }}" required>
-                </td>
-                <td>
-                    <input name="colony" type="text" class="form-control form-control-sm batch-colony" value="{{ row.colony }}" placeholder="#">
-                </td>
-                <td>
-                    <input name="concentration" type="text" inputmode="decimal" class="form-control form-control-sm batch-concentration" value="{{ row.concentration }}">
-                </td>
-                <td>
-                    <input name="date" type="date" class="form-control form-control-sm batch-date" value="{{ row.date|default:today }}">
-                </td>
-                <td class="text-end">
-                    <button type="button" class="btn btn-sm btn-outline-danger batch-remove-row" title="Remove row"><i class="bi bi-trash"></i></button>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <button type="button" class="btn btn-outline-secondary" id="batch-add-row"><i class="bi bi-plus"></i> Add entry</button>
-    <button type="submit" class="btn btn-primary ms-2"><i class="bi bi-search"></i> Preview batch</button>
-    {% if labels %}
-    <button id="label-print-button" type="button" class="btn btn-info ms-2" onclick="window.print();return false;"><i class="bi bi-printer"></i> Print batch</button>
-    {% endif %}
+    <div class="batch-print-form-header">
+        <div>
+            <span class="batch-print-kicker">Services</span>
+            <h2>Build print batch</h2>
+            <p>Enter identifiers and preview the labels before printing.</p>
+        </div>
+        <i class="bi bi-printer batch-print-form-icon" aria-hidden="true"></i>
+    </div>
+    <div class="batch-print-table-wrapper">
+        <table class="table table-sm batch-print-table">
+            <thead>
+                <tr>
+                    <th scope="col">Print type</th>
+                    <th scope="col">ID / code / QR / name</th>
+                    <th scope="col">Colony</th>
+                    <th scope="col">Concentration</th>
+                    <th scope="col">Date</th>
+                    <th scope="col" data-defaultsort="disabled"></th>
+                </tr>
+            </thead>
+            <tbody id="batch-print-rows">
+                {% for row in rows %}
+                <tr class="batch-print-row">
+                    <td>
+                        <select name="label_type" class="form-select form-select-sm batch-type">
+                            {% for value, label in label_types %}
+                            <option value="{{ value }}"{% if value == row.label_type %} selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <input name="identifier" type="text" class="form-control form-control-sm batch-identifier" value="{{ row.identifier }}" required>
+                    </td>
+                    <td>
+                        <input name="colony" type="text" class="form-control form-control-sm batch-colony" value="{{ row.colony }}" placeholder="#">
+                    </td>
+                    <td>
+                        <input name="concentration" type="text" inputmode="decimal" class="form-control form-control-sm batch-concentration" value="{{ row.concentration }}">
+                    </td>
+                    <td>
+                        <input name="date" type="date" class="form-control form-control-sm batch-date" value="{{ row.date|default:today }}">
+                    </td>
+                    <td class="text-end">
+                        <button type="button" class="btn btn-sm btn-outline-danger batch-remove-row" title="Remove row"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="batch-print-form-footer">
+        <div class="batch-print-add-actions" aria-label="Add label entry">
+            <button type="button" class="btn btn-outline-secondary batch-add-entry" data-label-type="plasmids">
+                <i class="bi bi-plus"></i> Add plasmid entry
+            </button>
+            <button type="button" class="btn btn-outline-secondary batch-add-entry" data-label-type="glycerolstocks">
+                <i class="bi bi-plus"></i> Add GS entry
+            </button>
+        </div>
+        <div class="batch-print-form-actions">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Preview batch</button>
+            {% if labels %}
+            <button id="label-print-button" type="button" class="btn btn-info" onclick="window.print();return false;"><i class="bi bi-printer"></i> Print batch</button>
+            {% endif %}
+        </div>
+    </div>
 </form>
 {% endif %}
 
 {% if missing %}
-<div class="alert alert-warning">
+<div class="alert alert-warning batch-print-alert">
     Not found or not visible: {{ missing|join:", " }}
 </div>
 {% endif %}
 
 {% if searched and not labels %}
-<div class="alert alert-secondary">No labels to print.</div>
+<div class="alert alert-secondary batch-print-alert">No labels to print.</div>
 {% endif %}
 
 {% if labels %}
@@ -281,9 +209,9 @@
             bindRow($(this));
         });
 
-        $("#batch-add-row").on("click", function(){
+        $(".batch-add-entry").on("click", function(){
             var template = $("#batch-print-rows .batch-print-row:first").clone();
-            template.find(".batch-type").val("plasmids");
+            template.find(".batch-type").val($(this).data("label-type"));
             template.find(".batch-identifier").val("");
             template.find(".batch-colony").val("");
             template.find(".batch-date").val(today);
@@ -295,4 +223,5 @@
 
     });
 </script>
+</div>
 {% endblock %}

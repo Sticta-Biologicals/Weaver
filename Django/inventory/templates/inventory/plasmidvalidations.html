@@ -216,22 +216,22 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             {% if not plasmid.reference_sequence %}
                             <li><a href="{% url 'plasmid_validation_edit' plasmid_id=plasmid.id %}" class="dropdown-item">
-                                <i class="bi bi-check2-square me-2 text-info"></i>Edit validation
+                                <i class="bi bi-check2-square me-2"></i>Edit validation
                             </a></li>
                             {% endif %}
                             {% if k == 'to_colonypcr' %}
                             <li><a href="{% url 'plasmid_pcr' plasmid_id=plasmid.id %}" class="dropdown-item">
-                                <i class="bi bi-arrow-return-right me-2 text-success"></i>Colony PCR
+                                <i class="bi bi-arrow-return-right me-2"></i>Colony PCR
                             </a></li>
                             {% endif %}
                             {% if k == 'to_digest' %}
                             <li><a href="{% url 'plasmid_digest' plasmid_id=plasmid.id %}" class="dropdown-item">
-                                <i class="bi bi-scissors me-2 text-secondary"></i>Digest
+                                <i class="bi bi-scissors me-2"></i>Digest
                             </a></li>
                             {% endif %}
                             {% if k == 'to_stock' %}
                             <li><a href="{% url 'glycerolstock_create_plasmid_defined' pid=plasmid.id %}" class="dropdown-item" target="_blank">
-                                <i class="bi bi-box-seam me-2 text-secondary"></i>Create GS
+                                <i class="bi bi-box-seam me-2"></i>Create GS
                             </a></li>
                             {% endif %}
                         </ul>
