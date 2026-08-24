@@ -49,6 +49,7 @@ from .custom.sanger import classify_run
 from .custom.sanger import clustal_content
 from .custom.sanger import combined_metrics
 from .custom.sanger import display_trim_range
+from .custom.sanger import include_unaligned_display_flanks
 from .custom.sanger import process_sanger_files
 from .custom.sanger import parse_ab1
 from .custom.sanger import read_is_usable
@@ -2565,6 +2566,7 @@ def sanger_browser_data(reference_sequence, service_result, reference_name="Refe
                     "observed": variant.get("observed", ""),
                     "quality": variant.get("quality"),
                     "low_quality": variant.get("low_quality", False),
+                    "display_only": variant.get("display_only", False),
                     "base_index": variant.get("base_index"),
                 }
                 for variant in display_alignment.get("variants", [])
@@ -2574,7 +2576,9 @@ def sanger_browser_data(reference_sequence, service_result, reference_name="Refe
         "referenceName": reference_name,
         "referenceSequence": reference_sequence,
         "referenceLength": len(reference_sequence),
-        "displayOrigin": reads[0]["start"] if reads else 0,
+        # Keep browser coordinates anchored to the plasmid origin. Read
+        # coordinates remain available internally for chromatogram evidence.
+        "displayOrigin": 0,
         "features": feature_rows(),
         "depth": service_result.get("combined", {}).get("depth", []),
         "reads": reads,
@@ -2624,15 +2628,22 @@ def recalculated_saved_sanger_read(read, reference_sequence, params=None):
         display_start, display_end = display_trim_range(len(raw_sequence), quality_metrics)
         display_sequence = raw_sequence[display_start:display_end]
         if display_sequence:
-            display_alignment = align_read(
-                reference_sequence,
-                display_sequence,
-                qualities,
-                display_start,
-                params,
-                display_end,
-                forced_orientation=alignment.get("best_orientation") or alignment.get("orientation"),
-            )
+                display_alignment = align_read(
+                    reference_sequence,
+                    display_sequence,
+                    qualities,
+                    display_start,
+                    params,
+                    display_end,
+                    forced_orientation=alignment.get("best_orientation") or alignment.get("orientation"),
+                )
+                display_alignment = include_unaligned_display_flanks(
+                    display_alignment,
+                    qualities,
+                    display_start,
+                    display_end,
+                    len(reference_sequence),
+                )
     warnings = list(read.warnings or [])
     if unusable_reason and unusable_reason not in warnings:
         warnings.append(unusable_reason)

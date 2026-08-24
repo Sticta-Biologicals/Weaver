@@ -713,18 +713,15 @@ def trim_by_quality(sequence, qualities, params, chromatogram=None, clear_range=
 
 
 def display_trim_range(sequence_length, quality_metrics):
-    blocks = quality_metrics.get("alignment_blocks") or []
-    if not blocks:
+    """Keep the complete raw read in the visual alignment.
+
+    ``alignment_blocks`` remain the trusted evidence used by metrics and
+    automated classification. The browser view must also expose low-quality
+    bases from the chromatogram, where confidence bands identify them.
+    """
+    if sequence_length <= 0:
         return 0, 0
-    start = blocks[0][0]
-    end = blocks[-1][1]
-    terminal_low_region = any(
-        int(region.get("end", -1)) >= sequence_length - 1
-        for region in quality_metrics.get("low_confidence_regions", [])
-    )
-    if terminal_low_region:
-        end = sequence_length
-    return start, end
+    return 0, sequence_length
 
 
 def local_quality_mask(qualities, params):
@@ -1018,6 +1015,68 @@ def align_read(reference, read_sequence, qualities, trim_start, params, trim_end
     }
 
 
+def include_unaligned_display_flanks(alignment, qualities, trim_start, trim_end, reference_length):
+    """Expose locally unaligned read flanks as low-confidence insertions.
+
+    These columns are display-only evidence. Trusted coverage, variants, and
+    automated classification continue to use the separate trusted alignment.
+    """
+    if not alignment or not reference_length:
+        return alignment
+    oriented_sequence = alignment.get("oriented_sequence", "")
+    if not oriented_sequence:
+        return alignment
+    query_start = max(0, min(len(oriented_sequence), int(alignment.get("query_start", 0))))
+    query_end = max(query_start, min(len(oriented_sequence), int(alignment.get("query_end", query_start))))
+    if query_start == 0 and query_end == len(oriented_sequence):
+        return alignment
+
+    orientation = alignment.get("best_orientation") or alignment.get("orientation") or "forward"
+
+    def original_base_index(oriented_index):
+        if orientation == "reverse":
+            return trim_end - 1 - oriented_index
+        return trim_start + oriented_index
+
+    def build_flank_variants(start, end, coordinate):
+        variants = []
+        for oriented_index in range(start, end):
+            base_index = original_base_index(oriented_index)
+            quality = qualities[base_index] if 0 <= base_index < len(qualities) else None
+            variants.append({
+                "coordinate": coordinate,
+                "type": "insertion",
+                "expected": "",
+                "observed": oriented_sequence[oriented_index],
+                "quality": quality,
+                "low_quality": True,
+                "display_only": True,
+                "base_index": base_index,
+            })
+        return variants
+
+    display_flank_variants = []
+    if query_start:
+        display_flank_variants.extend(
+            build_flank_variants(
+                0, query_start, (int(alignment.get("start", 0)) - 1) % reference_length
+            )
+        )
+    if query_end < len(oriented_sequence):
+        display_flank_variants.extend(
+            build_flank_variants(
+                query_end, len(oriented_sequence), int(alignment.get("end", 0)) % reference_length
+            )
+        )
+    if not display_flank_variants:
+        return alignment
+
+    display_alignment = alignment.copy()
+    display_alignment["variants"] = list(alignment.get("variants", [])) + display_flank_variants
+    display_alignment["display_unaligned_flank_count"] = len(display_flank_variants)
+    return display_alignment
+
+
 def read_is_usable(trimmed_sequence, quality_metrics, group_errors, params):
     if group_errors:
         return False, group_errors[0]
@@ -1094,6 +1153,13 @@ def process_sanger_files(file_objs, reference_sequence, parameters=None):
                     params,
                     display_end,
                     forced_orientation=alignment.get("best_orientation") or alignment.get("orientation"),
+                )
+                display_alignment = include_unaligned_display_flanks(
+                    display_alignment,
+                    qualities,
+                    display_start,
+                    display_end,
+                    len(reference_sequence),
                 )
         reads.append({
             "name": group_name,

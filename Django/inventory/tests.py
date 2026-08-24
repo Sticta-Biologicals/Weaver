@@ -58,6 +58,8 @@ from inventory.custom.restriction_digest import region_contains_position
 from inventory.custom.restriction_digest import serialize_digest_response
 from inventory.custom.sanger import detect_format
 from inventory.custom.sanger import detect_confidence_regions
+from inventory.custom.sanger import display_trim_range
+from inventory.custom.sanger import include_unaligned_display_flanks
 from inventory.custom.sanger import normalized_group_name
 from inventory.custom.sanger import parse_phd1
 from inventory.custom.sanger import parse_seq
@@ -84,6 +86,7 @@ from inventory.views import plasmid_update_computed_size
 from inventory.views import build_restriction_enzymes
 from inventory.views import run_local_blast
 from inventory.views import sanger_feature_color
+from inventory.views import sanger_browser_data
 from organization.models import Membership
 from organization.models import Project
 
@@ -480,6 +483,109 @@ class FastaParsingTests(SimpleTestCase):
 
 
 class SangerVerificationServiceTests(SimpleTestCase):
+    def test_display_alignment_exposes_unaligned_flanks_as_low_quality_insertions(self):
+        alignment = {
+            "start": 20,
+            "end": 40,
+            "query_start": 2,
+            "query_end": 8,
+            "best_orientation": "forward",
+            "oriented_sequence": "AACCGGTTAA",
+            "variants": [],
+        }
+
+        display_alignment = include_unaligned_display_flanks(
+            alignment,
+            [5, 8, 35, 35, 35, 35, 35, 35, 7, 4],
+            0,
+            10,
+            100,
+        )
+
+        self.assertEqual(len(display_alignment["variants"]), 4)
+        self.assertEqual(
+            [variant["base_index"] for variant in display_alignment["variants"]],
+            [0, 1, 8, 9],
+        )
+        self.assertTrue(all(variant["low_quality"] for variant in display_alignment["variants"]))
+
+    def test_display_alignment_keeps_low_quality_flanks_visible(self):
+        self.assertEqual(
+            display_trim_range(
+                100,
+                {"alignment_blocks": [(12, 82)], "low_confidence_regions": [{"start": 0, "end": 99}]},
+            ),
+            (0, 100),
+        )
+
+    def test_sanger_browser_coordinates_start_at_plasmid_origin(self):
+        reference = "ACGT" * 10
+        alignment = {
+            "start": 7,
+            "end": 15,
+            "segments": [],
+            "crosses_origin": False,
+            "identity": 100.0,
+            "reference_projection": reference,
+            "reference_projection_base_indices": list(range(len(reference))),
+            "variants": [],
+        }
+
+        browser_data = sanger_browser_data(
+            reference,
+            {
+                "reads": [{
+                    "name": "read-1",
+                    "is_usable": True,
+                    "alignment": alignment,
+                    "display_alignment": alignment,
+                    "chromatogram": {},
+                    "quality_metrics": {},
+                }],
+                "combined": {"depth": [], "uncovered_regions": []},
+            },
+        )
+
+        self.assertEqual(browser_data["displayOrigin"], 0)
+
+    def test_sanger_browser_data_preserves_display_only_insertions(self):
+        reference = "ACGT" * 10
+        alignment = {
+            "start": 0,
+            "end": 9,
+            "segments": [],
+            "crosses_origin": False,
+            "identity": 100.0,
+            "reference_projection": reference,
+            "reference_projection_base_indices": list(range(len(reference))),
+            "variants": [{
+                "coordinate": 9,
+                "type": "insertion",
+                "observed": "A",
+                "quality": 4,
+                "low_quality": True,
+                "display_only": True,
+                "base_index": 0,
+            }],
+        }
+
+        browser_data = sanger_browser_data(
+            reference,
+            {
+                "reads": [{
+                    "name": "read-1",
+                    "is_usable": True,
+                    "alignment": alignment,
+                    "display_alignment": alignment,
+                    "chromatogram": {},
+                    "quality_metrics": {},
+                }],
+                "combined": {"depth": [], "uncovered_regions": []},
+            },
+        )
+
+        self.assertTrue(browser_data["reads"][0]["variants"][0]["display_only"])
+
     def test_normalizes_complementary_sanger_files_to_one_group(self):
         base = "sample_C02"
 

@@ -206,6 +206,9 @@
         border-radius: 6px;
         pointer-events: none;
     }
+    #sanger-map-window-wrap {
+        display: none;
+    }
     .sanger-browser-controls {
         display: grid;
         grid-template-columns: minmax(128px, 210px) auto 1fr auto;
@@ -311,16 +314,19 @@
     .sanger-base-view {
         --sanger-base-font-size: 14px;
         --sanger-window-size: 100;
+        --sanger-content-width: 0px;
         border: 1px solid #49525c;
         border-radius: 8px;
         background: #11161b;
-        overflow: hidden;
+        overflow-x: auto;
+        overflow-y: hidden;
     }
     .sanger-base-row {
         display: grid;
-        grid-template-columns: minmax(128px, 210px) 1fr;
+        grid-template-columns: minmax(128px, 210px) var(--sanger-content-width, 1fr);
+        width: 100%;
         border-bottom: 1px solid #2f3842;
-        min-width: 0;
+        min-width: 100%;
     }
     .sanger-base-row:last-child {
         border-bottom: 0;
@@ -385,7 +391,7 @@
         white-space: pre;
         padding: .42rem .5rem;
         color: #dce5ee;
-        overflow: hidden;
+        overflow: visible;
     }
     .sanger-base-columns {
         padding-left: 0;
@@ -407,6 +413,26 @@
     }
     .sanger-base-insertion-ref {
         color: #46c6d2;
+    }
+    .sanger-display-only-gap {
+        background: transparent;
+    }
+    .sanger-display-only-marker {
+        position: absolute;
+        top: 7px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 3px;
+        background: rgba(154, 161, 169, .42);
+        color: #f2f5f8;
+        font: 11px system-ui, sans-serif;
+        line-height: 18px;
+        padding: 0 5px;
+        white-space: nowrap;
+        z-index: 1;
     }
     .sanger-feature-track {
         position: relative;
@@ -944,6 +970,7 @@
     <div class="sanger-map mb-3" id="sanger-map" aria-label="Sanger alignment map">
         <div class="sanger-map-axis"></div>
         <div class="sanger-map-window" id="sanger-map-window"></div>
+        <div class="sanger-map-window" id="sanger-map-window-wrap"></div>
     </div>
     <div class="sanger-browser-toolbar">
         {% if alignment_source_type != "FASTA" %}
@@ -951,7 +978,7 @@
             <span class="sanger-zoom-mark">-</span>
             <input type="range" class="form-range" min="0" max="88" value="0" id="sanger-zoom-slider" aria-label="Zoom">
             <span class="sanger-zoom-mark">+</span>
-            <span class="text-muted" id="sanger-zoom-label">100 bp</span>
+            <span class="text-muted" id="sanger-zoom-label">100 columns</span>
         </div>
         {% endif %}
         <div class="form-check form-switch">
@@ -1127,6 +1154,7 @@
     const zoomSlider = document.getElementById("sanger-zoom-slider");
     const zoomLabel = document.getElementById("sanger-zoom-label");
     const fastaIndividualSelect = document.getElementById("fasta-individual-read-select");
+    const wrappedWindowMarker = document.getElementById("sanger-map-window-wrap");
     if (!map || !data || !data.referenceLength) return;
 
     const isFastaAlignment = "{{ alignment_source_type|default:'' }}" === "FASTA";
@@ -1137,7 +1165,11 @@
     const maximumWindowSize = Math.min(referenceLength, 100);
     let windowSize = 100;
     let manualWindowSize = 0;
-    let start = 0;
+    // This is an index into the complete alignment-column stream, not a
+    // plasmid coordinate. A one-step move therefore always advances exactly
+    // one displayed column, including insertions.
+    let alignmentStart = 0;
+    let globalAlignmentColumnCache = null;
     let selectedBaseKey = "";
     let selectedDisplayCoordinate = null;
     const hiddenReadIndexes = new Set();
@@ -1223,31 +1255,40 @@
             zoomSlider.max = String(maximumWindowSize - minimumWindowSize);
             zoomSlider.value = String(maximumWindowSize - windowSize);
         }
-        if (zoomLabel) zoomLabel.textContent = `${windowSize} bp`;
+        if (zoomLabel) zoomLabel.textContent = `${windowSize} columns`;
         slider.max = String(maxStart());
-        start = clampStart(start);
+        alignmentStart = clampStart(alignmentStart);
     }
     function sequenceWidthPixels() {
         const rowWidth = baseView.clientWidth || 0;
         const labelWidth = Math.min(210, Math.max(128, rowWidth * 0.19));
         return Math.max(120, rowWidth - labelWidth - 16);
     }
-    function updateBaseZoomStyle(columnCount) {
+    function updateBaseZoomStyle() {
         const sequenceWidth = sequenceWidthPixels();
         const horizontalPadding = 16;
-        const visibleColumns = columnCount || windowSize;
-        const fontSize = Math.max(8, Math.min(18, (sequenceWidth - horizontalPadding) / Math.max(1, visibleColumns) * 1.72));
+        const fontSize = Math.max(8, Math.min(18, (sequenceWidth - horizontalPadding) / Math.max(1, windowSize) * 1.72));
         baseView.style.setProperty("--sanger-base-font-size", `${fontSize.toFixed(2)}px`);
-        baseView.style.setProperty("--sanger-window-size", String(visibleColumns));
+        baseView.style.setProperty("--sanger-window-size", String(windowSize));
+        baseView.style.setProperty(
+            "--sanger-content-width",
+            `${Math.max(120, sequenceWidth - horizontalPadding).toFixed(2)}px`
+        );
     }
     function maxZoomWindowSize() {
         return Math.max(minimumWindowSize, Math.min(maximumWindowSize, Math.floor((sequenceWidthPixels() - 16) / (8 / 1.72))));
     }
     function maxStart() {
-        return Math.max(0, referenceLength - windowSize);
+        // Every alignment column can be the first column of a circular
+        // viewport. The viewport itself is allowed to continue at column 0.
+        return Math.max(0, globalAlignmentColumns().length - 1);
     }
     function clampStart(nextStart) {
-        return Math.max(0, Math.min(maxStart(), Math.round(nextStart)));
+        const columnCount = globalAlignmentColumns().length;
+        if (!columnCount) return 0;
+        const numericStart = Number(nextStart);
+        const roundedStart = Number.isFinite(numericStart) ? Math.round(numericStart) : 0;
+        return ((roundedStart % columnCount) + columnCount) % columnCount;
     }
     function addSegment(className, startCoord, endCoord, top, title) {
         const el = document.createElement("div");
@@ -1351,7 +1392,7 @@
     }
     function drawMap() {
         Array.from(map.children).forEach((child) => {
-            if (child.id !== "sanger-map-window" && !child.classList.contains("sanger-map-axis")) {
+            if (child.id !== "sanger-map-window" && child.id !== "sanger-map-window-wrap" && !child.classList.contains("sanger-map-axis")) {
                 child.remove();
             }
         });
@@ -1446,31 +1487,52 @@
             .map((read, readIndex) => ({read, readIndex}))
             .filter((entry) => !hiddenReadIndexes.has(entry.readIndex));
     }
-    function alignmentColumnsForWindow() {
+    function globalAlignmentColumns() {
+        if (globalAlignmentColumnCache) return globalAlignmentColumnCache;
         const columns = [];
-        const visibleReads = visibleReadEntries().map((entry) => entry.read);
-        for (let i = 0; i < windowSize; i++) {
-            const coordinate = plasmidCoord(start + i);
-            columns.push({kind: "reference", coordinate: coordinate, displayOffset: i});
-            const insertionCount = Math.max(0, ...visibleReads.map((read) => insertionVariants(read, coordinate).length));
+        const reads = data.reads || [];
+        for (let displayOffset = 0; displayOffset < referenceLength; displayOffset++) {
+            const coordinate = plasmidCoord(displayOffset);
+            columns.push({kind: "reference", coordinate, displayOffset});
+            const insertionCount = Math.max(0, ...reads.map((read) => insertionVariants(read, coordinate).length));
             for (let insertionIndex = 0; insertionIndex < insertionCount; insertionIndex++) {
-                const supportingInsertions = visibleReads
-                    .map((read) => ({read: read, insertion: insertionVariants(read, coordinate)[insertionIndex]}))
+                const supportingInsertions = reads
+                    .map((read) => ({read, insertion: insertionVariants(read, coordinate)[insertionIndex]}))
                     .filter((entry) => entry.insertion);
                 const lowQuality = supportingInsertions.length > 0 && supportingInsertions.every((entry) => {
                     const baseIndex = insertionBaseIndex(entry.read, coordinate, insertionIndex);
                     return entry.insertion.low_quality || isLowQualityValue(entry.insertion.quality) || isLocalLowQualityBase(entry.read, baseIndex);
                 });
-                columns.push({kind: "insertion", coordinate: coordinate, displayOffset: i, insertionIndex: insertionIndex, lowQuality: lowQuality});
+                const displayOnly = supportingInsertions.length > 0 && supportingInsertions.every((entry) => entry.insertion.display_only);
+                columns.push({kind: "insertion", coordinate, displayOffset, insertionIndex, lowQuality, displayOnly});
             }
         }
+        globalAlignmentColumnCache = columns;
         return columns;
     }
+    function alignmentColumnsForWindow() {
+        const allColumns = globalAlignmentColumns();
+        if (!allColumns.length) return [];
+        return Array.from({length: windowSize}, (_, offset) => (
+            allColumns[(alignmentStart + offset) % allColumns.length]
+        ));
+    }
+    function alignmentStartForReference(displayCoordinate) {
+        const coordinate = plasmidCoord(displayCoordinate);
+        const index = globalAlignmentColumns().findIndex((column) => column.kind === "reference" && column.coordinate === coordinate);
+        return index >= 0 ? index : 0;
+    }
     function baseIndexHtml(columns) {
+        let firstReference = true;
         return columns.map((column) => {
-            if (column.kind !== "reference") return "<span>&nbsp;</span>";
+            if (column.kind !== "reference") {
+                return column.displayOnly
+                    ? '<span class="sanger-display-only-gap" title="Unaligned low-confidence flank">&nbsp;</span>'
+                    : "<span>&nbsp;</span>";
+            }
             const oneBased = displayBp(column.coordinate);
-            if (oneBased === 1 || oneBased % 10 === 0 || column.displayOffset === 0) {
+            if (firstReference || oneBased === 1 || oneBased % 10 === 0) {
+                firstReference = false;
                 return `<span>${oneBased}</span>`;
             }
             return "<span>&nbsp;</span>";
@@ -1510,6 +1572,7 @@
     function referenceHtml(columns) {
         return columns.map((column) => {
             if (column.kind === "insertion") {
+                if (column.displayOnly) return `<span class="sanger-display-only-gap" title="Unaligned low-confidence flank">&nbsp;</span>`;
                 if (column.lowQuality) return `<span>&nbsp;</span>`;
                 return `<span class="sanger-base-insertion-ref${column.lowQuality ? " sanger-base-low-quality" : ""}">+</span>`;
             }
@@ -1522,7 +1585,11 @@
             const referenceCoordinate = column.coordinate;
             if (column.kind === "insertion") {
                 const insertion = insertionVariants(read, referenceCoordinate)[column.insertionIndex];
-                if (column.lowQuality && !insertion) return `<span>&nbsp;</span>`;
+                if (column.lowQuality && !insertion) {
+                    return column.displayOnly
+                        ? `<span class="sanger-display-only-gap" title="Unaligned low-confidence flank">&nbsp;</span>`
+                        : "<span>&nbsp;</span>";
+                }
                 const base = insertion ? (insertion.observed || "-") : "-";
                 const selected = selectedBaseKey === `${readIndex}:${referenceCoordinate}:insertion:${column.insertionIndex}` ? " sanger-base-selected" : "";
                 if (!insertion) return `<span class="sanger-base-gap">-</span>`;
@@ -1534,7 +1601,8 @@
                 const confidenceClass = confidenceRegionsVisible() && lowRegion ? " sanger-base-low-quality" : confidenceRegionsVisible() && intermediateRegion ? " sanger-base-intermediate-quality" : "";
                 const regionTitle = lowRegion || intermediateRegion;
                     const title = `Insertion after plasmid bp ${displayBp(referenceCoordinate)}: ${base}${insertion.quality === null || insertion.quality === undefined ? "" : " Q" + insertion.quality}${lowQuality ? " | local low-quality region, not trusted" : ""}${regionTitle ? " | " + confidenceRegionTitle(regionTitle) : ""}`;
-                return `<span class="sanger-base-insertion${confidenceClass} sanger-base-clickable${selected}" data-read-index="${readIndex}" data-reference-coordinate="${referenceCoordinate}" data-variant-type="insertion" data-insertion-index="${column.insertionIndex}"${baseIndexAttr} title="${escapeHtml(title)}">${escapeHtml(base)}</span>`;
+                const displayOnlyClass = column.displayOnly ? " sanger-display-only-gap" : "";
+                return `<span class="sanger-base-insertion${displayOnlyClass}${confidenceClass} sanger-base-clickable${selected}" data-read-index="${readIndex}" data-reference-coordinate="${referenceCoordinate}" data-variant-type="insertion" data-insertion-index="${column.insertionIndex}"${baseIndexAttr} title="${escapeHtml(title)}">${escapeHtml(base)}</span>`;
             }
             const base = (read.projection || "")[referenceCoordinate] || "-";
             const ref = (data.referenceSequence || "")[referenceCoordinate] || "-";
@@ -1594,6 +1662,21 @@
     function featureTrack(columns) {
         const track = document.createElement("div");
         track.className = "sanger-feature-track";
+        let displayOnlyStart = null;
+        for (let index = 0; index <= columns.length; index++) {
+            const displayOnly = index < columns.length && columns[index].displayOnly;
+            if (displayOnly && displayOnlyStart === null) displayOnlyStart = index;
+            if ((!displayOnly || index === columns.length) && displayOnlyStart !== null) {
+                const marker = document.createElement("div");
+                marker.className = "sanger-display-only-marker";
+                marker.style.left = `${displayOnlyStart / columns.length * 100}%`;
+                marker.style.width = `${Math.max(1, (index - displayOnlyStart) / columns.length * 100)}%`;
+                marker.title = "Unaligned low-confidence flank; shown as alignment columns without a plasmid coordinate";
+                if (index - displayOnlyStart >= 8) marker.textContent = "low-Q unaligned flank";
+                track.appendChild(marker);
+                displayOnlyStart = null;
+            }
+        }
         (data.features || []).filter((feature) => featureIntersects(feature, columns)).forEach((feature) => {
             let segmentStart = null;
             for (let i = 0; i <= columns.length; i++) {
@@ -1876,10 +1959,10 @@
     function renderBases() {
         refreshWindowSize();
         const columns = alignmentColumnsForWindow();
-        updateBaseZoomStyle(columns.length);
+        updateBaseZoomStyle();
         renderHiddenReadBar();
         baseView.innerHTML = "";
-        row("Base index", baseIndexHtml(columns), "sanger-base-index sanger-base-columns");
+        row("Plasmid bp", baseIndexHtml(columns), "sanger-base-index sanger-base-columns");
         if (!toggleFeatures || toggleFeatures.checked) {
             rowNode("Features", featureTrack(columns), "sanger-feature-track");
         }
@@ -1891,23 +1974,55 @@
                 rowNode(`${read.name} trace`, traceTrack(read, columns), "sanger-trace-track");
             }
         });
-        const end = ((start + windowSize - 1) % referenceLength) + 1;
-        label.textContent = `${start + 1}..${start + windowSize}`;
+        const referenceColumns = columns.filter((column) => column.kind === "reference");
+        const firstReference = referenceColumns[0];
+        const lastReference = referenceColumns[referenceColumns.length - 1];
+        const mapStart = firstReference ? displayCoord(firstReference.coordinate) : 0;
+        const mapEnd = lastReference ? displayCoord(lastReference.coordinate) : mapStart;
+        const mapWidth = Math.max(1, circularDistance(mapStart, mapEnd) + 1);
+        if (firstReference && lastReference) {
+            label.textContent = `bp ${displayBp(firstReference.coordinate)} → ${displayBp(lastReference.coordinate)} · circular · cols ${alignmentStart + 1}..${alignmentStart + columns.length} / ${globalAlignmentColumns().length}`;
+        } else {
+            label.textContent = `cols ${alignmentStart + 1}..${alignmentStart + columns.length}`;
+        }
         slider.max = String(maxStart());
-        slider.value = String(clampStart(start));
-        windowMarker.style.left = `${pct(start)}%`;
-        windowMarker.style.width = `${Math.max(1, pct(windowSize))}%`;
+        slider.value = String(clampStart(alignmentStart));
+        if (mapWidth >= referenceLength) {
+            windowMarker.style.left = "0%";
+            windowMarker.style.width = "100%";
+            if (wrappedWindowMarker) {
+                wrappedWindowMarker.style.display = "none";
+                wrappedWindowMarker.style.width = "0%";
+            }
+        } else {
+            const visibleBeforeOrigin = Math.min(mapWidth, referenceLength - mapStart);
+            windowMarker.style.left = `${pct(mapStart)}%`;
+            windowMarker.style.width = `${Math.max(1, pct(visibleBeforeOrigin))}%`;
+            if (wrappedWindowMarker) {
+                const visibleAfterOrigin = mapWidth - visibleBeforeOrigin;
+                if (visibleAfterOrigin > 0) {
+                    wrappedWindowMarker.style.display = "block";
+                    wrappedWindowMarker.style.left = "0%";
+                    wrappedWindowMarker.style.width = `${pct(visibleAfterOrigin)}%`;
+                } else {
+                    wrappedWindowMarker.style.display = "none";
+                    wrappedWindowMarker.style.width = "0%";
+                }
+            }
+        }
     }
     function setStart(nextStart) {
-        start = clampStart(nextStart);
+        alignmentStart = clampStart(nextStart);
         renderBases();
     }
     function setStartBounded(nextStart) {
-        start = clampStart(nextStart);
+        alignmentStart = clampStart(nextStart);
         renderBases();
     }
     function displayCoordinateIsVisible(displayCoordinate) {
-        return displayCoordinate !== null && circularDistance(start, displayCoordinate) < windowSize;
+        return displayCoordinate !== null && alignmentColumnsForWindow().some((column) => (
+            column.kind === "reference" && displayCoord(column.coordinate) === displayCoordinate
+        ));
     }
     function positionFromEvent(event) {
         const rect = map.getBoundingClientRect();
@@ -1919,10 +2034,10 @@
     map.addEventListener("pointerdown", function (event) {
         dragging = true;
         map.setPointerCapture(event.pointerId);
-        setStart(positionFromEvent(event));
+        setStart(alignmentStartForReference(positionFromEvent(event)));
     });
     map.addEventListener("pointermove", function (event) {
-        if (dragging) setStart(positionFromEvent(event));
+        if (dragging) setStart(alignmentStartForReference(positionFromEvent(event)));
     });
     map.addEventListener("pointerup", function () {
         dragging = false;
@@ -1932,20 +2047,20 @@
         const delta = event.deltaY || event.deltaX;
         if (!delta) return;
         const step = Math.max(1, Math.round(windowSize * 0.2));
-        setStartBounded(start + (delta > 0 ? step : -step));
+        setStartBounded(alignmentStart + (delta > 0 ? step : -step));
     }, { passive: false });
     baseView.addEventListener("wheel", function (event) {
         event.preventDefault();
         const delta = event.deltaY || event.deltaX;
         if (!delta) return;
         const step = Math.max(1, Math.round(windowSize * 0.2));
-        setStartBounded(start + (delta > 0 ? step : -step));
+        setStartBounded(alignmentStart + (delta > 0 ? step : -step));
     }, { passive: false });
     slider.addEventListener("input", function () {
         setStart(Number(slider.value));
     });
-    if (stepLeft) stepLeft.addEventListener("click", function () { setStartBounded(start - 1); });
-    if (stepRight) stepRight.addEventListener("click", function () { setStartBounded(start + 1); });
+    if (stepLeft) stepLeft.addEventListener("click", function () { setStartBounded(alignmentStart - 1); });
+    if (stepRight) stepRight.addEventListener("click", function () { setStartBounded(alignmentStart + 1); });
     window.addEventListener("resize", renderBases);
     function renderHiddenReadBar() {
         if (!hiddenReadBar) return;
@@ -2020,10 +2135,12 @@
         if (control) control.addEventListener("change", renderBases);
     });
     if (zoomSlider) zoomSlider.addEventListener("input", function () {
-        const center = displayCoordinateIsVisible(selectedDisplayCoordinate) ? selectedDisplayCoordinate : (start + windowSize / 2) % referenceLength;
+        const selectedColumn = displayCoordinateIsVisible(selectedDisplayCoordinate)
+            ? alignmentStartForReference(selectedDisplayCoordinate)
+            : alignmentStart + windowSize / 2;
         const requestedWindow = maximumWindowSize - Number(zoomSlider.value);
         manualWindowSize = Math.max(minimumWindowSize, Math.min(maximumWindowSize, requestedWindow));
-        setStartBounded(center - manualWindowSize / 2);
+        setStartBounded(selectedColumn - manualWindowSize / 2);
     });
     if (fastaIndividualSelect && fastaViewMode === "individual") {
         data.reads.forEach((read, index) => {
@@ -2039,10 +2156,7 @@
             });
             selectedBaseKey = "";
             selectedDisplayCoordinate = null;
-            const activeRead = data.reads[readIndex];
-            if (activeRead && Number.isFinite(Number(activeRead.start))) {
-                setStartBounded(displayCoord(Number(activeRead.start)));
-            }
+            setStartBounded(0);
             drawMap();
             renderBases();
         }
