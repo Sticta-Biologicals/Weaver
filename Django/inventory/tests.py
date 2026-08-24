@@ -2335,16 +2335,47 @@ class GenBankImportTests(TestCase):
                 )
                 import_plasmids_from_genbank_dir(tempdir, self.project)
 
+        imported = Plasmid.objects.get(name="pYTK067_api", project=self.project)
+        imported.created_on = datetime.date(2026, 8, 20)
+        imported.save(update_fields=["created_on"])
+        newest = Plasmid.objects.create(
+            name="newest-plasmid",
+            intended_use="",
+            project=self.project,
+            created_on=datetime.date(2026, 8, 21),
+        )
+
         response = self.client.get(reverse("api-plasmids"))
 
         self.assertEqual(response.status_code, 200)
         payload = response.json()
-        self.assertEqual(payload["plasmids"][0]["pk"], "ytk_5")
-        self.assertEqual(payload["plasmids"][0]["pnm"], "YTK Part 5")
+        self.assertEqual(payload["page"], 1)
+        self.assertEqual(payload["page_size"], 50)
+        self.assertEqual(payload["plasmids"][0]["i"], str(newest.id))
+        self.assertEqual(payload["plasmids"][1]["pk"], "ytk_5")
+        self.assertEqual(payload["plasmids"][1]["pnm"], "YTK Part 5")
         self.assertIn(
             ["part", "Part", [["P5", "ap-ytk-5", "info"]]],
             payload["table_filters"],
         )
+
+        response = self.client.get(reverse("api-plasmids"), {
+            "recent_ids": f"{imported.id},{newest.id}",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["page_size"], 50)
+        self.assertEqual(response.json()["main_page_size"], 48)
+        self.assertEqual(
+            [row["i"] for row in response.json()["recently_viewed"]],
+            [str(imported.id), str(newest.id)],
+        )
+
+        response = self.client.get(reverse("api-plasmids"), {
+            "q": "pYTK067_api",
+            "search": "name",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()["plasmids"]), 1)
 
     def test_plasmid_import_view_can_create_destination_project(self):
         user = User.objects.create_user(username="new-project-user", password="pw")

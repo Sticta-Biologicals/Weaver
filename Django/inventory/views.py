@@ -999,29 +999,24 @@ def plasmids(request, render_html=None):
         plasmids = Plasmid.objects.filter(project_id__in=get_projects_where_member_can_any(request.user))
     else:
         plasmids = Plasmid.objects.filter(project_id=get_current_project_id(request))
-    level_from_table_filters = 0
-    level_to_table_filters = 0
+    levels = list(plasmids.values_list('level', flat=True))
+    level_from_table_filters = min((level for level in levels if level is not None), default=0)
+    level_to_table_filters = max((level for level in levels if level is not None), default=0)
     part_filters = set()
-    hasPlasmids = False
-    for plasmid in plasmids:
-        hasPlasmids = True
-        plasmid.refc = plasmid.recommended_enzyme_for_create()
-        part_key, part_name = get_detected_part_info(plasmid)
+    for metadata in plasmids.values_list('assembly_metadata', flat=True):
+        detected = (metadata or {}).get('detected', {})
+        part_key = detected.get('part_type_key') or ''
+        part_name = detected.get('part_name') or part_key.upper()
         if part_key:
             part_filters.add((
                 part_filter_label(part_key, part_name),
                 part_filter_slug(part_key),
                 part_filter_sort_key(part_key, part_name),
             ))
-        if plasmid.level:
-            if plasmid.level > level_to_table_filters:
-                level_to_table_filters = plasmid.level
-            if plasmid.level < level_from_table_filters:
-                level_from_table_filters = plasmid.level
     context = {
         'on_current_project_member_can_write_or_admin': on_current_project_member_can_write_or_admin(request),
         'table_filters': get_table_filters(level_from_table_filters, level_to_table_filters, part_filters=part_filters),
-        'has_plasmids': hasPlasmids,
+        'has_plasmids': plasmids.exists(),
         'RESTRICTION_ENZYMES': RestrictionEnzyme.objects.all,
         'show_from_all_projects': show_from_all_projects
     }
@@ -4287,24 +4282,77 @@ def api_plasmid_get_fasta_by_name(request, name):
 
 @require_member_can_any_current_project
 def api_plasmids(request):
-    output = []
-    level_from_table_filters = 0
-    level_to_table_filters = 0
-    part_filters = set()
+    try:
+        page_size = min(max(int(request.GET.get('page_size', 50)), 1), 100)
+    except (TypeError, ValueError):
+        page_size = 50
+    try:
+        page_number = max(int(request.GET.get('page', 1)), 1)
+    except (TypeError, ValueError):
+        page_number = 1
+    search = request.GET.get('q', '').strip()
+    search_field = request.GET.get('search', 'all')
+    recent_ids = [
+        value.strip()
+        for value in request.GET.get('recent_ids', '').split(',')
+        if value.strip() and looks_like_uuid(value.strip())
+    ][:min(20, max(page_size - 1, 0))]
     if get_show_from_all_projects(request):
-        plasmids = Plasmid.objects.filter(project_id__in=get_projects_where_member_can_any(request.user)).order_by(
-            'name')
+        visible_projects = get_projects_where_member_can_any(request.user)
+        visible_plasmids = Plasmid.objects.filter(project_id__in=visible_projects)
     else:
-        plasmids = Plasmid.objects.filter(project_id=get_current_project_id(request)).order_by('name')
-    for plasmid in plasmids:
-        part_key, part_name = get_detected_part_info(plasmid)
+        visible_plasmids = Plasmid.objects.filter(project_id=get_current_project_id(request))
+
+    recently_viewed = []
+    if recent_ids:
+        recently_viewed_by_id = {
+            str(plasmid.id): plasmid
+            for plasmid in visible_plasmids.filter(id__in=recent_ids).select_related('project', 'type').prefetch_related('selectable_markers')
+        }
+        recently_viewed = [recently_viewed_by_id[plasmid_id] for plasmid_id in recent_ids if plasmid_id in recently_viewed_by_id]
+
+    plasmids = visible_plasmids.order_by('-created_on', '-idx', 'name')
+    if search:
+        if search_field == 'idx' and search.isdigit():
+            plasmids = plasmids.filter(idx=int(search))
+        elif search_field == 'name':
+            plasmids = plasmids.filter(name__icontains=search)
+        else:
+            query = Q(name__icontains=search)
+            if search.isdigit():
+                query |= Q(idx=int(search))
+            plasmids = plasmids.filter(query)
+
+    filter_rows = list(plasmids.values_list('level', 'assembly_metadata'))
+    level_values = [level for level, _ in filter_rows if level is not None]
+    level_from_table_filters = min(level_values, default=0)
+    level_to_table_filters = max(level_values, default=0)
+    part_filters = set()
+    for _, metadata in filter_rows:
+        detected = (metadata or {}).get('detected', {})
+        part_key = detected.get('part_type_key') or ''
+        part_name = detected.get('part_name') or part_key.upper()
         if part_key:
             part_filters.add((
                 part_filter_label(part_key, part_name),
                 part_filter_slug(part_key),
                 part_filter_sort_key(part_key, part_name),
             ))
-        output.append({
+
+    main_page_size = max(page_size - len(recently_viewed), 1)
+    total = plasmids.count()
+    start = (page_number - 1) * main_page_size
+    plasmids = list(plasmids.select_related('project', 'type').prefetch_related('selectable_markers')[start:start + main_page_size])
+    plasmids_to_serialize = plasmids + [plasmid for plasmid in recently_viewed if plasmid not in plasmids]
+    writable_project_ids = set(Membership.objects.filter(
+        member=request.user,
+        project_id__in={plasmid.project_id for plasmid in plasmids_to_serialize},
+        access_policies__in=['a', 'w'],
+    ).values_list('project_id', flat=True))
+
+    def serialize_plasmid(plasmid):
+        part_key, part_name = get_detected_part_info(plasmid)
+        return {
             'cn': plasmid.__str__(),
             'n': plasmid.name,
             'l': plasmid.level,
@@ -4319,20 +4367,27 @@ def api_plasmids(request):
             'cs': plasmid.get_check_state(),
             'r': plasmid.recommended_enzyme_for_create(),
             'sm': " + ".join(list(plasmid.selectable_markers.all().values_list('three_letter_code', flat=True))),
-            'p': member_can_write_or_admin_plasmid(plasmid, request.user),
+            'p': plasmid.project_id in writable_project_ids,
             'wc': plasmid.working_colony_text(),
             'lc': plasmid.ligation_concentration(),
             'd': plasmid.description,
-            'iu': plasmid.intended_use
-        })
-        if plasmid.level:
-            if plasmid.level > level_to_table_filters:
-                level_to_table_filters = plasmid.level
-            if plasmid.level < level_from_table_filters:
-                level_from_table_filters = plasmid.level
+            'iu': plasmid.intended_use,
+            'co': plasmid.created_on.isoformat() if plasmid.created_on else '',
+        }
+
+    output = [serialize_plasmid(plasmid) for plasmid in plasmids]
+    recently_viewed_output = [serialize_plasmid(plasmid) for plasmid in recently_viewed]
     context = {
         'table_filters': get_table_filters(level_from_table_filters, level_to_table_filters, part_filters=part_filters),
         'plasmids': output,
+        'recently_viewed': recently_viewed_output,
+        'total': total,
+        'page': page_number,
+        'page_size': page_size,
+        'main_page_size': main_page_size,
+        'num_pages': (total + main_page_size - 1) // main_page_size,
+        'search': search,
+        'search_field': search_field,
         'csrf_token': django.middleware.csrf.get_token(request),
         'RESTRICTION_ENZYMES': list(RestrictionEnzyme.objects.values()),
     }

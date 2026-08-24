@@ -36,6 +36,9 @@ function do_filter(value){
 }
 
 $(document).ready(function(){
+    if ($('#plasmids-list[data-server-search="true"]').length) {
+        return;
+    }
     $('.table_search-target').click(function(){
         $('.table_search-target').removeClass('active');
         $(this).addClass('active');

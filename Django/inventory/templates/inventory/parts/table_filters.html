@@ -1,8 +1,3 @@
-<div class="d-flex justify-content-end mb-2">
-    <button id="pe-table-filter-clear" class="btn btn-outline-secondary btn-sm" type="button">
-        <i class="bi bi-x-circle"></i> Clear filters
-    </button>
-</div>
 <div class="pe-table-filter-buttons">
     {% for table_filter in table_filters %}
         <div class="pe-table-filter-buttons-group">
@@ -20,4 +15,7 @@
             </div>
         </div>
     {% endfor %}
+    <button id="pe-table-filter-clear" class="btn btn-outline-secondary btn-sm align-self-end ms-2" type="button">
+        <i class="bi bi-x-circle"></i> Clear filters
+    </button>
 </div>

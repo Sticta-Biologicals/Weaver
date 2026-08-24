@@ -22,6 +22,13 @@ Only a member can read a project. Plasmid, primer, and glycerol-stock writes req
 
 Open `Inventory > Plasmids` at `/inventory/plasmids/`. The list can be scoped to the current project or to all projects visible to the signed-in user. Each record includes a name, numeric index when assigned, selectable markers, intended use, description, project, creation date, assembly type and level, sequence file, QR identifier, construction state, and validation fields.
 
+The plasmid list is ordered with the most recent `created_on` date first and is
+loaded with server-side pagination and search. Each response is limited to a
+combined budget of 50 displayed rows: up to 20 recently viewed plasmids are
+shown above the main list, and the remaining slots are filled by the main
+list. Opening a plasmid records it in the browser's recent history; entries
+remain subject to the selected project scope.
+
 To create a record, use `Plasmids > Create > Form` or `/inventory/plasmid/create/`. Enter the name and intended use, then add any selectable markers, sequence file, backbone, inserts, type, assembly level, description, destination project, ligation state, and creation date offered by the form. Save only after confirming that the destination project is one where you have write or admin access. The resulting detail page links to the sequence viewer, downloads, PCR, digest, and FASTA or Sanger alignment tools when a sequence is present.
 
 The list also exposes `Plasmids > Validation`, public plasmid views for records marked public, QR lookup, label rendering, and record editing or deletion subject to project permissions. A record without a readable sequence cannot be used for PCR, digest, or sequence alignment; the relevant page reports that the sequence could not be read.
