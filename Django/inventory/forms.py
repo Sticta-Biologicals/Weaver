@@ -234,8 +234,7 @@ class PlasmidValidationForm(forms.ModelForm):
         fields = ['ligation_state', 'working_colony',
                   'colonypcr_state', 'colonypcr_date', 'colonypcr_observations',
                   'digestion_state', 'digestion_date', 'digestion_observations',
-                  'sequencing_state', 'sequencing_date', 'sequencing_observations',
-                  'sequencing_clustal_file']
+                  'sequencing_state', 'sequencing_date', 'sequencing_observations']
         widgets = {
             'colonypcr_date': DateInput(),
             'digestion_date': DateInput(),

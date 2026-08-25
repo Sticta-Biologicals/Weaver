@@ -1,0 +1,202 @@
+{% extends "inventory/parts/base.html" %}
+
+{% block header_object_type %}Services{% endblock %}
+{% block header_object_name %}Sanger sequencing{% endblock %}
+
+{% block content %}
+<style>
+    .sanger-services-page {
+        padding: 1rem 0 2rem;
+    }
+    .sanger-services-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+    }
+    .sanger-services-header h2 {
+        margin: 0;
+    }
+    .sanger-services-page .table_search {
+        margin-bottom: 1.25rem;
+    }
+    .sanger-services-table {
+        vertical-align: middle;
+    }
+    .sanger-services-table .sanger-plasmid-name {
+        display: inline-flex;
+        align-items: stretch;
+        max-width: 100%;
+        text-decoration: none;
+        vertical-align: middle;
+    }
+    .sanger-services-table .sanger-plasmid-name-label,
+    .sanger-services-table .sanger-plasmid-id {
+        display: inline-flex;
+        align-items: center;
+        min-height: 1.95rem;
+    }
+    .sanger-services-table .sanger-plasmid-name-label {
+        min-width: 0;
+        max-width: 220px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .sanger-services-table .sanger-plasmid-id {
+        flex: 0 0 auto;
+        font-size: .72rem;
+    }
+    .sanger-services-table .sanger-files {
+        min-width: 0;
+        white-space: nowrap;
+    }
+    .sanger-services-table .sanger-read-file-grid {
+        display: inline-flex;
+        align-items: stretch;
+        max-width: 100%;
+    }
+    .sanger-services-table .sanger-read-entry {
+        display: inline-flex;
+        min-width: 0;
+        max-width: 100%;
+    }
+    .sanger-services-table .sanger-read-entry + .sanger-read-entry {
+        margin-left: .35rem;
+    }
+    .sanger-services-table .sanger-read-direction,
+    .sanger-services-table .sanger-read-file {
+        display: inline-flex;
+        align-items: center;
+        min-height: 1.95rem;
+        flex: 0 0 auto;
+        font-size: .72rem;
+        font-weight: 700;
+    }
+    .sanger-services-table .sanger-read-direction {
+        min-width: 3.1rem;
+    }
+    .sanger-services-table .sanger-read-file {
+        min-width: 0;
+        gap: .25rem;
+    }
+    .sanger-services-table .sanger-read-file:hover {
+        color: #fff;
+        filter: brightness(1.12);
+    }
+    .sanger-services-table .badge {
+        font-weight: 500;
+    }
+</style>
+
+<div class="sanger-services-page">
+    <div class="sanger-services-header">
+        <div>
+            <div class="text-secondary small text-uppercase">Services</div>
+            <h2>Sanger sequencing runs</h2>
+            <p class="text-secondary mb-0">Review sequencing evidence associated with the plasmids in your accessible projects.</p>
+        </div>
+        <span class="text-secondary small">{{ sanger_runs|length }} run{{ sanger_runs|length|pluralize }}</span>
+    </div>
+
+    {% if sanger_runs %}
+    {% include "inventory/parts/table_search.html" with object_type="Sanger files" %}
+    <div class="table-responsive">
+        <table class="table table-sm table-striped table-hover table-search-target sanger-services-table">
+            <thead>
+                <tr>
+                    <th scope="col">Plasmid</th>
+                    <th scope="col">Project</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">User</th>
+                    <th scope="col">Sequencing files</th>
+                    <th scope="col">Automatic result</th>
+                    <th scope="col">Approval</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for run in sanger_runs %}
+                <tr class="sanger-services-row">
+                    <td>
+                        <a class="btn-group table-search-search_on me-1 sanger-plasmid-name" href="{% url 'plasmid' plasmid_id=run.plasmid.id %}" title="{{ run.plasmid.name }}" role="button" data-search-all="{{ run.plasmid.name }} {{ run.plasmid.idx }} {{ run.plasmid.project.name }} {{ run.created_by }} {{ run.label }} {{ run.automated_state }} {{ run.manual_decision }}" data-search-idx="{{ run.plasmid.idx }}" data-search-name="{{ run.plasmid.name }}">
+                            <span class="btn btn-success plasmid_list-name sanger-plasmid-name-label">{{ run.plasmid.name|truncatechars:26 }}</span><span class="btn btn-success opacity-75 plasmid_list-id sanger-plasmid-id fw-bold">{{ run.plasmid.idx }}</span>
+                        </a>
+                        {% if run.label %}<div class="text-secondary small">{{ run.label }}</div>{% endif %}
+                    </td>
+                    <td>{{ run.plasmid.project.name }}</td>
+                    <td>
+                        {{ run.created_at|date:"d M Y H:i" }}
+                    </td>
+                    <td>
+                        {% if run.created_by %}{{ run.created_by }}{% else %}<span class="text-secondary">—</span>{% endif %}
+                    </td>
+                    <td class="sanger-files">
+                        <div class="sanger-read-file-grid">
+                            {% for read in run.reads.all %}
+                            <div class="sanger-read-entry btn-group" role="group">
+                                {% if read.is_usable and read.detected_orientation == "forward" %}
+                                <span class="btn btn-success sanger-read-direction" title="Forward read">FWD</span>
+                                {% elif read.is_usable and read.detected_orientation == "reverse" %}
+                                <span class="btn btn-success sanger-read-direction" title="Reverse read">REV</span>
+                                {% else %}
+                                <span class="btn btn-secondary sanger-read-direction" title="Read without a reliable orientation">UNK</span>
+                                {% endif %}
+                                {% for uploaded_file in read.files.all %}
+                                    {% if uploaded_file.file %}
+                                    <a class="btn {% if read.is_usable and read.detected_orientation == 'forward' or read.is_usable and read.detected_orientation == 'reverse' %}btn-success{% else %}btn-secondary{% endif %} opacity-75 sanger-read-file" href="{% url 'sanger_read_file_download' plasmid_id=run.plasmid.id run_id=run.id read_id=read.id file_id=uploaded_file.id %}" download="{{ uploaded_file.original_name }}" data-sanger-file-name="{{ uploaded_file.original_name }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Download original file: {{ uploaded_file.original_name }}" aria-label="Download original file: {{ uploaded_file.original_name }}">
+                                        {{ uploaded_file.format|upper }} <i class="bi bi-download" aria-hidden="true"></i>
+                                    </a>
+                                    {% else %}
+                                    <span class="btn {% if read.is_usable and read.detected_orientation == 'forward' or read.is_usable and read.detected_orientation == 'reverse' %}btn-success{% else %}btn-secondary{% endif %} opacity-75 sanger-read-file" data-sanger-file-name="{{ uploaded_file.original_name }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Source unavailable: {{ uploaded_file.original_name }}">
+                                        {{ uploaded_file.format|upper }}
+                                    </span>
+                                    {% endif %}
+                                {% empty %}
+                                <span class="btn btn-outline-secondary sanger-read-file" title="Source unavailable">—</span>
+                                {% endfor %}
+                            </div>
+                            {% empty %}
+                            <span class="text-secondary small">No files recorded</span>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td>
+                        {% if run.automated_state == "PASS" %}
+                        <span class="badge text-bg-success">Pass</span>
+                        {% elif run.automated_state == "REVIEW" %}
+                        <span class="badge text-bg-warning">Review</span>
+                        {% elif run.automated_state == "FAIL" %}
+                        <span class="badge text-bg-danger">Fail</span>
+                        {% else %}
+                        <span class="badge text-bg-secondary">No usable data</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if run.manual_decision == "VERIFIED" %}
+                        <span class="badge text-bg-success">Approved</span>
+                        {% elif run.manual_decision == "REJECTED" %}
+                        <span class="badge text-bg-danger">Not approved</span>
+                        {% elif run.manual_decision == "INCONCLUSIVE" %}
+                        <span class="badge text-bg-warning">Inconclusive</span>
+                        {% else %}
+                        <span class="badge text-bg-secondary">Pending</span>
+                        {% endif %}
+                        {% if run.manual_decision_by %}<div class="text-secondary small mt-1">Authorized by {{ run.manual_decision_by }}</div>{% endif %}
+                    </td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-primary text-nowrap" href="{% url 'sanger_run_detail' plasmid_id=run.plasmid.id run_id=run.id %}">
+                            <i class="bi bi-eye me-1"></i>Review
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-secondary">No Sanger sequencing runs are available in your accessible projects.</div>
+    {% endif %}
+</div>
+{% endblock %}

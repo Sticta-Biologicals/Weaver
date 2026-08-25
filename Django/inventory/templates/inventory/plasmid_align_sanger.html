@@ -652,7 +652,17 @@
 <div class="alert alert-success">{{ save_clustal_done }}</div>
 {% endif %}
 
+{% if upload_done %}
+<div class="alert alert-success">{{ upload_done }}</div>
+{% endif %}
+
 {% if show_upload_form %}
+{% if alignment_source_type != "FASTA" %}
+<div class="sanger-panel mb-4">
+    <h4 class="mb-1">Upload sequencing files</h4>
+    <div class="text-muted">Select one or more Sanger trace files. Multiple <code>.ab1</code> files are supported in the same batch.</div>
+</div>
+{% endif %}
 {% if alignment_source_type == "FASTA" %}
 <form method="POST" enctype="multipart/form-data" id="fasta-upload-form">
     {% csrf_token %}
@@ -732,8 +742,8 @@
 <form method="POST" enctype="multipart/form-data" id="sanger-upload-form">
     {% csrf_token %}
     <div class="sanger-drop-zone mb-3" id="sanger-drop-zone">
-        <div class="h5 mb-1">Drop alignment files here</div>
-        <div class="text-muted">Accepted formats: FASTA (.fa/.fas/.fasta) or Sanger (.ab1/.phd.1/.seq). Sanger files with the same base name are grouped as one read.</div>
+        <div class="h5 mb-1">Drop sequencing files here</div>
+        <div class="text-muted">Accepted formats: Sanger (.ab1/.phd.1/.seq) or FASTA (.fa/.fas/.fasta). Select multiple <code>.ab1</code> files together; files with the same base name are grouped as one read.</div>
         <div class="mt-3">
             {{ upload_form.sanger_files }}
         </div>
@@ -769,11 +779,24 @@
 <h4 class="mt-5">Saved Sanger runs</h4>
 <div class="table-responsive">
     <table class="table table-sm align-middle">
-        <thead><tr><th>Date</th><th>Reads</th><th>Coverage</th><th>User decision</th><th></th></tr></thead>
+        <thead><tr><th>Date</th><th>Uploaded files</th><th>Reads</th><th>Coverage</th><th>User decision</th><th></th></tr></thead>
         <tbody>
         {% for previous_run in recent_runs %}
         <tr>
             <td>{{ previous_run.created_at|date:"d M Y H:i" }}</td>
+            <td>
+                {% for previous_read in previous_run.reads.all %}
+                    <div class="small mb-1">
+                        {% for uploaded_file in previous_read.files.all %}
+                            <span class="font-monospace">{{ uploaded_file.original_name }}</span>{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            <span class="text-muted">{{ previous_read.name }} (source unavailable)</span>
+                        {% endfor %}
+                    </div>
+                {% empty %}
+                    <span class="text-muted">No files recorded</span>
+                {% endfor %}
+            </td>
             <td>{{ previous_run.combined_metrics.useful_reads }}/{{ previous_run.combined_metrics.read_count }}</td>
             <td>{{ previous_run.combined_metrics.combined_coverage }}%</td>
             <td>{{ previous_run.get_manual_decision_display }}</td>
@@ -900,6 +923,25 @@
     <div class="sanger-metric"><div class="text-muted">Useful reads</div><strong>{{ sanger_result.combined.useful_reads }} / {{ sanger_result.combined.read_count }}</strong></div>
     <div class="sanger-metric"><div class="text-muted">High-confidence variants</div><strong>{{ sanger_result.combined.high_quality_variant_count }}</strong>{% if sanger_result.combined.high_quality_variant_density != None %}<div class="text-muted">{{ sanger_result.combined.high_quality_variant_density }}% of aligned bases</div>{% endif %}</div>
 </div>
+{% endif %}
+
+{% if alignment_source_type != "FASTA" %}
+{% for read in sanger_result.reads %}
+{% if not read.is_usable or not read.alignment %}
+<div class="alert alert-warning sanger-review-suggestion">
+    <div class="fw-semibold">{{ read.name }} did not produce a reliable alignment.</div>
+    <div class="small mb-2">Review the raw trace and compare its sequence with the plasmid using the independent tools below.</div>
+    <div class="d-flex flex-wrap gap-2">
+        {% if run and read.id and read.chromatogram.aTrace %}
+        <a class="btn btn-outline-warning btn-sm" href="{% url 'sanger_read_chromatogram' plasmid_id=plasmid.id run_id=run.id read_id=read.id %}" target="_blank" rel="noopener">Open chromatogram window</a>
+        {% endif %}
+        {% if read.raw_sequence %}
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'services-blast' %}?sequence={{ read.raw_sequence|urlencode }}&name={{ read.name|urlencode }}">Local BLAST</a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endfor %}
 {% endif %}
 
 {% if alignment_source_type == "FASTA" and show_results and fasta_clustal_content %}
@@ -1093,6 +1135,11 @@
                     {% if run and read.id and read.chromatogram.aTrace %}
                     <a class="btn btn-outline-primary btn-sm me-2" href="{% url 'sanger_read_chromatogram' plasmid_id=plasmid.id run_id=run.id read_id=read.id %}" target="_blank" rel="noopener">Chromatogram</a>
                     {% endif %}
+                    {% for warning in read.warnings %}
+                        {% if warning == "trimmed sequence shorter than minimum" or warning == "The usable sequence is too short for reliable alignment." %}
+                        <button type="button" class="btn btn-link text-warning p-0 sanger-warning-icon" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="The usable sequence is too short for reliable alignment." aria-label="The usable sequence is too short for reliable alignment."><i class="bi bi-exclamation-triangle-fill"></i></button>
+                        {% endif %}
+                    {% endfor %}
                     {% if read.is_usable %}
                     <span class="badge bg-success">usable</span>
                     {% else %}
@@ -1100,15 +1147,22 @@
                     {% endif %}
                 </td>
             </tr>
-            {% if read.warnings or read.errors %}
+            {% for warning in read.warnings %}
+            {% if warning != "trimmed sequence shorter than minimum" and warning != "The usable sequence is too short for reliable alignment." %}
             <tr>
                 <td></td>
                 <td colspan="9">
-                    {% for warning in read.warnings %}<div class="text-warning">{{ warning }}</div>{% endfor %}
-                    {% for error in read.errors %}<div class="text-danger">{{ error }}</div>{% endfor %}
+                    <div class="text-warning">{{ warning }}</div>
                 </td>
             </tr>
             {% endif %}
+            {% endfor %}
+            {% for error in read.errors %}
+            <tr>
+                <td></td>
+                <td colspan="9"><div class="text-danger">{{ error }}</div></td>
+            </tr>
+            {% endfor %}
             {% endfor %}
         </tbody>
     </table>
@@ -1877,20 +1931,47 @@
             }
         });
         shadeConfidenceColumns();
-        function drawTraceSegments(segments, alpha, lineWidth) {
+        function drawTraceSegments(segments, alpha, lineWidth, fillAlpha) {
             ctx.save();
-            ctx.globalAlpha = alpha;
             traces.forEach(([key, color]) => {
                 const trace = chrom[key] || [];
-                ctx.strokeStyle = color;
-                ctx.lineWidth = lineWidth;
                 segments.forEach((segment) => {
+                    const baseline = height - 12;
                     ctx.beginPath();
                     let started = false;
+                    let firstX = null;
+                    let lastX = null;
                     for (let i = segment.startTrace; i <= segment.endTrace && i < trace.length; i++) {
                         const x = xForTracePosition(i, segment.left, segment.right);
                         if (x < -4 || x > width + 4) continue;
-                        const y = height - 12 - (trace[i] / maxSignal * (height - 28));
+                        const y = baseline - (trace[i] / maxSignal * (height - 28));
+                        if (!started) {
+                            ctx.moveTo(x, baseline);
+                            ctx.lineTo(x, y);
+                            firstX = x;
+                            started = true;
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                        lastX = x;
+                    }
+                    if (!started) return;
+                    ctx.lineTo(lastX, baseline);
+                    ctx.lineTo(firstX, baseline);
+                    ctx.closePath();
+                    ctx.fillStyle = color;
+                    ctx.globalAlpha = fillAlpha;
+                    ctx.fill();
+
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = lineWidth;
+                    ctx.globalAlpha = alpha;
+                    ctx.beginPath();
+                    started = false;
+                    for (let i = segment.startTrace; i <= segment.endTrace && i < trace.length; i++) {
+                        const x = xForTracePosition(i, segment.left, segment.right);
+                        if (x < -4 || x > width + 4) continue;
+                        const y = baseline - (trace[i] / maxSignal * (height - 28));
                         if (!started) {
                             ctx.moveTo(x, y);
                             started = true;
@@ -1898,14 +1979,16 @@
                             ctx.lineTo(x, y);
                         }
                     }
-                    ctx.stroke();
+                    if (started) {
+                        ctx.stroke();
+                    }
                 });
             });
             ctx.restore();
         }
-        drawTraceSegments(lowQualityTraceSegments, 0.32, 0.9);
-        drawTraceSegments(insertionTraceSegments, 0.82, 1.1);
-        drawTraceSegments(trustedTraceSegments, 1, 1.2);
+        drawTraceSegments(lowQualityTraceSegments, 0.32, 0.9, 0.06);
+        drawTraceSegments(insertionTraceSegments, 0.82, 1.1, 0.10);
+        drawTraceSegments(trustedTraceSegments, 1, 1.2, 0.12);
         const basePos = chrom.basePos || [];
         const baseCalls = chrom.baseCalls || [];
         const qualNums = chrom.qualNums || [];
@@ -2170,6 +2253,42 @@
     renderBases();
 })();
 </script>
+
+{% if is_saved_run_view %}
+<script>
+(function () {
+    const plasmidHeader = document.getElementById("header-container");
+    if (!plasmidHeader) return;
+    if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
+    let scrollAnimationFrame = null;
+    function scrollToPlasmidHeader() {
+        const targetTop = plasmidHeader.getBoundingClientRect().top + window.scrollY;
+        const startTop = window.scrollY;
+        const distance = Math.max(0, targetTop) - startTop;
+        if (Math.abs(distance) < 1) return;
+        if (scrollAnimationFrame) window.cancelAnimationFrame(scrollAnimationFrame);
+        const startTime = performance.now();
+        const duration = 500;
+        function animateScroll(now) {
+            const progress = Math.min(1, (now - startTime) / duration);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            window.scrollTo(0, startTop + distance * eased);
+            if (progress < 1) scrollAnimationFrame = window.requestAnimationFrame(animateScroll);
+            else scrollAnimationFrame = null;
+        }
+        scrollAnimationFrame = window.requestAnimationFrame(animateScroll);
+    }
+    function settleScroll() {
+        window.requestAnimationFrame(function () {
+            window.requestAnimationFrame(scrollToPlasmidHeader);
+        });
+    }
+    if (document.readyState === "complete") settleScroll();
+    else window.addEventListener("load", settleScroll, {once: true});
+    window.setTimeout(scrollToPlasmidHeader, 180);
+})();
+</script>
+{% endif %}
 
 <script>
 (function () {

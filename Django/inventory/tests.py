@@ -3,6 +3,7 @@ import tempfile
 from io import StringIO
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 from uuid import uuid4
 
 from Bio import SeqIO
@@ -13,10 +14,12 @@ from django.test import SimpleTestCase
 from django.test import TestCase
 from django.test import override_settings
 from django.urls import reverse
+from django.utils.datastructures import MultiValueDict
 from Bio.Seq import Seq
 from Bio.SeqFeature import FeatureLocation
 from Bio.SeqFeature import SeqFeature
 from Bio.SeqRecord import SeqRecord
+from django.core.files.base import ContentFile
 
 from inventory.custom.genbank_import import import_plasmids_from_genbank_dir
 from inventory.custom.genbank_import import import_plasmids_from_uploaded_genbanks
@@ -64,6 +67,9 @@ from inventory.custom.sanger import normalized_group_name
 from inventory.custom.sanger import parse_phd1
 from inventory.custom.sanger import parse_seq
 from inventory.custom.sanger import process_sanger_files
+from inventory.custom.sanger import read_is_usable
+from inventory.custom.sanger import SangerProcessingParameters
+from inventory.forms import SangerAlignForm
 from inventory.models import Primer
 from inventory.models import Plasmid
 from inventory.models import Experiment
@@ -73,6 +79,8 @@ from inventory.models import Location
 from inventory.models import RestrictionBuffer
 from inventory.models import RestrictionEnzyme
 from inventory.models import RestrictionEnzymeBuffer
+from inventory.models import SangerRead
+from inventory.models import SangerReadFile
 from inventory.models import SangerVerificationRun
 from inventory.models import Strain
 from inventory.views import fasta_alignment_result
@@ -483,6 +491,17 @@ class FastaParsingTests(SimpleTestCase):
 
 
 class SangerVerificationServiceTests(SimpleTestCase):
+    def test_short_trimmed_sequence_has_user_friendly_reason(self):
+        usable, reason = read_is_usable(
+            "A" * 12,
+            {"trimmed_length": 12},
+            [],
+            SangerProcessingParameters(),
+        )
+
+        self.assertFalse(usable)
+        self.assertEqual(reason, "The usable sequence is too short for reliable alignment.")
+
     def test_display_alignment_exposes_unaligned_flanks_as_low_quality_insertions(self):
         alignment = {
             "start": 20,
@@ -1735,21 +1754,212 @@ class SangerVerificationEntryTests(TestCase):
 
         self.assertRedirects(response, reverse("plasmid_align_sanger", kwargs={"plasmid_id": self.plasmid.id}))
 
-    def test_entry_redirects_to_latest_verified_run_first(self):
+    def test_entry_keeps_upload_page_when_a_verified_run_exists(self):
         SangerVerificationRun.objects.create(plasmid=self.plasmid, created_by=self.user)
-        verified = SangerVerificationRun.objects.create(plasmid=self.plasmid, created_by=self.user, manual_decision="VERIFIED")
+        SangerVerificationRun.objects.create(plasmid=self.plasmid, created_by=self.user, manual_decision="VERIFIED")
 
         response = self.client.get(reverse("plasmid_seq_verification_entry", kwargs={"weaver_id": self.plasmid.idx}))
 
-        self.assertRedirects(response, reverse("sanger_run_detail", kwargs={"plasmid_id": self.plasmid.id, "run_id": verified.id}), fetch_redirect_response=False)
+        self.assertRedirects(response, reverse("plasmid_align_sanger", kwargs={"plasmid_id": self.plasmid.id}), fetch_redirect_response=False)
 
-    def test_entry_redirects_to_latest_loaded_run_when_none_verified(self):
+    def test_entry_keeps_upload_page_when_previous_run_exists(self):
         SangerVerificationRun.objects.create(plasmid=self.plasmid, created_by=self.user)
-        latest = SangerVerificationRun.objects.create(plasmid=self.plasmid, created_by=self.user)
+        SangerVerificationRun.objects.create(plasmid=self.plasmid, created_by=self.user)
 
         response = self.client.get(reverse("plasmid_seq_verification_entry", kwargs={"weaver_id": self.plasmid.idx}))
 
-        self.assertRedirects(response, reverse("sanger_run_detail", kwargs={"plasmid_id": self.plasmid.id, "run_id": latest.id}), fetch_redirect_response=False)
+        self.assertRedirects(response, reverse("plasmid_align_sanger", kwargs={"plasmid_id": self.plasmid.id}), fetch_redirect_response=False)
+
+    def test_upload_page_lists_previous_files_without_loading_alignment(self):
+        run = SangerVerificationRun.objects.create(plasmid=self.plasmid, created_by=self.user)
+        read = SangerRead.objects.create(run=run, name="forward")
+        SangerReadFile.objects.create(
+            read=read,
+            format="ab1",
+            original_name="forward.ab1",
+            sha256="a" * 64,
+            size=7,
+        )
+
+        response = self.client.get(reverse("plasmid_align_sanger", kwargs={"plasmid_id": self.plasmid.id}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Saved Sanger runs")
+        self.assertContains(response, "forward.ab1")
+        self.assertContains(response, 'id="sanger-upload-form"')
+        self.assertContains(response, 'accept=".ab1,.phd.1,.seq,.fa,.fas,.fasta"')
+        self.assertContains(response, "multiple")
+        self.assertNotContains(response, 'id="sanger-map"')
+
+    def test_successful_upload_redirects_to_saved_run(self):
+        service_result = {
+            "parameters": {},
+            "reads": [],
+            "combined": {"variants": []},
+            "classification": {"state": "NO_DATA", "reasons": []},
+        }
+        reference = SeqRecord(Seq("ACGT" * 20), id="redirect-reference")
+
+        with patch("inventory.views.process_sanger_files", return_value=service_result), \
+                patch("inventory.views.grab_seq", return_value=(True, Seq("ACGT" * 20))), \
+                patch("inventory.views.plasmid_seqrecord", return_value=reference), \
+                patch("inventory.views.plasmid_sequence_file_contents", return_value=""):
+            response = self.client.post(
+                reverse("plasmid_align_sanger", kwargs={"plasmid_id": self.plasmid.id}),
+                {
+                    "label": "first upload",
+                    "sanger_files": SimpleUploadedFile("forward.ab1", b"trace-data"),
+                },
+            )
+
+            run = SangerVerificationRun.objects.get(plasmid=self.plasmid)
+            detail_url = reverse("sanger_run_detail", kwargs={
+                "plasmid_id": self.plasmid.id,
+                "run_id": run.id,
+            })
+            self.assertRedirects(response, detail_url + "?uploaded=1", fetch_redirect_response=False)
+
+            refreshed = self.client.get(response.url)
+            self.assertEqual(refreshed.status_code, 200)
+            self.assertContains(refreshed, "Sanger sequencing files uploaded and saved.")
+            self.assertEqual(SangerVerificationRun.objects.filter(plasmid=self.plasmid).count(), 1)
+
+
+class SangerUploadFormTests(SimpleTestCase):
+    def test_accepts_multiple_ab1_files_in_one_submission(self):
+        files = MultiValueDict({
+            "sanger_files": [
+                SimpleUploadedFile("forward.ab1", b"trace-a"),
+                SimpleUploadedFile("reverse.ab1", b"trace-b"),
+            ],
+        })
+
+        form = SangerAlignForm({}, files)
+
+        self.assertTrue(form.is_valid())
+        self.assertEqual([file.name for file in form.cleaned_data["sanger_files"]], ["forward.ab1", "reverse.ab1"])
+
+
+class SangerFailedReadReviewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="failed-read-user", password="pw")
+        self.project = Project.objects.create(name="Failed read project", public=False)
+        Membership.objects.create(member=self.user, project=self.project, access_policies="r")
+        self.plasmid = Plasmid.objects.create(
+            idx=504,
+            name="Failed read plasmid",
+            intended_use="test",
+            project=self.project,
+            ligation_state=1,
+        )
+        record = SeqRecord(Seq("ACGT" * 40), id="failed-read-reference", name="failed-read-reference", description=".")
+        record.annotations["molecule_type"] = "DNA"
+        self.plasmid.sequence.save("failed-read-reference.gb", ContentFile(record.format("genbank")), save=True)
+        self.run = SangerVerificationRun.objects.create(plasmid=self.plasmid, created_by=self.user)
+        chromatogram = {
+            "aTrace": [10, 12, 15, 11] * 20,
+            "cTrace": [8, 9, 10, 7] * 20,
+            "gTrace": [7, 8, 9, 6] * 20,
+            "tTrace": [6, 7, 8, 5] * 20,
+            "basePos": list(range(0, 80)),
+            "baseCalls": list("A" * 80),
+            "qualNums": [10] * 80,
+        }
+        self.read = SangerRead.objects.create(
+            run=self.run,
+            name="poor-quality-read",
+            selected_source="ab1",
+            parsing_result={"chromatogram": chromatogram},
+            is_usable=False,
+        )
+        self.client.force_login(self.user)
+
+    def test_failed_read_offers_chromatogram_and_local_blast_separately(self):
+        response = self.client.get(reverse("sanger_run_detail", kwargs={
+            "plasmid_id": self.plasmid.id,
+            "run_id": self.run.id,
+        }))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "poor-quality-read did not produce a reliable alignment.")
+        self.assertContains(response, "Open chromatogram window")
+        self.assertContains(response, "Local BLAST")
+        self.assertContains(response, reverse("services-blast"))
+        self.assertContains(response, 'const plasmidHeader = document.getElementById("header-container")')
+
+    def test_failed_read_chromatogram_can_be_opened_without_alignment(self):
+        response = self.client.get(reverse("sanger_read_chromatogram", kwargs={
+            "plasmid_id": self.plasmid.id,
+            "run_id": self.run.id,
+            "read_id": self.read.id,
+        }))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Sanger chromatogram")
+        self.assertContains(response, 'const plasmidHeader = document.getElementById("header-container")')
+
+    def test_short_read_warning_uses_icon_with_tooltip(self):
+        self.read.warnings = ["The usable sequence is too short for reliable alignment."]
+        self.read.save(update_fields=["warnings"])
+
+        response = self.client.get(reverse("sanger_run_detail", kwargs={
+            "plasmid_id": self.plasmid.id,
+            "run_id": self.run.id,
+        }))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "bi-exclamation-triangle-fill")
+        self.assertContains(response, 'data-bs-title="The usable sequence is too short for reliable alignment."')
+        self.assertNotContains(response, "trimmed sequence shorter than minimum")
+
+
+class PlasmidValidationSequencingFilesTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="validation-editor", password="pw")
+        self.project = Project.objects.create(name="Validation project", public=False)
+        Membership.objects.create(member=self.user, project=self.project, access_policies="w")
+        self.plasmid = Plasmid.objects.create(
+            idx=503,
+            name="Validation plasmid",
+            intended_use="test",
+            project=self.project,
+            ligation_state=1,
+        )
+        self.run = SangerVerificationRun.objects.create(plasmid=self.plasmid, created_by=self.user)
+        self.read = SangerRead.objects.create(run=self.run, name="forward")
+        self.source_file = SangerReadFile.objects.create(
+            read=self.read,
+            format="ab1",
+            original_name="forward.ab1",
+            sha256="b" * 64,
+            size=7,
+        )
+        self.source_file.file.save("forward.ab1", ContentFile(b"AB1DATA"), save=True)
+        self.client.force_login(self.user)
+        self.client.cookies["current_project_id"] = str(self.project.id)
+
+    def test_validation_form_lists_sequencing_file_and_review_links(self):
+        response = self.client.get(reverse("plasmid_validation_edit", kwargs={"plasmid_id": self.plasmid.id}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Sequencing Files")
+        self.assertNotContains(response, "Sequencing clustal file")
+        self.assertContains(response, "forward.ab1")
+        self.assertContains(response, "Download")
+        self.assertContains(response, "Review trace")
+        self.assertContains(response, "Review alignment")
+
+    def test_sequencing_file_download_is_scoped_to_its_plasmid_run_and_read(self):
+        response = self.client.get(reverse("sanger_read_file_download", kwargs={
+            "plasmid_id": self.plasmid.id,
+            "run_id": self.run.id,
+            "read_id": self.read.id,
+            "file_id": self.source_file.id,
+        }))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("forward.ab1", response["Content-Disposition"])
+        self.assertEqual(b"".join(response.streaming_content), b"AB1DATA")
 
 
 class SangerDecisionTests(TestCase):
@@ -1817,6 +2027,132 @@ class SangerDecisionTests(TestCase):
         self.plasmid.refresh_from_db()
         self.assertEqual(self.run.manual_decision, "")
         self.assertEqual(self.plasmid.sequencing_state, 1)
+
+
+class SangerServicesListTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="sanger-services-user", password="pw")
+        self.visible_project = Project.objects.create(name="Visible sequencing project", public=False)
+        self.hidden_project = Project.objects.create(name="Hidden sequencing project", public=False)
+        Membership.objects.create(member=self.user, project=self.visible_project, access_policies="r")
+        self.visible_plasmid = Plasmid.objects.create(
+            idx=505,
+            name="Visible Sanger plasmid",
+            intended_use="test",
+            project=self.visible_project,
+        )
+        self.hidden_plasmid = Plasmid.objects.create(
+            idx=506,
+            name="Hidden Sanger plasmid",
+            intended_use="test",
+            project=self.hidden_project,
+        )
+        self.approved_run = SangerVerificationRun.objects.create(
+            plasmid=self.visible_plasmid,
+            created_by=self.user,
+            automated_state="PASS",
+            manual_decision="VERIFIED",
+            manual_decision_by=self.user,
+        )
+        read = SangerRead.objects.create(
+            run=self.approved_run,
+            name="forward",
+            detected_orientation="forward",
+            is_usable=True,
+        )
+        self.read = read
+        source_file = SangerReadFile.objects.create(
+            read=read,
+            format="ab1",
+            original_name="visible-forward.ab1",
+            sha256="c" * 64,
+            size=123,
+        )
+        source_file.file.save("visible-forward.ab1", ContentFile(b"AB1DATA"), save=True)
+        self.source_file = source_file
+        reverse_read = SangerRead.objects.create(
+            run=self.approved_run,
+            name="reverse",
+            detected_orientation="reverse",
+            is_usable=True,
+        )
+        reverse_file = SangerReadFile.objects.create(
+            read=reverse_read,
+            format="ab1",
+            original_name="visible-reverse.ab1",
+            sha256="d" * 64,
+            size=123,
+        )
+        reverse_file.file.save("visible-reverse.ab1", ContentFile(b"AB1DATA"), save=True)
+        invalid_read = SangerRead.objects.create(
+            run=self.approved_run,
+            name="poor-quality-503",
+            detected_orientation="forward",
+            is_usable=False,
+        )
+        invalid_file = SangerReadFile.objects.create(
+            read=invalid_read,
+            format="ab1",
+            original_name="poor-quality-503.ab1",
+            sha256="e" * 64,
+            size=123,
+        )
+        invalid_file.file.save("poor-quality-503.ab1", ContentFile(b"AB1DATA"), save=True)
+        SangerVerificationRun.objects.create(
+            plasmid=self.visible_plasmid,
+            created_by=self.user,
+            automated_state="FAIL",
+            manual_decision="REJECTED",
+        )
+        SangerVerificationRun.objects.create(
+            plasmid=self.hidden_plasmid,
+            automated_state="PASS",
+            manual_decision="VERIFIED",
+        )
+        self.client.force_login(self.user)
+
+    def test_lists_accessible_runs_with_files_and_approval_status(self):
+        response = self.client.get(reverse("services-sanger"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Sanger sequencing runs")
+        self.assertContains(response, 'id="table_search-input"')
+        self.assertContains(response, "Search Sanger files ...")
+        self.assertContains(response, "Visible Sanger plasmid")
+        self.assertContains(response, "visible-forward.ab1")
+        self.assertContains(response, "visible-reverse.ab1")
+        self.assertContains(response, 'data-sanger-file-name="visible-forward.ab1"')
+        self.assertContains(response, "FWD")
+        self.assertContains(response, "REV")
+        self.assertContains(response, "UNK")
+        self.assertContains(response, 'class="btn btn-secondary sanger-read-direction"')
+        self.assertContains(response, "poor-quality-503.ab1")
+        self.assertContains(response, "Download original file: visible-forward.ab1")
+        self.assertContains(response, 'download="visible-forward.ab1"')
+        self.assertContains(response, reverse("sanger_read_file_download", kwargs={
+            "plasmid_id": self.approved_run.plasmid_id,
+            "run_id": self.approved_run.id,
+            "read_id": self.read.id,
+            "file_id": self.source_file.id,
+        }))
+        self.assertContains(response, "Approved")
+        self.assertContains(response, "Authorized by sanger-services-user")
+        self.assertContains(response, "Not approved")
+        self.assertNotContains(response, "Hidden Sanger plasmid")
+        self.assertContains(response, reverse("sanger_run_detail", kwargs={
+            "plasmid_id": self.approved_run.plasmid_id,
+            "run_id": self.approved_run.id,
+        }))
+
+    def test_user_without_project_membership_sees_no_runs(self):
+        outsider = User.objects.create_user(username="sanger-services-outsider", password="pw")
+        self.client.force_login(outsider)
+
+        response = self.client.get(reverse("services-sanger"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No Sanger sequencing runs are available")
+        self.assertNotContains(response, "Visible Sanger plasmid")
 
 
 class PrimerDimerAnalysisTests(SimpleTestCase):

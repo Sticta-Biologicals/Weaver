@@ -1082,7 +1082,7 @@ def read_is_usable(trimmed_sequence, quality_metrics, group_errors, params):
         return False, group_errors[0]
     usable_length = quality_metrics.get("trimmed_length", len(trimmed_sequence))
     if usable_length < params.minimum_trimmed_length:
-        return False, "trimmed sequence shorter than minimum"
+        return False, "The usable sequence is too short for reliable alignment."
     if quality_metrics.get("ambiguous_fraction", 1.0) > params.max_ambiguous_fraction:
         return False, "too many ambiguous bases"
     return True, ""

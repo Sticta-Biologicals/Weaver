@@ -9,6 +9,12 @@ function do_filter(value){
     if(value){
         $(".table-search-target tbody tr").filter(function() {
             var element = $(this).find('.table-search-search_on').first().attr('data-search-' + search_on)
+            if(search_on != 'idx'){
+                var file_names = $(this).find('[data-sanger-file-name]').map(function(){
+                    return $(this).attr('data-sanger-file-name') || '';
+                }).get().join(' ');
+                element = (element || '') + ' ' + file_names;
+            }
             if(element){
                 var element_value = element.replace(/[^A-Za-z0-9]/g,'').toLowerCase();
                 if(search_on == 'idx'){

@@ -98,7 +98,7 @@ import html
 import re
 from urllib.parse import urlencode
 from django.conf import settings
-from django.http import HttpResponse, Http404
+from django.http import FileResponse, HttpResponse, Http404
 from django.core.exceptions import ObjectDoesNotExist
 from .custom.box import BOX_ROWS
 from .custom.box import BOX_COLUMNS
@@ -109,7 +109,7 @@ from django.urls import reverse
 from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Case, IntegerField, Prefetch, Q, Value, When
 
 from Bio import SeqIO
 from Bio import Align
@@ -2830,6 +2830,23 @@ def delete_sanger_run_files(run):
             read_file.file.storage.delete(read_file.file.name)
 
 
+def sanger_run_display_context(plasmid, run, recent_runs=None, is_saved_run_view=False):
+    """Build the browser context shared by the upload and saved-run views."""
+    plasmid_seq = str(grab_seq(plasmid)[1])
+    sanger_result = sanger_result_from_run(run)
+    sanger_result["reference_record"] = plasmid_seqrecord(plasmid)
+    return {
+        "run": run,
+        "sanger_result": sanger_result,
+        "sanger_browser_data": json.dumps(sanger_browser_data(plasmid_seq, sanger_result, plasmid.name)),
+        "align_data": alignment_tracks_for_ove(plasmid.name, plasmid_seq, sanger_result["reads"]),
+        "plasmid_sequence_file_contents": plasmid_sequence_file_contents(plasmid),
+        "show_results": True,
+        "recent_runs": recent_runs if recent_runs is not None else plasmid.sanger_verification_runs.exclude(id=run.id)[:10],
+        "is_saved_run_view": is_saved_run_view,
+    }
+
+
 @require_member_can_read_project_of_plasmid
 def plasmid_align_fasta(request, plasmid_id):
     try:
@@ -2899,10 +2916,11 @@ def plasmid_align_sanger(request, plasmid_id):
     except ObjectDoesNotExist:
         raise Http404
 
+    sanger_runs = plasmid_to_align.sanger_verification_runs.all().prefetch_related("reads__files")
     context = {
         'plasmid': plasmid_to_align,
         'user_can_edit_plasmid': member_can_write_or_admin_plasmid(plasmid_to_align, request.user),
-        'recent_runs': plasmid_to_align.sanger_verification_runs.all()[:10],
+        'recent_runs': sanger_runs[:10],
     }
 
     if request.method == 'POST':
@@ -2932,15 +2950,11 @@ def plasmid_align_sanger(request, plasmid_id):
                     notes=form.cleaned_data.get("notes", ""),
                     save_clustal=form.cleaned_data.get("save_clustal_file", False),
                 )
-                context['run'] = run
-                context['sanger_result'] = sanger_result
-                context['align_data'] = alignment_tracks_for_ove(plasmid_to_align.name, plasmid_seq, sanger_result["reads"])
-                context['sanger_browser_data'] = json.dumps(sanger_browser_data(plasmid_seq, sanger_result, plasmid_to_align.name))
-                context['plasmid_sequence_file_contents'] = plasmid_sequence_file_contents(plasmid_to_align)
-                context['show_results'] = True
-                context['recent_runs'] = plasmid_to_align.sanger_verification_runs.exclude(id=run.id)[:10]
-                if form.cleaned_data.get("save_clustal_file"):
-                    context['save_clustal_done'] = "Saved Sanger Clustal file for this verification run"
+                detail_url = reverse(
+                    "sanger_run_detail",
+                    kwargs={"plasmid_id": plasmid_to_align.id, "run_id": run.id},
+                )
+                return redirect("{}?uploaded=1".format(detail_url))
             except Exception as exc:
                 context['error'] = "Sanger verification failed: {}".format(exc)
         else:
@@ -2956,10 +2970,6 @@ def redirect_to_sanger_verification(request, plasmid_to_align):
     if not on_project_member_can_any(plasmid_to_align.project, request.user):
         return render(request, 'common/no_permission_to_edit.html')
 
-    runs = plasmid_to_align.sanger_verification_runs.all()
-    run = runs.filter(manual_decision="VERIFIED").first() or runs.first()
-    if run:
-        return redirect("sanger_run_detail", plasmid_id=plasmid_to_align.id, run_id=run.id)
     return redirect("plasmid_align_sanger", plasmid_id=plasmid_to_align.id)
 
 
@@ -2987,21 +2997,17 @@ def sanger_run_detail(request, plasmid_id, run_id):
     except ObjectDoesNotExist:
         raise Http404
 
-    plasmid_seq = str(grab_seq(plasmid_to_align)[1])
-    sanger_result = sanger_result_from_run(run)
-    sanger_result["reference_record"] = plasmid_seqrecord(plasmid_to_align)
     context = {
         'plasmid': plasmid_to_align,
         'user_can_edit_plasmid': member_can_write_or_admin_plasmid(plasmid_to_align, request.user),
-        'recent_runs': plasmid_to_align.sanger_verification_runs.exclude(id=run.id)[:10],
-        'run': run,
-        'sanger_result': sanger_result,
-        'sanger_browser_data': json.dumps(sanger_browser_data(plasmid_seq, sanger_result, plasmid_to_align.name)),
-        'align_data': alignment_tracks_for_ove(plasmid_to_align.name, plasmid_seq, sanger_result["reads"]),
-        'plasmid_sequence_file_contents': plasmid_sequence_file_contents(plasmid_to_align),
-        'show_results': True,
-        'is_saved_run_view': True,
     }
+    if request.GET.get("uploaded") == "1":
+        context['upload_done'] = "Sanger sequencing files uploaded and saved."
+    context.update(sanger_run_display_context(
+        plasmid_to_align,
+        run,
+        is_saved_run_view=True,
+    ))
     return render(request, 'inventory/plasmid_align_sanger.html', context)
 
 
@@ -3045,6 +3051,27 @@ def sanger_read_chromatogram(request, plasmid_id, run_id, read_id):
         }),
     }
     return render(request, "inventory/sanger_chromatogram.html", context)
+
+
+@require_member_can_read_project_of_plasmid
+def sanger_read_file_download(request, plasmid_id, run_id, read_id, file_id):
+    try:
+        source_file = SangerReadFile.objects.select_related("read__run").get(
+            id=file_id,
+            read_id=read_id,
+            read__run_id=run_id,
+            read__run__plasmid_id=plasmid_id,
+        )
+    except ObjectDoesNotExist:
+        raise Http404
+
+    if not source_file.file:
+        raise Http404
+    response = FileResponse(source_file.file.open("rb"), content_type="application/octet-stream")
+    response["Content-Disposition"] = 'attachment; filename="{}"'.format(
+        get_valid_filename(os.path.basename(source_file.original_name))
+    )
+    return response
 
 
 @require_member_can_read_project_of_plasmid
@@ -3243,6 +3270,7 @@ def PlasmidValidationFromLink(request, validation_payload):
                   {'form': form, 'plasmid': plasmid_to_validate,
                    'validation_link_payload': validation_payload,
                    'validation_link_method': initial['method'],
+                   'sanger_runs': plasmid_to_validate.sanger_verification_runs.all().prefetch_related('reads__files')[:10],
                    'user_can_edit_plasmid': member_can_write_or_admin_plasmid(plasmid_to_validate, request.user)})
 
 
@@ -3265,6 +3293,7 @@ def PlasmidValidationEdit(request, plasmid_id):
 
     return render(request, 'inventory/plasmidvalidation_update_form.html',
                   {'form': form, 'plasmid': plasmid_to_validate,
+        'sanger_runs': plasmid_to_validate.sanger_verification_runs.all().prefetch_related('reads__files')[:10],
         'user_can_edit_plasmid': member_can_write_or_admin_plasmid(plasmid_to_validate, request.user)})
 
 
@@ -3887,6 +3916,32 @@ def ServicesStats(request):
 
 def ServicesGtr(request):
     return render(request, 'inventory/services/gtr/gtr.html')
+
+
+def ServicesSanger(request):
+    visible_projects = get_projects_where_member_can_any(request.user)
+    service_reads = (
+        SangerRead.objects
+        .prefetch_related("files")
+        .annotate(
+            services_read_order=Case(
+                When(is_usable=True, detected_orientation="forward", then=Value(0)),
+                When(is_usable=True, detected_orientation="reverse", then=Value(1)),
+                default=Value(2),
+                output_field=IntegerField(),
+            )
+        )
+        .order_by("services_read_order", "name")
+    )
+    sanger_runs = (
+        SangerVerificationRun.objects
+        .filter(plasmid__project__in=visible_projects)
+        .select_related("plasmid", "plasmid__project", "created_by")
+        .prefetch_related(Prefetch("reads", queryset=service_reads))
+    )
+    return render(request, "inventory/services/sanger/sanger.html", {
+        "sanger_runs": sanger_runs,
+    })
 
 
 def ServicesL0d(request):

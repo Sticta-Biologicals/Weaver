@@ -26,6 +26,7 @@ from .views import PlasmidValidationFromLink
 from .views import ServicesBlast
 from .views import ServicesGtr
 from .views import ServicesL0d
+from .views import ServicesSanger
 from .views import ServicesPcr
 from .views import ServicesStats
 from .views import ServicesBatchPrints
@@ -63,6 +64,7 @@ urlpatterns = [
     path('plasmid/align/sanger/<uuid:plasmid_id>', login_required(views.plasmid_align_sanger, redirect_field_name='next'), name='plasmid_align_sanger'),
     path('plasmid/align/sanger/<uuid:plasmid_id>/run/<uuid:run_id>', login_required(views.sanger_run_detail, redirect_field_name='next'), name='sanger_run_detail'),
     path('plasmid/align/sanger/<uuid:plasmid_id>/run/<uuid:run_id>/read/<uuid:read_id>/chromatogram', login_required(views.sanger_read_chromatogram, redirect_field_name='next'), name='sanger_read_chromatogram'),
+    path('plasmid/align/sanger/<uuid:plasmid_id>/run/<uuid:run_id>/read/<uuid:read_id>/file/<uuid:file_id>/download', login_required(views.sanger_read_file_download, redirect_field_name='next'), name='sanger_read_file_download'),
     path('plasmid/align/sanger/<uuid:plasmid_id>/run/<uuid:run_id>/download/<str:kind>', login_required(views.sanger_run_download, redirect_field_name='next'), name='sanger_run_download'),
     path('plasmid/align/sanger/<uuid:plasmid_id>/run/<uuid:run_id>/decision', login_required(views.sanger_run_decision, redirect_field_name='next'), name='sanger_run_decision'),
     path('plasmid/align/sanger/<uuid:plasmid_id>/run/<uuid:run_id>/delete', login_required(views.sanger_run_delete, redirect_field_name='next'), name='sanger_run_delete'),
@@ -104,6 +106,7 @@ urlpatterns = [
     path('services/blast/', login_required(ServicesBlast, redirect_field_name='next'), name='services-blast'),
     path('services/gtr/', login_required(ServicesGtr, redirect_field_name='next'), name='services-gtr'),
     path('services/l0d/', login_required(ServicesL0d, redirect_field_name='next'), name='services-l0d'),
+    path('services/sanger/', login_required(ServicesSanger, redirect_field_name='next'), name='services-sanger'),
     path('services/pcr/', login_required(ServicesPcr, redirect_field_name='next'), name='services-pcr'),
     path('services/batch-prints/', login_required(ServicesBatchPrints, redirect_field_name='next'), name='services-batch-prints'),
     path('services/stats/', login_required(ServicesStats, redirect_field_name='next'), name='services-stats'),
