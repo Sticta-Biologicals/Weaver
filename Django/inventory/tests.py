@@ -1977,22 +1977,43 @@ class SangerBatchUploadTests(TestCase):
         self.assertContains(response, 'name="replace_existing"')
         self.assertNotContains(response, 'name="replace_existing" checked')
 
-    def test_batch_upload_requires_primer_column_and_value(self):
-        response = self.client.post(
-            reverse("sanger_batch_upload"),
-            {
-                "ab1_files": [SimpleUploadedFile("trace.ab1", b"trace")],
-                "mapping_csv": SimpleUploadedFile(
-                    "mapping.csv",
-                    b"ab1_file,plasmid_id\ntrace.ab1,601\n",
-                    content_type="text/csv",
-                ),
-            },
-        )
+    def test_batch_upload_allows_empty_primer_id(self):
+        with patch("inventory.views.process_sanger_files", return_value=self.service_result()), \
+                patch("inventory.views.grab_seq", return_value=(True, Seq("ACGT" * 20))):
+            response = self.client.post(
+                reverse("sanger_batch_upload"),
+                {
+                    "ab1_files": [SimpleUploadedFile("trace.ab1", b"trace")],
+                    "mapping_csv": SimpleUploadedFile(
+                        "mapping.csv",
+                        b"ab1_file,plasmid_id,primer_id\ntrace.ab1,601,\n",
+                        content_type="text/csv",
+                    ),
+                },
+            )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "The CSV must contain the columns ab1_file, plasmid_id, and primer_id.")
-        self.assertEqual(SangerVerificationRun.objects.count(), 0)
+        self.assertContains(response, "Uploaded 1 AB1 files into 1 Sanger runs.")
+        self.assertEqual(SangerVerificationRun.objects.filter(plasmid=self.first_plasmid).count(), 1)
+
+    def test_batch_upload_allows_omitted_primer_column(self):
+        with patch("inventory.views.process_sanger_files", return_value=self.service_result()), \
+                patch("inventory.views.grab_seq", return_value=(True, Seq("ACGT" * 20))):
+            response = self.client.post(
+                reverse("sanger_batch_upload"),
+                {
+                    "ab1_files": [SimpleUploadedFile("trace.ab1", b"trace")],
+                    "mapping_csv": SimpleUploadedFile(
+                        "mapping.csv",
+                        b"ab1_file,plasmid_id\ntrace.ab1,601\n",
+                        content_type="text/csv",
+                    ),
+                },
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Uploaded 1 AB1 files into 1 Sanger runs.")
+        self.assertEqual(SangerVerificationRun.objects.filter(plasmid=self.first_plasmid).count(), 1)
 
     def test_batch_upload_skips_existing_file_and_uploads_the_rest(self):
         existing_run = SangerVerificationRun.objects.create(plasmid=self.first_plasmid, created_by=self.user)

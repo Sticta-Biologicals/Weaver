@@ -170,16 +170,16 @@ def parse_sanger_batch_mapping(data):
         None,
     )
     errors = []
-    if not filename_header or not plasmid_header or not primer_header:
-        return [], ["The CSV must contain the columns ab1_file, plasmid_id, and primer_id."]
+    if not filename_header or not plasmid_header:
+        return [], ["The CSV must contain the columns ab1_file and plasmid_id."]
 
     rows = []
     for line_number, row in enumerate(reader, start=2):
         filename = os.path.basename((row.get(filename_header) or "").strip())
         plasmid_id = (row.get(plasmid_header) or "").strip()
-        primer_id = (row.get(primer_header) or "").strip()
-        if not filename or not plasmid_id or not primer_id:
-            errors.append("Row {} must contain ab1_file, plasmid_id, and primer_id.".format(line_number))
+        primer_id = (row.get(primer_header) or "").strip() if primer_header else ""
+        if not filename or not plasmid_id:
+            errors.append("Row {} must contain ab1_file and plasmid_id.".format(line_number))
             continue
         rows.append({
             "filename": filename,

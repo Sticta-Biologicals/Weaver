@@ -8,6 +8,8 @@ Open a plasmid and choose `Align > Sanger`, or use `/inventory/plasmid/align/san
 
 Optionally enter a run label and notes, and enable saving a Clustal file. The default processing limit is 96 files, 8 MB per file, and 96 MB for the batch. Invalid extensions, an empty upload, mixed alignment modes, oversized files, or unreadable content are reported as validation or processing errors.
 
+For batch uploads, the mapping CSV requires `ab1_file` and `plasmid_id`. The `primer_id` column is optional; an empty value or an omitted column stores the read without a primer assignment.
+
 Weaver groups files by base name when a read has more than one representation. For a group it prefers AB1, then PHD.1, then SEQ as the sequence source while retaining the uploaded files. SEQ supplies sequence text only; it cannot supply chromatogram traces or Phred quality values.
 
 The saved-run `Reads` table shows the primer associated with the selected source file for each read. Users with write access to the plasmid can assign a primer, replace an incorrect assignment, or clear it when the metadata is missing.
