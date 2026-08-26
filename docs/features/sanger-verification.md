@@ -1,6 +1,6 @@
 # Sanger Verification
 
-Sanger verification compares one or more sequencing reads with a readable reference plasmid sequence and saves the parsed files, alignment evidence, metrics, and review decision as a verification run.
+Sanger verification compares one or more sequencing reads with a readable reference plasmid sequence and saves the parsed files, chromatograms, alignment evidence, metrics, and review decision as a verification run. Parsing and alignment are upload-time operations; saved-run listings and pagination read the persisted result and do not reopen or reanalyze AB1 files.
 
 ## Upload a Run
 
@@ -10,11 +10,25 @@ Optionally enter a run label and notes, and enable saving a Clustal file. The de
 
 Weaver groups files by base name when a read has more than one representation. For a group it prefers AB1, then PHD.1, then SEQ as the sequence source while retaining the uploaded files. SEQ supplies sequence text only; it cannot supply chromatogram traces or Phred quality values.
 
+The saved-run `Reads` table shows the primer associated with the selected source file for each read. Users with write access to the plasmid can assign a primer, replace an incorrect assignment, or clear it when the metadata is missing.
+
 ## Read Orientation and Alignment
 
 For each read, Weaver records the selected source, raw and trimmed sequence, parsing errors, warnings, quality metrics, and detected orientation. Orientation can be `Forward`, `Reverse complement`, `Ambiguous`, or `Unmapped`. The aligned read is compared with the plasmid reference, and the run aggregates coverage, alignment metrics, variants, gaps, and low-confidence regions. A read can be retained but marked unusable when its sequence or quality data do not support alignment.
 
+The saved-run detail view is scoped to the selected run. When a run contains repeated reads with the same orientation and highly overlapping plasmid coverage, the detail view keeps the newest read using the sequencer date encoded in its filename, falling back to the date stored in the file. Same-orientation reads covering distinct regions remain visible. When a run contains complete Forward/Reverse evidence groups from different sequencing dates, the detail view uses the newest complete date group; same-orientation reads covering distinct regions within that group remain eligible. If usable evidence exists, failed or unmapped reads from the same upload are kept in a separate troubleshooting section with access to their chromatogram; they are excluded from the active sequencing evidence and metrics and remain hidden until their troubleshooting entry is selected. If no usable evidence exists, they remain visible as the run's review evidence. This is a display and review selection; it does not delete the persisted read records. The run selector displays the sequencing date encoded in the filename, falling back to AB1 metadata, and exposes failed reads as selectable `No reliable alignment` troubleshooting entries without exposing their filenames; same-date failed reads with consecutive sequencer IDs are grouped into one entry.
+
+The Services table groups persisted runs by plasmid; it does not merge persisted runs. Within the selected run, it shows the newest complete Forward/Reverse sequencing-date group and omits unknown-orientation reads whenever reliable Forward or Reverse evidence is available, so older or failed evidence is not mixed into the active row. If a run has no reliable orientation, its unknown reads remain available in the summary for troubleshooting. The Date column shows the sequencing date (without time) encoded in the selected filename, falling back to the date stored in file metadata; the upload date (also without time) is available from the adjacent information icon. It shows the newest manually accepted run (`Verified / Approved`) by default when one exists. If none is manually accepted, it shows the newest automatically approved run (`PASS`), then the newest run needing review (`REVIEW`); only if neither exists does it fall back to the newest uploaded run. The run selector exposes every run for that plasmid so a different run can be reviewed explicitly.
+
+Each inline AB1 chromatogram has its own `Auto-adjust` switch. Autoscaling is calculated only from that read's visible trace window, and changing one read's switch does not change the scale of any other inline chromatogram. Switching modes uses the same smooth scale transition as the detailed chromatogram viewer. The inline trace can also be dragged horizontally to move the visible alignment window.
+
+When the alignment contains a deletion, the inline trace does not stretch the signal across the missing reference bases. It returns to the baseline through the deletion interval and resumes at the next aligned base; inline traces are drawn as lines without an artificial filled area.
+
 Open a saved run at `/inventory/plasmid/align/sanger/<plasmid_id>/run/<run_id>`. The alignment browser provides a reference coordinate view, read coverage and orientation, feature context when the reference is annotated, variants, gaps, and quality regions. Use its read controls to move through the reference and inspect the evidence supporting a possible variant. Coordinates for stored variants are zero-based internally; use the displayed reference coordinate labels when communicating a finding.
+
+The Sanger services header exposes batch upload as an upload icon with an `Upload AB1 batch` hover tooltip; counts and page metadata remain available through the table pagination controls rather than the header.
+
+The one-base left and right controls advance once on click and repeat continuously while held, with keyboard Enter/Space support and automatic stop on release or cancellation.
 
 ## Quality, Coverage, Variants, and Gaps
 

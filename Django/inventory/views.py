@@ -49,11 +49,21 @@ from .custom.sanger import classify_run
 from .custom.sanger import clustal_content
 from .custom.sanger import combined_metrics
 from .custom.sanger import display_trim_range
+from .custom.sanger import ab1_run_datetime
+from .custom.sanger import ab1_run_datetime_label
+from .custom.sanger import filename_run_datetime
+from .custom.sanger import file_registration_number
+from .custom.sanger import sanger_file_run_datetime
+from .custom.sanger import latest_confirmation_pair
 from .custom.sanger import include_unaligned_display_flanks
 from .custom.sanger import process_sanger_files
 from .custom.sanger import parse_ab1
+from .custom.sanger import parse_sanger_batch_mapping
+from .custom.sanger import preferred_sanger_run
 from .custom.sanger import read_is_usable
 from .custom.sanger import read_metrics_tsv
+from .custom.sanger import sanitize_filename
+from .custom.sanger import select_sanger_review_candidates
 from .custom.sanger import SangerProcessingParameters
 from .custom.sanger import trim_by_quality
 from .custom.sanger import variants_csv
@@ -66,21 +76,20 @@ from .models import TableFilter
 from organization.decorators import require_current_project_set
 from organization.decorators import require_member_can_any_current_project
 from organization.decorators import require_member_can_write_or_admin_current_project
+from organization.decorators import require_member_can_write_or_admin_any_project
 from organization.decorators import require_member_can_read_project_of_plasmid
 from organization.decorators import require_member_can_read_project_of_gs
-from organization.decorators import require_member_can_read_project_of_primer
 from organization.decorators import require_member_can_write_or_admin_project_of_plasmid
 from organization.decorators import require_member_can_write_or_admin_project_of_gs
-from organization.decorators import require_member_can_write_or_admin_project_of_primer
 from organization.views import get_current_project_id
 from organization.views import get_current_project
 from organization.views import on_current_project_member_can_write_or_admin
 from organization.views import on_project_member_can_write_or_admin
 from organization.views import get_projects_where_member_can
 from organization.views import get_projects_where_member_can_any
+from organization.views import get_show_from_all_projects
 from organization.views import member_can_write_or_admin_plasmid
 from organization.views import member_can_write_or_admin_gs
-from organization.views import get_show_from_all_projects
 from organization.views import member_can_write_or_admin_primer
 from organization.views import on_project_member_can_any
 from organization.models import Membership
@@ -137,6 +146,7 @@ from .forms import save_restriction_enzyme_buffers
 import json
 from io import StringIO
 from .forms import SangerAlignForm
+from .forms import SangerBatchUploadForm
 from .forms import FastaAlignForm
 from .forms import L0SequenceInput
 from .forms import BlastSequenceInput
@@ -157,6 +167,7 @@ from tempfile import mkstemp
 from shutil import move, copymode
 from os import fdopen, remove
 from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import SimpleUploadedFile
 from datetime import datetime
 from datetime import date
 from django.utils import timezone
@@ -2582,18 +2593,8 @@ def sanger_browser_data(reference_sequence, service_result, reference_name="Refe
 
 
 def chromatogram_for_saved_read(read):
-    stored = read.parsing_result.get("chromatogram", {})
-    if read.selected_source != "ab1":
-        return stored
-    ab1_file = next((file_obj for file_obj in read.files.all() if file_obj.format == "ab1" and file_obj.file), None)
-    if not ab1_file:
-        return stored
-    try:
-        with ab1_file.file.open("rb") as handle:
-            parsed = parse_ab1(handle.read())
-    except Exception:
-        return stored
-    return parsed.chromatogram or stored
+    """Return the chromatogram captured during upload-time analysis."""
+    return read.parsing_result.get("chromatogram", {})
 
 
 def recalculated_saved_sanger_read(read, reference_sequence, params=None):
@@ -2659,9 +2660,12 @@ def recalculated_saved_sanger_read(read, reference_sequence, params=None):
     }
 
 
-def sanger_result_from_run(run):
+def sanger_result_from_run(run, focus_read_id=None, focus_read_ids=None):
     reference_sequence = str(grab_seq(run.plasmid)[1])
     params = SangerProcessingParameters()
+    focused_read_ids = {str(read_id) for read_id in (focus_read_ids or []) if read_id}
+    if focus_read_id:
+        focused_read_ids.add(str(focus_read_id))
 
     variants = []
     variants_by_read = {}
@@ -2680,51 +2684,86 @@ def sanger_result_from_run(run):
         if variant.read_id:
             variants_by_read.setdefault(variant.read_id, []).append(row)
 
-    reads = []
-    for read in run.reads.prefetch_related("files").all():
-        chromatogram = chromatogram_for_saved_read(read)
-        recalculated_read = recalculated_saved_sanger_read(read, reference_sequence, params)
-        if recalculated_read:
-            reads.append(recalculated_read)
+    read_candidates = []
+    for read in run.reads.prefetch_related("files__primer").all():
+        if focused_read_ids and str(read.id) not in focused_read_ids:
             continue
-        alignment = read.alignment_metrics.copy() if read.alignment_metrics else {}
+        stored_alignment = (read.alignment_metrics or {}).copy()
+        stored_display_alignment = stored_alignment.pop("display_alignment", None)
+        alignment = stored_alignment
         saved_variants = variants_by_read.get(read.id, [])
-        alignment_variant_base_indices = {}
-        for variant in alignment.get("variants", []):
-            key = (
-                variant.get("coordinate"),
-                variant.get("type"),
-                variant.get("observed", ""),
-                variant.get("expected", ""),
-            )
-            if variant.get("base_index") is not None:
-                alignment_variant_base_indices[key] = variant.get("base_index")
-        for variant in saved_variants:
-            if variant.get("base_index") is not None:
-                continue
-            key = (
-                variant.get("coordinate"),
-                variant.get("type"),
-                variant.get("observed", ""),
-                variant.get("expected", ""),
-            )
-            if key in alignment_variant_base_indices:
-                variant["base_index"] = alignment_variant_base_indices[key]
-        alignment["variants"] = saved_variants
-        reads.append({
+        alignment["variants"] = saved_variants or alignment.get("variants", [])
+        stored_chromatogram = chromatogram_for_saved_read(read)
+        stored_raw_sequence = read.raw_sequence or "".join(stored_chromatogram.get("baseCalls") or [])
+        read_data = {
             "id": str(read.id),
             "name": read.name,
             "formats": read.parsing_result.get("formats", []),
             "selected_source": read.selected_source,
-            "raw_sequence": read.raw_sequence,
+            "raw_sequence": stored_raw_sequence,
             "trimmed_sequence": read.trimmed_sequence,
             "quality_metrics": read.quality_metrics,
             "alignment": alignment,
+            "display_alignment": stored_display_alignment or alignment,
             "warnings": read.warnings,
             "errors": read.parsing_result.get("errors", []),
             "is_usable": read.is_usable,
-            "chromatogram": chromatogram,
+            "chromatogram": stored_chromatogram,
+        }
+
+        read_datetimes = []
+        registration_numbers = []
+        for source_file in read.files.all():
+            metadata = source_file.metadata or {}
+            run_datetime = sanger_file_run_datetime(metadata, source_file.original_name)
+            if run_datetime:
+                read_datetimes.append(run_datetime)
+            registration_number = file_registration_number(source_file.original_name)
+            if registration_number is not None:
+                registration_numbers.append(registration_number)
+        alignment = read_data.get("alignment") or {}
+        source_files = list(read.files.all())
+        selected_source = str(read_data.get("selected_source") or read.selected_source or "").lower()
+        selected_source_file = next(
+            (source_file for source_file in source_files if source_file.format.lower() == selected_source),
+            source_files[0] if source_files else None,
+        )
+        selected_primer = selected_source_file.primer if selected_source_file else None
+        read_data.update({
+            "source_file_id": str(selected_source_file.id) if selected_source_file else "",
+            "primer_id": str(selected_primer.id) if selected_primer else "",
+            "primer_name": selected_primer.name if selected_primer else "",
+            "primer_display_name": display_primer_name(selected_primer) if selected_primer else "",
+            "primer_display_id": display_primer_id(selected_primer) if selected_primer else None,
         })
+        read_candidates.append({
+            "read": read_data,
+            "orientation": alignment.get("orientation") or read.detected_orientation,
+            "covered_positions": alignment.get("covered_positions", []),
+            "run_date": max(read_datetimes).date() if read_datetimes else None,
+            "run_datetime": max(read_datetimes) if read_datetimes else None,
+            "registration_number": max(registration_numbers) if registration_numbers else None,
+        })
+
+    selected_read_candidates = select_sanger_review_candidates(read_candidates)
+    reads = [candidate["read"] for candidate in selected_read_candidates]
+    failed_candidates = [
+        candidate["read"] for candidate in read_candidates
+        if not candidate["read"].get("is_usable") or not candidate["read"].get("alignment")
+    ]
+    has_usable_evidence = any(
+        candidate["read"].get("is_usable") and candidate["read"].get("alignment")
+        for candidate in read_candidates
+    )
+    focused_failed_read = any(
+        str(read.get("id")) in focused_read_ids
+        for read in failed_candidates
+    )
+    failed_reads = failed_candidates if not has_usable_evidence or focused_failed_read else []
+
+    if len(selected_read_candidates) != len(read_candidates):
+        selected_names = {read["name"] for read in reads}
+        variants = [variant for variant in variants if not variant["read"] or variant["read"] in selected_names]
 
     if any(read.get("alignment") for read in reads):
         combined = combined_metrics(reference_sequence, reads, params)
@@ -2741,6 +2780,7 @@ def sanger_result_from_run(run):
     return {
         "parameters": run.parameters,
         "reads": reads,
+        "failed_reads": failed_reads,
         "combined": combined,
         "classification": {
             "state": run.automated_state,
@@ -2750,10 +2790,21 @@ def sanger_result_from_run(run):
     }
 
 
-def persist_sanger_verification(plasmid, user, service_result, label="", notes="", save_clustal=False):
+def persist_sanger_verification(plasmid, user, service_result, label="", notes="", save_clustal=False, primer_by_filename=None):
+    primer_by_filename = primer_by_filename or {}
+    sequencing_datetimes = [
+        run_datetime
+        for uploaded in service_result.get("uploaded_files", [])
+        for run_datetime in [sanger_file_run_datetime(uploaded.metadata, uploaded.original_name)]
+        if run_datetime
+    ]
+    sequencing_datetime = max(sequencing_datetimes) if sequencing_datetimes else None
+    if sequencing_datetime and timezone.is_naive(sequencing_datetime):
+        sequencing_datetime = timezone.make_aware(sequencing_datetime)
     run = SangerVerificationRun.objects.create(
         plasmid=plasmid,
         created_by=user,
+        sequencing_datetime=sequencing_datetime,
         label=label or "",
         notes=notes or "",
         parameters=service_result["parameters"],
@@ -2764,6 +2815,10 @@ def persist_sanger_verification(plasmid, user, service_result, label="", notes="
     saved_reads = {}
     for read_data in service_result["reads"]:
         alignment = read_data.get("alignment") or {}
+        persisted_alignment = alignment.copy()
+        persisted_alignment["covered_positions"] = alignment.get("covered_positions", [])
+        persisted_alignment["variants"] = alignment.get("variants", [])
+        persisted_alignment["display_alignment"] = read_data.get("display_alignment") or {}
         read = SangerRead.objects.create(
             run=run,
             name=read_data["name"],
@@ -2778,7 +2833,7 @@ def persist_sanger_verification(plasmid, user, service_result, label="", notes="
                 "chromatogram": read_data.get("chromatogram", {}),
             },
             quality_metrics=read_data.get("quality_metrics", {}),
-            alignment_metrics={key: value for key, value in alignment.items() if key not in ("covered_positions", "variants", "ref_alignment", "read_alignment", "oriented_sequence")},
+            alignment_metrics=persisted_alignment,
             warnings=read_data.get("warnings", []),
             is_usable=read_data.get("is_usable", False),
         )
@@ -2786,11 +2841,12 @@ def persist_sanger_verification(plasmid, user, service_result, label="", notes="
         for uploaded in read_data.get("files", []):
             read_file = SangerReadFile.objects.create(
                 read=read,
+                primer=primer_by_filename.get(uploaded.original_name),
                 format=uploaded.format,
                 original_name=uploaded.original_name,
                 sha256=uploaded.sha256,
                 size=uploaded.size,
-                metadata={},
+                metadata=getattr(uploaded, "metadata", {}) or {},
             )
             read_file.file.save(uploaded.original_name, ContentFile(uploaded.data), save=True)
 
@@ -2830,10 +2886,154 @@ def delete_sanger_run_files(run):
             read_file.file.storage.delete(read_file.file.name)
 
 
-def sanger_run_display_context(plasmid, run, recent_runs=None, is_saved_run_view=False):
+def sanger_read_sequencing_datetime(read):
+    datetimes = []
+    for source_file in read.files.all():
+        metadata = source_file.metadata or {}
+        run_datetime = sanger_file_run_datetime(metadata, source_file.original_name)
+        if run_datetime:
+            datetimes.append(run_datetime)
+    return max(datetimes) if datetimes else None
+
+
+def sanger_failed_read_groups(reads):
+    """Group failed reads from one sequencing event for selector navigation."""
+    entries = []
+    for read in reads:
+        sequencing_datetime = sanger_read_sequencing_datetime(read)
+        registration_numbers = [
+            file_registration_number(source_file.original_name)
+            for source_file in read.files.all()
+        ]
+        registration_numbers = [number for number in registration_numbers if number is not None]
+        entries.append({
+            "read": read,
+            "sequencing_datetime": sequencing_datetime,
+            "sequencing_date": sequencing_datetime.date() if sequencing_datetime else None,
+            "registration_number": max(registration_numbers) if registration_numbers else None,
+        })
+    entries.sort(
+        key=lambda entry: (
+            entry["sequencing_datetime"] or datetime.min,
+            entry["registration_number"] if entry["registration_number"] is not None else -1,
+            str(entry["read"].id),
+        ),
+        reverse=True,
+    )
+    groups = []
+    for entry in entries:
+        previous = groups[-1][-1] if groups else None
+        same_date = previous and entry["sequencing_date"] == previous["sequencing_date"]
+        consecutive_numbers = (
+            previous
+            and entry["registration_number"] is not None
+            and previous["registration_number"] is not None
+            and abs(entry["registration_number"] - previous["registration_number"]) <= 1
+        )
+        if same_date and consecutive_numbers:
+            groups[-1].append(entry)
+        else:
+            groups.append([entry])
+    return [
+        {
+            "reads": [entry["read"] for entry in group],
+            "sequencing_datetime": max(
+                (entry["sequencing_datetime"] for entry in group if entry["sequencing_datetime"]),
+                default=None,
+            ),
+        }
+        for group in groups
+    ]
+
+
+def sanger_run_sequencing_datetime(run):
+    if run.sequencing_datetime:
+        return run.sequencing_datetime
+    datetimes = [
+        run_datetime
+        for read in run.reads.all()
+        for run_datetime in [sanger_read_sequencing_datetime(read)]
+        if run_datetime
+    ]
+    return max(datetimes) if datetimes else None
+
+
+def sanger_run_selector_choices(plasmid, runs, selected_run=None, selected_read_ids=None):
+    """Build run navigation options using sequencing dates from the evidence.
+
+    A failed read that shares a persisted upload run with usable evidence gets
+    its own selector option. It remains linked to the original run, but the
+    ``focus_reads`` parameter opens that failed sequencing event independently.
+    """
+    runs = list(runs or [])
+    default_run = selected_run or preferred_sanger_run(runs)
+    default_id = default_run.id if default_run else None
+    selected_read_ids = {str(read_id) for read_id in (selected_read_ids or []) if read_id}
+    runs = sorted(
+        runs,
+        key=lambda run: (
+            0 if run.manual_decision == "VERIFIED"
+            else 1 if run.automated_state == "PASS"
+            else 2,
+            -((sanger_run_sequencing_datetime(run) or run.created_at).timestamp()),
+            str(run.id),
+        ),
+    )
+    automatic_labels = {
+        "PASS": "Pass",
+        "REVIEW": "Review",
+        "FAIL": "Fail",
+        "NO_DATA": "No usable data",
+    }
+    choices = []
+    for run in runs:
+        manual_label = run.get_manual_decision_display() or "Pending"
+        automatic_label = automatic_labels.get(run.automated_state, run.automated_state or "Unknown")
+        sequencing_datetime = sanger_run_sequencing_datetime(run)
+        display_datetime = sequencing_datetime or run.created_at
+        run_url = reverse(
+            "sanger_run_detail",
+            kwargs={"plasmid_id": plasmid.id, "run_id": run.id},
+        )
+        choices.append({
+            "id": str(run.id),
+            "url": run_url,
+            "label": "{} — {} — {}".format(
+                display_datetime.strftime("%d %b %Y %H:%M"),
+                manual_label,
+                automatic_label,
+            ),
+            "selected": run.id == default_id and not selected_read_ids,
+        })
+        run_reads = list(run.reads.all())
+        has_usable_read = any(read.is_usable and read.alignment_metrics for read in run_reads)
+        if has_usable_read:
+            failed_reads = [
+                read for read in run_reads
+                if not read.is_usable or not read.alignment_metrics
+            ]
+            for failed_group in sanger_failed_read_groups(failed_reads):
+                group_reads = failed_group["reads"]
+                read_datetime = failed_group["sequencing_datetime"] or display_datetime
+                group_read_ids = {str(read.id) for read in group_reads}
+                choices.append({
+                    "id": "{}:failed:{}".format(run.id, ":".join(sorted(group_read_ids))),
+                    "url": "{}?{}".format(
+                        run_url,
+                        urlencode({"focus_reads": ",".join(sorted(group_read_ids))}),
+                    ),
+                    "label": "{} — No reliable alignment".format(
+                        read_datetime.strftime("%d %b %Y %H:%M"),
+                    ),
+                    "selected": run.id == default_id and bool(selected_read_ids & group_read_ids),
+                })
+    return choices
+
+
+def sanger_run_display_context(plasmid, run, recent_runs=None, is_saved_run_view=False, focus_read_ids=None):
     """Build the browser context shared by the upload and saved-run views."""
     plasmid_seq = str(grab_seq(plasmid)[1])
-    sanger_result = sanger_result_from_run(run)
+    sanger_result = sanger_result_from_run(run, focus_read_ids=focus_read_ids)
     sanger_result["reference_record"] = plasmid_seqrecord(plasmid)
     return {
         "run": run,
@@ -2916,11 +3116,45 @@ def plasmid_align_sanger(request, plasmid_id):
     except ObjectDoesNotExist:
         raise Http404
 
-    sanger_runs = plasmid_to_align.sanger_verification_runs.all().prefetch_related("reads__files")
+    sanger_runs = list(
+        plasmid_to_align.sanger_verification_runs
+        .all()
+        .prefetch_related("reads__files__primer")
+        .order_by("-created_at", "-id")
+    )
+    for previous_run in sanger_runs:
+        sequencing_datetime = sanger_run_sequencing_datetime(previous_run)
+        previous_run.services_sequence_date = (
+            sequencing_datetime.strftime("%d %b %Y")
+            if sequencing_datetime
+            else ""
+        )
+        previous_run.services_sequence_sort_timestamp = (
+            sequencing_datetime.timestamp()
+            if sequencing_datetime
+            else previous_run.created_at.timestamp()
+        )
+    sanger_runs.sort(
+        key=lambda previous_run: (
+            previous_run.services_sequence_sort_timestamp,
+            previous_run.created_at.timestamp(),
+            str(previous_run.id),
+        ),
+        reverse=True,
+    )
+    visible_sanger_primers = list(visible_primers_for_user(request.user).order_by("name"))
     context = {
         'plasmid': plasmid_to_align,
         'user_can_edit_plasmid': member_can_write_or_admin_plasmid(plasmid_to_align, request.user),
-        'recent_runs': sanger_runs[:10],
+        'recent_runs': sanger_runs,
+        'sanger_run_choices': sanger_run_selector_choices(plasmid_to_align, sanger_runs),
+        'sanger_primer_choices': [
+            {
+                'id': str(primer.id),
+                'label': primer.name,
+            }
+            for primer in visible_sanger_primers
+        ],
     }
 
     if request.method == 'POST':
@@ -2938,6 +3172,17 @@ def plasmid_align_sanger(request, plasmid_id):
                     context['show_upload_form'] = True
                     return render(request, 'inventory/plasmid_align_sanger.html', context)
                 return render_uploaded_fasta_alignment(request, plasmid_to_align, upload_files, form, context)
+            primer_ids = request.POST.getlist("primer_id")
+            primers_by_id = {str(primer.id): primer for primer in visible_sanger_primers}
+            if len(primer_ids) != len(upload_files) or any(primer_id not in primers_by_id for primer_id in primer_ids):
+                context['error'] = "Select a valid primer for every sequencing file."
+                context['upload_form'] = form
+                context['show_upload_form'] = True
+                return render(request, 'inventory/plasmid_align_sanger.html', context)
+            primer_by_filename = {
+                sanitize_filename(uploaded_file.name): primers_by_id[primer_id]
+                for uploaded_file, primer_id in zip(upload_files, primer_ids)
+            }
             try:
                 plasmid_seq = str(grab_seq(plasmid_to_align)[1])
                 sanger_result = process_sanger_files(upload_files, plasmid_seq)
@@ -2949,6 +3194,7 @@ def plasmid_align_sanger(request, plasmid_id):
                     label=form.cleaned_data.get("label", ""),
                     notes=form.cleaned_data.get("notes", ""),
                     save_clustal=form.cleaned_data.get("save_clustal_file", False),
+                    primer_by_filename=primer_by_filename,
                 )
                 detail_url = reverse(
                     "sanger_run_detail",
@@ -2997,18 +3243,80 @@ def sanger_run_detail(request, plasmid_id, run_id):
     except ObjectDoesNotExist:
         raise Http404
 
+    focus_read_ids = [
+        read_id.strip()
+        for read_id in (request.GET.get("focus_reads") or "").split(",")
+        if read_id.strip()
+    ]
+    legacy_focus_read_id = (request.GET.get("focus_read") or "").strip()
+    if legacy_focus_read_id and not focus_read_ids:
+        focus_read_ids = [legacy_focus_read_id]
+    if focus_read_ids and run.reads.filter(id__in=focus_read_ids).count() != len(set(focus_read_ids)):
+        raise Http404
+
+    sanger_runs = list(
+        plasmid_to_align.sanger_verification_runs
+        .all()
+        .prefetch_related("reads__files")
+        .order_by("-created_at", "-id")
+    )
     context = {
         'plasmid': plasmid_to_align,
         'user_can_edit_plasmid': member_can_write_or_admin_plasmid(plasmid_to_align, request.user),
+        'sanger_run_choices': sanger_run_selector_choices(
+            plasmid_to_align,
+            sanger_runs,
+            selected_run=run,
+            selected_read_ids=focus_read_ids,
+        ),
+        'sanger_primer_choices': [
+            {
+                'id': str(primer.id),
+                'label': primer.name,
+            }
+            for primer in visible_primers_for_user(request.user).order_by("name")
+        ],
     }
     if request.GET.get("uploaded") == "1":
         context['upload_done'] = "Sanger sequencing files uploaded and saved."
+    if request.GET.get("primer_updated") == "1":
+        context['primer_update_done'] = "Primer assignment updated."
     context.update(sanger_run_display_context(
         plasmid_to_align,
         run,
         is_saved_run_view=True,
+        focus_read_ids=focus_read_ids,
     ))
     return render(request, 'inventory/plasmid_align_sanger.html', context)
+
+
+@require_member_can_write_or_admin_project_of_plasmid
+def sanger_read_file_primer_update(request, plasmid_id, run_id, read_id, file_id):
+    if request.method != "POST":
+        raise Http404
+    try:
+        source_file = SangerReadFile.objects.select_related("read__run").get(
+            id=file_id,
+            read_id=read_id,
+            read__run_id=run_id,
+            read__run__plasmid_id=plasmid_id,
+        )
+    except ObjectDoesNotExist:
+        raise Http404
+
+    primer_id = (request.POST.get("primer_id", "") or "").strip()
+    primer = None
+    if primer_id:
+        primer = visible_primers_for_user(request.user).filter(id=primer_id).first()
+        if primer is None:
+            raise Http404
+    source_file.primer = primer
+    source_file.save(update_fields=["primer"])
+    detail_url = reverse(
+        "sanger_run_detail",
+        kwargs={"plasmid_id": plasmid_id, "run_id": run_id},
+    )
+    return redirect(f"{detail_url}?primer_updated=1")
 
 
 @require_member_can_read_project_of_plasmid
@@ -3020,8 +3328,11 @@ def sanger_read_chromatogram(request, plasmid_id, run_id, read_id):
     except ObjectDoesNotExist:
         raise Http404
 
-    plasmid_seq = str(grab_seq(plasmid_to_align)[1])
-    read_data = recalculated_saved_sanger_read(read, plasmid_seq) or {
+    saved_result = sanger_result_from_run(run, focus_read_ids=[str(read.id)])
+    read_data = next(
+        (saved_read for saved_read in saved_result.get("reads", []) if saved_read.get("id") == str(read.id)),
+        None,
+    ) or {
         "id": str(read.id),
         "name": read.name,
         "selected_source": read.selected_source,
@@ -3270,7 +3581,7 @@ def PlasmidValidationFromLink(request, validation_payload):
                   {'form': form, 'plasmid': plasmid_to_validate,
                    'validation_link_payload': validation_payload,
                    'validation_link_method': initial['method'],
-                   'sanger_runs': plasmid_to_validate.sanger_verification_runs.all().prefetch_related('reads__files')[:10],
+                   'sanger_runs': plasmid_to_validate.sanger_verification_runs.all().prefetch_related('reads__files__primer')[:10],
                    'user_can_edit_plasmid': member_can_write_or_admin_plasmid(plasmid_to_validate, request.user)})
 
 
@@ -3293,7 +3604,7 @@ def PlasmidValidationEdit(request, plasmid_id):
 
     return render(request, 'inventory/plasmidvalidation_update_form.html',
                   {'form': form, 'plasmid': plasmid_to_validate,
-        'sanger_runs': plasmid_to_validate.sanger_verification_runs.all().prefetch_related('reads__files')[:10],
+        'sanger_runs': plasmid_to_validate.sanger_verification_runs.all().prefetch_related('reads__files__primer')[:10],
         'user_can_edit_plasmid': member_can_write_or_admin_plasmid(plasmid_to_validate, request.user)})
 
 
@@ -3628,7 +3939,6 @@ def primer_display_name(primer):
     return display_primer_name(primer)
 
 
-@require_member_can_read_project_of_primer
 def primer(request, primer_id):
     try:
         primer_to_detail = Primer.objects.get(id=primer_id)
@@ -3643,13 +3953,8 @@ def primer(request, primer_id):
     return render(request, 'inventory/primer.html', context)
 
 
-@require_current_project_set
 def primers(request):
-    show_from_all_projects = get_show_from_all_projects(request)
-    if show_from_all_projects:
-        primers = visible_primers_for_user(request.user)
-    else:
-        primers = Primer.objects.filter(project_id=get_current_project_id(request))
+    primers = visible_primers_for_user(request.user)
 
     primers = sorted(primers, key=lambda primer: (
         primer_numeric_id(primer) if primer_numeric_id(primer) is not None else 10**9,
@@ -3661,25 +3966,21 @@ def primers(request):
         primer.can_edit = member_can_write_or_admin_primer(primer, request.user)
     context = {
         'primers': primers,
-        'show_from_all_projects': show_from_all_projects,
-        'on_current_project_member_can_write_or_admin': on_current_project_member_can_write_or_admin(request)
+        'user_can_manage_primers': member_can_write_or_admin_primer(None, request.user),
     }
     return render(request, 'inventory/primers.html', context)
 
 
-@require_current_project_set
-@require_member_can_write_or_admin_current_project
+@require_member_can_write_or_admin_any_project
 def primer_import(request):
     result = None
     form = PrimerBatchUploadForm(request.POST or None, request.FILES or None)
-    current_project = get_current_project(request)
 
     if request.method == "POST" and form.is_valid():
         try:
             fasta_text = request.FILES["fasta_file"].read().decode("utf-8-sig")
             result = import_primers_from_fasta(
                 StringIO(fasta_text),
-                current_project,
                 update_existing=form.cleaned_data["update_existing"],
                 name_source=form.cleaned_data["name_source"],
                 default_direction=form.cleaned_data["default_direction"],
@@ -3701,7 +4002,6 @@ def primer_import(request):
     context = {
         "form": form,
         "result": result,
-        "current_project": current_project,
     }
     return render(request, "inventory/primer_import.html", context)
 
@@ -3767,7 +4067,7 @@ class PrimerCreate(CreateView):
     fields = '__all__'
     template_name_suffix = '_create_form'
 
-    @method_decorator(require_member_can_write_or_admin_current_project)
+    @method_decorator(require_member_can_write_or_admin_any_project)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
@@ -3780,7 +4080,7 @@ class PrimerEdit(UpdateView):
     fields = '__all__'
     template_name_suffix = '_update_form'
 
-    @method_decorator(require_member_can_write_or_admin_project_of_primer)
+    @method_decorator(require_member_can_write_or_admin_any_project)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
@@ -3791,7 +4091,7 @@ class PrimerEdit(UpdateView):
 class PrimerDelete(DeleteView):
     model = Primer
 
-    @method_decorator(require_member_can_write_or_admin_project_of_primer)
+    @method_decorator(require_member_can_write_or_admin_any_project)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
@@ -3799,7 +4099,6 @@ class PrimerDelete(DeleteView):
         return reverse('primers') + '?form_result_object_deleted=true'
 
 
-@require_member_can_read_project_of_primer
 def primer_label(request, primer_id):
     try:
         primer_to_label = Primer.objects.get(id=primer_id)
@@ -3918,11 +4217,22 @@ def ServicesGtr(request):
     return render(request, 'inventory/services/gtr/gtr.html')
 
 
+def sanger_file_metadata(source_file):
+    """Return metadata captured when the sequencing file was uploaded.
+
+    Listing and pagination are read-only operations. They must not reopen an
+    AB1 file and run the parser as a fallback. Older uploads without cached
+    metadata still get their filename-based date below, while the full AB1
+    analysis remains an upload-time operation.
+    """
+    return source_file.metadata or {}
+
+
 def ServicesSanger(request):
     visible_projects = get_projects_where_member_can_any(request.user)
     service_reads = (
         SangerRead.objects
-        .prefetch_related("files")
+        .prefetch_related("files__primer")
         .annotate(
             services_read_order=Case(
                 When(is_usable=True, detected_orientation="forward", then=Value(0)),
@@ -3933,15 +4243,276 @@ def ServicesSanger(request):
         )
         .order_by("services_read_order", "name")
     )
-    sanger_runs = (
+    all_sanger_runs = (
         SangerVerificationRun.objects
         .filter(plasmid__project__in=visible_projects)
         .select_related("plasmid", "plasmid__project", "created_by")
+        .defer(
+            "parameters",
+            "automated_reasons",
+            "combined_metrics",
+            "notes",
+            "manual_decision_comment",
+            "clustal_file",
+        )
+        .order_by("plasmid_id", "-created_at", "-id")
+    )
+
+    runs_by_plasmid = {}
+    for run in all_sanger_runs:
+        runs_by_plasmid.setdefault(run.plasmid_id, []).append(run)
+
+    selected_rows = []
+    selected_metadata = {}
+    for plasmid_id, runs in runs_by_plasmid.items():
+        selected = preferred_sanger_run(runs)
+        selected_rows.append(selected)
+        selected_metadata[selected.id] = {
+            "run_count": len(runs),
+            "selection_label": "Selected: accepted"
+            if selected.manual_decision == "VERIFIED"
+            else "Selected: automatic approval"
+            if selected.automated_state == "PASS"
+            else "Selected: latest review"
+            if selected.automated_state == "REVIEW"
+            else "Selected: latest uploaded",
+        }
+
+    selected_rows.sort(
+        key=lambda run: (
+            run.plasmid.idx is None,
+            -(run.plasmid.idx or 0),
+            run.plasmid.name.lower(),
+        )
+    )
+    page_size = 50
+    total_sanger_runs = len(selected_rows)
+    total_sanger_pages = max((total_sanger_runs + page_size - 1) // page_size, 1)
+    try:
+        sanger_page = max(int(request.GET.get("page", 1)), 1)
+    except (TypeError, ValueError):
+        sanger_page = 1
+    sanger_page = min(sanger_page, total_sanger_pages)
+    page_start = (sanger_page - 1) * page_size
+    page_run_ids = [run.id for run in selected_rows[page_start:page_start + page_size]]
+
+    selected_runs = (
+        SangerVerificationRun.objects
+        .filter(id__in=page_run_ids)
+        .select_related("plasmid", "plasmid__project", "created_by")
         .prefetch_related(Prefetch("reads", queryset=service_reads))
     )
+    sanger_runs = []
+    for run in selected_runs:
+        metadata = selected_metadata[run.id]
+        run.services_run_count = metadata["run_count"]
+        run.services_selection_label = metadata["selection_label"]
+        read_candidates = []
+        file_metadata_by_read = {}
+        for read in run.reads.all():
+            read_datetimes = []
+            registration_numbers = []
+            file_metadata_by_read[read.id] = []
+            for source_file in read.files.all():
+                file_metadata = sanger_file_metadata(source_file)
+                file_metadata_by_read[read.id].append((source_file, file_metadata))
+                run_datetime = sanger_file_run_datetime(file_metadata, source_file.original_name)
+                if run_datetime:
+                    read_datetimes.append(run_datetime)
+                registration_number = file_registration_number(source_file.original_name)
+                if registration_number is not None:
+                    registration_numbers.append(registration_number)
+            read_candidates.append({
+                "read": read,
+                "orientation": read.detected_orientation if read.is_usable else "unknown",
+                "run_date": max(read_datetimes).date() if read_datetimes else None,
+                "run_datetime": max(read_datetimes) if read_datetimes else None,
+                "registration_number": max(registration_numbers) if registration_numbers else None,
+            })
+        run.services_reads = latest_confirmation_pair(read_candidates)
+        selected_read_ids = {read.id for read in run.services_reads}
+        run.services_reads = [
+            item["read"] for item in read_candidates
+            if item["read"].id in selected_read_ids
+        ]
+        run.services_primers = []
+        sequence_datetimes = {}
+        primer_ids = set()
+        for read in run.services_reads:
+            for source_file, file_metadata in file_metadata_by_read.get(read.id, []):
+                if source_file.primer and source_file.primer.id not in primer_ids:
+                    primer_ids.add(source_file.primer.id)
+                    source_file.primer.services_display_name = display_primer_name(source_file.primer) or source_file.primer.name
+                    source_file.primer.services_display_id = display_primer_id(source_file.primer)
+                    run.services_primers.append(source_file.primer)
+                run_datetime = sanger_file_run_datetime(file_metadata, source_file.original_name)
+                if run_datetime:
+                    sequence_datetimes[run_datetime] = ab1_run_datetime_label(
+                        file_metadata,
+                        source_file.original_name,
+                    )
+        run.services_sequence_dates = [
+            sequence_datetimes[run_datetime]
+            for run_datetime in sorted(sequence_datetimes)
+        ]
+        run.services_sequence_date = (
+            max(sequence_datetimes).strftime("%d %b %Y")
+            if sequence_datetimes
+            else ""
+        )
+        sanger_runs.append(run)
+    runs_by_id = {run.id: run for run in sanger_runs}
+    sanger_runs = [runs_by_id[run_id] for run_id in page_run_ids if run_id in runs_by_id]
     return render(request, "inventory/services/sanger/sanger.html", {
         "sanger_runs": sanger_runs,
+        "sanger_page": sanger_page,
+        "sanger_page_count": total_sanger_pages,
+        "sanger_total_count": total_sanger_runs,
+        "can_upload_sanger_batch": get_projects_where_member_can(request.user, ["a", "w"]).exists(),
     })
+
+
+def sanger_batch_upload(request):
+    writable_projects = get_projects_where_member_can(request.user, ["a", "w"])
+    if not writable_projects.exists():
+        return render(request, "common/no_permission_to_edit.html")
+
+    context = {"writable_projects": writable_projects}
+    if request.method == "POST":
+        form = SangerBatchUploadForm(request.POST, request.FILES)
+        context["upload_form"] = form
+        if form.is_valid():
+            upload_files = request.FILES.getlist("ab1_files")
+            mapping_file = request.FILES.get("mapping_csv")
+            replace_existing = form.cleaned_data.get("replace_existing", False)
+            mapping_rows, mapping_errors = parse_sanger_batch_mapping(mapping_file.read())
+            errors = list(mapping_errors)
+
+            file_by_name = {}
+            for uploaded_file in upload_files:
+                filename = os.path.basename(uploaded_file.name)
+                if filename in file_by_name:
+                    errors.append("The AB1 filename is duplicated in the upload: {}.".format(filename))
+                else:
+                    file_by_name[filename] = uploaded_file.read()
+
+            plasmids = list(Plasmid.objects.filter(project__in=writable_projects))
+            plasmids_by_identifier = {}
+            for plasmid in plasmids:
+                if plasmid.idx is not None:
+                    plasmids_by_identifier[str(plasmid.idx)] = plasmid
+                plasmids_by_identifier[str(plasmid.id)] = plasmid
+
+            primers = list(visible_primers_for_user(request.user))
+            primers_by_identifier = {}
+            for primer in primers:
+                identifiers = [str(primer.id), str(primer.qr_id)]
+                numeric_id = display_primer_id(primer)
+                if numeric_id is not None:
+                    identifiers.append(str(numeric_id))
+                for identifier in identifiers:
+                    primers_by_identifier[identifier] = primer
+
+            mapping_by_file = {}
+            batch_warnings = []
+            for row in mapping_rows:
+                filename = row["filename"]
+                if filename in mapping_by_file:
+                    errors.append("The CSV maps the AB1 file {} more than once.".format(filename))
+                    continue
+                plasmid = plasmids_by_identifier.get(row["plasmid_id"])
+                if not plasmid:
+                    batch_warnings.append(
+                        "Row {} ignored: unavailable plasmid ID {}. The associated AB1 file will not be uploaded.".format(
+                            row["line_number"], row["plasmid_id"],
+                        )
+                    )
+                    file_by_name.pop(filename, None)
+                    continue
+                if filename not in file_by_name:
+                    errors.append("The CSV references {}, but that file was not uploaded.".format(filename))
+                    continue
+                primer = None
+                if row["primer_id"]:
+                    primer = primers_by_identifier.get(row["primer_id"])
+                    if not primer:
+                        errors.append("Row {} references an unavailable primer ID for plasmid {}: {}.".format(
+                            row["line_number"], row["plasmid_id"], row["primer_id"],
+                        ))
+                        continue
+                mapping_by_file[filename] = (plasmid, primer)
+
+            for filename in file_by_name:
+                if filename not in mapping_by_file:
+                    errors.append("The uploaded AB1 file {} is missing from the CSV.".format(filename))
+
+            files_by_plasmid = {}
+            skipped_existing_files = []
+            if not errors:
+                plasmid_ids = {plasmid.id for plasmid, _primer in mapping_by_file.values()}
+                existing_files = set(
+                    SangerReadFile.objects
+                    .filter(read__run__plasmid_id__in=plasmid_ids)
+                    .values_list("read__run__plasmid_id", "original_name")
+                )
+                for filename, (plasmid, primer) in mapping_by_file.items():
+                    duplicate_key = (plasmid.id, sanitize_filename(filename))
+                    if duplicate_key in existing_files and not replace_existing:
+                        skipped_existing_files.append(filename)
+                        continue
+                    files_by_plasmid.setdefault(plasmid.id, []).append((filename, primer))
+
+            if errors:
+                context["batch_errors"] = errors
+            else:
+                if batch_warnings:
+                    context["batch_warnings"] = batch_warnings
+                if skipped_existing_files:
+                    context.setdefault("batch_warnings", []).append(
+                        "Skipped existing AB1 file(s): {}.".format(", ".join(sorted(skipped_existing_files)))
+                    )
+                processed_runs = []
+                try:
+                    for plasmid_id, file_entries in files_by_plasmid.items():
+                        plasmid = plasmids_by_identifier[str(plasmid_id)]
+                        filenames = [filename for filename, _primer in file_entries]
+                        sequence_result = grab_seq(plasmid)
+                        if not sequence_result[0]:
+                            raise ValueError("Could not read the sequence for plasmid {}.".format(plasmid.idx or plasmid.id))
+                        batch_files = [
+                            SimpleUploadedFile(filename, file_by_name[filename], content_type="application/octet-stream")
+                            for filename in filenames
+                        ]
+                        service_result = process_sanger_files(batch_files, str(sequence_result[1]))
+                        primer_by_filename = {
+                            sanitize_filename(filename): primer
+                            for filename, primer in file_entries
+                            if primer is not None
+                        }
+                        processed_runs.append((plasmid, service_result, primer_by_filename))
+
+                    with transaction.atomic():
+                        for plasmid, service_result, primer_by_filename in processed_runs:
+                            persist_sanger_verification(
+                                plasmid,
+                                request.user,
+                                service_result,
+                                label="Batch AB1 upload",
+                                primer_by_filename=primer_by_filename,
+                            )
+                except Exception as exc:
+                    context["batch_errors"] = ["Batch upload failed: {}".format(exc)]
+                else:
+                    uploaded_file_count = sum(len(file_entries) for file_entries in files_by_plasmid.values())
+                    context["batch_upload_done"] = "Uploaded {} AB1 files into {} Sanger runs{}.".format(
+                        uploaded_file_count,
+                        len(processed_runs),
+                        " ({} existing file(s) skipped)".format(len(skipped_existing_files)) if skipped_existing_files else "",
+                    )
+                    context["upload_form"] = SangerBatchUploadForm()
+    else:
+        context["upload_form"] = SangerBatchUploadForm()
+    return render(request, "inventory/services/sanger/batch_upload.html", context)
 
 
 def ServicesL0d(request):

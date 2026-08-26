@@ -60,6 +60,8 @@ from inventory.custom.restriction_digest import normalize_regions
 from inventory.custom.restriction_digest import region_contains_position
 from inventory.custom.restriction_digest import serialize_digest_response
 from inventory.custom.sanger import detect_format
+from inventory.custom.sanger import ab1_run_datetime_label
+from inventory.custom.sanger import filename_run_datetime
 from inventory.custom.sanger import detect_confidence_regions
 from inventory.custom.sanger import display_trim_range
 from inventory.custom.sanger import include_unaligned_display_flanks
@@ -67,8 +69,13 @@ from inventory.custom.sanger import normalized_group_name
 from inventory.custom.sanger import parse_phd1
 from inventory.custom.sanger import parse_seq
 from inventory.custom.sanger import process_sanger_files
+from inventory.custom.sanger import preferred_sanger_run
 from inventory.custom.sanger import read_is_usable
 from inventory.custom.sanger import SangerProcessingParameters
+from inventory.custom.sanger import latest_confirmation_pair
+from inventory.views import sanger_failed_read_groups
+from inventory.custom.sanger import select_nonredundant_read_candidates
+from inventory.custom.sanger import select_sanger_review_candidates
 from inventory.forms import SangerAlignForm
 from inventory.models import Primer
 from inventory.models import Plasmid
@@ -1530,12 +1537,11 @@ class RestrictionDigestTests(SimpleTestCase):
 
 class PrimerBatchImportTests(TestCase):
     def test_defaults_missing_direction_to_forward(self):
-        project = Project.objects.create(name="Sticta", public=False)
         fasta = StringIO(">123-no-direction\nAAAACCCC\n")
 
-        result = import_primers_from_fasta(fasta, project, default_direction="f")
+        result = import_primers_from_fasta(fasta, default_direction="f")
 
-        imported = Primer.objects.get(project=project)
+        imported = Primer.objects.get(name="123-no-direction")
         self.assertEqual(result["created"], 1)
         self.assertEqual(imported.name, "123-no-direction")
         self.assertEqual(imported.sequence_3, "AAAACCCC")
@@ -1581,8 +1587,8 @@ class PrimerBatchImportTests(TestCase):
             response.url,
             reverse("primers") + "?form_result_primer_import_success=true&primer_import_changed=2&primer_import_created=2&primer_import_updated=0&primer_import_skipped=0&primer_import_errors=0",
         )
-        self.assertTrue(Primer.objects.filter(project=project, name="1001-Test-F").exists())
-        self.assertTrue(Primer.objects.filter(project=project, name="1002-Test-R").exists())
+        self.assertTrue(Primer.objects.filter(name="1001-Test-F").exists())
+        self.assertTrue(Primer.objects.filter(name="1002-Test-R").exists())
 
         summary_response = self.client.get(response.url)
         self.assertContains(summary_response, "Primer batch import complete! 2 primers loaded into Weaver.")
@@ -1592,7 +1598,7 @@ class PrimerBatchImportTests(TestCase):
         user = User.objects.create_user(username="primer-delete-user", password="pw")
         project = Project.objects.create(name="Primer Delete Project", public=False)
         Membership.objects.create(member=user, project=project, access_policies="w")
-        primer = Primer.objects.create(name="1001-Test-F", sequence_3="AAAACCCC", fwd_or_rev="f", project=project)
+        primer = Primer.objects.create(name="1001-Test-F", sequence_3="AAAACCCC", fwd_or_rev="f")
         self.client.force_login(user)
 
         response = self.client.get(reverse("primer_delete", args=(primer.id,)))
@@ -1603,20 +1609,18 @@ class PrimerBatchImportTests(TestCase):
 
 
 class PrimerAccessTests(TestCase):
-    def test_visible_primers_include_all_readable_projects(self):
+    def test_visible_primers_are_global_for_authenticated_users(self):
         user = User.objects.create_user(username="weaver-user")
         visible_project_a = Project.objects.create(name="Visible A", public=False)
         visible_project_b = Project.objects.create(name="Visible B", public=False)
         hidden_project = Project.objects.create(name="Hidden", public=False)
-        Membership.objects.create(member=user, project=visible_project_a, access_policies="r")
-        Membership.objects.create(member=user, project=visible_project_b, access_policies="w")
-        Primer.objects.create(name="1-visible-a-F", sequence_3="AAAA", fwd_or_rev="f", project=visible_project_a)
-        Primer.objects.create(name="2-visible-b-R", sequence_3="CCCC", fwd_or_rev="r", project=visible_project_b)
-        Primer.objects.create(name="3-hidden-F", sequence_3="GGGG", fwd_or_rev="f", project=hidden_project)
+        Primer.objects.create(name="1-global-a-F", sequence_3="AAAA", fwd_or_rev="f")
+        Primer.objects.create(name="2-global-b-R", sequence_3="CCCC", fwd_or_rev="r")
+        Primer.objects.create(name="3-global-c-F", sequence_3="GGGG", fwd_or_rev="f")
 
         primer_names = set(visible_primers_for_user(user).values_list("name", flat=True))
 
-        self.assertEqual(primer_names, {"1-visible-a-F", "2-visible-b-R"})
+        self.assertEqual(primer_names, {"1-global-a-F", "2-global-b-R", "3-global-c-F"})
 
     def test_fasta_header_direction_can_replace_name_suffix(self):
         entries = primer_entries_from_fasta(
@@ -1637,19 +1641,19 @@ class PrimerListViewTests(TestCase):
         self.project_b = Project.objects.create(name="Primer Project B", public=False)
         Membership.objects.create(member=self.user, project=self.project_a, access_policies="w")
         Membership.objects.create(member=self.user, project=self.project_b, access_policies="w")
-        Primer.objects.create(name="1001-Project-A-F", sequence_3="AAAACCCC", fwd_or_rev="f", project=self.project_a)
-        Primer.objects.create(name="2001-Project-B-R", sequence_3="GGGGTTTT", fwd_or_rev="r", project=self.project_b)
+        Primer.objects.create(name="1001-Project-A-F", sequence_3="AAAACCCC", fwd_or_rev="f")
+        Primer.objects.create(name="2001-Project-B-R", sequence_3="GGGGTTTT", fwd_or_rev="r")
         self.client.force_login(self.user)
         self.client.cookies["current_project_id"] = str(self.project_a.id)
 
-    def test_primers_view_defaults_to_current_project_only(self):
+    def test_primers_view_shows_all_global_primers(self):
         response = self.client.get(reverse("primers"))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Project-A-F")
-        self.assertNotContains(response, "Project-B-R")
+        self.assertContains(response, "Project-B-R")
 
-    def test_primers_view_can_show_all_projects_with_cookie_toggle(self):
+    def test_primers_view_ignores_project_toggle_cookie(self):
         self.client.cookies["show_from_all_projects"] = "True"
 
         response = self.client.get(reverse("primers"))
@@ -1657,6 +1661,9 @@ class PrimerListViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Project-A-F")
         self.assertContains(response, "Project-B-R")
+        self.assertNotContains(response, 'id="show_from_all_projects"')
+        self.assertContains(response, 'title="Batch upload primers"')
+        self.assertContains(response, 'title="Create primer"')
 
     def test_primers_view_does_not_render_project_column(self):
         response = self.client.get(reverse("primers"))
@@ -1731,6 +1738,11 @@ class SangerVerificationEntryTests(TestCase):
         self.user = User.objects.create_user(username="seq-user", password="pw")
         self.project = Project.objects.create(name="Sticta", public=False)
         Membership.objects.create(member=self.user, project=self.project, access_policies="r")
+        self.sanger_primer = Primer.objects.create(
+            name="7100-Sanger-Sequence-F",
+            sequence_3="ACGTACGTACGT",
+            fwd_or_rev="f",
+        )
         self.plasmid = Plasmid.objects.create(
             idx=499,
             name="L0-P8b-Hr1Chr4_Up",
@@ -1786,10 +1798,62 @@ class SangerVerificationEntryTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Saved Sanger runs")
         self.assertContains(response, "forward.ab1")
+        self.assertContains(response, "Return to run tables")
+        self.assertNotContains(response, 'id="sanger-run-selector-list"')
+        self.assertNotContains(response, "Select one or more Sanger trace files.")
         self.assertContains(response, 'id="sanger-upload-form"')
         self.assertContains(response, 'accept=".ab1,.phd.1,.seq,.fa,.fas,.fasta"')
         self.assertContains(response, "multiple")
         self.assertNotContains(response, 'id="sanger-map"')
+        self.assertLess(
+            response.content.index(b"Saved Sanger runs"),
+            response.content.index(b'id="sanger-upload-form"'),
+        )
+        self.assertContains(response, "Select primer")
+
+    def test_upload_page_orders_runs_by_sequencing_date(self):
+        latest_sequencing_run = SangerVerificationRun.objects.create(
+            plasmid=self.plasmid,
+            created_by=self.user,
+        )
+        latest_read = SangerRead.objects.create(run=latest_sequencing_run, name="latest")
+        SangerReadFile.objects.create(
+            read=latest_read,
+            format="ab1",
+            original_name="latest_2025-02-01-12-00-00.ab1",
+            sha256="b" * 64,
+            size=7,
+        )
+        older_sequencing_run = SangerVerificationRun.objects.create(
+            plasmid=self.plasmid,
+            created_by=self.user,
+        )
+        older_read = SangerRead.objects.create(run=older_sequencing_run, name="older")
+        SangerReadFile.objects.create(
+            read=older_read,
+            format="ab1",
+            original_name="older_2025-01-01-12-00-00.ab1",
+            sha256="c" * 64,
+            size=7,
+        )
+
+        response = self.client.get(reverse("plasmid_align_sanger", kwargs={"plasmid_id": self.plasmid.id}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertLess(
+            response.content.index(b"latest_2025-02-01-12-00-00.ab1"),
+            response.content.index(b"older_2025-01-01-12-00-00.ab1"),
+        )
+
+    def test_upload_requires_a_primer_for_every_sanger_file(self):
+        response = self.client.post(
+            reverse("plasmid_align_sanger", kwargs={"plasmid_id": self.plasmid.id}),
+            {"sanger_files": SimpleUploadedFile("forward.ab1", b"trace-data")},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Select a valid primer for every sequencing file.")
+        self.assertFalse(SangerVerificationRun.objects.filter(plasmid=self.plasmid).exists())
 
     def test_successful_upload_redirects_to_saved_run(self):
         service_result = {
@@ -1809,6 +1873,7 @@ class SangerVerificationEntryTests(TestCase):
                 {
                     "label": "first upload",
                     "sanger_files": SimpleUploadedFile("forward.ab1", b"trace-data"),
+                    "primer_id": str(self.sanger_primer.id),
                 },
             )
 
@@ -1824,7 +1889,6 @@ class SangerVerificationEntryTests(TestCase):
             self.assertContains(refreshed, "Sanger sequencing files uploaded and saved.")
             self.assertEqual(SangerVerificationRun.objects.filter(plasmid=self.plasmid).count(), 1)
 
-
 class SangerUploadFormTests(SimpleTestCase):
     def test_accepts_multiple_ab1_files_in_one_submission(self):
         files = MultiValueDict({
@@ -1838,6 +1902,302 @@ class SangerUploadFormTests(SimpleTestCase):
 
         self.assertTrue(form.is_valid())
         self.assertEqual([file.name for file in form.cleaned_data["sanger_files"]], ["forward.ab1", "reverse.ab1"])
+
+
+class SangerBatchUploadTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="sanger-batch-user", password="pw")
+        self.project = Project.objects.create(name="Sanger batch project", public=False)
+        Membership.objects.create(member=self.user, project=self.project, access_policies="w")
+        self.batch_primer = Primer.objects.create(
+            name="7000-Batch-Sequence-F",
+            sequence_3="ACGTACGTACGT",
+            fwd_or_rev="f",
+        )
+        self.first_plasmid = Plasmid.objects.create(
+            idx=601,
+            name="Batch plasmid one",
+            intended_use="test",
+            project=self.project,
+        )
+        self.second_plasmid = Plasmid.objects.create(
+            idx=602,
+            name="Batch plasmid two",
+            intended_use="test",
+            project=self.project,
+        )
+        self.client.force_login(self.user)
+
+    @staticmethod
+    def service_result():
+        return {
+            "parameters": {},
+            "reads": [],
+            "combined": {"variants": []},
+            "classification": {"state": "NO_DATA", "reasons": []},
+        }
+
+    def test_batch_upload_groups_ab1_files_by_plasmid_id(self):
+        files = {
+            "ab1_files": [
+                SimpleUploadedFile("one-forward.ab1", b"one-forward"),
+                SimpleUploadedFile("one-reverse.ab1", b"one-reverse"),
+                SimpleUploadedFile("two-forward.ab1", b"two-forward"),
+            ],
+            "mapping_csv": SimpleUploadedFile(
+                "mapping.csv",
+                b"ab1_file,plasmid_id,primer_id\none-forward.ab1,601,7000\none-reverse.ab1,601,7000\ntwo-forward.ab1,602,7000\n",
+                content_type="text/csv",
+            ),
+        }
+        calls = []
+
+        def fake_process(uploaded_files, reference_sequence):
+            calls.append([file.name for file in uploaded_files])
+            return self.service_result()
+
+        with patch("inventory.views.process_sanger_files", side_effect=fake_process), \
+                patch("inventory.views.grab_seq", return_value=(True, Seq("ACGT" * 20))):
+            response = self.client.post(reverse("sanger_batch_upload"), files)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Uploaded 3 AB1 files into 2 Sanger runs.")
+        self.assertEqual(sorted(calls), [["one-forward.ab1", "one-reverse.ab1"], ["two-forward.ab1"]])
+        self.assertEqual(SangerVerificationRun.objects.filter(plasmid=self.first_plasmid).count(), 1)
+        self.assertEqual(SangerVerificationRun.objects.filter(plasmid=self.second_plasmid).count(), 1)
+
+    def test_batch_upload_uses_primer_import_layout(self):
+        response = self.client.get(reverse("sanger_batch_upload"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'class="col-lg-7"')
+        self.assertContains(response, 'class="col-lg-5"')
+        self.assertContains(response, 'class="alert alert-light border"')
+        self.assertContains(response, "ab1_file,plasmid_id,primer_id")
+        self.assertContains(response, 'name="replace_existing"')
+        self.assertNotContains(response, 'name="replace_existing" checked')
+
+    def test_batch_upload_requires_primer_column_and_value(self):
+        response = self.client.post(
+            reverse("sanger_batch_upload"),
+            {
+                "ab1_files": [SimpleUploadedFile("trace.ab1", b"trace")],
+                "mapping_csv": SimpleUploadedFile(
+                    "mapping.csv",
+                    b"ab1_file,plasmid_id\ntrace.ab1,601\n",
+                    content_type="text/csv",
+                ),
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "The CSV must contain the columns ab1_file, plasmid_id, and primer_id.")
+        self.assertEqual(SangerVerificationRun.objects.count(), 0)
+
+    def test_batch_upload_skips_existing_file_and_uploads_the_rest(self):
+        existing_run = SangerVerificationRun.objects.create(plasmid=self.first_plasmid, created_by=self.user)
+        existing_read = SangerRead.objects.create(run=existing_run, name="already")
+        SangerReadFile.objects.create(
+            read=existing_read,
+            format="ab1",
+            original_name="already.ab1",
+            sha256="b" * 64,
+            size=5,
+        )
+        files = {
+            "ab1_files": [
+                SimpleUploadedFile("already.ab1", b"new-trace"),
+                SimpleUploadedFile("new.ab1", b"new-trace"),
+            ],
+            "mapping_csv": SimpleUploadedFile(
+                "mapping.csv",
+                b"ab1_file,plasmid_id,primer_id\nalready.ab1,601,7000\nnew.ab1,601,7000\n",
+                content_type="text/csv",
+            ),
+        }
+        calls = []
+
+        def fake_process(uploaded_files, reference_sequence):
+            calls.append([file.name for file in uploaded_files])
+            return self.service_result()
+
+        with patch("inventory.views.process_sanger_files", side_effect=fake_process), \
+                patch("inventory.views.grab_seq", return_value=(True, Seq("ACGT" * 20))):
+            response = self.client.post(reverse("sanger_batch_upload"), files)
+
+        self.assertContains(response, "Skipped existing AB1 file(s): already.ab1.")
+        self.assertContains(response, "Uploaded 1 AB1 files into 1 Sanger runs (1 existing file(s) skipped).")
+        self.assertEqual(calls, [["new.ab1"]])
+
+    def test_batch_upload_can_process_existing_file_when_replacement_is_checked(self):
+        existing_run = SangerVerificationRun.objects.create(plasmid=self.first_plasmid, created_by=self.user)
+        existing_read = SangerRead.objects.create(run=existing_run, name="already")
+        SangerReadFile.objects.create(
+            read=existing_read,
+            format="ab1",
+            original_name="already.ab1",
+            sha256="b" * 64,
+            size=5,
+        )
+        files = {
+            "ab1_files": [SimpleUploadedFile("already.ab1", b"replacement")],
+            "mapping_csv": SimpleUploadedFile(
+                "mapping.csv",
+                b"ab1_file,plasmid_id,primer_id\nalready.ab1,601,7000\n",
+                content_type="text/csv",
+            ),
+            "replace_existing": "on",
+        }
+        calls = []
+
+        def fake_process(uploaded_files, reference_sequence):
+            calls.append([file.name for file in uploaded_files])
+            return self.service_result()
+
+        with patch("inventory.views.process_sanger_files", side_effect=fake_process), \
+                patch("inventory.views.grab_seq", return_value=(True, Seq("ACGT" * 20))):
+            response = self.client.post(reverse("sanger_batch_upload"), files)
+
+        self.assertContains(response, "Uploaded 1 AB1 files into 1 Sanger runs.")
+        self.assertEqual(calls, [["already.ab1"]])
+
+    def test_batch_upload_warns_and_skips_missing_plasmid_without_blocking_valid_files(self):
+        files = {
+            "ab1_files": [
+                SimpleUploadedFile("deleted-plasmid.ab1", b"deleted"),
+                SimpleUploadedFile("valid-plasmid.ab1", b"valid"),
+            ],
+            "mapping_csv": SimpleUploadedFile(
+                "mapping.csv",
+                b"ab1_file,plasmid_id,primer_id\ndeleted-plasmid.ab1,155,7000\nvalid-plasmid.ab1,601,7000\n",
+                content_type="text/csv",
+            ),
+        }
+        calls = []
+
+        def fake_process(uploaded_files, reference_sequence):
+            calls.append([file.name for file in uploaded_files])
+            return self.service_result()
+
+        with patch("inventory.views.process_sanger_files", side_effect=fake_process), \
+                patch("inventory.views.grab_seq", return_value=(True, Seq("ACGT" * 20))):
+            response = self.client.post(reverse("sanger_batch_upload"), files)
+
+        self.assertContains(response, "Row 2 ignored: unavailable plasmid ID 155.")
+        self.assertContains(response, "Uploaded 1 AB1 files into 1 Sanger runs.")
+        self.assertEqual(calls, [["valid-plasmid.ab1"]])
+        self.assertEqual(SangerVerificationRun.objects.filter(plasmid=self.first_plasmid).count(), 1)
+
+    def test_batch_upload_rejects_unmapped_file_without_creating_runs(self):
+        files = {
+            "ab1_files": [SimpleUploadedFile("unmapped.ab1", b"unmapped")],
+            "mapping_csv": SimpleUploadedFile(
+                "mapping.csv",
+                b"ab1_file,plasmid_id,primer_id\nother.ab1,601,7000\n",
+                content_type="text/csv",
+            ),
+        }
+
+        response = self.client.post(reverse("sanger_batch_upload"), files)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "The CSV references other.ab1, but that file was not uploaded.")
+        self.assertContains(response, "The uploaded AB1 file unmapped.ab1 is missing from the CSV.")
+        self.assertEqual(SangerVerificationRun.objects.count(), 0)
+
+    def test_batch_upload_links_ab1_to_primer_in_same_project(self):
+        primer = Primer.objects.create(
+            name="7001-Sequence-F",
+            sequence_3="ACGTACGTACGT",
+            fwd_or_rev="f",
+        )
+        files = {
+            "ab1_files": [SimpleUploadedFile("primer-read.ab1", b"trace")],
+            "mapping_csv": SimpleUploadedFile(
+                "mapping.csv",
+                b"ab1_file,plasmid_id,primer_id\nprimer-read.ab1,601,7001\n",
+                content_type="text/csv",
+            ),
+        }
+
+        def fake_process(uploaded_files, reference_sequence):
+            uploaded = uploaded_files[0]
+            return {
+                "parameters": {},
+                "reads": [{
+                    "name": "primer-read",
+                    "files": [SimpleNamespace(
+                        format="ab1",
+                        original_name=uploaded.name,
+                        sha256="a" * 64,
+                        size=5,
+                        data=b"trace",
+                    )],
+                    "alignment": {},
+                    "raw_sequence": "",
+                    "trimmed_sequence": "",
+                    "quality_metrics": {},
+                    "warnings": [],
+                    "is_usable": False,
+                }],
+                "combined": {"variants": []},
+                "classification": {"state": "NO_DATA", "reasons": []},
+            }
+
+        with patch("inventory.views.process_sanger_files", side_effect=fake_process), \
+                patch("inventory.views.grab_seq", return_value=(True, Seq("ACGT" * 20))):
+            response = self.client.post(reverse("sanger_batch_upload"), files)
+
+        self.assertContains(response, "Uploaded 1 AB1 files into 1 Sanger runs.")
+        source_file = SangerReadFile.objects.get(original_name="primer-read.ab1")
+        self.assertEqual(source_file.primer, primer)
+
+    def test_batch_upload_links_global_primer(self):
+        primer = Primer.objects.create(
+            name="7002-Shared-Sequence-R",
+            sequence_3="TGCATGCATGCA",
+            fwd_or_rev="r",
+        )
+        files = {
+            "ab1_files": [SimpleUploadedFile("shared-primer-read.ab1", b"trace")],
+            "mapping_csv": SimpleUploadedFile(
+                "mapping.csv",
+                b"ab1_file,plasmid_id,primer_id\nshared-primer-read.ab1,601,7002\n",
+                content_type="text/csv",
+            ),
+        }
+
+        def fake_process(uploaded_files, reference_sequence):
+            uploaded = uploaded_files[0]
+            return {
+                "parameters": {},
+                "reads": [{
+                    "name": "shared-primer-read",
+                    "files": [SimpleNamespace(
+                        format="ab1",
+                        original_name=uploaded.name,
+                        sha256="c" * 64,
+                        size=5,
+                        data=b"trace",
+                    )],
+                    "alignment": {},
+                    "raw_sequence": "",
+                    "trimmed_sequence": "",
+                    "quality_metrics": {},
+                    "warnings": [],
+                    "is_usable": False,
+                }],
+                "combined": {"variants": []},
+                "classification": {"state": "NO_DATA", "reasons": []},
+            }
+
+        with patch("inventory.views.process_sanger_files", side_effect=fake_process), \
+                patch("inventory.views.grab_seq", return_value=(True, Seq("ACGT" * 20))):
+            response = self.client.post(reverse("sanger_batch_upload"), files)
+
+        self.assertContains(response, "Uploaded 1 AB1 files into 1 Sanger runs.")
+        source_file = SangerReadFile.objects.get(original_name="shared-primer-read.ab1")
+        self.assertEqual(source_file.primer, primer)
 
 
 class SangerFailedReadReviewTests(TestCase):
@@ -1874,6 +2234,64 @@ class SangerFailedReadReviewTests(TestCase):
         )
         self.client.force_login(self.user)
 
+    def test_saved_run_detail_shows_and_updates_primer_assignment(self):
+        assigned_primer = Primer.objects.create(
+            name="7101-Assigned-Seq-F",
+            sequence_3="ACGTACGTACGT",
+            fwd_or_rev="f",
+        )
+        replacement_primer = Primer.objects.create(
+            name="7102-Replacement-Seq-F",
+            sequence_3="TTTTCCCCAAAA",
+            fwd_or_rev="f",
+        )
+        source_file = SangerReadFile.objects.create(
+            read=self.read,
+            primer=assigned_primer,
+            format="ab1",
+            original_name="poor-quality-read.ab1",
+            sha256="a" * 64,
+            size=7,
+        )
+        membership = Membership.objects.get(member=self.user, project=self.project)
+        membership.access_policies = "w"
+        membership.save(update_fields=["access_policies"])
+
+        response = self.client.get(reverse("sanger_run_detail", kwargs={
+            "plasmid_id": self.plasmid.id,
+            "run_id": self.run.id,
+        }))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Primer")
+        self.assertContains(response, "Return to run tables")
+        self.assertContains(response, reverse("services-sanger"))
+        self.assertContains(response, assigned_primer.name)
+        self.assertContains(response, "No primer")
+
+        response = self.client.post(reverse("sanger_read_file_primer_update", kwargs={
+            "plasmid_id": self.plasmid.id,
+            "run_id": self.run.id,
+            "read_id": self.read.id,
+            "file_id": source_file.id,
+        }), {"primer_id": str(replacement_primer.id)})
+
+        self.assertRedirects(response, reverse("sanger_run_detail", kwargs={
+            "plasmid_id": self.plasmid.id,
+            "run_id": self.run.id,
+        }) + "?primer_updated=1", fetch_redirect_response=False)
+        source_file.refresh_from_db()
+        self.assertEqual(source_file.primer, replacement_primer)
+
+        self.client.post(reverse("sanger_read_file_primer_update", kwargs={
+            "plasmid_id": self.plasmid.id,
+            "run_id": self.run.id,
+            "read_id": self.read.id,
+            "file_id": source_file.id,
+        }), {"primer_id": ""})
+        source_file.refresh_from_db()
+        self.assertIsNone(source_file.primer)
+
     def test_failed_read_offers_chromatogram_and_local_blast_separately(self):
         response = self.client.get(reverse("sanger_run_detail", kwargs={
             "plasmid_id": self.plasmid.id,
@@ -1886,6 +2304,29 @@ class SangerFailedReadReviewTests(TestCase):
         self.assertContains(response, "Local BLAST")
         self.assertContains(response, reverse("services-blast"))
         self.assertContains(response, 'const plasmidHeader = document.getElementById("header-container")')
+
+    def test_mixed_run_hides_failed_read_from_active_review(self):
+        SangerRead.objects.create(
+            run=self.run,
+            name="usable-forward-read",
+            detected_orientation="forward",
+            alignment_metrics={
+                "orientation": "forward",
+                "covered_positions": [0, 1, 2],
+                "identity": 100.0,
+                "aligned_length": 3,
+                "variants": [],
+            },
+            is_usable=True,
+        )
+
+        response = self.client.get(reverse("sanger_run_detail", kwargs={
+            "plasmid_id": self.plasmid.id,
+            "run_id": self.run.id,
+        }))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "poor-quality-read did not produce a reliable alignment.")
 
     def test_failed_read_chromatogram_can_be_opened_without_alignment(self):
         response = self.client.get(reverse("sanger_read_chromatogram", kwargs={
@@ -1911,6 +2352,28 @@ class SangerFailedReadReviewTests(TestCase):
         self.assertContains(response, "bi-exclamation-triangle-fill")
         self.assertContains(response, 'data-bs-title="The usable sequence is too short for reliable alignment."')
         self.assertNotContains(response, "trimmed sequence shorter than minimum")
+
+    def test_saved_run_detail_hides_previous_runs(self):
+        SangerVerificationRun.objects.create(
+            plasmid=self.plasmid,
+            created_by=self.user,
+            label="previous run",
+        )
+
+        response = self.client.get(reverse("sanger_run_detail", kwargs={
+            "plasmid_id": self.plasmid.id,
+            "run_id": self.run.id,
+        }))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Saved Sanger runs")
+        self.assertContains(response, "Reads")
+        self.assertContains(response, "sanger-inline-autoadjust")
+        self.assertContains(response, "Auto-adjust")
+        self.assertContains(response, "enableHoldToRepeat")
+        self.assertContains(response, "inlineDragging")
+        self.assertContains(response, "isSkippedReferenceGap")
+        self.assertContains(response, "ctx.lineTo(gapStartX, baseline)")
 
 
 class PlasmidValidationSequencingFilesTests(TestCase):
@@ -2054,6 +2517,11 @@ class SangerServicesListTests(TestCase):
             manual_decision="VERIFIED",
             manual_decision_by=self.user,
         )
+        self.primer = Primer.objects.create(
+            name="8001-Visible-Seq-F",
+            sequence_3="ACGTACGTACGT",
+            fwd_or_rev="f",
+        )
         read = SangerRead.objects.create(
             run=self.approved_run,
             name="forward",
@@ -2063,10 +2531,12 @@ class SangerServicesListTests(TestCase):
         self.read = read
         source_file = SangerReadFile.objects.create(
             read=read,
+            primer=self.primer,
             format="ab1",
             original_name="visible-forward.ab1",
             sha256="c" * 64,
             size=123,
+            metadata={"run_start_date": "2025-10-15", "run_start_time": "14:54:11"},
         )
         source_file.file.save("visible-forward.ab1", ContentFile(b"AB1DATA"), save=True)
         self.source_file = source_file
@@ -2115,18 +2585,24 @@ class SangerServicesListTests(TestCase):
         response = self.client.get(reverse("services-sanger"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Sanger sequencing runs")
+        self.assertContains(response, "Services")
+        self.assertContains(response, "Sanger sequencing")
+        self.assertNotContains(response, "Sanger sequencing runs")
         self.assertContains(response, 'id="table_search-input"')
         self.assertContains(response, "Search Sanger files ...")
         self.assertContains(response, "Visible Sanger plasmid")
         self.assertContains(response, "visible-forward.ab1")
+        self.assertContains(response, "15 Oct 2025")
+        self.assertContains(response, 'title="Date uploaded:')
+        self.assertContains(response, "8001-Visible-Seq-F")
+        self.assertContains(response, reverse("primer", kwargs={"primer_id": self.primer.id}))
         self.assertContains(response, "visible-reverse.ab1")
         self.assertContains(response, 'data-sanger-file-name="visible-forward.ab1"')
         self.assertContains(response, "FWD")
         self.assertContains(response, "REV")
-        self.assertContains(response, "UNK")
-        self.assertContains(response, 'class="btn btn-secondary sanger-read-direction"')
-        self.assertContains(response, "poor-quality-503.ab1")
+        self.assertNotContains(response, "UNK")
+        self.assertNotContains(response, 'class="btn btn-secondary sanger-read-direction"')
+        self.assertNotContains(response, "poor-quality-503.ab1")
         self.assertContains(response, "Download original file: visible-forward.ab1")
         self.assertContains(response, 'download="visible-forward.ab1"')
         self.assertContains(response, reverse("sanger_read_file_download", kwargs={
@@ -2137,12 +2613,96 @@ class SangerServicesListTests(TestCase):
         }))
         self.assertContains(response, "Approved")
         self.assertContains(response, "Authorized by sanger-services-user")
-        self.assertContains(response, "Not approved")
+        self.assertContains(response, "All runs (2)")
+        self.assertNotContains(response, 'aria-label="Select run for Visible Sanger plasmid"')
+        self.assertNotContains(response, "Not approved")
         self.assertNotContains(response, "Hidden Sanger plasmid")
         self.assertContains(response, reverse("sanger_run_detail", kwargs={
             "plasmid_id": self.approved_run.plasmid_id,
             "run_id": self.approved_run.id,
         }))
+
+    @patch("inventory.views.parse_ab1", side_effect=AssertionError("AB1 parsing must not run while listing saved runs"))
+    def test_services_list_uses_persisted_metadata_without_reparsing_ab1(self, parse_ab1):
+        response = self.client.get(reverse("services-sanger"))
+
+        self.assertEqual(response.status_code, 200)
+        parse_ab1.assert_not_called()
+
+    def test_services_list_falls_back_to_newest_uploaded_run(self):
+        fallback_plasmid = Plasmid.objects.create(
+            idx=507,
+            name="Fallback Sanger plasmid",
+            intended_use="test",
+            project=self.visible_project,
+        )
+        SangerVerificationRun.objects.create(
+            plasmid=fallback_plasmid,
+            created_by=self.user,
+            label="older",
+        )
+        SangerVerificationRun.objects.create(
+            plasmid=fallback_plasmid,
+            created_by=self.user,
+            label="newest",
+        )
+
+        response = self.client.get(reverse("services-sanger"))
+
+        self.assertContains(response, "Fallback Sanger plasmid")
+        self.assertContains(response, "newest")
+        newest_url = reverse("sanger_run_detail", kwargs={
+            "plasmid_id": fallback_plasmid.id,
+            "run_id": SangerVerificationRun.objects.get(plasmid=fallback_plasmid, label="newest").id,
+        })
+        self.assertContains(response, newest_url)
+        self.assertContains(response, "Selected: latest uploaded")
+        self.assertContains(response, "All runs (2)")
+
+    def test_reader_does_not_see_batch_upload_button(self):
+        response = self.client.get(reverse("services-sanger"))
+
+        self.assertNotContains(response, reverse("sanger_batch_upload"))
+
+    def test_uploader_sees_icon_only_batch_upload_control(self):
+        membership = Membership.objects.get(member=self.user, project=self.visible_project)
+        membership.access_policies = "w"
+        membership.save(update_fields=["access_policies"])
+
+        response = self.client.get(reverse("services-sanger"))
+
+        self.assertContains(response, 'title="Upload AB1 batch"')
+        self.assertContains(response, 'aria-label="Upload AB1 batch"')
+        self.assertContains(response, 'title="Refresh"')
+        self.assertNotContains(response, "plasmids</span>")
+
+    def test_services_list_shows_only_top_50_plasmids_by_id(self):
+        for idx in range(600, 655):
+            plasmid = Plasmid.objects.create(
+                idx=idx,
+                name="Sanger limit {}".format(idx),
+                intended_use="test",
+                project=self.visible_project,
+            )
+            SangerVerificationRun.objects.create(plasmid=plasmid, created_by=self.user)
+
+        response = self.client.get(reverse("services-sanger"))
+
+        self.assertEqual(response.content.count(b'class="sanger-services-row"'), 50)
+        self.assertContains(response, "Sanger limit 654")
+        self.assertNotContains(response, "Sanger limit 604")
+        self.assertContains(response, 'aria-label="Next page"')
+        self.assertNotContains(response, 'aria-label="Previous page"')
+        self.assertEqual(response.content.count(b'aria-label="Next page"'), 2)
+
+        second_page = self.client.get(reverse("services-sanger") + "?page=2")
+
+        self.assertEqual(second_page.content.count(b'class="sanger-services-row"'), 6)
+        self.assertContains(second_page, "Sanger limit 604")
+        self.assertNotContains(second_page, "Sanger limit 654")
+        self.assertContains(second_page, 'aria-label="Previous page"')
+        self.assertNotContains(second_page, 'aria-label="Next page"')
+        self.assertEqual(second_page.content.count(b'aria-label="Previous page"'), 2)
 
     def test_user_without_project_membership_sees_no_runs(self):
         outsider = User.objects.create_user(username="sanger-services-outsider", password="pw")
@@ -2153,6 +2713,217 @@ class SangerServicesListTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "No Sanger sequencing runs are available")
         self.assertNotContains(response, "Visible Sanger plasmid")
+
+
+class SangerAb1MetadataTests(SimpleTestCase):
+    def test_formats_ab1_run_start_datetime(self):
+        self.assertEqual(
+            ab1_run_datetime_label({"run_start_date": "2025-10-15", "run_start_time": "14:54:11"}),
+            "15 Oct 2025 14:54",
+        )
+
+    def test_returns_empty_label_when_ab1_has_no_run_datetime(self):
+        self.assertEqual(ab1_run_datetime_label({}), "")
+
+    def test_extracts_run_datetime_from_filename(self):
+        filename = "6098-Diego-503_Hr1_Chr4_Dw_c4-457-pL0-chech-F_2026-07-07-13-15-37_E02.ab1"
+        self.assertEqual(filename_run_datetime(filename), datetime.datetime(2026, 7, 7, 13, 15, 37))
+        self.assertEqual(ab1_run_datetime_label({}, filename), "07 Jul 2026 13:15")
+
+    def test_prefers_filename_datetime_over_ab1_metadata(self):
+        self.assertEqual(
+            ab1_run_datetime_label(
+                {"run_start_date": "2025-10-15", "run_start_time": "14:54:11"},
+                "trace_2026-07-07-13-15-37.ab1",
+            ),
+            "07 Jul 2026 13:15",
+        )
+
+    def test_prefers_latest_forward_when_no_reverse_exists(self):
+        old_forward = SimpleNamespace(name="4998-old-forward")
+        latest_forward = SimpleNamespace(name="6098-latest-forward")
+        selected = latest_confirmation_pair([
+            {
+                "read": old_forward,
+                "orientation": "forward",
+                "run_date": datetime.date(2026, 5, 4),
+                "run_datetime": datetime.datetime(2026, 5, 4, 18, 35, 26),
+                "registration_number": 4998,
+            },
+            {
+                "read": latest_forward,
+                "orientation": "forward",
+                "run_date": datetime.date(2026, 7, 7),
+                "run_datetime": datetime.datetime(2026, 7, 7, 13, 15, 37),
+                "registration_number": 6098,
+            },
+        ])
+
+        self.assertEqual(selected, [latest_forward])
+
+    def test_prefers_latest_complete_pair_and_highest_close_registration_numbers(self):
+        old_forward = SimpleNamespace(name="100-old-F")
+        old_reverse = SimpleNamespace(name="101-old-R")
+        latest_forward = SimpleNamespace(name="16837-latest-F")
+        latest_forward_older = SimpleNamespace(name="16835-latest-F")
+        latest_reverse = SimpleNamespace(name="16838-latest-R")
+        latest_reverse_older = SimpleNamespace(name="16836-latest-R")
+        selected = latest_confirmation_pair([
+            {"read": old_forward, "orientation": "forward", "run_date": datetime.date(2024, 8, 29), "registration_number": 100},
+            {"read": old_reverse, "orientation": "reverse", "run_date": datetime.date(2024, 8, 29), "registration_number": 101},
+            {"read": latest_forward_older, "orientation": "forward", "run_date": datetime.date(2024, 9, 5), "registration_number": 16835},
+            {"read": latest_reverse_older, "orientation": "reverse", "run_date": datetime.date(2024, 9, 5), "registration_number": 16836},
+            {"read": latest_forward, "orientation": "forward", "run_date": datetime.date(2024, 9, 5), "registration_number": 16837},
+            {"read": latest_reverse, "orientation": "reverse", "run_date": datetime.date(2024, 9, 5), "registration_number": 16838},
+        ])
+
+        self.assertEqual(selected, [latest_forward, latest_reverse])
+
+    def test_omits_unknown_reads_when_latest_complete_pair_exists(self):
+        old_forward = SimpleNamespace(name="100-old-F")
+        old_reverse = SimpleNamespace(name="101-old-R")
+        old_unknown = SimpleNamespace(name="102-old-unknown")
+        latest_forward = SimpleNamespace(name="200-latest-F")
+        latest_reverse = SimpleNamespace(name="201-latest-R")
+        latest_unknown = SimpleNamespace(name="202-latest-unknown")
+
+        selected = latest_confirmation_pair([
+            {"read": old_forward, "orientation": "forward", "run_date": datetime.date(2024, 8, 29), "registration_number": 100},
+            {"read": old_reverse, "orientation": "reverse", "run_date": datetime.date(2024, 8, 29), "registration_number": 101},
+            {"read": old_unknown, "orientation": "unknown", "run_date": datetime.date(2024, 8, 29), "registration_number": 102},
+            {"read": latest_forward, "orientation": "forward", "run_date": datetime.date(2024, 9, 5), "registration_number": 200},
+            {"read": latest_reverse, "orientation": "reverse", "run_date": datetime.date(2024, 9, 5), "registration_number": 201},
+            {"read": latest_unknown, "orientation": "unknown", "run_date": datetime.date(2024, 9, 5), "registration_number": 202},
+        ])
+
+        self.assertEqual(selected, [latest_forward, latest_reverse])
+
+    def test_omits_unknown_reads_when_only_one_orientation_exists(self):
+        latest_forward = SimpleNamespace(name="latest-forward")
+        old_unknown = SimpleNamespace(name="old-unknown")
+        latest_unknown = SimpleNamespace(name="latest-unknown")
+
+        selected = latest_confirmation_pair([
+            {
+                "read": old_unknown,
+                "orientation": "unknown",
+                "run_date": datetime.date(2024, 8, 29),
+                "registration_number": 100,
+            },
+            {
+                "read": latest_forward,
+                "orientation": "forward",
+                "run_date": datetime.date(2024, 9, 5),
+                "run_datetime": datetime.datetime(2024, 9, 5, 12, 0),
+                "registration_number": 200,
+            },
+            {
+                "read": latest_unknown,
+                "orientation": "unknown",
+                "run_date": datetime.date(2024, 9, 5),
+                "registration_number": 201,
+            },
+        ])
+
+        self.assertEqual(selected, [latest_forward])
+
+    def test_review_uses_latest_complete_date_group_before_region_selection(self):
+        old_forward = {"name": "old-forward", "is_usable": True, "alignment": {"orientation": "forward"}}
+        latest_forward = {"name": "latest-forward", "is_usable": True, "alignment": {"orientation": "forward"}}
+        latest_reverse = {"name": "latest-reverse", "is_usable": True, "alignment": {"orientation": "reverse"}}
+
+        selected = select_sanger_review_candidates([
+            {"read": old_forward, "orientation": "forward", "covered_positions": [1, 2], "run_date": datetime.date(2024, 8, 29)},
+            {"read": latest_forward, "orientation": "forward", "covered_positions": [3, 4], "run_date": datetime.date(2024, 9, 5)},
+            {"read": latest_reverse, "orientation": "reverse", "covered_positions": [5, 6], "run_date": datetime.date(2024, 9, 5)},
+        ])
+
+        self.assertEqual([item["read"] for item in selected], [latest_forward, latest_reverse])
+
+    def test_groups_failed_reads_with_consecutive_registration_numbers(self):
+        first = SimpleNamespace(id="first", files=SimpleNamespace(all=lambda: [SimpleNamespace(
+            original_name="36720-read_2025-10-15-12-34-25.ab1", metadata={}
+        )]))
+        second = SimpleNamespace(id="second", files=SimpleNamespace(all=lambda: [SimpleNamespace(
+            original_name="36721-read_2025-10-15-12-34-25.ab1", metadata={}
+        )]))
+
+        groups = sanger_failed_read_groups([first, second])
+
+        self.assertEqual([[read.id for read in group["reads"]] for group in groups], [["second", "first"]])
+
+    def test_collapses_overlapping_reads_per_orientation_to_latest(self):
+        old_forward = SimpleNamespace(name="old-forward")
+        latest_forward = SimpleNamespace(name="latest-forward")
+        selected = select_nonredundant_read_candidates([
+            {
+                "read": old_forward,
+                "orientation": "forward",
+                "covered_positions": list(range(100, 200)),
+                "run_datetime": datetime.datetime(2026, 5, 4, 18, 35, 26),
+                "registration_number": 4998,
+            },
+            {
+                "read": latest_forward,
+                "orientation": "forward",
+                "covered_positions": list(range(110, 210)),
+                "run_datetime": datetime.datetime(2026, 7, 7, 13, 15, 37),
+                "registration_number": 6098,
+            },
+        ])
+
+        self.assertEqual([item["read"] for item in selected], [latest_forward])
+
+    def test_keeps_same_orientation_reads_covering_distinct_regions(self):
+        first_forward = SimpleNamespace(name="first-forward")
+        second_forward = SimpleNamespace(name="second-forward")
+        selected = select_nonredundant_read_candidates([
+            {
+                "read": first_forward,
+                "orientation": "forward",
+                "covered_positions": list(range(100, 200)),
+                "run_datetime": datetime.datetime(2026, 7, 7, 13, 15, 37),
+            },
+            {
+                "read": second_forward,
+                "orientation": "forward",
+                "covered_positions": list(range(500, 600)),
+                "run_datetime": datetime.datetime(2026, 7, 7, 13, 20, 37),
+            },
+        ])
+
+        self.assertEqual([item["read"] for item in selected], [first_forward, second_forward])
+
+    def test_saved_run_review_omits_failed_reads_when_usable_evidence_exists(self):
+        failed = {"name": "old-failed", "is_usable": False, "alignment": {}}
+        latest = {"name": "latest-forward", "is_usable": True, "alignment": {"orientation": "forward"}}
+
+        selected = select_sanger_review_candidates([
+            {"read": failed, "orientation": "unknown", "covered_positions": []},
+            {"read": latest, "orientation": "forward", "covered_positions": [100, 101]},
+        ])
+
+        self.assertEqual([item["read"] for item in selected], [latest])
+
+    def test_prefers_manual_acceptance_then_automatic_pass(self):
+        runs = [
+            SimpleNamespace(id="accepted", created_at=datetime.datetime(2026, 1, 1), automated_state="PASS", manual_decision="VERIFIED"),
+            SimpleNamespace(id="automatic", created_at=datetime.datetime(2026, 1, 2), automated_state="PASS", manual_decision=""),
+            SimpleNamespace(id="review", created_at=datetime.datetime(2026, 1, 4), automated_state="REVIEW", manual_decision=""),
+            SimpleNamespace(id="latest", created_at=datetime.datetime(2026, 1, 5), automated_state="FAIL", manual_decision=""),
+        ]
+
+        self.assertEqual(preferred_sanger_run(runs).id, "accepted")
+
+        runs[0].manual_decision = ""
+        self.assertEqual(preferred_sanger_run(runs).id, "automatic")
+
+        runs[0].automated_state = "FAIL"
+        runs[1].automated_state = "FAIL"
+        self.assertEqual(preferred_sanger_run(runs).id, "review")
+
+        runs[2].automated_state = "FAIL"
+        self.assertEqual(preferred_sanger_run(runs).id, "latest")
 
 
 class PrimerDimerAnalysisTests(SimpleTestCase):

@@ -2,17 +2,12 @@ from django.core.management.base import BaseCommand
 
 from inventory.custom.pcr import infer_type_iis_overhang
 from inventory.models import Primer
-from organization.models import Project
 
 
 class Command(BaseCommand):
     help = "Identify Type IIS cloning overhangs in primers whose full sequence is stored as the 3' sequence."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--project",
-            help="Project name or numeric project ID to restrict the scan.",
-        )
         parser.add_argument(
             "--apply",
             action="store_true",
@@ -21,15 +16,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         primers = Primer.objects.order_by("name")
-        project_value = options.get("project")
-        if project_value:
-            if str(project_value).isdigit():
-                project = Project.objects.filter(id=int(project_value)).first()
-            else:
-                project = Project.objects.filter(name=project_value).first()
-            if not project:
-                raise SystemExit(f"Project not found: {project_value}")
-            primers = primers.filter(project=project)
 
         scanned = 0
         matched = 0

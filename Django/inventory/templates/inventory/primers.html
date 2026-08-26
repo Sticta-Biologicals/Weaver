@@ -4,10 +4,9 @@
 
 {% block header_object_name %}Primers{% endblock %}
 {% block header_object_links %}
-    {% include "inventory/parts/show_from_all_projects.html" %}
     <a href="{% url 'primers' %}" class="btn btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Refresh"><i class="bi bi-arrow-clockwise"></i></a>
-    <a href="{% url 'primer_import' %}" class="btn btn-outline-primary{% if not on_current_project_member_can_write_or_admin %} disabled{% endif %}" role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Batch upload primers"><i class="bi bi-upload"></i></a>
-    <a href="{% url 'primer_create' %}" class="btn btn-primary{% if not on_current_project_member_can_write_or_admin %} disabled{% endif %}" role="button" target="_blank"><i
+    <a href="{% url 'primer_import' %}" class="btn btn-outline-primary{% if not user_can_manage_primers %} disabled{% endif %}" role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Batch upload primers" aria-label="Batch upload primers"><i class="bi bi-upload"></i></a>
+    <a href="{% url 'primer_create' %}" class="btn btn-primary{% if not user_can_manage_primers %} disabled{% endif %}" role="button" target="_blank" data-bs-toggle="tooltip" data-bs-placement="top" title="Create primer" aria-label="Create primer"><i
                 class="bi bi-plus"></i></a>
 {% endblock %}
 
@@ -39,7 +38,7 @@
     <tr>
         <td>
             <a class="btn-group table-search-search_on me-1" role="button" href="{% url 'primer' primer_id=primer.id %}"
-               data-search-all="{{primer_id}} {{primer.display_name}} {{primer.project}} {{primer.intended_use}} {{primer.sequence_5}}{{primer.sequence_3}}"
+               data-search-all="{{primer_id}} {{primer.display_name}} {{primer.intended_use}} {{primer.sequence_5}}{{primer.sequence_3}}"
                data-search-idx="{{primer_id}}"
                data-search-name="{{primer.display_name}}">
                 {% if primer_id %}

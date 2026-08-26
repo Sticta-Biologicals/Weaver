@@ -106,6 +106,33 @@ class SangerAlignForm(forms.Form):
         return cleaned_data
 
 
+class SangerBatchUploadForm(forms.Form):
+    ab1_files = MultipleFileField(
+        label="AB1 files",
+        widget=MultipleFileInput(attrs={
+            "multiple": True,
+            "accept": ".ab1",
+            "id": "id_ab1_files",
+        }),
+    )
+    mapping_csv = forms.FileField(label="CSV mapping file")
+    replace_existing = forms.BooleanField(
+        label="Replace existing files",
+        required=False,
+        help_text="Process a new version when an AB1 with the same name already exists for that plasmid.",
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        files = self.files.getlist("ab1_files")
+        invalid_files = [file.name for file in files if not file.name.lower().endswith(".ab1")]
+        if invalid_files:
+            self.add_error("ab1_files", "Only .ab1 files are accepted: {}".format(", ".join(invalid_files)))
+        if not files:
+            self.add_error("ab1_files", "Upload at least one .ab1 file.")
+        return cleaned_data
+
+
 class DateInput(forms.DateInput):
     input_type = 'date'
 

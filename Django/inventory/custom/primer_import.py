@@ -117,7 +117,6 @@ def primer_entries_from_fasta(
 
 def import_primers_from_fasta(
         handle,
-        project,
         dry_run=False,
         update_existing=False,
         name_source="id",
@@ -147,7 +146,7 @@ def import_primers_from_fasta(
             })
             continue
 
-        primer = Primer.objects.filter(name=entry["name"], project=project).first()
+        primer = Primer.objects.filter(name=entry["name"]).first()
 
         if primer:
             if not update_existing:
@@ -178,7 +177,6 @@ def import_primers_from_fasta(
                 sequence_5=entry["sequence_5"],
                 fwd_or_rev=entry["direction"],
                 intended_use=entry["intended_use"],
-                project=project,
             )
         result["created"] += 1
         result["messages"].append({

@@ -2,19 +2,12 @@ from django.core.management.base import BaseCommand, CommandError
 
 from inventory.custom.primer_import import PrimerImportError
 from inventory.custom.primer_import import import_primers_from_fasta
-from organization.models import Project
-
 
 class Command(BaseCommand):
     help = "Import primers from a FASTA file into Weaver's Primer database."
 
     def add_arguments(self, parser):
         parser.add_argument("fasta_path", help="Path to the FASTA file to import.")
-        parser.add_argument(
-            "--project",
-            required=True,
-            help="Project name or numeric project ID for imported primers.",
-        )
         parser.add_argument(
             "--dry-run",
             action="store_true",
@@ -23,7 +16,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--update-existing",
             action="store_true",
-            help="Update existing primers with the same name and project.",
+            help="Update existing primers with the same name.",
         )
         parser.add_argument(
             "--name-source",
@@ -43,13 +36,10 @@ class Command(BaseCommand):
             help="Direction to use when F/R cannot be inferred from the name.",
         )
     def handle(self, *args, **options):
-        project = self.get_project(options["project"])
-
         try:
             with open(options["fasta_path"], encoding="utf-8-sig") as fasta_handle:
                 result = import_primers_from_fasta(
                     fasta_handle,
-                    project,
                     dry_run=options["dry_run"],
                     update_existing=options["update_existing"],
                     name_source=options["name_source"],
@@ -72,14 +62,3 @@ class Command(BaseCommand):
                 f"{action} {result['created']}, {update_action} {result['updated']}, skipped {result['skipped']}, errors {result['errors']}."
             )
         )
-
-    def get_project(self, project_value):
-        if project_value.isdigit():
-            project = Project.objects.filter(id=int(project_value)).first()
-        else:
-            project = Project.objects.filter(name__iexact=project_value).first()
-
-        if not project:
-            raise CommandError(f"Project not found: {project_value}")
-
-        return project

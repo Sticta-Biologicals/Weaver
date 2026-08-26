@@ -17,11 +17,16 @@
     }
     .sanger-file-row {
         display: grid;
-        grid-template-columns: minmax(180px, 1fr) 90px 100px minmax(150px, .8fr) 44px;
+        grid-template-columns: minmax(180px, 1fr) 90px 100px minmax(150px, .8fr) minmax(220px, 1fr) 44px;
         gap: .75rem;
         align-items: center;
         border-bottom: 1px solid #3f474f;
         padding: .5rem 0;
+    }
+    .sanger-file-header {
+        display: grid;
+        grid-template-columns: minmax(180px, 1fr) 90px 100px minmax(150px, .8fr) minmax(220px, 1fr) 44px;
+        gap: .75rem;
     }
     .sanger-summary-grid {
         display: grid;
@@ -123,6 +128,136 @@
     .sanger-delete-button:focus,
     .sanger-delete-button:active {
         transform: none !important;
+    }
+    .sanger-run-list {
+        display: grid;
+        gap: .75rem;
+    }
+    .sanger-run-card {
+        border: 1px solid #49525c;
+        border-radius: 8px;
+        background: #252a30;
+        overflow: hidden;
+    }
+    .sanger-run-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: .85rem 1rem .7rem;
+        border-bottom: 1px solid #3f474f;
+    }
+    .sanger-run-card-kicker,
+    .sanger-run-card-section-label {
+        color: #aab4be;
+        font-size: .72rem;
+        letter-spacing: .02em;
+        text-transform: uppercase;
+    }
+    .sanger-run-card-date {
+        margin: .15rem 0 .1rem;
+        color: #f2f5f8;
+        font-size: 1.05rem;
+        font-weight: 500;
+    }
+    .sanger-run-card-uploaded {
+        color: #aab4be;
+        font-size: .78rem;
+    }
+    .sanger-run-card-statuses {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: .35rem;
+    }
+    .sanger-run-card-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 1rem;
+        align-items: end;
+        padding: .85rem 1rem;
+    }
+    .sanger-run-card-summary {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .45rem;
+        margin-bottom: .8rem;
+    }
+    .sanger-run-stat {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .3rem .5rem;
+        border: 1px solid #49525c;
+        border-radius: .35rem;
+        color: #f2f5f8;
+        font-size: .78rem;
+    }
+    .sanger-run-stat-label {
+        color: #aab4be;
+    }
+    .sanger-run-file-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .4rem;
+        margin-top: .35rem;
+    }
+    .sanger-run-file-chip {
+        display: inline-flex;
+        align-items: center;
+        min-width: 0;
+        max-width: 100%;
+        padding: .28rem .45rem;
+        border: 1px solid #49525c;
+        border-radius: .35rem;
+        background: #1f2429;
+        color: #f2f5f8;
+        font-size: .78rem;
+    }
+    .sanger-run-file-chip .badge {
+        flex: 0 0 auto;
+        margin-right: .4rem;
+        font-size: .65rem;
+        font-weight: 500;
+    }
+    .sanger-run-file-name {
+        min-width: 0;
+        max-width: 520px;
+        overflow: hidden;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .sanger-run-file-primer {
+        max-width: 180px;
+        margin-left: .5rem;
+        overflow: hidden;
+        color: #aab4be;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .sanger-run-file-primer a {
+        color: #6ea8fe;
+    }
+    .sanger-run-card-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: .35rem;
+    }
+    @media (max-width: 767.98px) {
+        .sanger-run-card-header,
+        .sanger-run-card-body {
+            display: block;
+        }
+        .sanger-run-card-statuses,
+        .sanger-run-card-actions {
+            justify-content: flex-start;
+            margin-top: .65rem;
+        }
+        .sanger-run-file-name {
+            max-width: 210px;
+        }
     }
     .sanger-map {
         position: relative;
@@ -470,11 +605,50 @@
         height: 108px;
         padding: 0 !important;
         background: #101214;
+        cursor: grab;
+        touch-action: none;
+    }
+    .sanger-base-view.is-dragging-trace .sanger-trace-track {
+        cursor: grabbing;
     }
     .sanger-trace-track canvas {
         display: block;
         width: 100%;
         height: 108px;
+    }
+    .sanger-trace-label {
+        padding: .3rem .45rem;
+    }
+    .sanger-trace-label-content {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: .2rem;
+        min-width: 0;
+    }
+    .sanger-trace-label-name {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .sanger-inline-autoadjust {
+        display: flex;
+        align-items: center;
+        gap: .25rem;
+        margin: 0 0 0 -.15rem;
+        padding-left: 0;
+        color: #dce5ee;
+        cursor: pointer;
+        font-size: .92rem;
+        font-weight: 400;
+        line-height: 1.45;
+        justify-content: flex-start;
+        white-space: nowrap;
+    }
+    .sanger-inline-autoadjust .form-check-input {
+        flex: 0 0 auto;
+        margin: 0;
     }
     .sanger-browser-toolbar {
         display: flex;
@@ -626,6 +800,41 @@
         color: #aab4be;
         border-top: 1px solid #343c44;
     }
+    .sanger-primer-edit {
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+        width: 180px;
+        min-width: 0;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        height: auto !important;
+    }
+    .sanger-primer-edit .form-select {
+        width: 148px;
+        min-width: 0;
+        padding: .2rem 1.75rem .2rem .45rem;
+        font-size: .78rem;
+    }
+    .sanger-primer-name {
+        display: inline-flex;
+        align-items: center;
+        gap: .25rem;
+        max-width: 220px;
+    }
+    .sanger-run-selector-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+    }
+    .sanger-run-selector {
+        width: 360px;
+        max-width: 38vw;
+        padding: .25rem 1.75rem .25rem .5rem;
+        font-size: .82rem;
+    }
     .sanger-base-a { color: #23d03f; }
     .sanger-base-c { color: #7fa1ff; }
     .sanger-base-g { color: #e6e6e6; }
@@ -638,9 +847,25 @@
         <h2 class="mb-1">{% if alignment_source_type == "FASTA" %}FASTA alignment{% else %}Sequence alignment{% endif %}</h2>
         <div class="text-muted">{{ plasmid.name }}</div>
     </div>
-    {% if not show_upload_form %}
-    <a href="{% if alignment_source_type == "FASTA" %}{% url 'plasmid_align_fasta' plasmid_id=plasmid.id %}{% else %}{% url 'plasmid_align' plasmid_id=plasmid.id %}{% endif %}" class="btn btn-outline-primary" role="button"><i class="bi bi-plus-circle-dotted"></i> New alignment</a>
-    {% endif %}
+    <div class="d-flex gap-2">
+        {% if not show_upload_form %}
+        {% if is_saved_run_view %}
+        {% if sanger_run_choices|length > 1 %}
+        <div class="sanger-run-selector-wrap">
+            <label class="small text-muted mb-0" for="sanger-run-selector-detail">Run</label>
+            <select id="sanger-run-selector-detail" class="form-select sanger-run-selector" aria-label="Select Sanger run" onchange="if (this.value) window.location.href = this.value;">
+                {% for run_choice in sanger_run_choices %}
+                <option value="{{ run_choice.url }}"{% if run_choice.selected %} selected{% endif %}>{{ run_choice.label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+        {% endif %}
+        {% endif %}
+        {% if alignment_source_type != "FASTA" %}
+        <a href="{% url 'services-sanger' %}" class="btn btn-outline-warning" role="button" title="Return to run tables"><i class="bi bi-arrow-left me-1"></i> Return to run tables</a>
+        {% endif %}
+    </div>
 </div>
 
 {% if error %}
@@ -656,13 +881,76 @@
 <div class="alert alert-success">{{ upload_done }}</div>
 {% endif %}
 
-{% if show_upload_form %}
-{% if alignment_source_type != "FASTA" %}
-<div class="sanger-panel mb-4">
-    <h4 class="mb-1">Upload sequencing files</h4>
-    <div class="text-muted">Select one or more Sanger trace files. Multiple <code>.ab1</code> files are supported in the same batch.</div>
+{% if primer_update_done %}
+<div class="alert alert-success">{{ primer_update_done }}</div>
+{% endif %}
+
+{% if recent_runs and not is_saved_run_view %}
+<div class="d-flex justify-content-between align-items-center mt-4 mb-2 gap-2 flex-wrap">
+    <h4 class="mb-0">Saved Sanger runs</h4>
+</div>
+<div class="sanger-run-list mb-4" aria-label="Saved Sanger runs">
+    {% for previous_run in recent_runs %}
+    <article class="sanger-run-card">
+        <div class="sanger-run-card-header">
+            <div>
+                <div class="sanger-run-card-kicker">Sequencing run</div>
+                <div class="sanger-run-card-date">{{ previous_run.services_sequence_date|default:"Date unavailable" }}</div>
+                <div class="sanger-run-card-uploaded">Uploaded {{ previous_run.created_at|date:"d M Y" }}</div>
+            </div>
+            <div class="sanger-run-card-statuses">
+                {% if previous_run.automated_state == "PASS" %}
+                <span class="badge text-bg-success">Pass</span>
+                {% elif previous_run.automated_state == "REVIEW" %}
+                <span class="badge text-bg-warning">Review</span>
+                {% elif previous_run.automated_state == "FAIL" %}
+                <span class="badge text-bg-danger">Fail</span>
+                {% else %}
+                <span class="badge text-bg-secondary">No usable data</span>
+                {% endif %}
+                <span class="badge text-bg-secondary">{{ previous_run.get_manual_decision_display|default:"Pending" }}</span>
+            </div>
+        </div>
+        <div class="sanger-run-card-body">
+            <div>
+                <div class="sanger-run-card-summary">
+                    <span class="sanger-run-stat"><span class="sanger-run-stat-label">Reads</span><strong>{{ previous_run.combined_metrics.useful_reads }}/{{ previous_run.combined_metrics.read_count }}</strong></span>
+                    <span class="sanger-run-stat"><span class="sanger-run-stat-label">Coverage</span><strong>{{ previous_run.combined_metrics.combined_coverage }}%</strong></span>
+                </div>
+                <div class="sanger-run-card-section-label">Uploaded files</div>
+                <div class="sanger-run-file-list">
+                    {% for previous_read in previous_run.reads.all %}
+                        {% for uploaded_file in previous_read.files.all %}
+                        <span class="sanger-run-file-chip" title="{{ uploaded_file.original_name }}">
+                            <span class="badge text-bg-secondary">{{ uploaded_file.format|upper }}</span>
+                            <span class="sanger-run-file-name">{{ uploaded_file.original_name }}</span>
+                            {% if uploaded_file.primer %}<span class="sanger-run-file-primer">primer: <a href="{% url 'primer' primer_id=uploaded_file.primer.id %}">{{ uploaded_file.primer.name }}</a></span>{% endif %}
+                        </span>
+                        {% empty %}
+                        <span class="sanger-run-file-chip" title="Source unavailable"><span class="sanger-run-file-name">{{ previous_read.name }} (source unavailable)</span></span>
+                        {% endfor %}
+                    {% empty %}
+                    <span class="text-secondary">No files recorded</span>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="sanger-run-card-actions">
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'sanger_run_detail' plasmid_id=plasmid.id run_id=previous_run.id %}"><i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>Open</a>
+                <a class="btn btn-outline-secondary btn-sm" href="{% url 'sanger_run_download' plasmid_id=plasmid.id run_id=previous_run.id kind='reads' %}"><i class="bi bi-download me-1" aria-hidden="true"></i>Metrics</a>
+                {% if user_can_edit_plasmid %}
+                <form method="POST" action="{% url 'sanger_run_delete' plasmid_id=plasmid.id run_id=previous_run.id %}" class="sanger-inline-form" onsubmit="return confirm('Delete this Sanger run and its uploaded files?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger btn-sm sanger-delete-button">Delete</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </article>
+    {% endfor %}
 </div>
 {% endif %}
+
+{% if show_upload_form %}
 {% if alignment_source_type == "FASTA" %}
 <form method="POST" enctype="multipart/form-data" id="fasta-upload-form">
     {% csrf_token %}
@@ -769,54 +1057,14 @@
         <strong id="sanger-queue-count">No files selected</strong>
         <button type="button" class="btn btn-outline-secondary btn-sm" id="sanger-clear-files">Clear queue</button>
     </div>
+    <div class="sanger-file-header small text-muted mb-1" aria-hidden="true">
+        <span>File</span><span>Format</span><span>Size</span><span>Read group</span><span>Primer used (required for Sanger files)</span><span></span>
+    </div>
     <div id="sanger-file-list" class="mb-3"></div>
     <div class="alert alert-info" id="sanger-group-summary">No read groups detected yet.</div>
     <input class="btn btn-primary" type="submit" value="Align">
 </form>
-{% endif %}
-
-{% if recent_runs %}
-<h4 class="mt-5">Saved Sanger runs</h4>
-<div class="table-responsive">
-    <table class="table table-sm align-middle">
-        <thead><tr><th>Date</th><th>Uploaded files</th><th>Reads</th><th>Coverage</th><th>User decision</th><th></th></tr></thead>
-        <tbody>
-        {% for previous_run in recent_runs %}
-        <tr>
-            <td>{{ previous_run.created_at|date:"d M Y H:i" }}</td>
-            <td>
-                {% for previous_read in previous_run.reads.all %}
-                    <div class="small mb-1">
-                        {% for uploaded_file in previous_read.files.all %}
-                            <span class="font-monospace">{{ uploaded_file.original_name }}</span>{% if not forloop.last %}, {% endif %}
-                        {% empty %}
-                            <span class="text-muted">{{ previous_read.name }} (source unavailable)</span>
-                        {% endfor %}
-                    </div>
-                {% empty %}
-                    <span class="text-muted">No files recorded</span>
-                {% endfor %}
-            </td>
-            <td>{{ previous_run.combined_metrics.useful_reads }}/{{ previous_run.combined_metrics.read_count }}</td>
-            <td>{{ previous_run.combined_metrics.combined_coverage }}%</td>
-            <td>{{ previous_run.get_manual_decision_display }}</td>
-            <td>
-                <div class="sanger-run-actions">
-                <a class="btn btn-outline-primary btn-sm" href="{% url 'sanger_run_detail' plasmid_id=plasmid.id run_id=previous_run.id %}">Open</a>
-                <a class="btn btn-outline-secondary btn-sm" href="{% url 'sanger_run_download' plasmid_id=plasmid.id run_id=previous_run.id kind='reads' %}">Metrics</a>
-                {% if user_can_edit_plasmid %}
-                <form method="POST" action="{% url 'sanger_run_delete' plasmid_id=plasmid.id run_id=previous_run.id %}" class="sanger-inline-form" onsubmit="return confirm('Delete this Sanger run and its uploaded files?');">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-danger btn-sm sanger-delete-button">Delete</button>
-                </form>
-                {% endif %}
-                </div>
-            </td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
+{{ sanger_primer_choices|json_script:"sanger-primer-options" }}
 {% endif %}
 
 <script>
@@ -827,8 +1075,15 @@
     const count = document.getElementById("sanger-queue-count");
     const summary = document.getElementById("sanger-group-summary");
     const clear = document.getElementById("sanger-clear-files");
+    const primerOptionsElement = document.getElementById("sanger-primer-options");
+    const primerOptions = primerOptionsElement ? JSON.parse(primerOptionsElement.textContent) : [];
     const dt = new DataTransfer();
+    const primerSelections = {};
     const validSuffixes = [".ab1", ".phd.1", ".seq", ".fa", ".fas", ".fasta"];
+
+    function fileKey(file) {
+        return `${file.name}|${file.size}|${file.lastModified}`;
+    }
 
     function formatOf(name) {
         const lower = name.toLowerCase();
@@ -858,6 +1113,29 @@
             const row = document.createElement("div");
             row.className = "sanger-file-row";
             row.innerHTML = `<span>${file.name}</span><span>${format}</span><span>${Math.ceil(file.size / 1024)} KB</span><span>${group}</span>`;
+            const primerSelect = document.createElement("select");
+            primerSelect.className = "form-select form-select-sm";
+            primerSelect.name = "primer_id";
+            primerSelect.required = ["AB1", "PHD.1", "SEQ"].includes(format);
+            primerSelect.setAttribute("aria-label", `Primer used for ${file.name}`);
+            const placeholder = document.createElement("option");
+            placeholder.value = "";
+            placeholder.textContent = primerOptions.length
+                ? (primerSelect.required ? "Select primer" : "No primer (FASTA)")
+                : "No primers available";
+            placeholder.selected = true;
+            primerSelect.appendChild(placeholder);
+            primerOptions.forEach((primer) => {
+                const option = document.createElement("option");
+                option.value = primer.id;
+                option.textContent = primer.label;
+                primerSelect.appendChild(option);
+            });
+            primerSelect.value = primerSelections[fileKey(file)] || "";
+            primerSelect.addEventListener("change", function () {
+                primerSelections[fileKey(file)] = primerSelect.value;
+            });
+            row.appendChild(primerSelect);
             const remove = document.createElement("button");
             remove.type = "button";
             remove.className = "btn btn-outline-danger btn-sm";
@@ -869,6 +1147,7 @@
                 });
                 dt.items.clear();
                 Array.from(fresh.files).forEach((kept) => dt.items.add(kept));
+                delete primerSelections[fileKey(file)];
                 sync();
             });
             row.appendChild(remove);
@@ -889,7 +1168,11 @@
         sync();
     }
     input.addEventListener("change", function () { addFiles(input.files); });
-    clear.addEventListener("click", function () { dt.items.clear(); sync(); });
+    clear.addEventListener("click", function () {
+        dt.items.clear();
+        Object.keys(primerSelections).forEach((key) => delete primerSelections[key]);
+        sync();
+    });
     dropZone.addEventListener("dragover", function (event) {
         event.preventDefault();
         dropZone.classList.add("is-dragover");
@@ -926,11 +1209,10 @@
 {% endif %}
 
 {% if alignment_source_type != "FASTA" %}
-{% for read in sanger_result.reads %}
-{% if not read.is_usable or not read.alignment %}
+{% for read in sanger_result.failed_reads %}
 <div class="alert alert-warning sanger-review-suggestion">
     <div class="fw-semibold">{{ read.name }} did not produce a reliable alignment.</div>
-    <div class="small mb-2">Review the raw trace and compare its sequence with the plasmid using the independent tools below.</div>
+    <div class="small mb-2">This failed read is kept separately from the active sequencing evidence. Review the raw trace to inspect the failure.</div>
     <div class="d-flex flex-wrap gap-2">
         {% if run and read.id and read.chromatogram.aTrace %}
         <a class="btn btn-outline-warning btn-sm" href="{% url 'sanger_read_chromatogram' plasmid_id=plasmid.id run_id=run.id read_id=read.id %}" target="_blank" rel="noopener">Open chromatogram window</a>
@@ -940,7 +1222,6 @@
         {% endif %}
     </div>
 </div>
-{% endif %}
 {% endfor %}
 {% endif %}
 
@@ -1116,7 +1397,7 @@
     <table class="table table-sm align-middle">
         <thead>
             <tr>
-                <th>{% if alignment_source_type == "FASTA" %}Sequence{% else %}Read{% endif %}</th><th>Formats</th><th>Source</th><th>Orientation</th><th>Coordinates</th><th>Length</th>{% if alignment_source_type != "FASTA" %}<th>Quality</th>{% endif %}<th>Identity</th><th>Variants</th><th>Use</th>
+                <th>{% if alignment_source_type == "FASTA" %}Sequence{% else %}Read{% endif %}</th><th>Formats</th><th>Source</th><th>Primer</th><th>Orientation</th><th>Coordinates</th><th>Length</th>{% if alignment_source_type != "FASTA" %}<th>Quality</th>{% endif %}<th>Identity</th><th>Variants</th><th>Use</th>
             </tr>
         </thead>
         <tbody>
@@ -1125,6 +1406,30 @@
                 <td>{{ read.name }}</td>
                 <td>{{ read.formats|join:", " }}</td>
                 <td>{{ read.selected_source|upper }}</td>
+                <td>
+                    {% if read.source_file_id %}
+                    {% if user_can_edit_plasmid and run %}
+                    <form method="POST" action="{% url 'sanger_read_file_primer_update' plasmid_id=plasmid.id run_id=run.id read_id=read.id file_id=read.source_file_id %}" class="sanger-primer-edit">
+                        {% csrf_token %}
+                        <select name="primer_id" class="form-select form-select-sm" aria-label="Primer used for {{ read.name }}">
+                            <option value="">No primer</option>
+                            {% for primer in sanger_primer_choices %}
+                            <option value="{{ primer.id }}"{% if read.primer_id == primer.id %} selected{% endif %}>{{ primer.label }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-outline-primary btn-sm" title="Save primer" aria-label="Save primer"><i class="bi bi-check2"></i></button>
+                    </form>
+                    {% elif read.primer_name %}
+                    <a class="sanger-primer-name" href="{% url 'primer' primer_id=read.primer_id %}">
+                        {% if read.primer_display_id %}{{ read.primer_display_id }} - {% endif %}{{ read.primer_display_name|default:read.primer_name }}
+                    </a>
+                    {% else %}
+                    <span class="text-muted">No primer</span>
+                    {% endif %}
+                    {% else %}
+                    <span class="text-muted">—</span>
+                    {% endif %}
+                </td>
                 <td>{{ read.alignment.orientation|default:"unmapped" }}</td>
                 <td>{% if read.alignment %}{{ read.alignment.start_display }}..{{ read.alignment.end_display }}{% if read.alignment.crosses_origin %} (crosses origin){% endif %}{% else %}-{% endif %}</td>
                 <td>{{ read.quality_metrics.raw_length }} -> {{ read.quality_metrics.trimmed_length }}</td>
@@ -1151,7 +1456,7 @@
             {% if warning != "trimmed sequence shorter than minimum" and warning != "The usable sequence is too short for reliable alignment." %}
             <tr>
                 <td></td>
-                <td colspan="9">
+                <td colspan="10">
                     <div class="text-warning">{{ warning }}</div>
                 </td>
             </tr>
@@ -1160,7 +1465,7 @@
             {% for error in read.errors %}
             <tr>
                 <td></td>
-                <td colspan="9"><div class="text-danger">{{ error }}</div></td>
+                <td colspan="10"><div class="text-danger">{{ error }}</div></td>
             </tr>
             {% endfor %}
             {% endfor %}
@@ -1227,6 +1532,11 @@
     let selectedBaseKey = "";
     let selectedDisplayCoordinate = null;
     const hiddenReadIndexes = new Set();
+    const inlineTraceStates = new Map();
+    let inlineDragging = false;
+    let inlineDragStartX = 0;
+    let inlineDragStartWindow = 0;
+    let inlineDragWidth = 0;
     const lowQualityDisplayPhred = 20;
     const lowQualityWindowSize = 12;
 
@@ -1792,7 +2102,50 @@
         });
         return anchors;
     }
-    function drawTraceCanvas(canvas, read, columns) {
+    function traceWindowForColumns(read, columns) {
+        const visible = traceAnchorsForColumns(read, columns);
+        const traceOrdered = visible
+            .filter((point) => point.tracePos !== null && point.tracePos !== undefined)
+            .sort((a, b) => a.tracePos - b.tracePos);
+        if (visible.length < 2 || traceOrdered.length < 2) return null;
+        const traceLength = ((read.chromatogram || {}).aTrace || []).length;
+        if (!traceLength) return null;
+        return {
+            visible: visible,
+            traceOrdered: traceOrdered,
+            traceStart: Math.max(0, Math.min(...traceOrdered.map((point) => point.tracePos))),
+            traceEnd: Math.min(traceLength - 1, Math.max(...traceOrdered.map((point) => point.tracePos))),
+        };
+    }
+    function inlineTraceStateFor(readIndex) {
+        if (!inlineTraceStates.has(readIndex)) {
+            inlineTraceStates.set(readIndex, {
+                autoscaled: false,
+                animatedScaleMax: null,
+                scaleAnimationFrame: null,
+            });
+        }
+        return inlineTraceStates.get(readIndex);
+    }
+    function inlineTraceScaleMax(read, traceStart, traceEnd, autoscaled) {
+        const chrom = read.chromatogram || {};
+        const traces = ["aTrace", "cTrace", "gTrace", "tTrace"];
+        const traceLength = (chrom.aTrace || []).length;
+        if (!autoscaled && read.traceMaxSignal) return Number(read.traceMaxSignal) || 1;
+        const rangeStart = autoscaled ? Math.max(0, Math.floor(traceStart)) : 0;
+        const rangeEnd = autoscaled
+            ? Math.min(traceLength, Math.ceil(traceEnd) + 1)
+            : traceLength;
+        let maxSignal = 1;
+        traces.forEach((key) => {
+            const trace = chrom[key] || [];
+            for (let i = rangeStart; i < rangeEnd && i < trace.length; i += 1) {
+                if (trace[i] > maxSignal) maxSignal = trace[i];
+            }
+        });
+        return maxSignal;
+    }
+    function drawTraceCanvas(canvas, read, columns, state) {
         const chrom = read.chromatogram || {};
         const traces = [
             ["aTrace", "#23d03f"],
@@ -1811,16 +2164,17 @@
         ctx.clearRect(0, 0, width, height);
         ctx.fillStyle = "#101214";
         ctx.fillRect(0, 0, width, height);
-        const visible = traceAnchorsForColumns(read, columns);
-        const traceOrdered = visible
-            .filter((point) => point.tracePos !== null && point.tracePos !== undefined)
-            .sort((a, b) => a.tracePos - b.tracePos);
-        if (visible.length < 2) {
+        const traceWindow = traceWindowForColumns(read, columns);
+        const visible = traceWindow ? traceWindow.visible : [];
+        const traceOrdered = traceWindow ? traceWindow.traceOrdered : [];
+        if (!traceWindow) {
             ctx.fillStyle = "#8fa0b2";
             ctx.font = "12px system-ui, sans-serif";
             ctx.fillText("No aligned AB1 trace in this window", 12, 22);
             return;
         }
+        const traceStart = traceWindow.traceStart;
+        const traceEnd = traceWindow.traceEnd;
         function isHighQualityAnchor(point) {
             return !point.localLowQuality && (point.quality === null || point.quality === undefined || Number(point.quality) >= 20);
         }
@@ -1832,14 +2186,6 @@
         }
         const trustedAnchors = traceOrdered.filter(isHighQualityAnchor);
         const trustedVisibleAnchors = visible.filter(isHighQualityAnchor).sort((a, b) => a.columnIndex - b.columnIndex);
-        if (traceOrdered.length < 2) {
-            ctx.fillStyle = "#8fa0b2";
-            ctx.font = "12px system-ui, sans-serif";
-            ctx.fillText("No aligned AB1 trace in this window", 12, 22);
-            return;
-        }
-        const traceStart = Math.max(0, Math.min(...traceOrdered.map((point) => point.tracePos)));
-        const traceEnd = Math.min((chrom.aTrace || []).length - 1, Math.max(...traceOrdered.map((point) => point.tracePos)));
         function baseColumnMetrics() {
             const sequenceRow = baseView.querySelector(".sanger-base-columns") || baseView.querySelector(".sanger-base-seq");
             if (!sequenceRow) {
@@ -1882,6 +2228,14 @@
         const lowQualityTraceSegments = drawableTraceSegments(traceOrdered, (left, right) => !isHighQualityAnchor(left) || !isHighQualityAnchor(right));
         const insertionTraceSegments = drawableTraceSegments(traceOrdered, isTrustedInsertionSegment);
         const trustedTraceSegments = drawableTraceSegments(trustedAnchors);
+        function isSkippedReferenceGap(segment) {
+            if (segment.right.columnIndex - segment.left.columnIndex <= 1) return false;
+            return !visible.some((point) => (
+                point.columnIndex > segment.left.columnIndex
+                && point.columnIndex < segment.right.columnIndex
+                && point.kind === "insertion"
+            ));
+        }
         function shadeConfidenceColumns() {
             if (!confidenceRegionsVisible()) return;
             const sorted = visible.slice().sort((a, b) => a.columnIndex - b.columnIndex);
@@ -1922,14 +2276,10 @@
                 ctx.fillRect(x1, 24, x2 - x1, height - 36);
             }
         }
-        let maxSignal = Number(read.traceMaxSignal || 0) || 1;
-        traces.forEach(([key]) => {
-            const trace = chrom[key] || [];
-            if (read.traceMaxSignal) return;
-            for (let i = 0; i < trace.length; i++) {
-                if (trace[i] > maxSignal) maxSignal = trace[i];
-            }
-        });
+        const activeTraceState = state || {autoscaled: false, animatedScaleMax: null};
+        const maxSignal = activeTraceState.animatedScaleMax === null
+            ? inlineTraceScaleMax(read, traceStart, traceEnd, activeTraceState.autoscaled)
+            : Math.max(1, Number(activeTraceState.animatedScaleMax) || 1);
         shadeConfidenceColumns();
         function drawTraceSegments(segments, alpha, lineWidth, fillAlpha) {
             ctx.save();
@@ -1937,49 +2287,75 @@
                 const trace = chrom[key] || [];
                 segments.forEach((segment) => {
                     const baseline = height - 12;
+                    const skippedReferenceGap = isSkippedReferenceGap(segment);
+                    const traceMidpoint = skippedReferenceGap
+                        ? (segment.left.tracePos + segment.right.tracePos) / 2
+                        : null;
+                    const gapStartX = skippedReferenceGap
+                        ? anchorX(segment.left) + columnMetrics.pitch / 2
+                        : null;
+                    const gapEndX = skippedReferenceGap
+                        ? anchorX(segment.right) - columnMetrics.pitch / 2
+                        : null;
+                    function traceX(tracePosition) {
+                        if (!skippedReferenceGap) return xForTracePosition(tracePosition, segment.left, segment.right);
+                        if (tracePosition <= traceMidpoint) {
+                            return anchorX(segment.left) + (gapStartX - anchorX(segment.left)) * (
+                                (tracePosition - segment.left.tracePos) / Math.max(1, traceMidpoint - segment.left.tracePos)
+                            );
+                        }
+                        return gapEndX + (anchorX(segment.right) - gapEndX) * (
+                            (tracePosition - traceMidpoint) / Math.max(1, segment.right.tracePos - traceMidpoint)
+                        );
+                    }
                     ctx.beginPath();
                     let started = false;
-                    let firstX = null;
-                    let lastX = null;
+                    let previousSide = null;
+                    const points = [];
                     for (let i = segment.startTrace; i <= segment.endTrace && i < trace.length; i++) {
-                        const x = xForTracePosition(i, segment.left, segment.right);
+                        const x = traceX(i);
                         if (x < -4 || x > width + 4) continue;
                         const y = baseline - (trace[i] / maxSignal * (height - 28));
-                        if (!started) {
-                            ctx.moveTo(x, baseline);
-                            ctx.lineTo(x, y);
-                            firstX = x;
-                            started = true;
-                        } else {
-                            ctx.lineTo(x, y);
-                        }
-                        lastX = x;
-                    }
-                    if (!started) return;
-                    ctx.lineTo(lastX, baseline);
-                    ctx.lineTo(firstX, baseline);
-                    ctx.closePath();
-                    ctx.fillStyle = color;
-                    ctx.globalAlpha = fillAlpha;
-                    ctx.fill();
-
-                    ctx.strokeStyle = color;
-                    ctx.lineWidth = lineWidth;
-                    ctx.globalAlpha = alpha;
-                    ctx.beginPath();
-                    started = false;
-                    for (let i = segment.startTrace; i <= segment.endTrace && i < trace.length; i++) {
-                        const x = xForTracePosition(i, segment.left, segment.right);
-                        if (x < -4 || x > width + 4) continue;
-                        const y = baseline - (trace[i] / maxSignal * (height - 28));
+                        const side = skippedReferenceGap && i > traceMidpoint ? "right" : "left";
+                        points.push({x: x, y: y, side: side});
                         if (!started) {
                             ctx.moveTo(x, y);
                             started = true;
+                        } else if (side !== previousSide) {
+                            ctx.lineTo(gapStartX, baseline);
+                            ctx.moveTo(gapEndX, baseline);
+                            ctx.lineTo(x, y);
                         } else {
                             ctx.lineTo(x, y);
                         }
+                        previousSide = side;
                     }
                     if (started) {
+                        if (!skippedReferenceGap) {
+                            ctx.beginPath();
+                            ctx.moveTo(points[0].x, baseline);
+                            points.forEach((point) => ctx.lineTo(point.x, point.y));
+                            ctx.lineTo(points[points.length - 1].x, baseline);
+                            ctx.closePath();
+                            ctx.fillStyle = color;
+                            ctx.globalAlpha = fillAlpha;
+                            ctx.fill();
+                        }
+                        ctx.strokeStyle = color;
+                        ctx.lineWidth = lineWidth;
+                        ctx.globalAlpha = alpha;
+                        ctx.beginPath();
+                        points.forEach((point, index) => {
+                            if (index === 0) {
+                                ctx.moveTo(point.x, point.y);
+                            } else if (point.side !== points[index - 1].side) {
+                                ctx.lineTo(gapStartX, baseline);
+                                ctx.moveTo(gapEndX, baseline);
+                                ctx.lineTo(point.x, point.y);
+                            } else {
+                                ctx.lineTo(point.x, point.y);
+                            }
+                        });
                         ctx.stroke();
                     }
                 });
@@ -2005,10 +2381,80 @@
             }
         });
     }
-    function traceTrack(read, columns) {
+    function animateInlineTraceScale(canvas, read, columns, state, fromScale) {
+        if (state.scaleAnimationFrame !== null) cancelAnimationFrame(state.scaleAnimationFrame);
+        const traceWindow = traceWindowForColumns(read, columns);
+        if (!traceWindow) {
+            state.animatedScaleMax = null;
+            state.scaleAnimationFrame = null;
+            drawTraceCanvas(canvas, read, columns, state);
+            return;
+        }
+        const targetScale = inlineTraceScaleMax(read, traceWindow.traceStart, traceWindow.traceEnd, state.autoscaled);
+        const startScale = Number.isFinite(fromScale) ? fromScale : targetScale;
+        const duration = 280;
+        const animationStart = performance.now();
+        function frame(now) {
+            const rawProgress = Math.min(1, (now - animationStart) / duration);
+            const progress = rawProgress < .5
+                ? 2 * rawProgress * rawProgress
+                : 1 - Math.pow(-2 * rawProgress + 2, 2) / 2;
+            state.animatedScaleMax = startScale + (targetScale - startScale) * progress;
+            drawTraceCanvas(canvas, read, columns, state);
+            if (rawProgress < 1) {
+                state.scaleAnimationFrame = requestAnimationFrame(frame);
+            } else {
+                state.animatedScaleMax = null;
+                state.scaleAnimationFrame = null;
+            }
+        }
+        state.scaleAnimationFrame = requestAnimationFrame(frame);
+    }
+    function traceTrack(read, columns, readIndex) {
+        const state = inlineTraceStateFor(readIndex);
         const canvas = document.createElement("canvas");
-        requestAnimationFrame(() => drawTraceCanvas(canvas, read, columns));
-        return canvas;
+        const row = document.createElement("div");
+        row.className = "sanger-base-row";
+        const labelNode = document.createElement("div");
+        labelNode.className = "sanger-base-label sanger-trace-label";
+        const labelContent = document.createElement("div");
+        labelContent.className = "sanger-trace-label-content";
+        const nameNode = document.createElement("span");
+        nameNode.className = "sanger-trace-label-name";
+        nameNode.title = read.name || "trace";
+        nameNode.textContent = `${read.name} trace`;
+        const autoAdjustLabel = document.createElement("label");
+        autoAdjustLabel.className = "sanger-inline-autoadjust form-check form-switch";
+        const autoAdjustInput = document.createElement("input");
+        autoAdjustInput.className = "form-check-input";
+        autoAdjustInput.type = "checkbox";
+        autoAdjustInput.role = "switch";
+        autoAdjustInput.id = `sanger-inline-autoadjust-${readIndex}`;
+        autoAdjustInput.setAttribute("aria-label", `Auto-adjust ${read.name || "trace"}`);
+        autoAdjustInput.checked = Boolean(state.autoscaled);
+        const autoAdjustText = document.createElement("span");
+        autoAdjustText.textContent = "Auto-adjust";
+        autoAdjustLabel.appendChild(autoAdjustInput);
+        autoAdjustLabel.appendChild(autoAdjustText);
+        autoAdjustInput.addEventListener("change", function () {
+            const traceWindow = traceWindowForColumns(read, columns);
+            const fromScale = state.animatedScaleMax === null && traceWindow
+                ? inlineTraceScaleMax(read, traceWindow.traceStart, traceWindow.traceEnd, state.autoscaled)
+                : state.animatedScaleMax;
+            state.autoscaled = autoAdjustInput.checked;
+            animateInlineTraceScale(canvas, read, columns, state, fromScale);
+        });
+        labelContent.appendChild(nameNode);
+        labelContent.appendChild(autoAdjustLabel);
+        labelNode.appendChild(labelContent);
+        const body = document.createElement("div");
+        body.className = "sanger-trace-track";
+        body.appendChild(canvas);
+        row.appendChild(labelNode);
+        row.appendChild(body);
+        baseView.appendChild(row);
+        requestAnimationFrame(() => drawTraceCanvas(canvas, read, columns, state));
+        return row;
     }
     function showVariant(variant) {
         if (!variant || !detail) return;
@@ -2054,7 +2500,7 @@
             readRow(read, readIndex, readHtml(read, readIndex, columns), "sanger-base-columns");
             const chrom = read.chromatogram || {};
             if ((!toggleTraces || toggleTraces.checked) && Array.isArray(chrom.aTrace) && chrom.aTrace.length) {
-                rowNode(`${read.name} trace`, traceTrack(read, columns), "sanger-trace-track");
+                traceTrack(read, columns, readIndex);
             }
         });
         const referenceColumns = columns.filter((column) => column.kind === "reference");
@@ -2139,11 +2585,68 @@
         const step = Math.max(1, Math.round(windowSize * 0.2));
         setStartBounded(alignmentStart + (delta > 0 ? step : -step));
     }, { passive: false });
+    baseView.addEventListener("pointerdown", function (event) {
+        const traceTrack = event.target.closest(".sanger-trace-track");
+        if (!traceTrack || event.button !== 0) return;
+        inlineDragging = true;
+        inlineDragStartX = event.clientX;
+        inlineDragStartWindow = alignmentStart;
+        inlineDragWidth = Math.max(1, traceTrack.getBoundingClientRect().width);
+        baseView.classList.add("is-dragging-trace");
+        baseView.setPointerCapture(event.pointerId);
+        event.preventDefault();
+    });
+    baseView.addEventListener("pointermove", function (event) {
+        if (!inlineDragging) return;
+        const dx = event.clientX - inlineDragStartX;
+        setStart(inlineDragStartWindow - dx / inlineDragWidth * windowSize);
+    });
+    function stopInlineDragging() {
+        inlineDragging = false;
+        baseView.classList.remove("is-dragging-trace");
+    }
+    baseView.addEventListener("pointerup", stopInlineDragging);
+    baseView.addEventListener("pointercancel", stopInlineDragging);
+    baseView.addEventListener("lostpointercapture", stopInlineDragging);
     slider.addEventListener("input", function () {
         setStart(Number(slider.value));
     });
-    if (stepLeft) stepLeft.addEventListener("click", function () { setStartBounded(alignmentStart - 1); });
-    if (stepRight) stepRight.addEventListener("click", function () { setStartBounded(alignmentStart + 1); });
+    function enableHoldToRepeat(button, step) {
+        let delayTimer = null;
+        let repeatTimer = null;
+        function stopRepeating() {
+            if (delayTimer !== null) window.clearTimeout(delayTimer);
+            if (repeatTimer !== null) window.clearInterval(repeatTimer);
+            delayTimer = null;
+            repeatTimer = null;
+        }
+        function startRepeating(event) {
+            if (event.type === "pointerdown" && event.button !== undefined && event.button !== 0) return;
+            event.preventDefault();
+            stopRepeating();
+            setStartBounded(alignmentStart + step);
+            delayTimer = window.setTimeout(function () {
+                repeatTimer = window.setInterval(function () {
+                    setStartBounded(alignmentStart + step);
+                }, 75);
+            }, 300);
+            if (event.pointerId !== undefined && button.setPointerCapture) {
+                button.setPointerCapture(event.pointerId);
+            }
+        }
+        button.addEventListener("pointerdown", startRepeating);
+        button.addEventListener("pointerup", stopRepeating);
+        button.addEventListener("pointercancel", stopRepeating);
+        button.addEventListener("lostpointercapture", stopRepeating);
+        button.addEventListener("blur", stopRepeating);
+        button.addEventListener("keydown", function (event) {
+            if ((event.key !== "Enter" && event.key !== " ") || event.repeat) return;
+            startRepeating(event);
+        });
+        button.addEventListener("keyup", stopRepeating);
+    }
+    if (stepLeft) enableHoldToRepeat(stepLeft, -1);
+    if (stepRight) enableHoldToRepeat(stepRight, 1);
     window.addEventListener("resize", renderBases);
     function renderHiddenReadBar() {
         if (!hiddenReadBar) return;

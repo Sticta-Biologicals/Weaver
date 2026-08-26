@@ -139,3 +139,8 @@ STATICFILES_DIRS = [
 
 MEDIA_ROOT = WEAVER_DATA_DIR
 MEDIA_URL = '/media/'
+
+# Sanger batch uploads may contain hundreds of AB1 files plus the mapping CSV.
+# Keep a finite multipart file-count limit while allowing the batch workflow
+# to exceed Django's conservative default.
+DATA_UPLOAD_MAX_NUMBER_FILES = 1000

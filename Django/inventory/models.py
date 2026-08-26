@@ -542,6 +542,7 @@ class SangerVerificationRun(models.Model):
     plasmid = models.ForeignKey(Plasmid, on_delete=models.CASCADE, related_name="sanger_verification_runs")
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, blank=True, null=True, related_name="sanger_verification_runs")
     created_at = models.DateTimeField(auto_now_add=True)
+    sequencing_datetime = models.DateTimeField(blank=True, null=True)
     label = models.CharField(max_length=200, blank=True)
     colony = models.CharField(max_length=100, blank=True)
     sample = models.CharField(max_length=100, blank=True)
@@ -590,6 +591,7 @@ class SangerRead(models.Model):
 class SangerReadFile(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     read = models.ForeignKey(SangerRead, on_delete=models.CASCADE, related_name="files")
+    primer = models.ForeignKey("Primer", on_delete=models.SET_NULL, blank=True, null=True, related_name="sanger_read_files")
     format = models.CharField(max_length=10, choices=SANGER_FILE_FORMATS)
     original_name = models.CharField(max_length=255)
     file = models.FileField(upload_to=sanger_read_file_upload_to, blank=True, max_length=500)
@@ -666,7 +668,6 @@ class Primer(models.Model):
     fwd_or_rev = models.CharField(choices=FWD_OR_REV, max_length=1, blank=True)
     intended_use = models.CharField(max_length=1000, blank=True)
     qr_id = ShortUUIDField(default=generate_shortuuid, editable=False)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

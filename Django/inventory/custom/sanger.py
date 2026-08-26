@@ -1,4 +1,5 @@
 import csv
+import datetime
 import hashlib
 import io
 import json
@@ -71,6 +72,7 @@ class UploadedSangerFile:
     sha256: str
     format: str
     group_name: str
+    metadata: dict = field(default_factory=dict)
     errors: list = field(default_factory=list)
 
 
@@ -105,6 +107,89 @@ def normalized_group_name(filename):
     if lowered.endswith(".ab1") or lowered.endswith(".seq"):
         return basename[:-4]
     return os.path.splitext(basename)[0]
+
+
+def preferred_sanger_run(runs):
+    """Return the run shown by default for a plasmid.
+
+    The newest manually accepted run is preferred. When there is no manually
+    accepted run, the newest run that passed automatic classification is used,
+    followed by the newest run needing review. If neither exists, fall back to
+    the newest uploaded run. A run's identity and read records are not changed
+    by this display choice.
+    """
+    def sequencing_timestamp(run):
+        persisted_datetime = getattr(run, "sequencing_datetime", None)
+        if persisted_datetime:
+            return persisted_datetime.timestamp()
+        return run.created_at.timestamp()
+
+    ordered_runs = sorted(
+        list(runs or []),
+        key=lambda run: (sequencing_timestamp(run), str(run.id)),
+        reverse=True,
+    )
+    if not ordered_runs:
+        return None
+    accepted_runs = [run for run in ordered_runs if run.manual_decision == "VERIFIED"]
+    if accepted_runs:
+        return accepted_runs[0]
+    automatically_approved_runs = [run for run in ordered_runs if run.automated_state == "PASS"]
+    if automatically_approved_runs:
+        return automatically_approved_runs[0]
+    review_runs = [run for run in ordered_runs if run.automated_state == "REVIEW"]
+    return review_runs[0] if review_runs else ordered_runs[0]
+
+
+def parse_sanger_batch_mapping(data):
+    """Parse CSV rows mapping an AB1 filename to a plasmid identifier."""
+    try:
+        text = data.decode("utf-8-sig") if isinstance(data, bytes) else str(data or "")
+    except UnicodeDecodeError:
+        return [], ["The mapping CSV must be UTF-8 encoded."]
+
+    reader = csv.DictReader(io.StringIO(text))
+    if not reader.fieldnames:
+        return [], ["The mapping CSV is empty or has no header row."]
+
+    normalized_headers = {
+        (header or "").strip().lower(): header
+        for header in reader.fieldnames
+        if header is not None
+    }
+    filename_header = next(
+        (normalized_headers[name] for name in ("ab1_file", "filename", "file_name", "file") if name in normalized_headers),
+        None,
+    )
+    plasmid_header = next(
+        (normalized_headers[name] for name in ("plasmid_id", "plasmid", "id") if name in normalized_headers),
+        None,
+    )
+    primer_header = next(
+        (normalized_headers[name] for name in ("primer_id", "primer", "primer_uuid") if name in normalized_headers),
+        None,
+    )
+    errors = []
+    if not filename_header or not plasmid_header or not primer_header:
+        return [], ["The CSV must contain the columns ab1_file, plasmid_id, and primer_id."]
+
+    rows = []
+    for line_number, row in enumerate(reader, start=2):
+        filename = os.path.basename((row.get(filename_header) or "").strip())
+        plasmid_id = (row.get(plasmid_header) or "").strip()
+        primer_id = (row.get(primer_header) or "").strip()
+        if not filename or not plasmid_id or not primer_id:
+            errors.append("Row {} must contain ab1_file, plasmid_id, and primer_id.".format(line_number))
+            continue
+        rows.append({
+            "filename": filename,
+            "plasmid_id": plasmid_id,
+            "primer_id": primer_id,
+            "line_number": line_number,
+        })
+    if not rows and not errors:
+        errors.append("The mapping CSV has no data rows.")
+    return rows, errors
 
 
 def sanitize_filename(filename):
@@ -226,6 +311,212 @@ def _abif_value(raw, key):
     if isinstance(value, bytes):
         return value.decode(errors="replace")
     return value
+
+
+def ab1_run_datetime(metadata):
+    """Return the instrument run start as a naive local datetime when available."""
+    metadata = metadata or {}
+    date_value = str(metadata.get("run_start_date") or "").strip()
+    time_value = str(metadata.get("run_start_time") or "").strip()
+    if not date_value:
+        return None
+    for value, formats in (
+        ("{} {}".format(date_value, time_value), ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M")),
+        (date_value, ("%Y-%m-%d", "%y%m%d", "%Y%m%d")),
+    ):
+        for date_format in formats:
+            try:
+                return datetime.datetime.strptime(value, date_format)
+            except ValueError:
+                continue
+    return None
+
+
+def ab1_run_datetime_label(metadata, filename=None):
+    """Format the filename run date, falling back to AB1 metadata."""
+    run_datetime = sanger_file_run_datetime(metadata, filename)
+    return run_datetime.strftime("%d %b %Y %H:%M") if run_datetime else ""
+
+
+def filename_run_datetime(filename):
+    """Extract a sequencer run datetime from a filename."""
+    match = re.search(
+        r"(?<!\d)(20\d{2})-(\d{2})-(\d{2})-(\d{2})-(\d{2})-(\d{2})(?!\d)",
+        os.path.basename(filename or ""),
+    )
+    if not match:
+        return None
+    try:
+        return datetime.datetime.strptime("-".join(match.groups()), "%Y-%m-%d-%H-%M-%S")
+    except ValueError:
+        return None
+
+
+def sanger_file_run_datetime(metadata=None, filename=None):
+    """Return the filename date, falling back to the AB1 metadata date."""
+    return filename_run_datetime(filename) or ab1_run_datetime(metadata)
+
+
+def file_registration_number(filename):
+    """Return the leading sequencer/file number used to order confirmation pairs."""
+    match = re.match(r"\s*(\d+)", os.path.basename(filename or ""))
+    return int(match.group(1)) if match else None
+
+
+def latest_confirmation_pair(read_candidates):
+    """Select the latest complete forward/reverse pair for the Services table.
+
+    ``read_candidates`` contains one item per persisted read with ``read``,
+    ``orientation``, ``run_date``, ``run_datetime`` and ``registration_number``
+    keys. Filename run dates take precedence over AB1 metadata dates. When
+    several pairs share a date, the pair with the closest leading file numbers and
+    highest registration numbers is preferred. If only one orientation exists,
+    only its most recent read is returned. Unknown-orientation reads are not
+    included when any reliable orientation is available; they remain
+    accessible from the saved-run detail view for troubleshooting.
+    """
+    selected_candidates = latest_sanger_complete_date_group(read_candidates)
+    forward = [item for item in selected_candidates if item.get("orientation") == "forward"]
+    reverse = [item for item in selected_candidates if item.get("orientation") == "reverse"]
+    if not forward and not reverse:
+        return [item["read"] for item in selected_candidates]
+
+    def datetime_key(item):
+        run_datetime = item.get("run_datetime")
+        if run_datetime is not None:
+            return run_datetime
+        run_date = item.get("run_date")
+        if run_date is not None:
+            return datetime.datetime.combine(run_date, datetime.time.min)
+        return datetime.datetime.min
+
+    def number_key(item):
+        number = item.get("registration_number")
+        return number if number is not None else -1
+
+    if not forward or not reverse:
+        selected_orientation = forward or reverse
+        selected = max(selected_orientation, key=lambda item: (datetime_key(item), number_key(item)))
+        return [selected["read"]]
+
+    numbered_pairs = []
+    for forward_item in forward:
+        for reverse_item in reverse:
+            forward_number = forward_item.get("registration_number")
+            reverse_number = reverse_item.get("registration_number")
+            if forward_number is not None and reverse_number is not None:
+                numbered_pairs.append((
+                    abs(forward_number - reverse_number),
+                    max(forward_number, reverse_number),
+                    forward_item,
+                    reverse_item,
+                ))
+    if numbered_pairs:
+        _, _, selected_forward, selected_reverse = min(
+            numbered_pairs,
+            key=lambda pair: (pair[0], -pair[1]),
+        )
+    else:
+        selected_forward = max(forward, key=number_key)
+        selected_reverse = max(reverse, key=number_key)
+    return [selected_forward["read"], selected_reverse["read"]]
+
+
+def latest_sanger_complete_date_group(read_candidates):
+    """Return the newest date group containing both Forward and Reverse reads.
+
+    Files from one upload can represent more than one sequencing event. A
+    complete Forward/Reverse group defines the active event; multiple reads in
+    that group remain available for region-based nonredundancy selection.
+    """
+    candidates = list(read_candidates or [])
+    dated_groups = {}
+    for item in candidates:
+        if item.get("run_date") is not None:
+            dated_groups.setdefault(item["run_date"], []).append(item)
+    eligible_groups = [
+        (run_date, group)
+        for run_date, group in dated_groups.items()
+        if any(item.get("orientation") == "forward" for item in group)
+        and any(item.get("orientation") == "reverse" for item in group)
+    ]
+    if not eligible_groups:
+        return candidates
+    return max(eligible_groups, key=lambda entry: entry[0])[1]
+
+
+def select_nonredundant_read_candidates(read_candidates, overlap_threshold=0.8):
+    """Keep distinct regions while collapsing redundant reads per orientation.
+
+    A run may legitimately contain more than one Forward or Reverse read when
+    the reads cover different plasmid regions. Reads with at least
+    ``overlap_threshold`` of the smaller covered region in common are treated
+    as repeated coverage of the same region, and the newest candidate is kept.
+    Candidates without coverage coordinates are retained because their regions
+    cannot be compared safely.
+    """
+    candidates = list(read_candidates or [])
+    selected_indexes = set(
+        index
+        for index, candidate in enumerate(candidates)
+        if candidate.get("orientation") not in ("forward", "reverse")
+    )
+
+    def overlap(left, right):
+        left_positions = set(left.get("covered_positions") or [])
+        right_positions = set(right.get("covered_positions") or [])
+        if not left_positions or not right_positions:
+            return 0.0
+        return len(left_positions & right_positions) / min(len(left_positions), len(right_positions))
+
+    def recency_key(index):
+        candidate = candidates[index]
+        run_datetime = candidate.get("run_datetime")
+        registration_number = candidate.get("registration_number")
+        return (
+            run_datetime is not None,
+            run_datetime or datetime.datetime.min,
+            registration_number is not None,
+            registration_number if registration_number is not None else -1,
+            -index,
+        )
+
+    for orientation in ("forward", "reverse"):
+        orientation_indexes = [
+            index
+            for index, candidate in enumerate(candidates)
+            if candidate.get("orientation") == orientation
+        ]
+        remaining = set(orientation_indexes)
+        while remaining:
+            component = {min(remaining)}
+            expanded = True
+            while expanded:
+                expanded = False
+                for index in list(remaining - component):
+                    if any(overlap(candidates[index], candidates[other]) >= overlap_threshold for other in component):
+                        component.add(index)
+                        expanded = True
+            selected_indexes.add(max(component, key=recency_key))
+            remaining -= component
+
+    return [candidate for index, candidate in enumerate(candidates) if index in selected_indexes]
+
+
+def select_sanger_review_candidates(read_candidates):
+    """Return the reads that should be shown in a saved-run review.
+
+    Failed or unmapped reads are useful troubleshooting evidence only when a
+    run has no usable aligned reads. If usable evidence exists, review the
+    nonredundant aligned reads and keep failed records out of the active
+    sequencing view.
+    """
+    candidates = latest_sanger_complete_date_group(read_candidates)
+    usable_candidates = [
+        candidate for candidate in candidates
+        if candidate.get("read", {}).get("is_usable") and candidate.get("read", {}).get("alignment")
+    ]
+    return select_nonredundant_read_candidates(usable_candidates or candidates)
 
 
 def clear_range_from_metadata(metadata, sequence_length):
@@ -1105,6 +1396,7 @@ def process_sanger_files(file_objs, reference_sequence, parameters=None):
         parsed = []
         for uploaded in files:
             source = parse_file(uploaded)
+            uploaded.metadata = source.metadata or {}
             parsed.append(source)
             errors.extend(source.errors)
         selected, source_warnings = choose_source(parsed)

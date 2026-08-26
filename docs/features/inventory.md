@@ -16,7 +16,7 @@ Membership access has three levels:
 - `write` allows record creation and edits in addition to reading.
 - `admin` allows project administration, including membership changes and project deletion.
 
-Only a member can read a project. Plasmid, primer, and glycerol-stock writes require write or admin access to the record's project. Project administration requires admin access, and the last project admin cannot be removed. A user who needs to work in a project must therefore be added to its memberships rather than relying on the active-project selector.
+Only a member can read a project. Plasmid and glycerol-stock writes require write or admin access to the record's project. Primers are global inventory records; their writes require write or admin access in at least one project but are not tied to the active project. Project administration requires admin access, and the last project admin cannot be removed. A user who needs to work in a project must therefore be added to its memberships rather than relying on the active-project selector.
 
 ## Plasmids
 
@@ -54,9 +54,9 @@ Strain, box, and location records do not have dedicated create links in the inve
 
 ## Primers
 
-Open `Components > Primers` at `/inventory/primers/`. A primer record contains a name, 3-prime hybridizing sequence, optional 5-prime extension or overhang, forward/reverse direction, intended use, project, and QR ID. The two sequence fields are written 5-prime to 3-prime: put only the region that must hybridize to the template in `Sequence (3' end)`, and put non-hybridizing added bases in `Sequence (5' end / overhang)`.
+Open `Components > Primers` at `/inventory/primers/`. A primer record contains a name, 3-prime hybridizing sequence, optional 5-prime extension or overhang, forward/reverse direction, intended use, and QR ID. Primers are global and the list does not use the project selector. The two sequence fields are written 5-prime to 3-prime: put only the region that must hybridize to the template in `Sequence (3' end)`, and put non-hybridizing added bases in `Sequence (5' end / overhang)`.
 
-Create a primer at `/inventory/primer/create/` or import a FASTA file at `/inventory/primer/import/`. The importer accepts `.fa`, `.fas`, `.fasta`, or `.txt` text and offers the FASTA ID or full description as the name source, a default direction for names without `F` or `R`, and an option to update an existing primer with the same name in the project. FASTA metadata can declare an overhang and intended use. Invalid DNA or an empty hybridizing sequence is skipped and reported; existing primers are skipped unless updating is enabled.
+Create a primer at `/inventory/primer/create/` or import a FASTA file at `/inventory/primer/import/`. The importer accepts `.fa`, `.fas`, `.fasta`, or `.txt` text and offers the FASTA ID or full description as the name source, a default direction for names without `F` or `R`, and an option to update an existing primer with the same name globally. FASTA metadata can declare an overhang and intended use. Invalid DNA or an empty hybridizing sequence is skipped and reported; existing primers are skipped unless updating is enabled.
 
 ## Restriction Enzymes and Labels
 

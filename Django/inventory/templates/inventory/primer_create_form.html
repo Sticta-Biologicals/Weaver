@@ -5,5 +5,5 @@
 
 {% block content %}
 {% url 'primers' as cancel_url %}
-{% include "inventory/parts/inventory_form_panel.html" with form_section_label="Primer" form_title="Create primer" form_description="Add a primer to the current project." form_icon="bi-plus-square" submit_label="Create primer" submit_icon="bi-plus-lg" cancel_url=cancel_url cancel_label="Back to primers" %}
+{% include "inventory/parts/inventory_form_panel.html" with form_section_label="Primer" form_title="Create primer" form_description="Add a primer to the global primer inventory." form_icon="bi-plus-square" submit_label="Create primer" submit_icon="bi-plus-lg" cancel_url=cancel_url cancel_label="Back to primers" %}
 {% endblock %}
