@@ -1,3 +1,5 @@
+import logging
+
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -44,6 +46,7 @@ from .custom.genbank_import import import_plasmids_from_uploaded_genbanks
 from .custom.primer_import import PrimerImportError
 from .custom.primer_import import import_primers_from_fasta
 from .custom.sanger import alignment_tracks_for_ove
+from .custom.sanger import as_uploaded_sanger_file_list
 from .custom.sanger import align_read
 from .custom.sanger import classify_run
 from .custom.sanger import clustal_content
@@ -176,6 +179,9 @@ from django.http import JsonResponse
 from io import StringIO
 import requests
 from bs4 import BeautifulSoup
+
+
+logger = logging.getLogger(__name__)
 
 import plotly.express as px
 import pandas as pd
@@ -2794,7 +2800,7 @@ def persist_sanger_verification(plasmid, user, service_result, label="", notes="
     primer_by_filename = primer_by_filename or {}
     sequencing_datetimes = [
         run_datetime
-        for uploaded in service_result.get("uploaded_files", [])
+        for uploaded in as_uploaded_sanger_file_list(service_result.get("uploaded_files"))
         for run_datetime in [sanger_file_run_datetime(uploaded.metadata, uploaded.original_name)]
         if run_datetime
     ]
@@ -2838,7 +2844,7 @@ def persist_sanger_verification(plasmid, user, service_result, label="", notes="
             is_usable=read_data.get("is_usable", False),
         )
         saved_reads[read_data["name"]] = read
-        for uploaded in read_data.get("files", []):
+        for uploaded in as_uploaded_sanger_file_list(read_data.get("files")):
             read_file = SangerReadFile.objects.create(
                 read=read,
                 primer=primer_by_filename.get(uploaded.original_name),
@@ -4471,28 +4477,26 @@ def sanger_batch_upload(request):
                     context.setdefault("batch_warnings", []).append(
                         "Skipped existing AB1 file(s): {}.".format(", ".join(sorted(skipped_existing_files)))
                     )
-                processed_runs = []
+                processed_run_count = 0
+                uploaded_file_count = 0
                 try:
-                    for plasmid_id, file_entries in files_by_plasmid.items():
-                        plasmid = plasmids_by_identifier[str(plasmid_id)]
-                        filenames = [filename for filename, _primer in file_entries]
-                        sequence_result = grab_seq(plasmid)
-                        if not sequence_result[0]:
-                            raise ValueError("Could not read the sequence for plasmid {}.".format(plasmid.idx or plasmid.id))
-                        batch_files = [
-                            SimpleUploadedFile(filename, file_by_name[filename], content_type="application/octet-stream")
-                            for filename in filenames
-                        ]
-                        service_result = process_sanger_files(batch_files, str(sequence_result[1]))
-                        primer_by_filename = {
-                            sanitize_filename(filename): primer
-                            for filename, primer in file_entries
-                            if primer is not None
-                        }
-                        processed_runs.append((plasmid, service_result, primer_by_filename))
-
                     with transaction.atomic():
-                        for plasmid, service_result, primer_by_filename in processed_runs:
+                        for plasmid_id, file_entries in files_by_plasmid.items():
+                            plasmid = plasmids_by_identifier[str(plasmid_id)]
+                            filenames = [filename for filename, _primer in file_entries]
+                            sequence_result = grab_seq(plasmid)
+                            if not sequence_result[0]:
+                                raise ValueError("Could not read the sequence for plasmid {}.".format(plasmid.idx or plasmid.id))
+                            batch_files = [
+                                SimpleUploadedFile(filename, file_by_name[filename], content_type="application/octet-stream")
+                                for filename in filenames
+                            ]
+                            service_result = process_sanger_files(batch_files, str(sequence_result[1]))
+                            primer_by_filename = {
+                                sanitize_filename(filename): primer
+                                for filename, primer in file_entries
+                                if primer is not None
+                            }
                             persist_sanger_verification(
                                 plasmid,
                                 request.user,
@@ -4500,13 +4504,17 @@ def sanger_batch_upload(request):
                                 label="Batch AB1 upload",
                                 primer_by_filename=primer_by_filename,
                             )
+                            processed_run_count += 1
+                            uploaded_file_count += len(file_entries)
+                            for filename in filenames:
+                                file_by_name.pop(filename, None)
                 except Exception as exc:
+                    logger.exception("Sanger batch upload failed for user %s", request.user.pk)
                     context["batch_errors"] = ["Batch upload failed: {}".format(exc)]
                 else:
-                    uploaded_file_count = sum(len(file_entries) for file_entries in files_by_plasmid.values())
                     context["batch_upload_done"] = "Uploaded {} AB1 files into {} Sanger runs{}.".format(
                         uploaded_file_count,
-                        len(processed_runs),
+                        processed_run_count,
                         " ({} existing file(s) skipped)".format(len(skipped_existing_files)) if skipped_existing_files else "",
                     )
                     context["upload_form"] = SangerBatchUploadForm()

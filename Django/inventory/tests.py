@@ -69,6 +69,7 @@ from inventory.custom.sanger import normalized_group_name
 from inventory.custom.sanger import parse_phd1
 from inventory.custom.sanger import parse_seq
 from inventory.custom.sanger import process_sanger_files
+from inventory.custom.sanger import UploadedSangerFile
 from inventory.custom.sanger import preferred_sanger_run
 from inventory.custom.sanger import read_is_usable
 from inventory.custom.sanger import SangerProcessingParameters
@@ -2014,6 +2015,49 @@ class SangerBatchUploadTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Uploaded 1 AB1 files into 1 Sanger runs.")
         self.assertEqual(SangerVerificationRun.objects.filter(plasmid=self.first_plasmid).count(), 1)
+
+    def test_batch_upload_normalizes_single_uploaded_file_result(self):
+        uploaded = UploadedSangerFile(
+            original_name="trace.ab1",
+            data=b"trace",
+            size=5,
+            sha256="a" * 64,
+            format="ab1",
+            group_name="trace",
+        )
+        service_result = {
+            "parameters": {},
+            "uploaded_files": uploaded,
+            "reads": [{
+                "name": "trace",
+                "files": uploaded,
+                "alignment": {},
+                "raw_sequence": "",
+                "trimmed_sequence": "",
+                "quality_metrics": {},
+                "warnings": [],
+                "is_usable": False,
+            }],
+            "combined": {"variants": []},
+            "classification": {"state": "NO_DATA", "reasons": []},
+        }
+
+        with patch("inventory.views.process_sanger_files", return_value=service_result), \
+                patch("inventory.views.grab_seq", return_value=(True, Seq("ACGT" * 20))):
+            response = self.client.post(
+                reverse("sanger_batch_upload"),
+                {
+                    "ab1_files": [SimpleUploadedFile("trace.ab1", b"trace")],
+                    "mapping_csv": SimpleUploadedFile(
+                        "mapping.csv",
+                        b"ab1_file,plasmid_id\ntrace.ab1,601\n",
+                        content_type="text/csv",
+                    ),
+                },
+            )
+
+        self.assertContains(response, "Uploaded 1 AB1 files into 1 Sanger runs.")
+        self.assertEqual(SangerReadFile.objects.get(original_name="trace.ab1").size, 5)
 
     def test_batch_upload_skips_existing_file_and_uploads_the_rest(self):
         existing_run = SangerVerificationRun.objects.create(plasmid=self.first_plasmid, created_by=self.user)

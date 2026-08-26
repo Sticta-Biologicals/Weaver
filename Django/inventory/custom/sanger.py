@@ -76,6 +76,20 @@ class UploadedSangerFile:
     errors: list = field(default_factory=list)
 
 
+def as_uploaded_sanger_file_list(value):
+    """Normalize one uploaded-file object or an iterable of uploaded files."""
+    if value is None:
+        return []
+    if isinstance(value, (UploadedSangerFile, str, bytes)):
+        return [value]
+    if isinstance(value, (list, tuple)):
+        return list(value)
+    try:
+        return list(value)
+    except TypeError:
+        return [value]
+
+
 @dataclass
 class ParsedSource:
     format: str
@@ -202,7 +216,7 @@ def uploaded_files_from_request(files, parameters=None):
     uploaded = []
     total_size = 0
     seen_hash_names = set()
-    for file_obj in files:
+    for file_obj in as_uploaded_sanger_file_list(files):
         data = file_obj.read()
         size = len(data)
         total_size += size
@@ -624,7 +638,7 @@ def parse_file(uploaded):
 
 def group_uploaded_files(uploaded_files):
     groups = {}
-    for uploaded in uploaded_files:
+    for uploaded in as_uploaded_sanger_file_list(uploaded_files):
         groups.setdefault(uploaded.group_name, []).append(uploaded)
     return groups
 
