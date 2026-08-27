@@ -2393,6 +2393,29 @@ class SangerFailedReadReviewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "poor-quality-read did not produce a reliable alignment.")
 
+    def test_saved_run_detail_handles_legacy_alignment_without_covered_positions(self):
+        SangerRead.objects.create(
+            run=self.run,
+            name="legacy-aligned-read",
+            detected_orientation="forward",
+            alignment_metrics={
+                "orientation": "forward",
+                "identity": 100.0,
+                "aligned_length": 3,
+                "reference_projection_base_indices": [0, 1, 2],
+                "variants": [],
+            },
+            is_usable=True,
+        )
+
+        response = self.client.get(reverse("sanger_run_detail", kwargs={
+            "plasmid_id": self.plasmid.id,
+            "run_id": self.run.id,
+        }))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "legacy-aligned-read")
+
     def test_failed_read_chromatogram_can_be_opened_without_alignment(self):
         response = self.client.get(reverse("sanger_read_chromatogram", kwargs={
             "plasmid_id": self.plasmid.id,

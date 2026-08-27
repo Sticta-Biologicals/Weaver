@@ -1510,6 +1510,20 @@ def coverage_gaps(reference_length, covered):
     return gaps
 
 
+def alignment_covered_positions(alignment):
+    """Return covered reference coordinates, including for legacy alignments."""
+    alignment = alignment or {}
+    covered_positions = alignment.get("covered_positions")
+    if covered_positions is not None:
+        return list(covered_positions)
+    projection_base_indices = alignment.get("reference_projection_base_indices") or []
+    return [
+        coordinate
+        for coordinate, base_index in enumerate(projection_base_indices)
+        if base_index is not None
+    ]
+
+
 def combined_metrics(reference_sequence, reads, params):
     ref_len = len(reference_sequence)
     depth = [0] * ref_len
@@ -1525,11 +1539,12 @@ def combined_metrics(reference_sequence, reads, params):
             discarded += 1
             continue
         useful += 1
-        identities.append(alignment["identity"])
+        identities.append(alignment.get("identity", 0))
         aligned_bases += alignment.get("aligned_length", 0)
-        for coord in alignment["covered_positions"]:
-            depth[coord] += 1
-        for variant in alignment["variants"]:
+        for coord in alignment_covered_positions(alignment):
+            if 0 <= coord < ref_len:
+                depth[coord] += 1
+        for variant in alignment.get("variants", []):
             variant = variant.copy()
             variant["read"] = read["name"]
             variants.append(variant)

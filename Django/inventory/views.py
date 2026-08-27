@@ -46,6 +46,7 @@ from .custom.genbank_import import import_plasmids_from_uploaded_genbanks
 from .custom.primer_import import PrimerImportError
 from .custom.primer_import import import_primers_from_fasta
 from .custom.sanger import alignment_tracks_for_ove
+from .custom.sanger import alignment_covered_positions
 from .custom.sanger import as_uploaded_sanger_file_list
 from .custom.sanger import align_read
 from .custom.sanger import classify_run
@@ -2697,6 +2698,7 @@ def sanger_result_from_run(run, focus_read_id=None, focus_read_ids=None):
         stored_alignment = (read.alignment_metrics or {}).copy()
         stored_display_alignment = stored_alignment.pop("display_alignment", None)
         alignment = stored_alignment
+        alignment["covered_positions"] = alignment_covered_positions(alignment)
         saved_variants = variants_by_read.get(read.id, [])
         alignment["variants"] = saved_variants or alignment.get("variants", [])
         stored_chromatogram = chromatogram_for_saved_read(read)
