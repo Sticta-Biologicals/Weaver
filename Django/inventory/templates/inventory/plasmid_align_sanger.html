@@ -1754,6 +1754,48 @@
             addSegment("sanger-map-read-low-quality", bestStart, bestEnd, 44 + index * 15, `${read.name}: low-confidence region`);
         });
     }
+    function addCircularMapRange(className, startDisplay, length, top, title) {
+        const span = Math.min(referenceLength, Math.max(0, Number(length) || 0));
+        if (!span) return;
+        const normalizedStart = ((Number(startDisplay) % referenceLength) + referenceLength) % referenceLength;
+        const normalizedEnd = normalizedStart + span - 1;
+        if (normalizedEnd < referenceLength) {
+            addSegment(className, normalizedStart, normalizedEnd, top, title);
+            return;
+        }
+        addSegment(className, normalizedStart, referenceLength - 1, top, title);
+        addSegment(className, 0, normalizedEnd - referenceLength, top, title);
+    }
+    function addReadUnalignedLowQualitySegments(read, index) {
+        const displayOnlyVariants = (read.variants || []).filter((variant) => variant.display_only);
+        if (!displayOnlyVariants.length) return;
+        const start = Number(read.start);
+        const end = Number(read.end);
+        if (!Number.isFinite(start) || !Number.isFinite(end)) return;
+        const leftAnchor = ((start - 1) % referenceLength + referenceLength) % referenceLength;
+        const rightAnchor = ((end % referenceLength) + referenceLength) % referenceLength;
+        const leftCount = displayOnlyVariants.filter((variant) => Number(variant.coordinate) === leftAnchor).length;
+        const rightCount = displayOnlyVariants.filter((variant) => Number(variant.coordinate) === rightAnchor).length;
+        const top = 44 + index * 15;
+        if (leftCount) {
+            addCircularMapRange(
+                "sanger-map-read-low-quality",
+                displayCoord(leftAnchor) - leftCount,
+                leftCount,
+                top,
+                `${read.name}: ${leftCount} unaligned low-confidence base(s) before the aligned region`,
+            );
+        }
+        if (rightCount) {
+            addCircularMapRange(
+                "sanger-map-read-low-quality",
+                displayCoord(rightAnchor) + 1,
+                rightCount,
+                top,
+                `${read.name}: ${rightCount} unaligned low-confidence base(s) after the aligned region`,
+            );
+        }
+    }
     function drawMap() {
         Array.from(map.children).forEach((child) => {
             if (child.id !== "sanger-map-window" && child.id !== "sanger-map-window-wrap" && !child.classList.contains("sanger-map-axis")) {
@@ -1772,6 +1814,7 @@
         });
         visibleEntries.forEach(({read}, index) => {
             addReadLowQualitySegments(read, index);
+            addReadUnalignedLowQualitySegments(read, index);
             const segments = (read.segments || []).length ? read.segments : [read];
             segments.forEach((segment) => {
                 if (segment.crosses_origin || segment.start > segment.end) {
