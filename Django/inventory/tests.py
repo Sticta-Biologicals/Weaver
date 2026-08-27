@@ -1890,6 +1890,87 @@ class SangerVerificationEntryTests(TestCase):
             self.assertContains(refreshed, "Sanger sequencing files uploaded and saved.")
             self.assertEqual(SangerVerificationRun.objects.filter(plasmid=self.plasmid).count(), 1)
 
+    def test_rerun_reprocesses_saved_files_into_new_run(self):
+        membership = Membership.objects.get(member=self.user, project=self.project)
+        membership.access_policies = "w"
+        membership.save(update_fields=["access_policies"])
+        original_run = SangerVerificationRun.objects.create(
+            plasmid=self.plasmid,
+            created_by=self.user,
+            label="Original run",
+            notes="Keep this note",
+            manual_decision="VERIFIED",
+        )
+        original_read = SangerRead.objects.create(
+            run=original_run,
+            name="forward",
+            selected_source="ab1",
+        )
+        source_file = SangerReadFile.objects.create(
+            read=original_read,
+            primer=self.sanger_primer,
+            format="ab1",
+            original_name="forward.ab1",
+            sha256="a" * 64,
+            size=10,
+        )
+        source_file.file.save("forward.ab1", ContentFile(b"trace-data"), save=True)
+        service_result = {
+            "parameters": {},
+            "uploaded_files": [],
+            "reads": [{
+                "name": "forward",
+                "formats": ["ab1"],
+                "selected_source": "ab1",
+                "files": [UploadedSangerFile(
+                    original_name="forward.ab1",
+                    data=b"trace-data",
+                    size=10,
+                    sha256="a" * 64,
+                    format="ab1",
+                    group_name="forward",
+                )],
+                "alignment": {},
+                "display_alignment": {},
+                "raw_sequence": "",
+                "trimmed_sequence": "",
+                "quality_metrics": {},
+                "chromatogram": {},
+                "warnings": [],
+                "errors": [],
+                "is_usable": False,
+            }],
+            "combined": {"variants": [], "read_count": 1, "useful_reads": 0},
+            "classification": {"state": "NO_DATA", "reasons": []},
+        }
+        with patch("inventory.views.process_sanger_files", return_value=service_result), \
+                patch("inventory.views.grab_seq", return_value=(True, Seq("ACGT" * 20))), \
+                patch("inventory.views.plasmid_seqrecord", return_value=SeqRecord(Seq("ACGT" * 20), id="rerun-reference")):
+            response = self.client.post(reverse("sanger_run_rerun", kwargs={
+                "plasmid_id": self.plasmid.id,
+                "run_id": original_run.id,
+            }))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("?rerun=1", response.url)
+        with patch("inventory.views.plasmid_sequence_file_contents", return_value=""):
+            detail_response = self.client.get(response.url)
+        self.assertEqual(detail_response.status_code, 200)
+        self.assertContains(detail_response, "Sanger run reprocessed successfully.")
+        self.assertContains(detail_response, "Re-run analysis")
+        self.assertContains(detail_response, 'btn btn-outline-warning btn-sm')
+        self.assertContains(detail_response, 'btn btn-outline-danger btn-sm sanger-delete-button')
+        self.assertEqual(SangerVerificationRun.objects.filter(plasmid=self.plasmid).count(), 1)
+        original_run.refresh_from_db()
+        self.assertEqual(original_run.label, "Original run")
+        self.assertEqual(original_run.notes, "Keep this note")
+        self.assertEqual(original_run.manual_decision, "")
+        self.assertTrue(SangerReadFile.objects.filter(
+            original_name="forward.ab1",
+            read__run=original_run,
+            primer=self.sanger_primer,
+        ).exists())
+
 class SangerUploadFormTests(SimpleTestCase):
     def test_accepts_multiple_ab1_files_in_one_submission(self):
         files = MultiValueDict({
@@ -2751,6 +2832,7 @@ class SangerServicesListTests(TestCase):
         response = self.client.get(reverse("services-sanger"))
 
         self.assertNotContains(response, reverse("sanger_batch_upload"))
+        self.assertNotContains(response, 'title="Re-run all Sanger analyses"')
 
     def test_uploader_sees_icon_only_batch_upload_control(self):
         membership = Membership.objects.get(member=self.user, project=self.visible_project)
@@ -2761,8 +2843,81 @@ class SangerServicesListTests(TestCase):
 
         self.assertContains(response, 'title="Upload AB1 batch"')
         self.assertContains(response, 'aria-label="Upload AB1 batch"')
+        self.assertContains(response, 'title="Re-run all Sanger analyses"')
         self.assertContains(response, 'title="Refresh"')
+        self.assertContains(response, 'class="btn btn-secondary sanger-header-action-button"')
+        self.assertContains(response, 'class="btn btn-outline-primary sanger-batch-upload-button sanger-header-action-button"')
+        self.assertContains(response, 'sanger-header-action-button')
         self.assertNotContains(response, "plasmids</span>")
+
+    def test_writer_can_request_sanger_rerun_progress_manifest(self):
+        membership = Membership.objects.get(member=self.user, project=self.visible_project)
+        membership.access_policies = "w"
+        membership.save(update_fields=["access_policies"])
+
+        response = self.client.post(
+            reverse("sanger_rerun_all"),
+            {"progress": "1"},
+            HTTP_ACCEPT="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["total"], 2)
+        self.assertEqual(set(payload["run_ids"]), {
+            str(self.approved_run.id),
+            str(SangerVerificationRun.objects.filter(
+                plasmid=self.visible_plasmid,
+            ).exclude(id=self.approved_run.id).get().id),
+        })
+
+    @patch("inventory.views.process_sanger_files")
+    def test_writer_can_rerun_all_accessible_sanger_runs(self, process_sanger_files):
+        membership = Membership.objects.get(member=self.user, project=self.visible_project)
+        membership.access_policies = "w"
+        membership.save(update_fields=["access_policies"])
+        process_sanger_files.return_value = {
+            "parameters": {},
+            "uploaded_files": [],
+            "reads": [{
+                "name": "forward",
+                "formats": ["ab1"],
+                "selected_source": "ab1",
+                "files": [UploadedSangerFile(
+                    original_name="visible-forward.ab1",
+                    data=b"AB1DATA",
+                    size=7,
+                    sha256="c" * 64,
+                    format="ab1",
+                    group_name="forward",
+                )],
+                "alignment": {},
+                "display_alignment": {},
+                "raw_sequence": "",
+                "trimmed_sequence": "",
+                "quality_metrics": {},
+                "chromatogram": {},
+                "warnings": [],
+                "errors": [],
+                "is_usable": False,
+            }],
+            "combined": {"variants": []},
+            "classification": {"state": "NO_DATA", "reasons": []},
+        }
+        with patch("inventory.views.grab_seq", return_value=(True, Seq("ACGT" * 20))):
+            response = self.client.post(reverse("sanger_rerun_all"))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("rerun_all=1", response.url)
+        self.assertIn("processed=1", response.url)
+        self.assertIn("skipped=1", response.url)
+        self.assertIn("failed=0", response.url)
+        self.assertTrue(SangerVerificationRun.objects.filter(id=self.approved_run.id).exists())
+        self.assertEqual(SangerVerificationRun.objects.filter(plasmid=self.visible_plasmid).count(), 2)
+        self.assertTrue(SangerReadFile.objects.filter(
+            read__run_id=self.approved_run.id,
+            original_name="visible-forward.ab1",
+        ).exists())
 
     def test_services_list_shows_only_top_50_plasmids_by_id(self):
         for idx in range(600, 655):

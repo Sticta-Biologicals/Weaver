@@ -2798,7 +2798,16 @@ def sanger_result_from_run(run, focus_read_id=None, focus_read_ids=None):
     }
 
 
-def persist_sanger_verification(plasmid, user, service_result, label="", notes="", save_clustal=False, primer_by_filename=None):
+def persist_sanger_verification(
+        plasmid,
+        user,
+        service_result,
+        label="",
+        notes="",
+        save_clustal=False,
+        primer_by_filename=None,
+        existing_run=None,
+):
     primer_by_filename = primer_by_filename or {}
     sequencing_datetimes = [
         run_datetime
@@ -2809,17 +2818,51 @@ def persist_sanger_verification(plasmid, user, service_result, label="", notes="
     sequencing_datetime = max(sequencing_datetimes) if sequencing_datetimes else None
     if sequencing_datetime and timezone.is_naive(sequencing_datetime):
         sequencing_datetime = timezone.make_aware(sequencing_datetime)
-    run = SangerVerificationRun.objects.create(
-        plasmid=plasmid,
-        created_by=user,
-        sequencing_datetime=sequencing_datetime,
-        label=label or "",
-        notes=notes or "",
-        parameters=service_result["parameters"],
-        automated_state=service_result["classification"]["state"],
-        automated_reasons=service_result["classification"]["reasons"],
-        combined_metrics={key: value for key, value in service_result["combined"].items() if key != "variants"},
-    )
+    if existing_run is None:
+        run = SangerVerificationRun.objects.create(
+            plasmid=plasmid,
+            created_by=user,
+            sequencing_datetime=sequencing_datetime,
+            label=label or "",
+            notes=notes or "",
+            parameters=service_result["parameters"],
+            automated_state=service_result["classification"]["state"],
+            automated_reasons=service_result["classification"]["reasons"],
+            combined_metrics={key: value for key, value in service_result["combined"].items() if key != "variants"},
+        )
+    else:
+        run = existing_run
+        delete_sanger_run_files(run)
+        SangerVariant.objects.filter(run=run).delete()
+        run.reads.all().delete()
+        run.sequencing_datetime = sequencing_datetime
+        run.parameters = service_result["parameters"]
+        run.automated_state = service_result["classification"]["state"]
+        run.automated_reasons = service_result["classification"]["reasons"]
+        run.combined_metrics = {
+            key: value
+            for key, value in service_result["combined"].items()
+            if key != "variants"
+        }
+        run.clustal_file = None
+        run.manual_decision = ""
+        run.manual_decision_by = None
+        run.manual_decision_at = None
+        run.manual_decision_effective_date = None
+        run.manual_decision_comment = ""
+        run.save(update_fields=[
+            "sequencing_datetime",
+            "parameters",
+            "automated_state",
+            "automated_reasons",
+            "combined_metrics",
+            "clustal_file",
+            "manual_decision",
+            "manual_decision_by",
+            "manual_decision_at",
+            "manual_decision_effective_date",
+            "manual_decision_comment",
+        ])
     saved_reads = {}
     for read_data in service_result["reads"]:
         alignment = read_data.get("alignment") or {}
@@ -2879,6 +2922,46 @@ def persist_sanger_verification(plasmid, user, service_result, label="", notes="
         plasmid.sequencing_clustal_file = run.clustal_file.name
         plasmid.save()
     return run
+
+
+class SangerRerunSourceUnavailable(Exception):
+    """Raised when a saved Sanger run cannot be rebuilt from its source files."""
+
+
+def rerun_sanger_verification(run, user):
+    source_files = [
+        source_file
+        for read in run.reads.all()
+        for source_file in read.files.all()
+    ]
+    if not source_files or any(not source_file.file for source_file in source_files):
+        raise SangerRerunSourceUnavailable()
+
+    uploaded_files = []
+    for source_file in source_files:
+        with source_file.file.open("rb") as handle:
+            uploaded_files.append(SimpleUploadedFile(
+                source_file.original_name,
+                handle.read(),
+                content_type="application/octet-stream",
+            ))
+    plasmid = run.plasmid
+    service_result = process_sanger_files(uploaded_files, str(grab_seq(plasmid)[1]))
+    primer_by_filename = {
+        source_file.original_name: source_file.primer
+        for source_file in source_files
+        if source_file.primer
+    }
+    persist_sanger_verification(
+        plasmid,
+        user,
+        service_result,
+        label=run.label,
+        notes=run.notes,
+        save_clustal=bool(run.clustal_file),
+        primer_by_filename=primer_by_filename,
+        existing_run=run,
+    )
 
 
 def delete_sanger_run_files(run):
@@ -3289,6 +3372,12 @@ def sanger_run_detail(request, plasmid_id, run_id):
         context['upload_done'] = "Sanger sequencing files uploaded and saved."
     if request.GET.get("primer_updated") == "1":
         context['primer_update_done'] = "Primer assignment updated."
+    if request.GET.get("rerun") == "1":
+        context['rerun_done'] = "Sanger run reprocessed successfully."
+    if request.GET.get("rerun_error") == "missing_source":
+        context['rerun_error'] = "The run could not be reprocessed because a stored source file is unavailable."
+    elif request.GET.get("rerun_error") == "failed":
+        context['rerun_error'] = "The run could not be reprocessed. Check the server log for details."
     context.update(sanger_run_display_context(
         plasmid_to_align,
         run,
@@ -3296,6 +3385,36 @@ def sanger_run_detail(request, plasmid_id, run_id):
         focus_read_ids=focus_read_ids,
     ))
     return render(request, 'inventory/plasmid_align_sanger.html', context)
+
+
+@require_member_can_write_or_admin_project_of_plasmid
+def sanger_run_rerun(request, plasmid_id, run_id):
+    if request.method != "POST":
+        raise Http404
+    try:
+        plasmid = Plasmid.objects.get(id=plasmid_id)
+        run = SangerVerificationRun.objects.prefetch_related("reads__files__primer").get(
+            id=run_id,
+            plasmid=plasmid,
+        )
+    except ObjectDoesNotExist:
+        raise Http404
+
+    detail_url = reverse(
+        "sanger_run_detail",
+        kwargs={"plasmid_id": plasmid_id, "run_id": run_id},
+    )
+
+    try:
+        with transaction.atomic():
+            rerun_sanger_verification(run, request.user)
+    except SangerRerunSourceUnavailable:
+        return redirect("{}?rerun_error=missing_source".format(detail_url))
+    except Exception:
+        logger.exception("Sanger run reprocessing failed for run %s", run_id)
+        return redirect("{}?rerun_error=failed".format(detail_url))
+
+    return redirect("{}?rerun=1".format(detail_url))
 
 
 @require_member_can_write_or_admin_project_of_plasmid
@@ -4371,13 +4490,89 @@ def ServicesSanger(request):
         sanger_runs.append(run)
     runs_by_id = {run.id: run for run in sanger_runs}
     sanger_runs = [runs_by_id[run_id] for run_id in page_run_ids if run_id in runs_by_id]
-    return render(request, "inventory/services/sanger/sanger.html", {
+    context = {
         "sanger_runs": sanger_runs,
         "sanger_page": sanger_page,
         "sanger_page_count": total_sanger_pages,
         "sanger_total_count": total_sanger_runs,
         "can_upload_sanger_batch": get_projects_where_member_can(request.user, ["a", "w"]).exists(),
-    })
+    }
+    if request.GET.get("rerun_all") == "1":
+        try:
+            processed = int(request.GET.get("processed", 0))
+            skipped = int(request.GET.get("skipped", 0))
+            failed = int(request.GET.get("failed", 0))
+        except (TypeError, ValueError):
+            processed = skipped = failed = 0
+        context["rerun_all_done"] = (
+            "Reprocessed {} Sanger analyses. Skipped {} without source files; {} failed."
+            .format(processed, skipped, failed)
+        )
+    return render(request, "inventory/services/sanger/sanger.html", context)
+
+
+@require_member_can_write_or_admin_any_project
+def sanger_rerun_all(request):
+    if request.method != "POST":
+        raise Http404
+
+    writable_projects = get_projects_where_member_can(request.user, ["a", "w"])
+    run_queryset = (
+        SangerVerificationRun.objects
+        .filter(plasmid__project__in=writable_projects)
+        .order_by("created_at", "id")
+        .values_list("id", flat=True)
+    )
+
+    if request.POST.get("progress") == "1":
+        run_id = request.POST.get("run_id")
+        if not run_id:
+            run_ids = list(run_queryset)
+            return JsonResponse({
+                "run_ids": [str(run_id) for run_id in run_ids],
+                "total": len(run_ids),
+            })
+
+        try:
+            with transaction.atomic():
+                run = SangerVerificationRun.objects.select_for_update().prefetch_related(
+                    "reads__files__primer"
+                ).get(id=run_id, plasmid__project__in=writable_projects)
+                rerun_sanger_verification(run, request.user)
+        except (SangerVerificationRun.DoesNotExist, ValueError, ValidationError):
+            return JsonResponse({"error": "Sanger run is no longer available."}, status=404)
+        except SangerRerunSourceUnavailable:
+            return JsonResponse({"status": "skipped"})
+        except Exception:
+            logger.exception("Sanger analysis reprocessing failed for run %s", run_id)
+            return JsonResponse({"status": "failed"})
+        return JsonResponse({"status": "processed"})
+
+    processed = 0
+    skipped = 0
+    failed = 0
+    for run_id in run_queryset.iterator():
+        try:
+            with transaction.atomic():
+                run = SangerVerificationRun.objects.select_for_update().prefetch_related(
+                    "reads__files__primer"
+                ).get(id=run_id)
+                rerun_sanger_verification(run, request.user)
+        except SangerRerunSourceUnavailable:
+            skipped += 1
+        except Exception:
+            failed += 1
+            logger.exception("Sanger analysis reprocessing failed for run %s", run_id)
+        else:
+            processed += 1
+
+    status_url = reverse("services-sanger")
+    return redirect("{}?{}".format(status_url, urlencode({
+        "rerun_all": "1",
+        "processed": processed,
+        "skipped": skipped,
+        "failed": failed,
+    })))
 
 
 def sanger_batch_upload(request):

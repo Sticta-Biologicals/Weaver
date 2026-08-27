@@ -3,9 +3,13 @@
 {% block header_object_type %}Services{% endblock %}
 {% block header_object_name %}Sanger sequencing{% endblock %}
 {% block header_object_links %}
-    <a href="{% url 'services-sanger' %}" class="btn btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Refresh" aria-label="Refresh"><i class="bi bi-arrow-clockwise"></i></a>
+    <a href="{% url 'services-sanger' %}" class="btn btn-secondary sanger-header-action-button" role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Refresh" aria-label="Refresh"><i class="bi bi-arrow-clockwise"></i></a>
     {% if can_upload_sanger_batch %}
-    <a href="{% url 'sanger_batch_upload' %}" class="btn btn-outline-primary" role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Upload AB1 batch" aria-label="Upload AB1 batch"><i class="bi bi-upload"></i></a>
+    <form method="POST" action="{% url 'sanger_rerun_all' %}" class="sanger-header-action-form" data-sanger-rerun-progress-form onsubmit="return confirm('Re-run all saved Sanger analyses? This may take some time.');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-warning sanger-header-action-button" data-bs-toggle="tooltip" data-bs-placement="top" title="Re-run all Sanger analyses" aria-label="Re-run all Sanger analyses"><i class="bi bi-arrow-repeat"></i></button>
+    </form>
+    <a href="{% url 'sanger_batch_upload' %}" class="btn btn-outline-primary sanger-batch-upload-button sanger-header-action-button" role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Upload AB1 batch" aria-label="Upload AB1 batch"><i class="bi bi-upload"></i></a>
     {% endif %}
 {% endblock %}
 
@@ -13,6 +17,34 @@
 <style>
     .sanger-services-page {
         padding: 1rem 0 2rem;
+    }
+    form.sanger-header-action-form {
+        display: inline-flex !important;
+        align-items: center;
+        width: auto !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0;
+        background: transparent !important;
+    }
+    .sanger-header-action-form .btn {
+        margin-bottom: 0;
+    }
+    #header-links .sanger-header-action-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.375rem;
+        height: 2.375rem;
+        padding: .375rem 0 !important;
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+    .sanger-batch-upload-button {
+        background-color: #212529;
     }
     .sanger-services-page .table_search {
         margin-bottom: 1.25rem;
@@ -214,6 +246,12 @@
 </style>
 
 <div class="sanger-services-page">
+    {% if rerun_all_done %}
+    <div class="alert alert-info">{{ rerun_all_done }}</div>
+    {% endif %}
+    {% if can_upload_sanger_batch %}
+    <div id="sanger-rerun-progress" class="alert alert-info d-none" role="status" aria-live="polite"></div>
+    {% endif %}
     {% if sanger_runs %}
     {% include "inventory/parts/table_search.html" with object_type="Sanger files" %}
     {% if sanger_page_count > 1 %}
@@ -378,4 +416,76 @@
     <div class="alert alert-secondary">No Sanger sequencing runs are available in your accessible projects.</div>
     {% endif %}
 </div>
+{% if can_upload_sanger_batch %}
+<script>
+(() => {
+    const form = document.querySelector("[data-sanger-rerun-progress-form]");
+    const progress = document.getElementById("sanger-rerun-progress");
+    if (!form || !progress) return;
+
+    const button = form.querySelector("button[type=submit]");
+    const csrfToken = form.querySelector("[name=csrfmiddlewaretoken]").value;
+
+    const updateProgress = (processed, skipped, failed, total) => {
+        const completed = processed + skipped + failed;
+        progress.textContent = `Recalculated ${completed} of ${total} Sanger analyses (processed: ${processed}, skipped: ${skipped}, failed: ${failed}).`;
+    };
+
+    const requestProgress = async (runId) => {
+        const body = new URLSearchParams({progress: "1"});
+        if (runId) body.set("run_id", runId);
+        const response = await fetch(form.action, {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "X-CSRFToken": csrfToken,
+                "X-Requested-With": "XMLHttpRequest",
+            },
+            body,
+        });
+        const payload = await response.json();
+        if (!response.ok || payload.error) {
+            throw new Error(payload.error || "Unable to recalculate Sanger analyses.");
+        }
+        return payload;
+    };
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        button.disabled = true;
+        progress.classList.remove("d-none", "alert-danger");
+        progress.classList.add("alert-info");
+        progress.textContent = "Preparing Sanger analyses...";
+
+        let processed = 0;
+        let skipped = 0;
+        let failed = 0;
+        try {
+            const manifest = await requestProgress();
+            const runIds = manifest.run_ids || [];
+            updateProgress(0, 0, 0, runIds.length);
+            for (const runId of runIds) {
+                const result = await requestProgress(runId);
+                if (result.status === "processed") processed += 1;
+                else if (result.status === "skipped") skipped += 1;
+                else failed += 1;
+                updateProgress(processed, skipped, failed, runIds.length);
+            }
+
+            const url = new URL(window.location.href);
+            url.searchParams.set("rerun_all", "1");
+            url.searchParams.set("processed", processed);
+            url.searchParams.set("skipped", skipped);
+            url.searchParams.set("failed", failed);
+            window.setTimeout(() => window.location.assign(url.toString()), 500);
+        } catch (error) {
+            progress.classList.remove("alert-info");
+            progress.classList.add("alert-danger");
+            progress.textContent = error.message;
+            button.disabled = false;
+        }
+    });
+})();
+</script>
+{% endif %}
 {% endblock %}

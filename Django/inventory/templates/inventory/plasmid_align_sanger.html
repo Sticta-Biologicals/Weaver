@@ -79,6 +79,22 @@
         font-weight: 400;
         transform: none !important;
     }
+    .sanger-action-bar .btn-outline-warning,
+    .sanger-action-bar .btn-outline-danger {
+        background-color: #212529;
+    }
+    .sanger-action-bar .btn-outline-warning:hover,
+    .sanger-action-bar .btn-outline-warning:focus-visible {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #000;
+    }
+    .sanger-action-bar .btn-outline-danger:hover,
+    .sanger-action-bar .btn-outline-danger:focus-visible {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: #fff;
+    }
     .sanger-action-bar form {
         display: inline-flex;
         margin: 0;
@@ -885,6 +901,14 @@
 <div class="alert alert-success">{{ primer_update_done }}</div>
 {% endif %}
 
+{% if rerun_done %}
+<div class="alert alert-success">{{ rerun_done }}</div>
+{% endif %}
+
+{% if rerun_error %}
+<div class="alert alert-danger">{{ rerun_error }}</div>
+{% endif %}
+
 {% if recent_runs and not is_saved_run_view %}
 <div class="d-flex justify-content-between align-items-center mt-4 mb-2 gap-2 flex-wrap">
     <h4 class="mb-0">Saved Sanger runs</h4>
@@ -1256,6 +1280,12 @@
     <a class="btn btn-outline-primary btn-sm" href="{% url 'sanger_run_download' plasmid_id=plasmid.id run_id=run.id kind='variants' %}">Variants</a>
     {% if run.clustal_file %}
     <a class="btn btn-outline-primary btn-sm" href="{% url 'sanger_run_download' plasmid_id=plasmid.id run_id=run.id kind='clustal' %}">Clustal</a>
+    {% endif %}
+    {% if user_can_edit_plasmid %}
+    <form method="POST" action="{% url 'sanger_run_rerun' plasmid_id=plasmid.id run_id=run.id %}" class="sanger-inline-form" onsubmit="return confirm('Re-run this Sanger analysis?');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-warning btn-sm" title="Re-run analysis"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>Re-run analysis</button>
+    </form>
     {% endif %}
     {% if user_can_edit_plasmid %}
     <form method="POST" action="{% url 'sanger_run_delete' plasmid_id=plasmid.id run_id=run.id %}" class="sanger-inline-form" onsubmit="return confirm('Delete this Sanger run and its uploaded files?');">
