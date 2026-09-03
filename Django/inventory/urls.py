@@ -128,6 +128,7 @@ urlpatterns = [
     path('api/plasmid/<uuid:plasmid_id>/primer-matches/', login_required(views.api_plasmid_primer_matches, redirect_field_name='next'), name='api-plasmid-primer-matches'),
     path('api/plasmid/<uuid:plasmid_id>/amplicon-matches/', login_required(views.api_plasmid_amplicon_matches, redirect_field_name='next'), name='api-plasmid-amplicon-matches'),
     path('api/plasmid/<uuid:plasmid_id>/restriction-digests/', login_required(views.api_plasmid_restriction_digests, redirect_field_name='next'), name='api-plasmid-restriction-digests'),
+    path('api/primers/', login_required(views.api_primers, redirect_field_name='next'), name='api-primers'),
     # path('api/plasmids/', views.api_plasmids, name='api-plasmids'),
     path('api/parts/<str:enzyme_name>/<str:assembly_standard>/', login_required(views.api_parts, redirect_field_name='next'), name='api-parts'),
     # path('api/parts/<str:enzyme_name>/<str:assembly_standard>/', views.api_parts, name='api-parts'),

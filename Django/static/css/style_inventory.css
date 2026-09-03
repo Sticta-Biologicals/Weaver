@@ -92,10 +92,10 @@ pre.re {
 }
 
 span.re_left {
-    background: #ffc107;
+    background: rgba(255, 193, 7, 0.35);
 }
 span.re_right {
-    background: #0dcaf0;
+    background: rgba(13, 202, 240, 0.35);
 }
 pre.re span {
     display: inline-block;
@@ -2376,4 +2376,30 @@ span.plasmid-opts:hover {
     .blast-short-field {
         align-items: flex-start;
     }
+}
+.plasmid-pagination {
+    gap: 0 !important;
+}
+
+.plasmid-pagination .page-item {
+    margin: 0 !important;
+}
+
+.plasmid-pagination .page-item:not(:first-child) .page-link {
+    margin-left: -1px !important;
+}
+
+.plasmid-pagination .page-link {
+    margin-bottom: 0 !important;
+    border-radius: 0 !important;
+}
+
+.plasmid-pagination .page-item:first-child .page-link {
+    border-top-left-radius: var(--bs-pagination-border-radius) !important;
+    border-bottom-left-radius: var(--bs-pagination-border-radius) !important;
+}
+
+.plasmid-pagination .page-item:last-child .page-link {
+    border-top-right-radius: var(--bs-pagination-border-radius) !important;
+    border-bottom-right-radius: var(--bs-pagination-border-radius) !important;
 }

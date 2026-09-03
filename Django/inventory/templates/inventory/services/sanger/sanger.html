@@ -38,13 +38,20 @@
         align-items: center;
         justify-content: center;
         width: 2.375rem;
+        min-width: 2.375rem;
+        max-width: 2.375rem;
         height: 2.375rem;
+        min-height: 2.375rem;
+        max-height: 2.375rem;
+        flex: 0 0 2.375rem;
+        box-sizing: border-box;
         padding: .375rem 0 !important;
         margin-bottom: 0;
         vertical-align: middle;
     }
-    .sanger-batch-upload-button {
-        background-color: #212529;
+    #header-links .sanger-header-action-form .sanger-header-action-button:not(:hover):not(:focus):not(:active),
+    #header-links .sanger-batch-upload-button:not(:hover):not(:focus):not(:active) {
+        background-color: #444444;
     }
     .sanger-services-page .table_search {
         margin-bottom: 1.25rem;
@@ -259,6 +266,13 @@
         <ul class="pagination justify-content-end mb-0">
             <li class="page-item{% if sanger_page == 1 %} disabled{% endif %}">
                 {% if sanger_page > 1 %}
+                <a class="page-link" href="?page=1" aria-label="First page">&lt;&lt;</a>
+                {% else %}
+                <span class="page-link">&lt;&lt;</span>
+                {% endif %}
+            </li>
+            <li class="page-item{% if sanger_page == 1 %} disabled{% endif %}">
+                {% if sanger_page > 1 %}
                 <a class="page-link" href="?page={{ sanger_page|add:'-1' }}" aria-label="Previous page">Previous</a>
                 {% else %}
                 <span class="page-link">Previous</span>
@@ -270,6 +284,13 @@
                 <a class="page-link" href="?page={{ sanger_page|add:'1' }}" aria-label="Next page">Next</a>
                 {% else %}
                 <span class="page-link">Next</span>
+                {% endif %}
+            </li>
+            <li class="page-item{% if sanger_page == sanger_page_count %} disabled{% endif %}">
+                {% if sanger_page < sanger_page_count %}
+                <a class="page-link" href="?page={{ sanger_page_count }}" aria-label="Last page">&gt;&gt;</a>
+                {% else %}
+                <span class="page-link">&gt;&gt;</span>
                 {% endif %}
             </li>
         </ul>
@@ -396,6 +417,13 @@
         <ul class="pagination justify-content-end mb-0">
             <li class="page-item{% if sanger_page == 1 %} disabled{% endif %}">
                 {% if sanger_page > 1 %}
+                <a class="page-link" href="?page=1" aria-label="First page">&lt;&lt;</a>
+                {% else %}
+                <span class="page-link">&lt;&lt;</span>
+                {% endif %}
+            </li>
+            <li class="page-item{% if sanger_page == 1 %} disabled{% endif %}">
+                {% if sanger_page > 1 %}
                 <a class="page-link" href="?page={{ sanger_page|add:'-1' }}" aria-label="Previous page">Previous</a>
                 {% else %}
                 <span class="page-link">Previous</span>
@@ -407,6 +435,13 @@
                 <a class="page-link" href="?page={{ sanger_page|add:'1' }}" aria-label="Next page">Next</a>
                 {% else %}
                 <span class="page-link">Next</span>
+                {% endif %}
+            </li>
+            <li class="page-item{% if sanger_page == sanger_page_count %} disabled{% endif %}">
+                {% if sanger_page < sanger_page_count %}
+                <a class="page-link" href="?page={{ sanger_page_count }}" aria-label="Last page">&gt;&gt;</a>
+                {% else %}
+                <span class="page-link">&gt;&gt;</span>
                 {% endif %}
             </li>
         </ul>

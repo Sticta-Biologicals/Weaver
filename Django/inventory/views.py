@@ -402,28 +402,27 @@ class RestrictionEnzymeDelete(DeleteView):
         return reverse('restrictionenzymes') + '?form_result_object_deleted=true'
 
 
+def visible_glycerolstocks_for_request(request):
+    show_from_all_projects = get_show_from_all_projects(request)
+    if show_from_all_projects:
+        return GlycerolStock.objects.filter(
+            project_id__in=get_projects_where_member_can_any(request.user)
+        )
+    return GlycerolStock.objects.filter(project_id=get_current_project_id(request))
+
+
 @require_current_project_set
 def glycerolstocks(request):
     show_from_all_projects = get_show_from_all_projects(request)
-    if show_from_all_projects:
-        glycerolstocks = GlycerolStock.objects.filter(project_id__in=get_projects_where_member_can_any(request.user))
-    else:
-        glycerolstocks = GlycerolStock.objects.filter(project_id=get_current_project_id(request))
+    glycerolstocks = visible_glycerolstocks_for_request(request)
 
-    level_from_table_filters = 0
-    level_to_table_filters = 0
-    hasGlycerolStocks = False
-    for glycerolstock in glycerolstocks:
-        hasGlycerolStocks = True
-        if glycerolstock.plasmid:
-            if glycerolstock.plasmid.level:
-                if glycerolstock.plasmid.level > level_to_table_filters:
-                    level_to_table_filters = glycerolstock.plasmid.level
-                if glycerolstock.plasmid.level < level_from_table_filters:
-                    level_from_table_filters = glycerolstock.plasmid.level
+    level_values = list(glycerolstocks.values_list('plasmid__level', flat=True))
+    level_values = [level for level in level_values if level is not None]
+    level_from_table_filters = min(level_values, default=0)
+    level_to_table_filters = max(level_values, default=0)
     context = {
         'on_current_project_member_can_write_or_admin': on_current_project_member_can_write_or_admin(request),
-        'has_glycerolstocks': hasGlycerolStocks,
+        'has_glycerolstocks': glycerolstocks.exists(),
         'table_filters': get_table_filters(level_from_table_filters, level_to_table_filters),
         'show_from_all_projects': show_from_all_projects
     }
@@ -4132,21 +4131,83 @@ def primer(request, primer_id):
 
 
 def primers(request):
-    primers = visible_primers_for_user(request.user)
-
-    primers = sorted(primers, key=lambda primer: (
-        primer_numeric_id(primer) if primer_numeric_id(primer) is not None else 10**9,
-        primer.name or ""
-    ))
-    for primer in primers:
-        primer.display_idx = primer_numeric_id(primer)
-        primer.display_name = primer_display_name(primer)
-        primer.can_edit = member_can_write_or_admin_primer(primer, request.user)
     context = {
-        'primers': primers,
         'user_can_manage_primers': member_can_write_or_admin_primer(None, request.user),
     }
     return render(request, 'inventory/primers.html', context)
+
+
+def api_primers(request):
+    try:
+        page_size = min(max(int(request.GET.get('page_size', 50)), 1), 100)
+    except (TypeError, ValueError):
+        page_size = 50
+    try:
+        page_number = max(int(request.GET.get('page', 1)), 1)
+    except (TypeError, ValueError):
+        page_number = 1
+
+    search = request.GET.get('q', '').strip()
+    search_field = request.GET.get('search', 'all')
+    normalized_search = re.sub(r'[^A-Za-z0-9]', '', search).lower()
+
+    primers = list(visible_primers_for_user(request.user))
+    def primer_sort_key(primer):
+        display_idx = primer_numeric_id(primer)
+        return (
+            display_idx is None,
+            -(display_idx or 0),
+            primer.name or '',
+        )
+
+    primers.sort(key=primer_sort_key)
+
+    def matches_search(primer):
+        if not normalized_search:
+            return True
+        display_idx = primer_numeric_id(primer)
+        display_name = primer_display_name(primer)
+        if search_field == 'idx':
+            return display_idx is not None and str(display_idx) == normalized_search
+        if search_field == 'name':
+            return normalized_search in re.sub(r'[^A-Za-z0-9]', '', display_name).lower()
+        searchable = ' '.join((
+            str(display_idx or ''),
+            display_name,
+            primer.intended_use or '',
+            primer.sequence_5 or '',
+            primer.sequence_3 or '',
+        ))
+        return normalized_search in re.sub(r'[^A-Za-z0-9]', '', searchable).lower()
+
+    primers = [primer for primer in primers if matches_search(primer)]
+    total = len(primers)
+    start = (page_number - 1) * page_size
+    page_primers = primers[start:start + page_size]
+
+    output = []
+    for primer in page_primers:
+        output.append({
+            'id': str(primer.id),
+            'name': primer.name,
+            'display_idx': primer_numeric_id(primer),
+            'display_name': primer_display_name(primer),
+            'sequence_5': primer.sequence_5,
+            'sequence_3': primer.sequence_3,
+            'fwd_or_rev': primer.fwd_or_rev,
+            'intended_use': primer.intended_use,
+            'can_edit': member_can_write_or_admin_primer(primer, request.user),
+        })
+
+    return JsonResponse({
+        'primers': output,
+        'total': total,
+        'page': page_number,
+        'page_size': page_size,
+        'num_pages': (total + page_size - 1) // page_size,
+        'search': search,
+        'search_field': search_field,
+    })
 
 
 @require_member_can_write_or_admin_any_project
@@ -5278,58 +5339,94 @@ def api_plasmids(request):
 
 @require_member_can_any_current_project
 def api_glycerolstocks(request):
+    try:
+        page_size = min(max(int(request.GET.get('page_size', 50)), 1), 100)
+    except (TypeError, ValueError):
+        page_size = 50
+    try:
+        page_number = max(int(request.GET.get('page', 1)), 1)
+    except (TypeError, ValueError):
+        page_number = 1
+
+    search = request.GET.get('q', '').strip()
+    search_field = request.GET.get('search', 'all')
+    normalized_search = re.sub(r'[^A-Za-z0-9]', '', search).lower()
+    glycerolstocks = visible_glycerolstocks_for_request(request).select_related(
+        'strain', 'plasmid', 'plasmid__type', 'box', 'box__location'
+    ).order_by('strain__name', 'plasmid__name', 'id')
+
+    level_values = list(glycerolstocks.values_list('plasmid__level', flat=True))
+    level_values = [level for level in level_values if level is not None]
+    level_from_table_filters = min(level_values, default=0)
+    level_to_table_filters = max(level_values, default=0)
+
+    def stock_search_values(glycerolstock):
+        plasmid = glycerolstock.plasmid
+        plasmid_name = plasmid.name if plasmid else ''
+        plasmid_idx = str(plasmid.idx) if plasmid and plasmid.idx is not None else ''
+        box_name = glycerolstock.box.name if glycerolstock.box else ''
+        location = str(glycerolstock.box.location) if glycerolstock.box else ''
+        return {
+            'all': ' '.join((
+                str(glycerolstock),
+                plasmid_name,
+                plasmid_idx,
+                box_name,
+                location,
+                glycerolstock.qr_id or '',
+            )),
+            'name': ' '.join((str(glycerolstock), plasmid_name)),
+            'idx': plasmid_idx,
+        }
+
+    visible_stocks = list(glycerolstocks)
+    if normalized_search:
+        filtered_stocks = []
+        for glycerolstock in visible_stocks:
+            values = stock_search_values(glycerolstock)
+            value = values.get(search_field, values['all'])
+            normalized_value = re.sub(r'[^A-Za-z0-9]', '', value).lower()
+            if search_field == 'idx':
+                matches = normalized_value == normalized_search
+            else:
+                matches = normalized_search in normalized_value
+            if matches:
+                filtered_stocks.append(glycerolstock)
+        visible_stocks = filtered_stocks
+
+    total = len(visible_stocks)
+    start = (page_number - 1) * page_size
+    page_stocks = visible_stocks[start:start + page_size]
+
     output = []
-    level_from_table_filters = 0
-    level_to_table_filters = 0
-    if get_show_from_all_projects(request):
-        glycerolstocks = GlycerolStock.objects.filter(
-            project_id__in=get_projects_where_member_can_any(request.user)).order_by('strain', 'plasmid')
-    else:
-        glycerolstocks = GlycerolStock.objects.filter(project_id=get_current_project_id(request)).order_by('strain',
-                                                                                                           'plasmid')
-    for glycerolstock in glycerolstocks:
-        pi = ""
-        pix = ""
-        pn = ""
-        pt = ""
-        pl = ""
-        pcs = ''
-        if glycerolstock.plasmid:
-            if glycerolstock.plasmid.level:
-                if glycerolstock.plasmid.level > level_to_table_filters:
-                    level_to_table_filters = glycerolstock.plasmid.level
-                if glycerolstock.plasmid.level < level_from_table_filters:
-                    level_from_table_filters = glycerolstock.plasmid.level
-            pi = glycerolstock.plasmid.id
-            pix = glycerolstock.plasmid.idx
-            pn = glycerolstock.plasmid.name
-            if glycerolstock.plasmid.type:
-                pt = glycerolstock.plasmid.type.id
-            pl = glycerolstock.plasmid.level
-            pcs = glycerolstock.plasmid.get_check_state()
-        bn = ""
-        bl = ""
-        if glycerolstock.box:
-            bn = glycerolstock.box.name
-            bl = str(glycerolstock.box.location)
+    for glycerolstock in page_stocks:
+        plasmid = glycerolstock.plasmid
+        box = glycerolstock.box
         output.append({
-            'i': glycerolstock.id,
-            'pi': pi,
-            'pix': pix,
-            'pcs': pcs,
-            'pn': pn,
-            'pt': pt,
-            'pl': pl,
+            'i': str(glycerolstock.id),
+            'pi': str(plasmid.id) if plasmid else '',
+            'pix': plasmid.idx if plasmid else '',
+            'pcs': plasmid.get_check_state() if plasmid else '',
+            'pn': plasmid.name if plasmid else '',
+            'pt': plasmid.type_id if plasmid and plasmid.type_id else '',
+            'pl': plasmid.level if plasmid else '',
             's': str(glycerolstock.strain),
             'bc': glycerolstock.box_column,
             'br': glycerolstock.box_row,
-            'bn': bn,
-            'bl': bl,
-            'p': member_can_write_or_admin_gs(glycerolstock, request.user)
+            'bn': box.name if box else '',
+            'bl': str(box.location) if box else '',
+            'qr_id': str(glycerolstock.qr_id),
+            'p': member_can_write_or_admin_gs(glycerolstock, request.user),
         })
     context = {
         'table_filters': get_table_filters(level_from_table_filters, level_to_table_filters),
         'glycerolstocks': output,
+        'total': total,
+        'page': page_number,
+        'page_size': page_size,
+        'num_pages': (total + page_size - 1) // page_size,
+        'search': search,
+        'search_field': search_field,
     }
     return JsonResponse(context, safe=False)
 

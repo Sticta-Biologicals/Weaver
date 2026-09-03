@@ -414,6 +414,80 @@ class GlycerolstockBatchFlowTests(TestCase):
         self.assertFalse(response.context["all_created"])
 
 
+class GlycerolstockListViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="stock-list-user", password="pw")
+        self.project = Project.objects.create(name="Stock List Project", public=False)
+        Membership.objects.create(member=self.user, project=self.project, access_policies="w")
+        self.location = Location.objects.create(name="Stock freezer")
+        self.box = Box.objects.create(name="Stock box", location=self.location)
+        self.strain = Strain.objects.create(name="Stock strain")
+        self.plasmids = [
+            Plasmid.objects.create(
+                idx=idx,
+                name=name,
+                intended_use="Test",
+                project=self.project,
+            )
+            for idx, name in ((101, "Stock A"), (102, "Stock B"), (103, "Stock C"))
+        ]
+        for column, plasmid in enumerate(self.plasmids, start=1):
+            GlycerolStock.objects.create(
+                strain=self.strain,
+                plasmid=plasmid,
+                box=self.box,
+                box_row="A",
+                box_column=column,
+                project=self.project,
+            )
+        self.client.force_login(self.user)
+        self.client.cookies["current_project_id"] = str(self.project.id)
+
+    def test_stocks_view_uses_server_search_and_versioned_asset(self):
+        response = self.client.get(reverse("glycerolstocks"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="glycerolstocks-list" data-server-search="true"')
+        self.assertContains(response, 'placeholder="Search Stocks ..."')
+        self.assertContains(response, 'src="/static/js/glycerolstocks_table.js?version=14"')
+
+    def test_api_glycerolstocks_paginates_in_stable_order(self):
+        response = self.client.get(reverse("api-glycerolstocks"), {"page_size": 2})
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["total"], 3)
+        self.assertEqual(payload["page"], 1)
+        self.assertEqual(payload["page_size"], 2)
+        self.assertEqual(payload["num_pages"], 2)
+        self.assertEqual([stock["pn"] for stock in payload["glycerolstocks"]], ["Stock A", "Stock B"])
+
+        second_page = self.client.get(reverse("api-glycerolstocks"), {
+            "page": 2,
+            "page_size": 2,
+        }).json()
+        self.assertEqual([stock["pn"] for stock in second_page["glycerolstocks"]], ["Stock C"])
+
+    def test_api_glycerolstocks_searches_name_id_and_all_fields(self):
+        response = self.client.get(reverse("api-glycerolstocks"), {
+            "q": "Stock strain",
+            "search": "name",
+        })
+        self.assertEqual(response.json()["total"], 3)
+
+        response = self.client.get(reverse("api-glycerolstocks"), {
+            "q": "102",
+            "search": "idx",
+        })
+        self.assertEqual([stock["pn"] for stock in response.json()["glycerolstocks"]], ["Stock B"])
+
+        response = self.client.get(reverse("api-glycerolstocks"), {
+            "q": "Stock freezer",
+            "search": "all",
+        })
+        self.assertEqual(response.json()["total"], 3)
+
+
 def primer(name, sequence_3, direction):
     return SimpleNamespace(
         id=uuid4(),
@@ -1695,8 +1769,49 @@ class PrimerListViewTests(TestCase):
         response = self.client.get(reverse("primers"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Project-A-F")
-        self.assertContains(response, "Project-B-R")
+        self.assertContains(response, 'id="root-primers"')
+        self.assertContains(response, 'src="/static/js/primers_table.js?version=13"')
+
+    def test_api_primers_paginates_in_descending_display_sort(self):
+        Primer.objects.create(name="3001-Project-C-F", sequence_3="CCCC", fwd_or_rev="f")
+
+        response = self.client.get(reverse("api-primers"), {"page_size": 2})
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["total"], 3)
+        self.assertEqual(payload["page"], 1)
+        self.assertEqual(payload["page_size"], 2)
+        self.assertEqual(payload["num_pages"], 2)
+        self.assertEqual(
+            [primer["display_idx"] for primer in payload["primers"]],
+            [3001, 2001],
+        )
+
+        second_page = self.client.get(reverse("api-primers"), {
+            "page": 2,
+            "page_size": 2,
+        }).json()
+        self.assertEqual([primer["display_idx"] for primer in second_page["primers"]], [1001])
+
+    def test_api_primers_searches_id_name_and_all_fields(self):
+        response = self.client.get(reverse("api-primers"), {
+            "q": "2001",
+            "search": "idx",
+        })
+        self.assertEqual([primer["display_name"] for primer in response.json()["primers"]], ["Project-B-R"])
+
+        response = self.client.get(reverse("api-primers"), {
+            "q": "Project-B",
+            "search": "name",
+        })
+        self.assertEqual([primer["display_name"] for primer in response.json()["primers"]], ["Project-B-R"])
+
+        response = self.client.get(reverse("api-primers"), {
+            "q": "GGGG",
+            "search": "all",
+        })
+        self.assertEqual([primer["display_name"] for primer in response.json()["primers"]], ["Project-B-R"])
 
     def test_primers_view_ignores_project_toggle_cookie(self):
         self.client.cookies["show_from_all_projects"] = "True"
@@ -1704,8 +1819,7 @@ class PrimerListViewTests(TestCase):
         response = self.client.get(reverse("primers"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Project-A-F")
-        self.assertContains(response, "Project-B-R")
+        self.assertContains(response, 'id="root-primers"')
         self.assertNotContains(response, 'id="show_from_all_projects"')
         self.assertContains(response, 'title="Batch upload primers"')
         self.assertContains(response, 'title="Create primer"')
@@ -3027,8 +3141,11 @@ class SangerServicesListTests(TestCase):
         self.assertContains(response, "Sanger limit 654")
         self.assertNotContains(response, "Sanger limit 604")
         self.assertContains(response, 'aria-label="Next page"')
+        self.assertContains(response, 'aria-label="Last page"')
         self.assertNotContains(response, 'aria-label="Previous page"')
+        self.assertNotContains(response, 'aria-label="First page"')
         self.assertEqual(response.content.count(b'aria-label="Next page"'), 2)
+        self.assertEqual(response.content.count(b'aria-label="Last page"'), 2)
 
         second_page = self.client.get(reverse("services-sanger") + "?page=2")
 
@@ -3036,8 +3153,11 @@ class SangerServicesListTests(TestCase):
         self.assertContains(second_page, "Sanger limit 604")
         self.assertNotContains(second_page, "Sanger limit 654")
         self.assertContains(second_page, 'aria-label="Previous page"')
+        self.assertContains(second_page, 'aria-label="First page"')
         self.assertNotContains(second_page, 'aria-label="Next page"')
+        self.assertNotContains(second_page, 'aria-label="Last page"')
         self.assertEqual(second_page.content.count(b'aria-label="Previous page"'), 2)
+        self.assertEqual(second_page.content.count(b'aria-label="First page"'), 2)
 
     def test_user_without_project_membership_sees_no_runs(self):
         outsider = User.objects.create_user(username="sanger-services-outsider", password="pw")
