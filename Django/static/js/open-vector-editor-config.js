@@ -830,6 +830,12 @@ function ampliconRegionRows() {
 	return Array.from(document.querySelectorAll("#amplicon-regions .weaver-amplicon-region-row"));
 }
 
+function ampliconPrimerBindingRegionRows(direction) {
+	return Array.from(document.querySelectorAll(
+		"#amplicon-" + direction + "-binding-regions .weaver-amplicon-region-row"
+	));
+}
+
 function digestRequiredEnzymeButtons() {
 	return Array.from(document.querySelectorAll(".weaver-digest-enzyme-option"));
 }
@@ -953,6 +959,15 @@ function ampliconRegionExists(startValue, endValue) {
 	});
 }
 
+function ampliconPrimerBindingRegionExists(direction, startValue, endValue) {
+	return ampliconPrimerBindingRegionRows(direction).some((row) => {
+		const inputs = row.querySelectorAll("input");
+		const rowStart = inputs[0] ? String(inputs[0].value || "").trim() : "";
+		const rowEnd = inputs[1] ? String(inputs[1].value || "").trim() : "";
+		return rowStart === String(startValue) && rowEnd === String(endValue);
+	});
+}
+
 function addDigestRegion(startValue, endValue) {
 	const container = document.getElementById("digest-regions");
 	if (!container) {
@@ -1005,6 +1020,56 @@ function addDigestRegion(startValue, endValue) {
 
 function addAmpliconRegion(startValue, endValue) {
 	const container = document.getElementById("amplicon-regions");
+	if (!container) {
+		return;
+	}
+	const row = document.createElement("div");
+	row.className = "weaver-digest-region-row weaver-amplicon-region-row";
+	const startInput = document.createElement("input");
+	startInput.className = "form-control form-control-sm";
+	startInput.type = "text";
+	startInput.inputMode = "numeric";
+	startInput.pattern = "[0-9]*";
+	startInput.placeholder = "Start";
+	startInput.value = startValue || "";
+	const endInput = document.createElement("input");
+	endInput.className = "form-control form-control-sm";
+	endInput.type = "text";
+	endInput.inputMode = "numeric";
+	endInput.pattern = "[0-9]*";
+	endInput.placeholder = "End";
+	endInput.value = endValue || "";
+	const useSelectionButton = document.createElement("button");
+	useSelectionButton.type = "button";
+	useSelectionButton.className = "btn btn-sm btn-outline-primary";
+	useSelectionButton.title = "Use active map selection";
+	useSelectionButton.setAttribute("aria-label", "Use active map selection");
+	useSelectionButton.innerHTML = '<i class="bi bi-bounding-box"></i>';
+	useSelectionButton.onclick = () => {
+		const selection = currentOveSelectionForAmplicon();
+		if (!selection) {
+			setPrimerMatchStatus("No active map selection is available.", true);
+			return;
+		}
+		startInput.value = selection.start;
+		endInput.value = selection.end;
+	};
+	const removeButton = document.createElement("button");
+	removeButton.type = "button";
+	removeButton.className = "btn btn-sm btn-outline-secondary";
+	removeButton.title = "Remove region";
+	removeButton.setAttribute("aria-label", "Remove region");
+	removeButton.innerHTML = '<i class="bi bi-trash"></i>';
+	removeButton.onclick = () => row.remove();
+	row.appendChild(startInput);
+	row.appendChild(endInput);
+	row.appendChild(useSelectionButton);
+	row.appendChild(removeButton);
+	container.appendChild(row);
+}
+
+function addAmpliconPrimerBindingRegion(direction, startValue, endValue) {
+	const container = document.getElementById("amplicon-" + direction + "-binding-regions");
 	if (!container) {
 		return;
 	}
@@ -1107,6 +1172,16 @@ function ampliconRequestParams() {
 		};
 	}).filter((region) => String(region.start).trim() && String(region.end).trim());
 	params.set("regions", JSON.stringify(regions));
+	["fwd", "rev"].forEach((direction) => {
+		const bindingRegions = ampliconPrimerBindingRegionRows(direction).map((row) => {
+			const inputs = row.querySelectorAll("input");
+			return {
+				start: inputs[0] ? inputs[0].value : "",
+				end: inputs[1] ? inputs[1].value : ""
+			};
+		}).filter((region) => String(region.start).trim() && String(region.end).trim());
+		params.set(direction + "_binding_regions", JSON.stringify(bindingRegions));
+	});
 	return params;
 }
 
@@ -1617,6 +1692,20 @@ function mountWeaverPrimerToolbar() {
 			addAmpliconRegion(selection.start, selection.end);
 		};
 	}
+	["fwd", "rev"].forEach((direction) => {
+		const addBindingRegionButton = document.getElementById("amplicon-add-" + direction + "-binding-region");
+		if (!addBindingRegionButton) {
+			return;
+		}
+		addBindingRegionButton.onclick = () => {
+			const selection = currentOveSelectionForAmplicon();
+			if (!selection || ampliconPrimerBindingRegionExists(direction, selection.start, selection.end)) {
+				addAmpliconPrimerBindingRegion(direction);
+				return;
+			}
+			addAmpliconPrimerBindingRegion(direction, selection.start, selection.end);
+		};
+	});
 	const ampliconRunSearch = document.getElementById("amplicon-run-search");
 	if (ampliconRunSearch) {
 		ampliconRunSearch.onclick = loadPlasmidAmplicons;

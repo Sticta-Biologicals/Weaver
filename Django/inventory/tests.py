@@ -96,6 +96,7 @@ from inventory.views import fasta_alignment_result
 from inventory.views import fasta_record_from_text
 from inventory.views import fasta_records_from_text
 from inventory.views import amplicon_contains_region
+from inventory.views import amplicon_matches_primer_binding_regions
 from inventory.views import amplicon_matches_any_primer_id
 from inventory.views import amplicon_matches_primer_id
 from inventory.views import optional_int_query_param
@@ -1049,6 +1050,47 @@ class PcrSuggestionTests(SimpleTestCase):
 
         self.assertTrue(amplicon_contains_region(amplicon, inside, 100))
         self.assertFalse(amplicon_contains_region(amplicon, outside, 100))
+
+    def test_amplicon_binding_region_filter_uses_primer_three_prime_position(self):
+        amplicon = {
+            "notes": {
+                "fwd_3prime_position": ["3"],
+                "rev_3prime_position": ["8"],
+            },
+        }
+        fwd_zone = SimpleNamespace(start=3, end=3)
+        rev_zone = SimpleNamespace(start=8, end=8)
+        wrong_zone = SimpleNamespace(start=4, end=7)
+
+        self.assertTrue(amplicon_matches_primer_binding_regions(amplicon, (fwd_zone,), "fwd", 100))
+        self.assertTrue(amplicon_matches_primer_binding_regions(amplicon, (rev_zone,), "rev", 100))
+        self.assertFalse(amplicon_matches_primer_binding_regions(amplicon, (wrong_zone,), "fwd", 100))
+
+    def test_amplicon_binding_region_filter_supports_circular_zones_and_alternatives(self):
+        amplicon = {
+            "notes": {
+                "fwd_3prime_position": ["2"],
+            },
+        }
+        circular_zone = SimpleNamespace(start=90, end=5)
+        alternative_zone = SimpleNamespace(start=2, end=2)
+
+        self.assertTrue(amplicon_matches_primer_binding_regions(amplicon, (circular_zone,), "fwd", 100))
+        self.assertTrue(amplicon_matches_primer_binding_regions(amplicon, (alternative_zone,), "fwd", 100))
+
+    def test_matching_amplicons_record_primer_three_prime_positions(self):
+        amplicons = matching_amplicon_annotations(
+            "AAAACCCCGGGGTTTT",
+            [
+                primer("1-left-F", "AAAA", "f"),
+                primer("2-right-R", "CCCC", "r"),
+            ],
+            min_product_size=1,
+            max_tm_difference=99,
+        )
+
+        self.assertEqual(amplicons[0]["notes"]["fwd_3prime_position"], ["3"])
+        self.assertEqual(amplicons[0]["notes"]["rev_3prime_position"], ["8"])
 
     def test_amplicon_primer_id_filter_matches_either_primer(self):
         amplicon = {"notes": {"fwd_primer_id": ["693"], "rev_primer_id": ["694"]}}

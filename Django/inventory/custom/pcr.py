@@ -897,6 +897,10 @@ def matching_amplicon_annotations(
                     "rev_binding_length": [str(r_hit.get("binding_length", 0))],
                     "fwd_unmatched_5": [f_hit.get("unmatched_5", "")],
                     "rev_unmatched_5": [r_hit.get("unmatched_5", "")],
+                    # These are the positions at which the primer 3' ends
+                    # anneal on the reference sequence (0-based, circular).
+                    "fwd_3prime_position": [str(f_hit["end"] % sequence_length)],
+                    "rev_3prime_position": [str(r_hit["start"] % sequence_length)],
                     "primer_complementarity_severity": [complementarity["severity"]],
                     "primer_complementarity_max": [str(complementarity["max_contiguous"])],
                     "primer_complementarity_3prime": [str(complementarity["max_3prime_contiguous"])],

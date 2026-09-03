@@ -39,6 +39,7 @@ from .custom.restriction_digest import DEFAULT_MIN_FRAGMENTS
 from .custom.restriction_digest import DEFAULT_RESULT_LIMIT
 from .custom.restriction_digest import enzymes_with_effective_cuts
 from .custom.restriction_digest import normalize_regions
+from .custom.restriction_digest import region_contains_position
 from .custom.restriction_digest import serialize_digest_response
 from .custom.primer_access import visible_primers_for_user
 from .custom.genbank_import import GenBankImportError
@@ -1826,6 +1827,20 @@ def amplicon_matches_required_regions(amplicon, regions, sequence_length, flank_
     return all(amplicon_contains_region(amplicon, region, sequence_length, flank_bp) for region in regions)
 
 
+def amplicon_matches_primer_binding_regions(amplicon, regions, direction, sequence_length):
+    """Return whether a primer 3' end falls in one of its allowed regions."""
+    if not regions:
+        return True
+
+    notes = amplicon.get("notes") or {}
+    raw_position = (notes.get(f"{direction}_3prime_position") or [""])[0]
+    try:
+        position = int(raw_position)
+    except (TypeError, ValueError):
+        return False
+    return any(region_contains_position(region, position, sequence_length) for region in regions)
+
+
 def amplicon_matches_primer_id(amplicon, primer_id):
     if not primer_id:
         return True
@@ -1892,6 +1907,16 @@ def api_plasmid_amplicon_matches(request, plasmid_id):
         max_tm_difference = float(request.GET.get('max_tm_diff', 5))
         raw_regions = json.loads(request.GET.get('regions', '[]'))
         required_regions = parse_required_regions(raw_regions, len(str(sequence[1])))
+        raw_fwd_binding_regions = json.loads(request.GET.get('fwd_binding_regions', '[]'))
+        raw_rev_binding_regions = json.loads(request.GET.get('rev_binding_regions', '[]'))
+        required_fwd_binding_regions = parse_required_regions(
+            raw_fwd_binding_regions,
+            len(str(sequence[1])),
+        )
+        required_rev_binding_regions = parse_required_regions(
+            raw_rev_binding_regions,
+            len(str(sequence[1])),
+        )
         raw_primer_ids = []
         for value in request.GET.getlist('primer_ids'):
             raw_primer_ids.extend(value.split(','))
@@ -1928,6 +1953,26 @@ def api_plasmid_amplicon_matches(request, plasmid_id):
                 region_flank_bp,
             )
         ]
+    if required_fwd_binding_regions:
+        candidate_annotations = [
+            amplicon for amplicon in candidate_annotations
+            if amplicon_matches_primer_binding_regions(
+                amplicon,
+                required_fwd_binding_regions,
+                'fwd',
+                len(str(sequence[1])),
+            )
+        ]
+    if required_rev_binding_regions:
+        candidate_annotations = [
+            amplicon for amplicon in candidate_annotations
+            if amplicon_matches_primer_binding_regions(
+                amplicon,
+                required_rev_binding_regions,
+                'rev',
+                len(str(sequence[1])),
+            )
+        ]
     if primer_ids:
         candidate_annotations = [
             amplicon for amplicon in candidate_annotations
@@ -1950,6 +1995,8 @@ def api_plasmid_amplicon_matches(request, plasmid_id):
             'primer_ids': list(primer_ids),
             'region_count': len(required_regions),
             'region_flank_bp': region_flank_bp,
+            'fwd_binding_region_count': len(required_fwd_binding_regions),
+            'rev_binding_region_count': len(required_rev_binding_regions),
         },
     })
 
