@@ -118,6 +118,7 @@ const getNodeProperties = (item) => {
       logicalType,
       uuid: item.uuid,
       colony: item.colony,
+      noColony: item.no_colony,
       status: item.status,
       level: item.level,
       name: item.name,
@@ -161,7 +162,7 @@ const WeaverNode = ({ data, style }) => {
   const isInput = data.logicalType === 'input';
   const isOutput = data.logicalType === 'output';
   const isVerified = data.status === 'V';
-  const colonyText = data.colony ?? 'NS';
+  const colonyText = data.noColony ? 'NC' : (data.colony ?? 'NS');
 
   const handleBaseStyle = {
     width: '6px',
@@ -222,7 +223,7 @@ const WeaverNode = ({ data, style }) => {
       </div>
 
       {isVerified && (
-        <div className="weaver-flow-colony-badge" title="Working colony">
+        <div className="weaver-flow-colony-badge" title={data.noColony ? 'No colony' : 'Working colony'}>
           {colonyText}
         </div>
       )}
@@ -659,8 +660,10 @@ function ExperimentFlow({ experimentId }) {
                     </span>
                     <span className="weaver-flow-stat-name">{plasmid.name}</span>
                     <strong className="weaver-flow-stat-id">{plasmid.weaver_id}</strong>
-                    {plasmid.colony !== null && (
-                      <span className="weaver-flow-stat-colony">c {plasmid.colony}</span>
+                    {(plasmid.colony !== null || plasmid.no_colony) && (
+                      <span className="weaver-flow-stat-colony">
+                        {plasmid.no_colony ? 'NC' : `c ${plasmid.colony}`}
+                      </span>
                     )}
                   </button>
                 ))}

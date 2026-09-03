@@ -273,6 +273,10 @@ class Plasmid(models.Model):
     # validation
 
     working_colony = models.IntegerField(blank=True, null=True)
+    no_colony = models.BooleanField(
+        default=False,
+        help_text="Use when the construct is used directly or comes from synthesis.",
+    )
 
     colonypcr_state = models.IntegerField(choices=CHECK_STATES, blank=True, default=1)
     colonypcr_observations = models.CharField(max_length=1000, blank=True, null=True)
@@ -297,6 +301,8 @@ class Plasmid(models.Model):
     def working_colony_text_short(self):
         if self.reference_sequence:
             return "RS"
+        elif self.no_colony:
+            return "NC"
         elif self.ligation_state != 1:
             return "UC"
         elif self.is_validated():
@@ -313,6 +319,8 @@ class Plasmid(models.Model):
     def working_colony_text(self):
         if self.reference_sequence:
             return "Reference sequence"
+        elif self.no_colony:
+            return "No colony"
         elif self.ligation_state != 1:
             return "Under construction"
         elif self.is_validated():
@@ -325,6 +333,14 @@ class Plasmid(models.Model):
                 return str(self.working_colony) + " (Not validated)"
             else:
                 return "Not set"
+
+    def colony_source_text(self):
+        """Return the explicit colony status without validation state details."""
+        if self.no_colony:
+            return "No colony"
+        if self.working_colony is not None:
+            return "#" + str(self.working_colony)
+        return "Not set"
 
     def is_validated(self):
         if self.reference_sequence:

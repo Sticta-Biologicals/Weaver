@@ -3635,7 +3635,7 @@ def plasmid_deleted(request):
 
 def plasmid_validation_initial_from_payload(validation_payload):
     pattern = re.compile(
-        r'^(?P<weaver_id>\d+)_(?P<colony_number>\d+)_'
+        r'^(?P<weaver_id>\d+)_(?P<colony_number>\d+|none|no[-_]colony)_'
         r'(?P<date>\d{4}-\d{2}-\d{2})_(?P<method>pcr|digest)$',
         re.IGNORECASE
     )
@@ -3649,9 +3649,12 @@ def plasmid_validation_initial_from_payload(validation_payload):
         return None, "Invalid date in validation link"
 
     method = match.group('method').lower()
+    colony_token = match.group('colony_number').lower()
+    no_colony = not colony_token.isdigit()
     initial = {
         'weaver_id': int(match.group('weaver_id')),
-        'working_colony': int(match.group('colony_number')),
+        'working_colony': None if no_colony else int(colony_token),
+        'no_colony': no_colony,
         'ligation_state': 1,
     }
 
@@ -3688,7 +3691,8 @@ def PlasmidValidationFromLink(request, validation_payload):
     if request.method == 'POST':
         post_data = request.POST.copy()
         post_data['ligation_state'] = str(initial['ligation_state'])
-        post_data['working_colony'] = str(initial['working_colony'])
+        post_data['working_colony'] = '' if initial['no_colony'] else str(initial['working_colony'])
+        post_data['no_colony'] = 'on' if initial['no_colony'] else ''
         if initial['method'] == 'pcr':
             post_data['colonypcr_state'] = str(initial['colonypcr_state'])
             post_data['colonypcr_date'] = initial['colonypcr_date'].isoformat()
@@ -5415,6 +5419,7 @@ def _experiment_plasmid_node(plasmid, request):
         'parent': [],
         'status': _experiment_plasmid_status(plasmid),
         'colony': plasmid.working_colony,
+        'no_colony': plasmid.no_colony,
         'url': request.build_absolute_uri(plasmid_url),
         'ligation_raw': plasmid.ligation_raw(),
         'ready_to_build': False,

@@ -77,6 +77,7 @@ from inventory.custom.sanger import latest_confirmation_pair
 from inventory.views import sanger_failed_read_groups
 from inventory.custom.sanger import select_nonredundant_read_candidates
 from inventory.custom.sanger import select_sanger_review_candidates
+from inventory.forms import PlasmidValidationForm
 from inventory.forms import SangerAlignForm
 from inventory.models import Primer
 from inventory.models import Plasmid
@@ -99,6 +100,7 @@ from inventory.views import amplicon_matches_any_primer_id
 from inventory.views import amplicon_matches_primer_id
 from inventory.views import optional_int_query_param
 from inventory.views import plasmid_update_computed_size
+from inventory.views import plasmid_validation_initial_from_payload
 from inventory.views import build_restriction_enzymes
 from inventory.views import run_local_blast
 from inventory.views import sanger_feature_color
@@ -2569,6 +2571,54 @@ class PlasmidValidationSequencingFilesTests(TestCase):
         self.source_file.file.save("forward.ab1", ContentFile(b"AB1DATA"), save=True)
         self.client.force_login(self.user)
         self.client.cookies["current_project_id"] = str(self.project.id)
+
+    def test_validation_can_mark_construct_as_having_no_colony(self):
+        response = self.client.post(
+            reverse("plasmid_validation_edit", kwargs={"plasmid_id": self.plasmid.id}),
+            {
+                "ligation_state": "1",
+                "working_colony": "27",
+                "no_colony": "on",
+                "colonypcr_state": "0",
+                "digestion_state": "0",
+                "sequencing_state": "0",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.plasmid.refresh_from_db()
+        self.assertTrue(self.plasmid.no_colony)
+        self.assertIsNone(self.plasmid.working_colony)
+        self.assertEqual(self.plasmid.colony_source_text(), "No colony")
+        self.assertEqual(self.plasmid.working_colony_text_short(), "NC")
+
+    def test_validation_link_accepts_no_colony_token(self):
+        initial, error = plasmid_validation_initial_from_payload(
+            "503_none_2026-08-20_pcr"
+        )
+
+        self.assertIsNone(error)
+        self.assertIsNone(initial["working_colony"])
+        self.assertTrue(initial["no_colony"])
+
+        response = self.client.get(
+            reverse(
+                "plasmid_validation_from_link",
+                kwargs={"validation_payload": "503_none_2026-08-20_pcr"},
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["form"].initial["no_colony"])
+
+    def test_numeric_validation_link_keeps_colony_behavior(self):
+        initial, error = plasmid_validation_initial_from_payload(
+            "503_7_2026-08-20_pcr"
+        )
+
+        self.assertIsNone(error)
+        self.assertEqual(initial["working_colony"], 7)
+        self.assertFalse(initial["no_colony"])
 
     def test_validation_form_lists_sequencing_file_and_review_links(self):
         response = self.client.get(reverse("plasmid_validation_edit", kwargs={"plasmid_id": self.plasmid.id}))

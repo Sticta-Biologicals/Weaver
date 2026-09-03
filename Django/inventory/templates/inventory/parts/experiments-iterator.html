@@ -16,7 +16,9 @@
         </span>
         {% if plasmid.is_validated %}
             <span class="d-inline-block p-2 text-bg-secondary rounded">
-                {% if plasmid.working_colony != None %}
+                {% if plasmid.no_colony %}
+                    NC
+                {% elif plasmid.working_colony != None %}
                     c<span class="ps-1">{{plasmid.working_colony}}</span>
                 {% else %}
                     NS

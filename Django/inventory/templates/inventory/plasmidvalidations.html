@@ -239,7 +239,7 @@
                     {% endif %}
                </td>
                 {% if k == 'to_sequence' or k == 'to_stock' %}
-                <td class="validation-centered-column validation-working-column">{% if plasmid.working_colony %}{{plasmid.working_colony}}{% else %}Not set{% endif %}</td>
+                <td class="validation-centered-column validation-working-column">{{plasmid.colony_source_text}}</td>
                 {% endif %}
                 {% if k == 'to_ligate' %}
                 <td class="validation-centered-column">

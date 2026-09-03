@@ -256,9 +256,16 @@ class PlasmidEditForm(forms.ModelForm):
 
 
 class PlasmidValidationForm(forms.ModelForm):
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get('no_colony'):
+            cleaned_data['working_colony'] = None
+        return cleaned_data
+
     class Meta:
         model = Plasmid
         fields = ['ligation_state', 'working_colony',
+                  'no_colony',
                   'colonypcr_state', 'colonypcr_date', 'colonypcr_observations',
                   'digestion_state', 'digestion_date', 'digestion_observations',
                   'sequencing_state', 'sequencing_date', 'sequencing_observations']
