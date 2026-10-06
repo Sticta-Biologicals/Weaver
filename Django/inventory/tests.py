@@ -41,7 +41,10 @@ from inventory.custom.pcr import classify_ytk_overhang
 from inventory.custom.pcr import find_primer_binding_hits
 from inventory.custom.pcr import infer_type_iis_overhang
 from inventory.custom.pcr import inferred_primer_parts
+from inventory.custom.pcr import matching_primer_choices
 from inventory.custom.pcr import matching_amplicon_annotations
+from inventory.custom.pcr import compatible_primer_ids
+from inventory.custom.pcr import primer_pair_has_product
 from inventory.custom.pcr import primer_pair_amplicons
 from inventory.custom.pcr import primer_pair_complementarity
 from inventory.custom.pcr import select_non_overlapping_amplicons
@@ -1019,6 +1022,43 @@ class SangerFeatureColorTests(SimpleTestCase):
 
 
 class PcrSuggestionTests(SimpleTestCase):
+    def test_matching_primer_choices_only_returns_primers_that_bind(self):
+        sequence = "AAAACCCCGGGGTTTT"
+        forward = primer("1-left-F", "AAAA", "f")
+        reverse = primer("2-right-R", "CCCC", "r")
+        unrelated = primer("3-unrelated-R", "ACGT", "r")
+
+        choices = matching_primer_choices(sequence, [forward, reverse, unrelated])
+
+        self.assertEqual([choice["id"] for choice in choices], [str(forward.id), str(reverse.id)])
+        self.assertEqual(choices[0]["direction"], "forward")
+        self.assertEqual(choices[1]["direction"], "reverse")
+        self.assertEqual(choices[0]["hit_count"], 1)
+
+    def test_compatible_primer_ids_restricts_to_pairs_that_make_a_product(self):
+        sequence = "AAAACCCCGGGGTTTT"
+        forward = primer("1-left-F", "AAAA", "f")
+        reverse = primer("2-right-R", "CCCC", "r")
+        unrelated = primer("3-unrelated-R", "ACGT", "r")
+
+        compatible = compatible_primer_ids(sequence, forward, [forward, reverse, unrelated])
+
+        self.assertEqual(compatible, [str(reverse.id)])
+        self.assertTrue(primer_pair_has_product(sequence, forward, reverse))
+        self.assertFalse(primer_pair_has_product(sequence, forward, unrelated))
+
+    def test_primer_pair_amplicons_include_full_sequence_and_respect_tm_filter(self):
+        sequence = "AAAACCCCGGGGTTTT"
+        forward = primer("1-left-F", "AAAA", "f")
+        reverse = primer("2-right-R", "CCCC", "r")
+
+        products = primer_pair_amplicons(sequence, forward, reverse, max_tm_difference=99)
+        filtered = primer_pair_amplicons(sequence, forward, reverse, max_tm_difference=1)
+
+        self.assertEqual(products[0]["product_size"], 12)
+        self.assertEqual(products[0]["amplicon_sequence"], "AAAACCCCGGGG")
+        self.assertEqual(filtered, [])
+
     def test_infers_type_iis_overhang_from_full_primer_sequence(self):
         inferred = infer_type_iis_overhang("aaCGTCTCtctccTATGcgtaaaggcgaagag")
 
@@ -1477,6 +1517,135 @@ class PcrSuggestionTests(SimpleTestCase):
         self.assertEqual(complementarity["max_both_3prime_contiguous"], 1)
         self.assertEqual(complementarity["warnings"], [])
         self.assertIn("||", complementarity["alignment"]["match"])
+
+
+class PcrPrimerOptionsApiTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="pcr-options-user", password="pw")
+        self.project = Project.objects.create(name="PCR Options Project", public=False)
+        Membership.objects.create(member=self.user, project=self.project, access_policies="r")
+        self.plasmid = Plasmid.objects.create(
+            idx=900,
+            name="PCR options plasmid",
+            intended_use="Test",
+            project=self.project,
+        )
+        self.forward = Primer.objects.create(name="1-left-F", sequence_3="AAAA", fwd_or_rev="f")
+        self.reverse = Primer.objects.create(name="2-right-R", sequence_3="CCCC", fwd_or_rev="r")
+        self.unrelated = Primer.objects.create(name="3-unrelated-R", sequence_3="ACGT", fwd_or_rev="r")
+        self.client.force_login(self.user)
+
+    def test_selected_forward_returns_only_compatible_reverse_primers(self):
+        with patch("inventory.views.grab_seq", return_value=(True, Seq("AAAACCCCGGGGTTTT"))):
+            response = self.client.get(reverse("api-plasmid-pcr-primer-options", kwargs={
+                "plasmid_id": self.plasmid.id,
+            }), {
+                "primer_id": self.forward.id,
+                "max_tm_diff": "99",
+            })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["compatible_ids"], [str(self.reverse.id)])
+
+    def test_custom_forward_returns_only_compatible_reverse_primers(self):
+        with patch("inventory.views.grab_seq", return_value=(True, Seq("AAAACCCCGGGGTTTT"))):
+            response = self.client.get(reverse("api-plasmid-pcr-primer-options", kwargs={
+                "plasmid_id": self.plasmid.id,
+            }), {
+                "primer_sequence": "AAAA",
+                "direction": "forward",
+                "max_tm_diff": "99",
+            })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["compatible_ids"], [str(self.reverse.id)])
+
+    def test_custom_reverse_returns_only_compatible_forward_primers(self):
+        with patch("inventory.views.grab_seq", return_value=(True, Seq("AAAACCCCGGGGTTTT"))):
+            response = self.client.get(reverse("api-plasmid-pcr-primer-options", kwargs={
+                "plasmid_id": self.plasmid.id,
+            }), {
+                "primer_sequence": "CCCC",
+                "direction": "reverse",
+                "max_tm_diff": "99",
+            })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["compatible_ids"], [str(self.forward.id)])
+
+    def test_pcr_ove_endpoint_returns_selected_amplicon_and_primers(self):
+        with patch("inventory.views.grab_seq", return_value=(True, Seq("AAAACCCCGGGGTTTT"))):
+            response = self.client.get(reverse("api-plasmid-pcr-ove", kwargs={
+                "plasmid_id": self.plasmid.id,
+            }), {
+                "pcr_primer_f": self.forward.id,
+                "pcr_primer_r": self.reverse.id,
+                "min_size": "1",
+                "max_size": "100",
+                "max_tm_diff": "99",
+            })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["amplicon"]["notes"]["product_size"], ["12"])
+        self.assertEqual(len(response.json()["primers"]), 2)
+
+    def test_pcr_ove_endpoint_accepts_custom_primers(self):
+        with patch("inventory.views.grab_seq", return_value=(True, Seq("AAAACCCCGGGGTTTT"))):
+            response = self.client.get(reverse("api-plasmid-pcr-ove", kwargs={
+                "plasmid_id": self.plasmid.id,
+            }), {
+                "pcr_primer_f_seq": "AAAA",
+                "pcr_primer_r_seq": "CCCC",
+                "min_size": "1",
+                "max_size": "100",
+                "max_tm_diff": "99",
+            })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["amplicon"]["notes"]["product_size"], ["12"])
+        self.assertEqual(len(response.json()["primers"]), 2)
+
+    def test_pcr_page_renders_only_primers_that_bind(self):
+        with patch("inventory.views.grab_seq", return_value=(True, Seq("AAAACCCCGGGGTTTT"))):
+            response = self.client.get(reverse("plasmid_pcr", kwargs={
+                "plasmid_id": self.plasmid.id,
+            }))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Forward")
+        self.assertContains(response, "left-F")
+        self.assertContains(response, "right-R")
+        self.assertContains(response, "Active filters: Product size")
+
+    def test_pcr_result_renders_length_and_sequence_on_same_page(self):
+        with patch("inventory.views.grab_seq", return_value=(True, Seq("AAAACCCCGGGGTTTT"))):
+            response = self.client.post(reverse("plasmid_pcr", kwargs={
+                "plasmid_id": self.plasmid.id,
+            }), {
+                "primer_f": self.forward.id,
+                "primer_r": self.reverse.id,
+                "primer_f_seq": "",
+                "primer_r_seq": "",
+                "min_size": "1",
+                "max_size": "100",
+                "max_tm_diff": "99",
+            })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Design PCR")
+        self.assertContains(response, "Forward")
+        self.assertContains(response, "Amplicon length:")
+        self.assertContains(response, "Primers:")
+        self.assertContains(response, "1-left-F")
+        self.assertContains(response, "2-right-R")
+        self.assertContains(response, "pcr-result-copy")
+        self.assertContains(response, "Copy amplicon sequence")
+        self.assertContains(response, "12 bp")
+        self.assertContains(response, "AAAACCCCGGGG")
+        self.assertContains(response, "View in OVE")
+        self.assertNotContains(response, "New PCR")
+        self.assertNotContains(response, "Primer FWD")
+        self.assertNotContains(response, "Primer REV")
 
 
 class AmpliconPrimerFilterApiTests(TestCase):

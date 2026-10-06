@@ -1989,6 +1989,45 @@ async function loadPlasmidPrimerMatches(options = {}) {
 	}
 }
 
+async function loadPcrDesignFromQuery() {
+	if (typeof plasmid_pcr_ove_path === "undefined") {
+		return;
+	}
+	const params = new URLSearchParams(window.location.search);
+	if (!params.has("pcr_primer_f") && !params.has("pcr_primer_f_seq")) {
+		return;
+	}
+	setPrimerMatchStatus("Loading PCR amplicon...");
+	try {
+		const response = await fetch(plasmid_pcr_ove_path + "?" + params.toString(), {
+			headers: {
+				"Accept": "application/json"
+			}
+		});
+		const data = await response.json();
+		if (!response.ok) {
+			setPrimerMatchStatus(data.error || "Unable to load the PCR amplicon.", true);
+			return;
+		}
+		if (!data.amplicon) {
+			setPrimerMatchStatus("The PCR amplicon is not available.", true);
+			return;
+		}
+		editorState.sequenceData = removeWeaverPrimerMatches(editorState.sequenceData);
+		editorState.sequenceData.primers = [
+			...(editorState.sequenceData.primers || []),
+			...(data.primers || [])
+		];
+		weaverAmpliconCandidates = [data.amplicon];
+		weaverNonOverlappingAmplicons = [data.amplicon];
+		weaverAmpliconCandidatesLoaded = true;
+		showAmpliconAnnotations([data.amplicon], "PCR amplicon and selected primers shown on map.");
+		setAmpliconPanelOpen(true);
+	} catch (error) {
+		setPrimerMatchStatus("Unable to load the PCR amplicon.", true);
+	}
+}
+
 async function loadCdsPrimerView() {
 	await loadPlasmidPrimerMatches({cdsOnly: true});
 }
@@ -2003,6 +2042,7 @@ async function sequenceToJson() {
         editor.updateEditor(editorState);
 		stopCircularMapWheelPageScroll();
 		setTimeout(mountWeaverPrimerToolbar, 0);
+		await loadPcrDesignFromQuery();
     } else {
         window.toastr.success("Error parsing plasmid sequence file.");
     }

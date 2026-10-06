@@ -735,6 +735,39 @@ def matching_primer_annotations(sequence, primers):
     return annotations
 
 
+def matching_primer_choices(sequence, primers):
+    """Return the primers that can bind a sequence in a PCR selector shape."""
+    primer_by_uuid = {str(primer.id): primer for primer in primers}
+    choices = {}
+    for annotation in matching_primer_annotations(sequence, primers):
+        notes = annotation.get("notes", {})
+        primer_uuid = (notes.get("weaver_primer_uuid") or [""])[0]
+        primer = primer_by_uuid.get(primer_uuid)
+        if primer is None:
+            continue
+
+        if primer_uuid not in choices:
+            sequence_3 = inferred_primer_parts(primer)["sequence_3"]
+            choices[primer_uuid] = {
+                "id": primer_uuid,
+                "name": display_primer_name(primer),
+                "search_name": primer.name,
+                "display_id": display_primer_id(primer),
+                "direction": "reverse" if primer.fwd_or_rev == "r" else "forward",
+                "hit_count": int((notes.get("weaver_hit_count") or ["0"])[0]),
+                "tm_3": tm_value(sequence_3),
+            }
+
+    return sorted(
+        choices.values(),
+        key=lambda choice: (
+            choice["direction"],
+            choice["name"].lower(),
+            choice["display_id"] if choice["display_id"] is not None else float("inf"),
+        ),
+    )
+
+
 def matching_amplicon_annotations(
         sequence,
         primers,
@@ -937,7 +970,98 @@ def matching_amplicon_annotations(
     return annotations[:max_results]
 
 
-def primer_pair_amplicons(sequence, primer_f, primer_r, min_product_size=1, max_product_size=None):
+def primer_pair_has_product(
+        sequence,
+        primer_f,
+        primer_r,
+        min_product_size=1,
+        max_product_size=None,
+        max_tm_difference=None):
+    """Return whether a primer pair can produce a product without dimer analysis."""
+    sequence = clean_dna(sequence)
+    sequence_length = len(sequence)
+    if not sequence:
+        return False
+
+    fwd_parts = inferred_primer_parts(primer_f)
+    rev_parts = inferred_primer_parts(primer_r)
+    fwd_sequence = fwd_parts["sequence_3"]
+    rev_sequence = rev_parts["sequence_3"]
+    if not fwd_sequence or not rev_sequence:
+        return False
+
+    max_product_size = max_product_size or sequence_length
+    doubled_sequence = sequence + sequence
+    fwd_hits = [
+        hit for hit in find_primer_binding_hits(doubled_sequence, fwd_sequence)
+        if hit["start"] < sequence_length
+    ]
+    rev_hits = [
+        hit for hit in find_primer_binding_hits(doubled_sequence, rev_sequence, is_reverse=True)
+        if hit["start"] < sequence_length
+    ]
+
+    for f_hit in fwd_hits:
+        for r_hit in rev_hits:
+            r_start = r_hit["start"]
+            r_end = r_hit["end"]
+            if r_end < f_hit["start"]:
+                r_start += sequence_length
+                r_end += sequence_length
+
+            template_size = r_end - f_hit["start"] + 1
+            product_size = (
+                len(fwd_parts["sequence_5"]) +
+                len(f_hit.get("unmatched_5", "")) +
+                template_size +
+                len(r_hit.get("unmatched_5", "")) +
+                len(rev_parts["sequence_5"])
+            )
+            tm_difference = abs(tm_value(fwd_sequence) - tm_value(rev_sequence))
+            if (
+                    min_product_size <= product_size <= max_product_size and
+                    (max_tm_difference is None or tm_difference <= max_tm_difference)):
+                return True
+
+    return False
+
+
+def compatible_primer_ids(
+        sequence,
+        selected_primer,
+        primers,
+        min_product_size=1,
+        max_product_size=None,
+        max_tm_difference=None):
+    """Return visible opposite-direction primers that pair with ``selected_primer``."""
+    selected_is_reverse = selected_primer.fwd_or_rev == "r"
+    compatible_ids = []
+    for primer in primers:
+        primer_is_reverse = primer.fwd_or_rev == "r"
+        if str(primer.id) == str(selected_primer.id) or primer_is_reverse == selected_is_reverse:
+            continue
+
+        primer_f = primer if selected_is_reverse else selected_primer
+        primer_r = selected_primer if selected_is_reverse else primer
+        if primer_pair_has_product(
+                sequence,
+                primer_f,
+                primer_r,
+                min_product_size=min_product_size,
+                max_product_size=max_product_size,
+                max_tm_difference=max_tm_difference):
+            compatible_ids.append(str(primer.id))
+
+    return compatible_ids
+
+
+def primer_pair_amplicons(
+        sequence,
+        primer_f,
+        primer_r,
+        min_product_size=1,
+        max_product_size=None,
+        max_tm_difference=None):
     sequence = clean_dna(sequence)
     sequence_length = len(sequence)
     if not sequence:
@@ -981,6 +1105,9 @@ def primer_pair_amplicons(sequence, primer_f, primer_r, min_product_size=1, max_
             )
             if product_size < min_product_size or product_size > max_product_size:
                 continue
+            tm_difference = abs(tm_value(fwd_sequence) - tm_value(rev_sequence))
+            if max_tm_difference is not None and tm_difference > max_tm_difference:
+                continue
 
             display_end = r_end % sequence_length if r_end >= sequence_length else r_end
             key = (f_hit["start"], display_end)
@@ -989,6 +1116,13 @@ def primer_pair_amplicons(sequence, primer_f, primer_r, min_product_size=1, max_
             seen.add(key)
             less_stable_primer_tm = min(tm_value(fwd_sequence), tm_value(rev_sequence))
             template_product_sequence = doubled_sequence[f_hit["start"]:r_end + 1]
+            amplicon_sequence = (
+                fwd_parts["sequence_5"] +
+                f_hit.get("unmatched_5", "") +
+                template_product_sequence +
+                str(Seq(r_hit.get("unmatched_5", "")).reverse_complement()) +
+                str(Seq(rev_parts["sequence_5"]).reverse_complement())
+            )
             product_tm = tm_value(template_product_sequence)
             annealing_tm = recommended_annealing_tm(less_stable_primer_tm, product_tm)
             primer3_dimer = primer_dimer_analysis(primer_f, primer_r, annealing_temp_c=annealing_tm)
@@ -1002,7 +1136,8 @@ def primer_pair_amplicons(sequence, primer_f, primer_r, min_product_size=1, max_
                 "circular": r_end >= sequence_length,
                 "fwd_hit_count": len(fwd_hits),
                 "rev_hit_count": len(rev_hits),
-                "tm_difference": abs(tm_value(fwd_sequence) - tm_value(rev_sequence)),
+                "tm_difference": tm_difference,
+                "amplicon_sequence": amplicon_sequence,
                 "fwd_tm": tm_value(fwd_sequence),
                 "rev_tm": tm_value(rev_sequence),
                 "recommended_annealing_tm": annealing_tm,

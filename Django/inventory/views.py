@@ -22,7 +22,9 @@ from .custom.general import CHECK_STATES
 from .custom.general import LIGATION_STATES
 from .custom.pcr import suggest_pcr_primers
 from .custom.pcr import matching_primer_annotations
+from .custom.pcr import matching_primer_choices
 from .custom.pcr import matching_amplicon_annotations
+from .custom.pcr import compatible_primer_ids
 from .custom.pcr import primer_pair_amplicons
 from .custom.pcr import primer_pair_complementarity
 from .custom.pcr import select_non_overlapping_amplicons
@@ -1914,6 +1916,186 @@ def api_plasmid_primer_matches(request, plasmid_id):
 
 
 @require_member_can_read_project_of_plasmid
+def api_plasmid_pcr_primer_options(request, plasmid_id):
+    try:
+        plasmid_to_match = Plasmid.objects.get(id=plasmid_id)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    sequence = grab_seq(plasmid_to_match)
+    if not sequence[0]:
+        return JsonResponse({
+            'error': sequence[1],
+            'compatible_ids': [],
+        }, status=400)
+
+    try:
+        min_product_size = optional_int_query_param(request, 'min_size', 1)
+        max_product_size = optional_int_query_param(request, 'max_size', len(str(sequence[1])))
+        max_tm_difference = float(request.GET.get('max_tm_diff', 5))
+        if min_product_size < 1 or max_product_size < min_product_size or max_tm_difference < 0:
+            raise ValueError
+    except (TypeError, ValueError):
+        return JsonResponse({
+            'error': 'Bad PCR filter parameters',
+            'compatible_ids': [],
+        }, status=400)
+
+    primers = visible_primers_for_user(request.user)
+    selected_id = str(request.GET.get('primer_id', '')).strip()
+    custom_sequence = str(request.GET.get('primer_sequence', '')).strip()
+    direction = str(request.GET.get('direction', '')).strip().lower()
+    if selected_id:
+        selected_primer = next(
+            (primer for primer in primers if str(primer.id) == selected_id),
+            None,
+        )
+        if selected_primer is None:
+            return JsonResponse({
+                'error': 'Primer is not available',
+                'compatible_ids': [],
+            }, status=400)
+    elif custom_sequence:
+        if direction not in ('forward', 'reverse'):
+            return JsonResponse({
+                'error': 'Custom primer direction is required',
+                'compatible_ids': [],
+            }, status=400)
+        selected_primer = Primer(
+            name='Custom ' + ('F' if direction == 'forward' else 'R'),
+            sequence_3=custom_sequence,
+            sequence_5='',
+            fwd_or_rev='r' if direction == 'reverse' else 'f',
+        )
+    else:
+        return JsonResponse({'compatible_ids': []})
+
+    compatible_ids = compatible_primer_ids(
+        str(sequence[1]),
+        selected_primer,
+        primers,
+        min_product_size=min_product_size,
+        max_product_size=max_product_size,
+        max_tm_difference=max_tm_difference,
+    )
+    return JsonResponse({
+        'selected_id': selected_id,
+        'compatible_ids': compatible_ids,
+        'count': len(compatible_ids),
+        'filters': {
+            'min_size': min_product_size,
+            'max_size': max_product_size,
+            'max_tm_diff': max_tm_difference,
+        },
+    })
+
+
+@require_member_can_read_project_of_plasmid
+def api_plasmid_pcr_ove(request, plasmid_id):
+    try:
+        plasmid_to_match = Plasmid.objects.get(id=plasmid_id)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    sequence = grab_seq(plasmid_to_match)
+    if not sequence[0]:
+        return JsonResponse({'error': sequence[1]}, status=400)
+
+    try:
+        min_product_size = optional_int_query_param(request, 'min_size', 1)
+        max_product_size = optional_int_query_param(request, 'max_size', len(str(sequence[1])))
+        max_tm_difference = float(request.GET.get('max_tm_diff', 5))
+        if min_product_size < 1 or max_product_size < min_product_size or max_tm_difference < 0:
+            raise ValueError
+    except (TypeError, ValueError):
+        return JsonResponse({'error': 'Bad PCR filter parameters'}, status=400)
+
+    visible_primers = visible_primers_for_user(request.user)
+
+    def resolve_primer(direction):
+        primer_id = str(request.GET.get('pcr_primer_' + direction, '')).strip()
+        sequence_value = str(request.GET.get('pcr_primer_' + direction + '_seq', '')).strip()
+        if primer_id:
+            try:
+                primer = visible_primers.filter(id=primer_id).first()
+            except (TypeError, ValueError, ValidationError):
+                primer = None
+            if primer is None:
+                return None, '{} primer is not available'.format(direction.capitalize())
+            return primer, None
+        if sequence_value:
+            return Primer(
+                id='custom_' + direction[0],
+                name='Custom ' + direction[0].upper(),
+                sequence_3=sequence_value,
+                sequence_5='',
+                fwd_or_rev='r' if direction == 'r' else 'f',
+                intended_use='Custom sequence for PCR prediction',
+            ), None
+        direction_label = 'forward' if direction == 'f' else 'reverse'
+        return None, 'No {} primer was provided'.format(direction_label)
+
+    primer_f, error = resolve_primer('f')
+    if error:
+        return JsonResponse({'error': error}, status=400)
+    primer_r, error = resolve_primer('r')
+    if error:
+        return JsonResponse({'error': error}, status=400)
+
+    sequence_text = str(sequence[1])
+    products = primer_pair_amplicons(
+        sequence_text,
+        primer_f,
+        primer_r,
+        min_product_size=min_product_size,
+        max_product_size=max_product_size,
+        max_tm_difference=max_tm_difference,
+    )
+    if not products:
+        return JsonResponse({'error': 'No PCR product matches the selected filters'}, status=400)
+
+    product = products[0]
+    amplicon_annotations = matching_amplicon_annotations(
+        sequence_text,
+        [primer_f, primer_r],
+        min_product_size=min_product_size,
+        max_product_size=max_product_size,
+        max_tm_difference=max_tm_difference,
+    )
+    amplicon = next(
+        (
+            annotation for annotation in amplicon_annotations
+            if annotation.get('start') == product['start']
+            and annotation.get('end') == product['end']
+            and (annotation.get('notes', {}).get('product_size') or [''])[0] == str(product['product_size'])
+        ),
+        None,
+    )
+    if amplicon is None:
+        return JsonResponse({'error': 'Unable to create the OVE amplicon annotation'}, status=500)
+
+    amplicon.setdefault('notes', {})['weaver_pcr_design'] = ['true']
+    amplicon['notes']['fwd_primer_uuid'] = [str(primer_f.id)]
+    amplicon['notes']['rev_primer_uuid'] = [str(primer_r.id)]
+    primer_annotations = matching_primer_annotations(sequence_text, [primer_f, primer_r])
+    selected_primer_annotations = [
+        annotation for annotation in primer_annotations
+        if (
+            annotation.get('forward') and annotation.get('start') == product['start']
+        ) or (
+            not annotation.get('forward') and annotation.get('end') == product['end']
+        )
+    ]
+    if len(selected_primer_annotations) < 2:
+        selected_primer_annotations = primer_annotations
+
+    return JsonResponse({
+        'amplicon': amplicon,
+        'primers': selected_primer_annotations,
+    })
+
+
+@require_member_can_read_project_of_plasmid
 def api_plasmid_amplicon_matches(request, plasmid_id):
     try:
         plasmid_to_match = Plasmid.objects.get(id=plasmid_id)
@@ -2217,13 +2399,21 @@ def plasmid_pcr(request, plasmid_id):
 
     context = {
         'plasmid': plasmid_to_pcr,
-        'show_new_PCR': False,
         'user_can_edit_plasmid': member_can_write_or_admin_plasmid(plasmid_to_pcr, request.user)
     }
 
     sequence = grab_seq(plasmid_to_pcr)
 
     if sequence[0]:
+        visible_primers = visible_primers_for_user(request.user)
+        primer_choices = matching_primer_choices(str(sequence[1]), visible_primers)
+        context['pcr_selector'] = {
+            'forward': [choice for choice in primer_choices if choice['direction'] == 'forward'],
+            'reverse': [choice for choice in primer_choices if choice['direction'] == 'reverse'],
+            'filter_url': reverse('api-plasmid-pcr-primer-options', args=(plasmid_to_pcr.id,)),
+        }
+        context['pcr_form'] = PCRForm(user=request.user)
+
         if request.method == 'GET' and 'start' in request.GET and 'end' in request.GET:
             try:
                 selection_start = int(request.GET.get('start'))
@@ -2236,7 +2426,6 @@ def plasmid_pcr(request, plasmid_id):
                 context['error'] = "Bad PCR design coordinates"
                 return render(request, 'inventory/plasmid_pcr.html', context)
 
-            primers = visible_primers_for_user(request.user)
             context['pcr_design'] = {
                 'start': selection_start,
                 'end': selection_end,
@@ -2246,7 +2435,7 @@ def plasmid_pcr(request, plasmid_id):
                 'max_tm_difference': max_tm_difference,
                 'suggestions': suggest_pcr_primers(
                     str(sequence[1]),
-                    primers,
+                    visible_primers,
                     selection_start,
                     selection_end,
                     margin=margin,
@@ -2256,65 +2445,89 @@ def plasmid_pcr(request, plasmid_id):
             context['pcr_form'] = PCRForm(user=request.user)
 
         if request.method == 'POST':
-            visible_primers = visible_primers_for_user(request.user)
-            if request.POST['primer_f'] != "":
-                primer_f = visible_primers.filter(id=request.POST['primer_f']).first()
+            if request.POST.get('primer_f', '') != "":
+                primer_f = visible_primers.filter(id=request.POST.get('primer_f')).first()
                 if primer_f is None:
                     context['error'] = "Forward primer is not available"
             else:
-                if request.POST['primer_f_seq'] != "":
+                if request.POST.get('primer_f_seq', '') != "":
                     primer_f = Primer(
                         id='custom_f',
                         name='Custom F',
-                        sequence_3=request.POST['primer_f_seq'],
+                        sequence_3=request.POST.get('primer_f_seq'),
                         sequence_5='',
                         fwd_or_rev='f',
                         intended_use='Custom sequence for PCR prediction'
                     )
                 else:
                     context['error'] = "No forward primer set"
-            if request.POST['primer_r'] != "":
-                primer_r = visible_primers.filter(id=request.POST['primer_r']).first()
+            if request.POST.get('primer_r', '') != "":
+                primer_r = visible_primers.filter(id=request.POST.get('primer_r')).first()
                 if primer_r is None:
                     context['error'] = "Reverse primer is not available"
             else:
-                if request.POST['primer_r_seq'] != "":
+                if request.POST.get('primer_r_seq', '') != "":
                     primer_r = Primer(
                         id='custom_r',
                         name='Custom R',
-                        sequence_3=request.POST['primer_r_seq'],
+                        sequence_3=request.POST.get('primer_r_seq'),
                         sequence_5='',
-                        fwd_or_rev='f',
+                        fwd_or_rev='r',
                         intended_use='Custom sequence for PCR prediction'
                     )
                 else:
                     context['error'] = "No forward primer set"
-            if not 'error' in context:
-                context['primer_f'] = primer_f
-                context['primer_r'] = primer_r
-                if primer_r.sequence_5:
-                    context['primer_r_5_rc'] = str(Seq(primer_r.sequence_5).reverse_complement())
-                if primer_r.sequence_3:
-                    context['primer_r_3_rc'] = str(Seq(primer_r.sequence_3).reverse_complement())
-                double_seq = str(sequence[1]) + str(sequence[1])
-                pos_f = re.search(primer_f.sequence_3, double_seq, re.IGNORECASE)
-                if pos_f:
-                    start = pos_f.end()
-                    seq_from_f = double_seq[start:]
-                    pos_r = re.search(context['primer_r_3_rc'], seq_from_f, re.IGNORECASE)
-                    if pos_r:
-                        end = pos_r.start()
-                        context['amplicon'] = seq_from_f[:end].lower()
-                        context['size'] = len(
-                            primer_f.sequence_5 + primer_f.sequence_3 + context['amplicon'] + primer_r.sequence_3 +
-                            primer_r.sequence_5)
-                    else:
-                        context['error'] = "REV primer does not hit template"
+            if 'error' not in context:
+                try:
+                    min_product_size = int(request.POST.get('min_size', 1) or 1)
+                    max_product_size = int(request.POST.get('max_size', len(str(sequence[1]))) or len(str(sequence[1])))
+                    max_tm_difference = float(request.POST.get('max_tm_diff', 5) or 5)
+                    if min_product_size < 1 or max_product_size < min_product_size or max_tm_difference < 0:
+                        raise ValueError
+                except (TypeError, ValueError):
+                    context['error'] = "Bad PCR filter parameters"
                 else:
-                    context['error'] = "FWD primer does not hit template"
-            context['show_new_PCR'] = True
-        elif 'pcr_form' not in context:
-            context['pcr_form'] = PCRForm(user=request.user)
+                    context['pcr_filters'] = {
+                        'min_size': min_product_size,
+                        'max_size': max_product_size,
+                        'max_tm_diff': max_tm_difference,
+                    }
+                    products = primer_pair_amplicons(
+                        str(sequence[1]),
+                        primer_f,
+                        primer_r,
+                        min_product_size=min_product_size,
+                        max_product_size=max_product_size,
+                        max_tm_difference=max_tm_difference,
+                    )
+                    if not products:
+                        context['error'] = "No PCR product matches the selected filters"
+                    else:
+                        product = products[0]
+                        context['primer_f'] = primer_f
+                        context['primer_r'] = primer_r
+                        context['pcr_product'] = product
+                        context['amplicon_sequence'] = product['amplicon_sequence']
+                        context['size'] = product['product_size']
+                        ove_params = {
+                            'pcr_primer_f': str(request.POST.get('primer_f', '')).strip(),
+                            'pcr_primer_r': str(request.POST.get('primer_r', '')).strip(),
+                            'min_size': str(min_product_size),
+                            'max_size': str(max_product_size),
+                            'max_tm_diff': str(max_tm_difference),
+                        }
+                        if not ove_params['pcr_primer_f']:
+                            ove_params['pcr_primer_f_seq'] = str(request.POST.get('primer_f_seq', '')).strip()
+                        if not ove_params['pcr_primer_r']:
+                            ove_params['pcr_primer_r_seq'] = str(request.POST.get('primer_r_seq', '')).strip()
+                        context['pcr_ove_url'] = '{}?{}'.format(
+                            reverse('plasmid_view_edit', args=(plasmid_to_pcr.id,)),
+                            urlencode(ove_params),
+                        )
+                        context['primer_r_5_rc'] = str(Seq(primer_r.sequence_5).reverse_complement()) if primer_r.sequence_5 else ''
+                        context['primer_r_3_rc'] = str(Seq(primer_r.sequence_3).reverse_complement()) if primer_r.sequence_3 else ''
+            if 'error' in context:
+                context['pcr_form'] = PCRForm(user=request.user)
 
     else:
         context['error'] = sequence[1]

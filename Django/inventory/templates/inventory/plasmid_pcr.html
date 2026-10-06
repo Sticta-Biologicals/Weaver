@@ -6,10 +6,8 @@
 
 {% block content %}
 <link rel="stylesheet" type="text/css" media="print" href="{% static 'css/style_inventory_print.css' %}"/>
+<link rel="stylesheet" type="text/css" href="{% static 'css/plasmid_pcr.css' %}"/>
 {% if plasmid %}
-    {% if show_new_PCR %}
-    <a href="{% url 'plasmid_pcr' plasmid_id=plasmid.id %}" class="btn btn-outline-primary" role="button"><i class="bi bi-plus-circle-dotted"></i> New PCR</a>
-    {% endif %}
     {% if pcr_design %}
         <div class="alert alert-light border">
             <h4>PCR suggestions</h4>
@@ -84,129 +82,165 @@
         </div>
     {% endif %}
     {% if pcr_form %}
-        <div id="digest-emnzymes-header">Choose primers to design PCR with:</div>
-        <form id="pcr" action="" method="post">
-            {% csrf_token %}
-            {{pcr_form.as_p}}
-            <input type="submit" value="PCR" class="btn btn-dark">
-        </form>
-    {% else %}
         {% if error %}
         <div id="digest-error" class="alert alert-warning">{{error}}</div>
-        {% else %}
-            <div class="alert alert-light border">
-                <h4>Amplicon size <i class="bi bi-clipboard copy_clipboard" data-cc="{{plasmid}} / {{primer_f.name}} + {{primer_r.name}} / {{size}} bp"></i></h4>
-                <p>{{size}} bp</p>
+        {% endif %}
+        {% if pcr_selector %}
+        <section id="pcr-primer-selector" class="alert alert-light border" data-filter-url="{{pcr_selector.filter_url}}">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h4 class="mb-1">Design PCR</h4>
+                    <p class="mb-0 text-secondary">Select one Forward and one Reverse primer. Only primers that hybridize to this sequence are shown.</p>
+                </div>
+                <span id="pcr-filter-status" class="small text-secondary" aria-live="polite"></span>
             </div>
-            <div class="alert alert-light border">
-            <h4>Sequence</h4>
-            <p class="text-break"><span class="overhang">{{primer_f.sequence_5}}</span>{{primer_f.sequence_3}}{{amplicon}}{{primer_r_3_rc}}<span class="overhang">{{primer_r_5_rc}}</span></p>
-            </div>
-            <div class="alert alert-light border">
-            <h4>Primer FWD</h4>
-            {% with primer_f.sequence_5|add:primer_f.sequence_3 as complete_sequence %}
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th scope="col">Property</th>
-                        <th scope="col">Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">Primer</th>
-                        <td>{{primer_f.name}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Sequence (5' → 3') (5' overhang undelined</th>
-                        <td><span class="overhang">{{primer_f.sequence_5}}</span>{{primer_f.sequence_3}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Length</th>
-                        <td>
-                            {{complete_sequence|length}}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">GC content</th>
-                        <td>{{complete_sequence|gc_content|floatformat:"1"|intcomma}} %</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Tm<span class="table-help_text">According to <a target="_blank"
-                                                                                        href="http://biotools.nubic.northwestern.edu/OligoCalc.html#helpbasic">OligoCalc</a></span>
-                        </th>
-                        <td>{{complete_sequence|tm_value|floatformat:"1"|intcomma}} °C</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Tm 3'</th>
-                        <td>{{primer_f.sequence_3|tm_value|floatformat:"1"|intcomma}} °C</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">FWD or REV</th>
-                        <td>{% if primer_f.fwd_or_rev == 'r' %}REV{% else %}FWD{% endif %}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Intended use</th>
-                        <td>{{primer_f.intended_use}}</td>
-                    </tr>
-                </tbody>
-            </table>
-            {% endwith %}
-            </div>
-            <div class="alert alert-light border">
-            <h4>Primer REV</h4>
-            {% with primer_r.sequence_5|add:primer_r.sequence_3 as complete_sequence %}
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th scope="col">Property</th>
-                        <th scope="col">Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">Primer</th>
-                        <td>{{primer_r.name}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Sequence (5' → 3') (5' overhang undelined</th>
-                        <td><span class="overhang">{{primer_r.sequence_5}}</span>{{primer_r.sequence_3}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Length</th>
-                        <td>
-                            {{complete_sequence|length}}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">GC content</th>
-                        <td>{{complete_sequence|gc_content|floatformat:"1"|intcomma}} %</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Tm<span class="table-help_text">According to <a target="_blank"
-                                                                                        href="http://biotools.nubic.northwestern.edu/OligoCalc.html#helpbasic">OligoCalc</a></span>
-                        </th>
-                        <td>{{complete_sequence|tm_value|floatformat:"1"|intcomma}} °C</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Tm 3'</th>
-                        <td>{{primer_r.sequence_3|tm_value|floatformat:"1"|intcomma}} °C</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">FWD or REV</th>
-                        <td>{% if primer_r.fwd_or_rev == 'r' %}REV{% else %}FWD{% endif %}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Intended use</th>
-                        <td>{{primer_r.intended_use}}</td>
-                    </tr>
-                </tbody>
-            </table>
-            {% endwith %}
+            <form id="pcr-primer-selector-form" action="" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="primer_f" id="pcr-selected-forward" value="">
+                <input type="hidden" name="primer_r" id="pcr-selected-reverse" value="">
+                <input type="hidden" name="primer_f_seq" value="">
+                <input type="hidden" name="primer_r_seq" value="">
+                <button type="button" id="pcr-parameters-toggle" class="pcr-parameters-toggle" aria-expanded="true">
+                    <span>Filters</span>
+                    <i class="bi bi-chevron-up"></i>
+                </button>
+                <div id="pcr-parameters-body" class="pcr-parameters-body">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small mb-1" for="pcr-min-size">Product size</label>
+                            <div class="input-group input-group-sm">
+                                <input id="pcr-min-size" name="min_size" class="form-control" type="number" min="1" value="100" placeholder="Min" aria-label="Minimum product size">
+                                <input id="pcr-max-size" name="max_size" class="form-control" type="number" min="1" value="5000" placeholder="Max" aria-label="Maximum product size">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small mb-1" for="pcr-max-tm-diff">Maximum ΔTm</label>
+                            <div class="input-group input-group-sm">
+                                <input id="pcr-max-tm-diff" name="max_tm_diff" class="form-control" type="number" min="0" step="0.1" value="5" aria-label="Maximum Tm difference">
+                                <span class="input-group-text">°C</span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <button type="button" id="pcr-apply-filters" class="btn btn-sm btn-outline-primary w-100">
+                                <i class="bi bi-play-fill"></i> Find pairs
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="pcr-active-filters" class="small text-secondary mb-3" aria-live="polite">
+                    Active filters: Product size 100–5000 bp · Maximum ΔTm 5 °C
+                </div>
+                <div class="row g-3">
+                    <div class="col-12 col-lg-6">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Forward</h5>
+                            <button type="button" class="btn btn-sm btn-outline-secondary pcr-clear-selection" data-direction="forward">
+                                <i class="bi bi-x-circle"></i> Clear
+                            </button>
+                        </div>
+                        <input type="search" class="form-control form-control-sm mb-2 pcr-primer-search" data-direction="forward" placeholder="Search by name or ID" aria-label="Search Forward primer">
+                        <div class="list-group pcr-primer-list" data-direction="forward" role="radiogroup" aria-label="Forward primers">
+                            {% for choice in pcr_selector.forward %}
+                            <button type="button" class="list-group-item list-group-item-action pcr-primer-option text-start" data-primer-id="{{choice.id}}" data-search="{{choice.search_name}} {{choice.name}} {{choice.display_id|default_if_none:''}}" data-direction="forward" role="radio" aria-checked="false">
+                                <span class="d-flex justify-content-between align-items-center">
+                                    <span>
+                                        {% if choice.display_id %}<span class="badge text-bg-light border fw-light me-1">{{choice.display_id}}</span>{% endif %}
+                                        <span class="fw-semibold">{{choice.name}}</span>
+                                    </span>
+                                    <span class="badge text-bg-success fw-normal">{{choice.hit_count}} hit{{choice.hit_count|pluralize}}</span>
+                                </span>
+                                <small class="text-secondary">Tm 3' {{choice.tm_3|floatformat:"1"}} °C</small>
+                            </button>
+                            {% empty %}
+                            <div class="alert alert-warning mb-0">No Forward primers hybridize to this sequence.</div>
+                            {% endfor %}
+                        </div>
+                        <div class="input-group input-group-sm mt-2">
+                            <span class="input-group-text">Custom F</span>
+                            <input type="text" class="form-control pcr-custom-sequence" id="pcr-custom-forward" data-direction="forward" placeholder="Sequence 5' → 3'" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Reverse</h5>
+                            <button type="button" class="btn btn-sm btn-outline-secondary pcr-clear-selection" data-direction="reverse">
+                                <i class="bi bi-x-circle"></i> Clear
+                            </button>
+                        </div>
+                        <input type="search" class="form-control form-control-sm mb-2 pcr-primer-search" data-direction="reverse" placeholder="Search by name or ID" aria-label="Search Reverse primer">
+                        <div class="list-group pcr-primer-list" data-direction="reverse" role="radiogroup" aria-label="Reverse primers">
+                            {% for choice in pcr_selector.reverse %}
+                            <button type="button" class="list-group-item list-group-item-action pcr-primer-option text-start" data-primer-id="{{choice.id}}" data-search="{{choice.search_name}} {{choice.name}} {{choice.display_id|default_if_none:''}}" data-direction="reverse" role="radio" aria-checked="false">
+                                <span class="d-flex justify-content-between align-items-center">
+                                    <span>
+                                        {% if choice.display_id %}<span class="badge text-bg-light border fw-light me-1">{{choice.display_id}}</span>{% endif %}
+                                        <span class="fw-semibold">{{choice.name}}</span>
+                                    </span>
+                                    <span class="badge text-bg-success fw-normal">{{choice.hit_count}} hit{{choice.hit_count|pluralize}}</span>
+                                </span>
+                                <small class="text-secondary">Tm 3' {{choice.tm_3|floatformat:"1"}} °C</small>
+                            </button>
+                            {% empty %}
+                            <div class="alert alert-warning mb-0">No Reverse primers hybridize to this sequence.</div>
+                            {% endfor %}
+                        </div>
+                        <div class="input-group input-group-sm mt-2">
+                            <span class="input-group-text">Custom R</span>
+                            <input type="text" class="form-control pcr-custom-sequence" id="pcr-custom-reverse" data-direction="reverse" placeholder="Sequence 5' → 3'" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+                <div id="pcr-primer-selector-message" class="small text-secondary mt-3" aria-live="polite">Select both primers to continue.</div>
+                <button type="submit" id="pcr-primer-submit" class="btn btn-dark mt-2" disabled>Design PCR</button>
+            </form>
+        </section>
+        {% endif %}
+        <details class="mt-3">
+            <summary>Use an unlisted primer or custom sequence</summary>
+            <form id="pcr-manual" action="" method="post" class="mt-3">
+                {% csrf_token %}
+                {{pcr_form.as_p}}
+                <input type="submit" value="PCR manual" class="btn btn-outline-dark">
+            </form>
+        </details>
+        {% if pcr_product and not error %}
+            <div class="alert alert-light border pcr-result-card">
+                <div class="pcr-result-heading">
+                    <h4 class="mb-0">PCR result</h4>
+                    <div class="pcr-result-actions">
+                        {% if pcr_ove_url %}
+                        <a href="{{pcr_ove_url}}" class="btn btn-sm btn-outline-primary" role="button" target="_blank" rel="noopener">
+                            <i class="bi bi-bezier2"></i> View in OVE
+                        </a>
+                        {% endif %}
+                        <i class="bi bi-clipboard copy_clipboard pcr-result-copy" data-cc="{{plasmid}} / {{primer_f.name}} + {{primer_r.name}} / {{size}} bp" role="button" tabindex="0" title="Copy PCR summary" aria-label="Copy PCR summary"></i>
+                    </div>
+                </div>
+                <p class="mb-1"><strong>Primers:</strong> FWD {{primer_f.name}} · REV {{primer_r.name}}</p>
+                <p class="fs-5 mb-1"><strong>Amplicon length:</strong> {{size}} bp</p>
+                <p class="mb-0 text-secondary">
+                    Range: {{pcr_product.product_range}} ·
+                    Tm 3': {{pcr_product.fwd_tm|floatformat:"1"}} / {{pcr_product.rev_tm|floatformat:"1"}} °C ·
+                    ΔTm: {{pcr_product.tm_difference|floatformat:"1"}} °C
+                </p>
+                {% if pcr_filters %}
+                <p class="small text-secondary mb-0 mt-1">
+                    Filters: {{pcr_filters.min_size}}–{{pcr_filters.max_size}} bp · Maximum ΔTm {{pcr_filters.max_tm_diff|floatformat:"1"}} °C
+                </p>
+                {% endif %}
+                <hr class="my-3">
+                <div class="pcr-result-heading mb-2">
+                    <h5 class="mb-0">Amplicon sequence</h5>
+                    <i class="bi bi-clipboard copy_clipboard pcr-result-copy" data-cc="{{amplicon_sequence}}" role="button" tabindex="0" title="Copy amplicon sequence" aria-label="Copy amplicon sequence"></i>
+                </div>
+                <p class="text-break font-monospace mb-0">{{amplicon_sequence}}</p>
             </div>
         {% endif %}
+    {% elif error %}
+        <div id="digest-error" class="alert alert-warning">{{error}}</div>
     {% endif %}
 {% else %}
 <div class="alert alert-warning">No plasmid found.</div>
 {% endif %}
+<script defer type="text/javascript" src="{% static 'js/plasmid_pcr.js' %}"></script>
 {% endblock %}

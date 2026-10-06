@@ -126,6 +126,8 @@ urlpatterns = [
     path('api/experiments-map/', login_required(views.api_experiments_map, redirect_field_name='next'), name='api-experiments-map'),
     path('api/plasmids/', login_required(views.api_plasmids, redirect_field_name='next'), name='api-plasmids'),
     path('api/plasmid/<uuid:plasmid_id>/primer-matches/', login_required(views.api_plasmid_primer_matches, redirect_field_name='next'), name='api-plasmid-primer-matches'),
+    path('api/plasmid/<uuid:plasmid_id>/pcr-primer-options/', login_required(views.api_plasmid_pcr_primer_options, redirect_field_name='next'), name='api-plasmid-pcr-primer-options'),
+    path('api/plasmid/<uuid:plasmid_id>/pcr-ove/', login_required(views.api_plasmid_pcr_ove, redirect_field_name='next'), name='api-plasmid-pcr-ove'),
     path('api/plasmid/<uuid:plasmid_id>/amplicon-matches/', login_required(views.api_plasmid_amplicon_matches, redirect_field_name='next'), name='api-plasmid-amplicon-matches'),
     path('api/plasmid/<uuid:plasmid_id>/restriction-digests/', login_required(views.api_plasmid_restriction_digests, redirect_field_name='next'), name='api-plasmid-restriction-digests'),
     path('api/primers/', login_required(views.api_primers, redirect_field_name='next'), name='api-primers'),
