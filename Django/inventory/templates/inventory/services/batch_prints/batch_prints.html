@@ -1,11 +1,12 @@
 {% extends "inventory/parts/base.html" %}
+{% load static %}
 {% load humanize %}
 
 {% block header_object_type %}Services{% endblock %}
 {% block header_object_name %}Batch Prints{% endblock %}
 
 {% block content %}
-<div class="batch-prints-page">
+<div class="batch-prints-page" data-today="{{ today }}">
 
 {% if batch_from_gs %}
 <div class="batch-print-actions">
@@ -33,6 +34,17 @@
             <p>Enter identifiers and preview the labels before printing.</p>
         </div>
         <i class="bi bi-printer batch-print-form-icon" aria-hidden="true"></i>
+    </div>
+    <div class="batch-print-import">
+        <div class="batch-print-import-copy">
+            <span class="batch-print-kicker">NanoDrop</span>
+            <strong>Import copied measurements</strong>
+            <p>Copy the NanoDrop table and paste it here to create one print row per sample.</p>
+        </div>
+        <button type="button" id="batch-paste-nanodrop" class="btn btn-outline-primary text-nowrap">
+            <i class="bi bi-clipboard-plus"></i> Paste NanoDrop data
+        </button>
+        <div id="batch-nanodrop-status" class="batch-nanodrop-status" role="status" aria-live="polite" hidden></div>
     </div>
     <div class="batch-print-table-wrapper">
         <table class="table table-sm batch-print-table">
@@ -192,59 +204,6 @@
 </div>
 {% endif %}
 
-<script>
-    $(document).ready(function(){
-        var today = "{{ today }}";
-
-        function refreshConcentrationState(row) {
-            var type = row.find(".batch-type").val();
-            var concentration = row.find(".batch-concentration");
-            if (type === "glycerolstocks") {
-                concentration.val("");
-                concentration.prop("readonly", true);
-                concentration.attr("placeholder", "N/A");
-            } else {
-                concentration.prop("readonly", false);
-                concentration.attr("placeholder", "ng/ul");
-            }
-        }
-
-        function bindRow(row) {
-            refreshConcentrationState(row);
-            row.find(".batch-type").off("change").on("change", function(){
-                refreshConcentrationState(row);
-            });
-            row.find(".batch-remove-row").off("click").on("click", function(){
-                if ($("#batch-print-rows .batch-print-row").length > 1) {
-                    row.remove();
-                } else {
-                    row.find(".batch-identifier").val("");
-                    row.find(".batch-colony").val("");
-                    row.find(".batch-date").val(today);
-                    row.find(".batch-concentration").val("");
-                    row.find(".batch-type").val("plasmids");
-                    refreshConcentrationState(row);
-                }
-            });
-        }
-
-        $("#batch-print-rows .batch-print-row").each(function(){
-            bindRow($(this));
-        });
-
-        $(".batch-add-entry").on("click", function(){
-            var template = $("#batch-print-rows .batch-print-row:first").clone();
-            template.find(".batch-type").val($(this).data("label-type"));
-            template.find(".batch-identifier").val("");
-            template.find(".batch-colony").val("");
-            template.find(".batch-date").val(today);
-            template.find(".batch-concentration").val("");
-            $("#batch-print-rows").append(template);
-            bindRow(template);
-            template.find(".batch-identifier").focus();
-        });
-
-    });
-</script>
+<script src="{% static 'js/batch_prints.js' %}"></script>
 </div>
 {% endblock %}

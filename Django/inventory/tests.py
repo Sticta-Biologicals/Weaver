@@ -454,6 +454,14 @@ class BatchPrintLabelFormatTests(TestCase):
         self.assertContains(response, "ID 200 ~ c7")
         self.assertNotContains(response, "batch-label-title")
 
+    def test_batch_page_offers_nanodrop_clipboard_import(self):
+        response = self.client.get(reverse("services-batch-prints"))
+
+        self.assertContains(response, 'id="batch-paste-nanodrop"')
+        self.assertContains(response, "Paste NanoDrop data")
+        self.assertNotContains(response, 'id="batch-nanodrop-paste"')
+        self.assertContains(response, 'src="/static/js/batch_prints.js"')
+
 
 class GlycerolstockListViewTests(TestCase):
     def setUp(self):

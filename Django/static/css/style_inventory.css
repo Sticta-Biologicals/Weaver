@@ -1882,6 +1882,68 @@ span.plasmid-opts:hover {
     font-size: .8rem;
 }
 
+.batch-print-import {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: .65rem 1rem;
+    align-items: center;
+    padding: .85rem 1.15rem;
+    border-bottom: 1px solid var(--batch-print-border);
+    background: rgba(var(--bs-primary-rgb), .035);
+}
+
+.batch-print-import-copy {
+    min-width: 0;
+}
+
+.batch-print-import-copy strong {
+    display: block;
+    font-size: .9rem;
+}
+
+.batch-print-import-copy p {
+    margin: .15rem 0 0;
+    color: var(--bs-secondary-color);
+    font-size: .78rem;
+}
+
+.batch-nanodrop-status {
+    grid-column: 1 / -1;
+}
+
+.batch-nanodrop-clipboard-target {
+    position: fixed;
+    top: -100px;
+    left: -100px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.batch-nanodrop-status {
+    margin: 0;
+    color: var(--bs-secondary-color);
+    font-size: .78rem;
+}
+
+.batch-nanodrop-status.is-success {
+    color: var(--bs-success-text-emphasis);
+}
+
+.batch-nanodrop-status.is-warning {
+    color: var(--bs-warning-text-emphasis);
+}
+
+.batch-nanodrop-status.is-ready {
+    color: var(--bs-primary);
+}
+
+.batch-print-import .btn.is-listening {
+    border-color: var(--bs-primary);
+    background: var(--bs-primary-bg-subtle);
+}
+
 .batch-print-form-icon {
     color: var(--bs-primary);
     font-size: 1.8rem;
@@ -2021,6 +2083,14 @@ span.plasmid-opts:hover {
 }
 
 @media (max-width: 768px) {
+
+    .batch-print-import {
+        grid-template-columns: 1fr;
+    }
+
+    .batch-print-import .btn {
+        width: 100%;
+    }
     .batch-print-form-footer {
         align-items: stretch;
         flex-direction: column;
