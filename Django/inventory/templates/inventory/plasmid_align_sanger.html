@@ -1055,10 +1055,13 @@
     {% csrf_token %}
     <div class="sanger-drop-zone mb-3" id="sanger-drop-zone">
         <div class="h5 mb-1">Drop sequencing files here</div>
-        <div class="text-muted">Accepted formats: Sanger (.ab1/.phd.1/.seq) or FASTA (.fa/.fas/.fasta). Select multiple <code>.ab1</code> files together; files with the same base name are grouped as one read.</div>
+        <div class="text-muted">Accepted format: Sanger chromatogram <code>.ab1</code>. Select multiple files together; files with the same base name are grouped as one read.</div>
         <div class="mt-3">
             {{ upload_form.sanger_files }}
         </div>
+        {% for error in upload_form.sanger_files.errors %}
+        <div class="alert alert-danger mt-2 mb-0">{{ error }}</div>
+        {% endfor %}
     </div>
     <div class="row g-3 mb-3">
         <div class="col-md-6">
@@ -1082,7 +1085,7 @@
         <button type="button" class="btn btn-outline-secondary btn-sm" id="sanger-clear-files">Clear queue</button>
     </div>
     <div class="sanger-file-header small text-muted mb-1" aria-hidden="true">
-        <span>File</span><span>Format</span><span>Size</span><span>Read group</span><span>Primer used (required for Sanger files)</span><span></span>
+        <span>File</span><span>Format</span><span>Size</span><span>Read group</span><span>Primer used (optional)</span><span></span>
     </div>
     <div id="sanger-file-list" class="mb-3"></div>
     <div class="alert alert-info" id="sanger-group-summary">No read groups detected yet.</div>
@@ -1103,7 +1106,7 @@
     const primerOptions = primerOptionsElement ? JSON.parse(primerOptionsElement.textContent) : [];
     const dt = new DataTransfer();
     const primerSelections = {};
-    const validSuffixes = [".ab1", ".phd.1", ".seq", ".fa", ".fas", ".fasta"];
+    const validSuffixes = [".ab1"];
 
     function fileKey(file) {
         return `${file.name}|${file.size}|${file.lastModified}`;
@@ -1111,18 +1114,11 @@
 
     function formatOf(name) {
         const lower = name.toLowerCase();
-        if (lower.endsWith(".phd.1")) return "PHD.1";
         if (lower.endsWith(".ab1")) return "AB1";
-        if (lower.endsWith(".seq")) return "SEQ";
-        if (lower.endsWith(".fa") || lower.endsWith(".fas") || lower.endsWith(".fasta")) return "FASTA";
         return "invalid";
     }
     function groupOf(name) {
-        if (name.toLowerCase().endsWith(".phd.1")) return name.slice(0, -6);
-        if (name.toLowerCase().endsWith(".ab1") || name.toLowerCase().endsWith(".seq")) return name.slice(0, -4);
-        if (name.toLowerCase().endsWith(".fasta")) return name.slice(0, -6);
-        if (name.toLowerCase().endsWith(".fas")) return name.slice(0, -4);
-        if (name.toLowerCase().endsWith(".fa")) return name.slice(0, -3);
+        if (name.toLowerCase().endsWith(".ab1")) return name.slice(0, -4);
         return name.replace(/\.[^.]+$/, "");
     }
     function sync() {
@@ -1140,13 +1136,10 @@
             const primerSelect = document.createElement("select");
             primerSelect.className = "form-select form-select-sm";
             primerSelect.name = "primer_id";
-            primerSelect.required = ["AB1", "PHD.1", "SEQ"].includes(format);
             primerSelect.setAttribute("aria-label", `Primer used for ${file.name}`);
             const placeholder = document.createElement("option");
             placeholder.value = "";
-            placeholder.textContent = primerOptions.length
-                ? (primerSelect.required ? "Select primer" : "No primer (FASTA)")
-                : "No primers available";
+            placeholder.textContent = primerOptions.length ? "No primer (optional)" : "No primer selected";
             placeholder.selected = true;
             primerSelect.appendChild(placeholder);
             primerOptions.forEach((primer) => {
@@ -1180,12 +1173,7 @@
         count.textContent = dt.files.length ? `${dt.files.length} file(s) selected` : "No files selected";
         const invalid = Array.from(dt.files).filter((file) => !validSuffixes.some((suffix) => file.name.toLowerCase().endsWith(suffix)));
         summary.className = invalid.length ? "alert alert-warning" : "alert alert-info";
-        const formats = new Set(Array.from(dt.files).map((file) => formatOf(file.name)));
-        const hasFasta = formats.has("FASTA");
-        const hasSanger = ["AB1", "PHD.1", "SEQ"].some((format) => formats.has(format));
-        summary.textContent = hasFasta
-            ? `${dt.files.length} FASTA file(s) selected.${hasSanger ? " Do not mix FASTA and Sanger files in the same upload." : ""}${invalid.length ? " Invalid extensions are present and will be rejected." : ""}`
-            : `${Object.keys(groups).length} Sanger read group(s) detected.${invalid.length ? " Invalid extensions are present and will be rejected." : ""}`;
+        summary.textContent = `${Object.keys(groups).length} AB1 read group(s) detected.${invalid.length ? " Invalid extensions are present. Only .ab1 files are accepted." : ""}`;
     }
     function addFiles(files) {
         Array.from(files).forEach((file) => dt.items.add(file));

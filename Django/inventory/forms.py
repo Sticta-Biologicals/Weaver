@@ -94,15 +94,29 @@ class SangerAlignForm(forms.Form):
     notes = forms.CharField(label="Notes", required=False, widget=forms.Textarea(attrs={"rows": 2}))
     sanger_files = MultipleFileField(label="Sanger files", required=False, widget=MultipleFileInput(attrs={
         "multiple": True,
-        "accept": ".ab1,.phd.1,.seq,.fa,.fas,.fasta",
+        "accept": ".ab1",
         "id": "id_sanger_files",
     }))
     ab1 = forms.FileField(label="AB1 File", required=False)
 
     def clean(self):
         cleaned_data = super().clean()
-        if not self.files.getlist("sanger_files") and not self.files.get("ab1"):
-            raise forms.ValidationError("Upload at least one .ab1, .phd.1, or .seq file.")
+        uploaded_files = list(self.files.getlist("sanger_files"))
+        legacy_ab1 = self.files.get("ab1")
+        if legacy_ab1 and legacy_ab1 not in uploaded_files:
+            uploaded_files.append(legacy_ab1)
+        invalid_files = [
+            uploaded_file.name
+            for uploaded_file in uploaded_files
+            if not uploaded_file.name.lower().endswith(".ab1")
+        ]
+        if invalid_files:
+            self.add_error(
+                "sanger_files",
+                "Only .ab1 files are accepted: {}".format(", ".join(invalid_files)),
+            )
+        if not uploaded_files:
+            raise forms.ValidationError("Upload at least one .ab1 file.")
         return cleaned_data
 
 

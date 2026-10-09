@@ -3549,25 +3549,20 @@ def plasmid_align_sanger(request, plasmid_id):
             legacy_ab1 = request.FILES.get("ab1")
             if legacy_ab1 and legacy_ab1 not in upload_files:
                 upload_files.append(legacy_ab1)
-            fasta_files = [uploaded for uploaded in upload_files if is_fasta_alignment_file(uploaded.name)]
-            if fasta_files:
-                if len(fasta_files) != len(upload_files):
-                    context['error'] = "Do not mix FASTA files with Sanger trace files in the same alignment batch."
-                    context['upload_form'] = form
-                    context['show_upload_form'] = True
-                    return render(request, 'inventory/plasmid_align_sanger.html', context)
-                return render_uploaded_fasta_alignment(request, plasmid_to_align, upload_files, form, context)
             primer_ids = request.POST.getlist("primer_id")
             primers_by_id = {str(primer.id): primer for primer in visible_sanger_primers}
-            if len(primer_ids) != len(upload_files) or any(primer_id not in primers_by_id for primer_id in primer_ids):
-                context['error'] = "Select a valid primer for every sequencing file."
+            if len(primer_ids) > len(upload_files) or any(
+                    primer_id and primer_id not in primers_by_id
+                    for primer_id in primer_ids
+            ):
+                context['error'] = "One or more selected primers are invalid."
                 context['upload_form'] = form
                 context['show_upload_form'] = True
                 return render(request, 'inventory/plasmid_align_sanger.html', context)
-            primer_by_filename = {
-                sanitize_filename(uploaded_file.name): primers_by_id[primer_id]
-                for uploaded_file, primer_id in zip(upload_files, primer_ids)
-            }
+            primer_by_filename = {}
+            for index, primer_id in enumerate(primer_ids):
+                if primer_id:
+                    primer_by_filename[sanitize_filename(upload_files[index].name)] = primers_by_id[primer_id]
             try:
                 plasmid_seq = str(grab_seq(plasmid_to_align)[1])
                 sanger_result = process_sanger_files(upload_files, plasmid_seq)

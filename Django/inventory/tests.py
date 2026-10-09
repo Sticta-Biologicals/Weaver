@@ -2275,14 +2275,14 @@ class SangerVerificationEntryTests(TestCase):
         self.assertNotContains(response, 'id="sanger-run-selector-list"')
         self.assertNotContains(response, "Select one or more Sanger trace files.")
         self.assertContains(response, 'id="sanger-upload-form"')
-        self.assertContains(response, 'accept=".ab1,.phd.1,.seq,.fa,.fas,.fasta"')
+        self.assertContains(response, 'accept=".ab1"')
         self.assertContains(response, "multiple")
         self.assertNotContains(response, 'id="sanger-map"')
         self.assertLess(
             response.content.index(b"Saved Sanger runs"),
             response.content.index(b'id="sanger-upload-form"'),
         )
-        self.assertContains(response, "Select primer")
+        self.assertContains(response, "No primer (optional)")
 
     def test_upload_page_orders_runs_by_sequencing_date(self):
         latest_sequencing_run = SangerVerificationRun.objects.create(
@@ -2318,15 +2318,23 @@ class SangerVerificationEntryTests(TestCase):
             response.content.index(b"older_2025-01-01-12-00-00.ab1"),
         )
 
-    def test_upload_requires_a_primer_for_every_sanger_file(self):
-        response = self.client.post(
-            reverse("plasmid_align_sanger", kwargs={"plasmid_id": self.plasmid.id}),
-            {"sanger_files": SimpleUploadedFile("forward.ab1", b"trace-data")},
-        )
+    def test_upload_does_not_require_a_primer(self):
+        service_result = {
+            "parameters": {},
+            "reads": [],
+            "combined": {"variants": []},
+            "classification": {"state": "NO_DATA", "reasons": []},
+        }
+        with patch("inventory.views.process_sanger_files", return_value=service_result), \
+                patch("inventory.views.grab_seq", return_value=(True, Seq("ACGT" * 20))), \
+                patch("inventory.views.plasmid_seqrecord", return_value=SeqRecord(Seq("ACGT" * 20), id="upload-reference")):
+            response = self.client.post(
+                reverse("plasmid_align_sanger", kwargs={"plasmid_id": self.plasmid.id}),
+                {"sanger_files": SimpleUploadedFile("forward.ab1", b"trace-data")},
+            )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Select a valid primer for every sequencing file.")
-        self.assertFalse(SangerVerificationRun.objects.filter(plasmid=self.plasmid).exists())
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(SangerVerificationRun.objects.filter(plasmid=self.plasmid).exists())
 
     def test_successful_upload_redirects_to_saved_run(self):
         service_result = {
@@ -2456,6 +2464,16 @@ class SangerUploadFormTests(SimpleTestCase):
 
         self.assertTrue(form.is_valid())
         self.assertEqual([file.name for file in form.cleaned_data["sanger_files"]], ["forward.ab1", "reverse.ab1"])
+
+    def test_rejects_non_ab1_files(self):
+        files = MultiValueDict({
+            "sanger_files": [SimpleUploadedFile("forward.seq", b"sequence")],
+        })
+
+        form = SangerAlignForm({}, files)
+
+        self.assertFalse(form.is_valid())
+        self.assertIn("Only .ab1 files are accepted", str(form.errors))
 
 
 class SangerBatchUploadTests(TestCase):
